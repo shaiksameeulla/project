@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+ 
+ 
+ <bean id="unsyncConsumerScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.capgemini.lbs.centralserver.util.UnSyncBranchDataConsumerScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="persist2QueueService" value-ref="persist2QueueService"/>
+				<entry key="activeFileLocation" value="${ftp.home.directory}"/>		
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="unSyncConsumerTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<!-- see the example of method invoking job above -->
+	 	<property name="jobDetail" ref="unsyncConsumerScheduler"/>
+		<!-- 30 seconds   0 */3 00-18,21-23  * * ?" -->
+	  	<property name="cronExpression" value="0 5/10 * * * ?" />
+	</bean>
+	<bean id="unSyncConsumerTriggerFact" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="unSyncConsumerTriggerSCH"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="unSyncConsumerTrigger"/>
+			</list>
+		</property>
+	</bean>
+</beans>

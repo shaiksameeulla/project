@@ -1,0 +1,185 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<properties>
+		<org.springframework.version>3.0.3.RELEASE</org.springframework.version>
+		<tomcat_home>D:\tools\apache-tomcat-6.0.29</tomcat_home>
+		<base_dir>/Source/ctbs_plus_code_workspace</base_dir>
+	</properties>
+	<parent>
+		<groupId>com.dtdc</groupId>
+		<version>1.0-SNAPSHOT</version>
+		<artifactId>app</artifactId>
+	</parent>
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.dtdc</groupId>
+	<artifactId>ctbs-central-server</artifactId>
+	<packaging>war</packaging>
+	<version>1.0-SNAPSHOT</version>
+	<name>CTBS Plus Central Server</name>
+	<url>http://maven.apache.org</url>
+	<!-- Shared version number properties -->
+	
+	<dependencies>
+		<dependency>
+			<groupId>com.offlinejars</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dtdc</groupId>
+			<artifactId>ctbs-framework</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dtdc</groupId>
+			<artifactId>ctbs-common</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dtdc</groupId>
+			<artifactId>ctbs-domain</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dtdc</groupId>
+			<artifactId>ctbs-tranfer-object</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.offlinejars</groupId>
+			<artifactId>jboss-javaee</artifactId>
+			<version>5.0.1.GA</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.offlinejars</groupId>
+			<artifactId>jnp-client</artifactId>
+			<version>4.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.offlinejars</groupId>
+			<artifactId>jboss-logging</artifactId>
+			<version>6.0.0</version>
+		</dependency>
+		<dependency>
+		  <groupId>com.offlinejars</groupId>
+		  <artifactId>spring-orm</artifactId>
+		  <version>${org.springframework.version}</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>com.offlinejars</groupId>
+		  <artifactId>servlet-api</artifactId>
+		  <version>2.4</version>
+		  <scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.offlinejars</groupId>
+		    <artifactId>gson</artifactId>
+		    <version>1.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.offlinejars</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.5.2</version>
+			<scope>runtime</scope>
+		</dependency>
+		
+		<dependency>
+		   <groupId>com.offlinejars</groupId>
+		    <artifactId>c3p0</artifactId>
+		    <version>0.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.offlinejars</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.0.5</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+		    <groupId>com.offlinejars</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20090211</version>
+		</dependency>
+		
+		<dependency>
+		<groupId>com.offlinejars</groupId>
+		<artifactId>hornetq-core-client</artifactId>
+		<version>6.0.0.Final</version>
+		</dependency>
+		
+		<dependency>
+	 <groupId>com.offlinejars</groupId>
+	  <artifactId>hornetq-jms-client</artifactId>
+	  <version>6.0.0.Final</version>
+	</dependency>
+	
+		<dependency>
+	  <groupId>com.offlinejars</groupId>
+	  <artifactId>netty</artifactId>
+	  <version>3.2.1.Final</version>
+	</dependency>
+
+		<dependency>
+			<groupId>com.offlinejars</groupId>
+			<artifactId>org.quartz-all</artifactId>
+			<version>1.8.4</version>
+		</dependency>
+
+	</dependencies>
+	
+	<build>
+		<directory>target</directory>
+		<outputDirectory>target/classes</outputDirectory>
+		<finalName>${artifactId}</finalName>
+		<testOutputDirectory>target/test-classes</testOutputDirectory>
+		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>src/test</testSourceDirectory>
+		<resources>
+	      <resource>
+	        <directory>resources</directory>
+	      </resource>
+	    </resources>
+		
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<warSourceDirectory>
+						${basedir}/WebContent
+					</warSourceDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<copy todir="${base_dir}/ctbs-central-server/WebContent/WEB-INF" file="${base_dir}/config/ctbs-central-server/jdbc.properties" overwrite="true"/>
+								<copy todir="${base_dir}/ctbs-central-server/resources" file="${base_dir}/config/ctbs-central-server/log4j.xml" overwrite="true"/>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		
+	</build>
+</project>

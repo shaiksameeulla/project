@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+	
+	
+	<aop:aspectj-autoproxy />
+	<import resource="dtdc-hibernate.xml"/>
+	<import resource="dtdc-quartz.xml"/>
+	
+	<bean id="xmlParser" class="com.dtdc.bodbadmin.xmlutil.CTBSXMLParser"/>
+	
+	<bean id="messageProp"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		 <property name="location" value="classpath:centralDataExtraction.properties" /> 
+	</bean>
+
+	<bean id="centralBookingService" class="com.dtdc.centralserver.centralservices.booking.CentralBookingServiceImpl">
+		<property name="centralBookingDAO" ref="centralBookingDAO" />
+	</bean>
+	
+	<bean id="centralBookingDAO" class="com.dtdc.centralserver.centraldao.booking.CentralBookingDAOImpl" >
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	 </bean>
+	 
+	 <bean id="populateMacAddressOnStartup" class="com.capgemini.lbs.centralserver.util.PopulateMacAddressOnStartup" init-method="populateMacAddress" scope="singleton">
+	<property name="macAddressDao" ref="macAddressDao" />
+	 </bean>
+	 
+	 <bean id="macAddressDao" class="com.dtdc.centralserver.centraldao.PopulateMacAddressDAOImpl" >
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	 </bean>
+	 <!--DMC  start-->
+	 <bean id="centralDMCService" class="com.dtdc.centralserver.centralservices.dmc.CentralDmcReportServiceImpl">
+    <property name="centralDelvryMangmntCellDAO" ref="centralDMCDAO" />
+     </bean>
+	  <bean id="centralDMCDAO" class="com.dtdc.centralserver.centraldao.dmc.CentralDelvryMangmntCellDAOImpl" >
+    <property name="sessionFactory" ref="hibernateSessionFactory" />
+     </bean>
+	  <!--DMC  end-->
+
+<!--  Quartz and trigger details to populate a hash map-->
+
+	<bean name="populateHashMapJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+	<property name="targetObject" ref="populateMacAddressOnStartup" />
+		<property name="targetMethod" value="populateMacAddress" />
+	</bean>
+	
+	
+	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="populateHashMapJob" />
+		<!-- run every afternoon at 12 pm -->
+		<property name="cronExpression" value="0 0 12 * * ?" />
+	</bean>
+	
+	
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">7</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+		<ref bean="cronTrigger" />
+			<!-- Enable these 5 for BO DB Admin Build
+				<ref bean="bodbAdminCronTrigger" />
+				 <ref bean="bodbAdminGoodsIssueCronTrigger" />
+				<ref bean="bookingCronTrigger" /> 
+				<ref bean="dispatchCronTrigger" />
+				<ref bean="bodbAdminStationaryFranchiseeCronTrigger"/>
+				<ref bean="MasterDataCronTrigger" />
+				<ref bean="bodbAdminBookingFranchiseeCronTrigger"/>
+				<ref bean="bodbAdminManifestFranchiseeCronTrigger"/>
+				<ref bean="bodbAdminDeliveryFranchiseeCronTrigger"/>
+				<ref bean="bodbAdminDispatchFranchiseeCronTrigger"/>
+				<ref bean="MasterDataCronTriggerForFranchisees"/>-->
+				
+			</list>
+		 </property>
+		 
+	  </bean>
+	
+	 <!-- BO DB ADMIN DATA EXTRACTOR: START -->
+	<bean id="centralDataExtractorService" class="com.dtdc.bodbadmin.service.CentralDataExtractorServiceImpl" >
+	 		<property name="messageProp" ref="messageProp" />
+	 		<property name="objectConverter" ref="objectConverter" />
+			<property name="centralDataExtractorDAO" ref="centralDataExtractorDAO" />
+	 </bean>
+	 
+	 <bean id="objectConverter" class="com.dtdc.bodbadmin.utility.DomainToTransferObjectConverter">
+		<property name="centralDataExtractorDAO" ref="centralDataExtractorDAO" />
+	</bean>
+	 <bean id="requestProcessorService" class="com.dtdc.bodbadmin.service.BODBAdminRequestProcessorServiceImpl">
+	 	<property name="messageProp" ref="messageProp" />
+		<property name="centralDataExtractorDAO" ref="centralDataExtractorDAO" />
+	</bean>
+	 
+	 <bean id="centralDataExtractorDAO" class="com.dtdc.bodbadmin.dao.CentralDataExtractorDAOImpl" >
+			<property name="sessionFactory" ref="hibernateSessionFactory" />
+	 </bean>
+	 <!-- BO DB ADMIN DATA EXTRACTOR : END -->
+	 
+	<bean name="extractDataForBranches" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralDataExtractorService" />
+			<property name="targetMethod" value="extractDataForAllBranches" />
+	</bean>
+	
+	<bean id="bodbAdminCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="extractDataForBranches" />
+		<property name="cronExpression" value="0 */25 * * * ?" />
+	</bean>
+	
+	<bean name="extractDataForGoodsIssueBranches" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralDataExtractorService" />
+			<property name="targetMethod" value="extractGoodsIssueDataForAllBranches" />
+	</bean>
+	
+	<bean id="bodbAdminGoodsIssueCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="extractDataForGoodsIssueBranches" />
+		<property name="cronExpression" value="0 */15 * * * ?" />
+	</bean>
+	
+	
+	<bean name="dispatchExtractor" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralDataExtractorService" />
+			<property name="targetMethod" value="extractDataForDispatch" />
+	</bean>
+	
+	<bean id="dispatchCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="dispatchExtractor" />
+		<property name="cronExpression" value="0 45 * * * ?" />
+	</bean>
+	<bean name="bookingExtractor" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralDataExtractorService" />
+			<property name="targetMethod" value="extractDataForBooking" />
+	</bean>
+	<bean id="bookingCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="bookingExtractor" />
+		<property name="cronExpression" value="0 */18 * * * ?" />
+	</bean>
+	<bean id="persist2QueueService" class="com.capgemini.lbs.framework.bs.Persist2QueueServiceImpl">
+		<!-- <property name="fileLocation" value="${ftp.home.directory}" /> commented for error-->
+	</bean>
+	
+	<!-- FR-Module BO-DB-ADMIN START   -->
+	<bean name="extractDataForGoodsIssueFranchisees" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralDataExtractorService" />
+			<property name="targetMethod" value="extractGoodsIssueDataForAllFracnhisees" />
+	</bean>
+	
+	<bean name="extractBookingDataForFranchisees" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralDataExtractorService" />
+			<property name="targetMethod" value="extractBookingDataForFRModule" />
+	</bean>
+	
+	<bean name="extractDeliveryDataForFRModule" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralDataExtractorService" />
+			<property name="targetMethod" value="extractDeliveryDataForFRModule" />
+	</bean>
+	
+	<bean id="bodbAdminStationaryFranchiseeCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="extractDataForGoodsIssueFranchisees" />
+		<property name="cronExpression" value="0 */15 * * * ?" />
+	</bean>
+	
+	<bean id="bodbAdminBookingFranchiseeCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="extractBookingDataForFranchisees" />
+		<property name="cronExpression" value="0 */15 * * * ?" />
+	</bean>
+	
+	<bean id="bodbAdminDeliveryFranchiseeCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="extractDeliveryDataForFRModule" />
+		<property name="cronExpression" value="0 */15 * * * ?" />
+	</bean>
+	
+	<!-- FR-Module Queries END -->
+
+ 	<bean id="centralMasterDataExtractorService" class="com.dtdc.bodbadmin.service.MasterDBSyncServiceImpl" >
+	 		<property name="messageProp" ref="messageProp" />
+	 		<property name="objectConverter" ref="objectConverter" />
+			<property name="centralDataExtractorDAO" ref="centralDataExtractorDAO" />
+	 </bean>
+	 
+	<bean name="extractMasterDataForBranches" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralMasterDataExtractorService" />
+			<property name="targetMethod" value="extractDataForAllBranches" />
+	</bean>
+	<bean id="MasterDataCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="extractMasterDataForBranches" />
+		<property name="cronExpression" value="0 */15 * * * ?" />
+	</bean>
+	
+	<bean name="extractMasterDataForFranchisees" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralMasterDataExtractorService" />
+			<property name="targetMethod" value="extractDataForAllFranchisees" />
+	</bean>
+	<bean id="MasterDataCronTriggerForFranchisees" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="extractMasterDataForFranchisees" />
+		<property name="cronExpression" value="0 */15 * * * ?" />
+	</bean>
+	
+	<bean name="extractManifestDataForFranchisees" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralDataExtractorService" />
+			<property name="targetMethod" value="extractManifestDataForFRModule" />
+	</bean>
+	
+	<bean id="bodbAdminManifestFranchiseeCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="extractManifestDataForFranchisees" />
+		<property name="cronExpression" value="0 */05 * * * ?" />
+	</bean>
+	
+	<bean id="bodbAdminDispatchFranchiseeCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="extractDispatchDataForFranchisees" />
+		<property name="cronExpression" value="0 */15 * * * ?" />
+	</bean>
+		
+	<bean name="extractDispatchDataForFranchisees" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralDataExtractorService" />
+			<property name="targetMethod" value="extractDispatchDataForFRModule" />
+	</bean>
+	
+</beans>

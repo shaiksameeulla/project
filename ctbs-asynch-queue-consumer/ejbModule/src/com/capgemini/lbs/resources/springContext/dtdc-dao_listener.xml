@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<!-- For Booking Start -->
+
+	<bean id="cashBookingMDBDAO" class="src.com.dtdc.mdbDao.booking.CashBookingMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+
+	<bean id="franchiseeBookingDAO" class="src.com.dtdc.mdbDao.booking.FranchiseeBookingMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+
+	<bean id="mnpBookingDAO" class="src.com.dtdc.mdbDao.booking.MnpBookingMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+
+	<bean id="dpBookingDAO"
+		class="src.com.dtdc.mdbDao.booking.DirectPartyBookingMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+
+	<!-- For Booking End -->
+
+	<!--<bean id="vehicleManifestMDBDAO" class="src.com.dtdc.mdbDao.manifest.VehicleManifestMDBDAOImpl"> 
+		<property name="sessionFactory" ref="hibernateSessionFactory" /> </bean> -->
+	<bean id="purchaseMBDDAO" class="src.com.dtdc.mdbDao.purchase.PurchaseMBDDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="storeReqSlipMBDDAO" class="src.com.dtdc.mdbDao.purchase.StoreReqSlipMBDDAOImpl">
+        <property name="sessionFactory" ref="hibernateSessionFactory" />
+    </bean>
+
+	<!-- For Outgoing Manifest -->
+	<bean id="ctbsApplicationMDBDAO" class="src.com.dtdc.mdbServices.CTBSApplicationMDBDAOImpl">
+        <property name="sessionFactory" ref="hibernateSessionFactory" />
+    </bean>
+
+	<bean id="outgoingManifestMDBDAO" class="src.com.dtdc.mdbDao.manifest.OutgoingManifestMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+
+	<bean id="agentManifestMDBDAO"
+		class="src.com.dtdc.mdbDao.manifest.AgentManifestIntlMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<!-- For Manifest Module : START -->
+	
+	<bean id="bagManifestMDBDAO"
+		class="src.com.dtdc.mdbDao.manifest.BagManifestMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="selfSectorManifestMDBDAO"
+		class="src.com.dtdc.mdbDao.manifest.SelfSectorManifestMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="paperWorkManifestMDBDAO"
+		class="src.com.dtdc.mdbDao.manifest.PaperWorkManifestMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="packetManifestMDBDAO"
+		class="src.com.dtdc.mdbDao.manifest.PacketManifestMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<!-- For Manifest Module : END -->
+
+	<!-- For Delivey Module -->
+
+	<bean id="deliveryManifestMDBDAO" class="src.com.dtdc.mdbDao.delivery.DeliveryManifestMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="pickUpMDBDAO" class="src.com.dtdc.mdbDao.pickup.PickUpMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<!-- MOVED TO CTBS-CONFIG
+	<bean id="agentSoftBillDao" class="src.com.dtdc.mdbDao.invoice.AgentSoftBillMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	 -->
+	 
+	<bean id="dispatchMDBDao" class="src.com.dtdc.mdbDao.dispatch.DispatchMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<!-- Entry Tax -->
+	
+    <bean id="goodsIssueMBDDAO" class="src.com.dtdc.mdbDao.purchase.GoodsIssueMBDDAOImpl">
+        <property name="sessionFactory" ref="hibernateSessionFactory" />
+    </bean>
+     <bean id="miscExpenceDao" class="src.com.dtdc.mdbDao.expense.MiscExpenseMDBDAOImpl">
+        <property name="sessionFactory" ref="hibernateSessionFactory" />
+    </bean>
+    <bean id="podDao" class="src.com.dtdc.mdbDao.manifest.PODMDBDAOImpl">
+        <property name="sessionFactory" ref="hibernateSessionFactory" />
+    </bean>
+    <!-- DMC DAO Configurations start -->
+     <bean id="delvryMangmntCellDAO" class="src.com.dtdc.mdbDao.dmc.DelvryMangmntCellMDBDAOImpl">
+          <property name="sessionFactory" ref="hibernateSessionFactory" />
+    </bean>
+    <!-- DMC DAO Configurations End -->
+    <!-- HeldUp/Release DAO Configurations start -->
+     <bean id="heldUpReleaseDAO" class="src.com.dtdc.mdbDao.heldup.HeldUpReleaseMDBDAOImpl">
+          <property name="sessionFactory" ref="hibernateSessionFactory" />
+    </bean>
+    <!-- HeldUp/Release DAO Configurations End -->
+	
+	<!--Octroi DAO Configurations start -->
+     <bean id="octroiDAO" class="src.com.dtdc.mdbDao.entrytax.EntryTaxMDBDAOImpl">
+          <property name="sessionFactory" ref="hibernateSessionFactory" />
+    </bean>
+    <!-- Octroi DAO Configurations End -->
+    
+	<!--DRS/NDRS DAO Configurations start -->
+	<bean id="deliveryRunMDBDAO" class="src.com.dtdc.mdbDao.delivery.DeliveryRunMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="nonDeliveryRunMDBDAO" class="src.com.dtdc.mdbDao.delivery.NonDeliveryRunMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<!--DRS/NDRS DAO Configurations END -->
+	
+    <bean id="masterBagManifestMDBDAO" class="src.com.dtdc.mdbDao.manifest.MasterBagManifestMDBDAOImpl"> 
+      <property name="sessionFactory" ref="hibernateSessionFactory" />
+    </bean>
+    
+    <bean id="rtoManifestIncomingMDBDAO" class="src.com.dtdc.mdbDao.manifest.RTOManifestIncomingMDBDAOImpl">
+       <property name="sessionFactory" ref="hibernateSessionFactory" />
+    </bean>
+    
+    <bean id="rtoManifestOutgoingMDBDAO" class="src.com.dtdc.mdbDao.manifest.RTOManifestOutgoingMDBDAOImpl">
+       <property name="sessionFactory" ref="hibernateSessionFactory" />
+    </bean>
+    <bean id="splCustomerBookingDAO" class="src.com.dtdc.mdbDao.booking.SplCustomerBookingDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean> 
+    
+    <bean id="franchiseeBookingIntlMDBDAO" class="src.com.dtdc.mdbDao.booking.FranchiseeBookingIntlMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+    
+    <bean id="directPartyBookingIntlMDBDAO" class="src.com.dtdc.mdbDao.booking.DirectPartyBookingIntlMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean> 
+	
+	<bean id="cashBookingIntlMDBDAO" class="src.com.dtdc.mdbDao.booking.CashBookingIntlMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean> 
+	
+	<bean id="bookingMDBDAO" class="src.com.dtdc.mdbDao.booking.BookingMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean> 
+            	   
+	<bean id="roboManifestMDBDAO" class="src.com.dtdc.mdbDao.manifest.ROBOManifestMDBDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+</beans>

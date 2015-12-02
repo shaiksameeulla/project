@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" 
+xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" 
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+
+  <display-name>ctbs-central-server</display-name>
+    
+<context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+                /WEB-INF/springCtx/applicationContext*.xml
+        </param-value>
+  </context-param>
+  
+   <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+ 
+  <!-- 
+ 	Queue Test Servlet 
+   -->
+   
+  <servlet>
+    <servlet-name>QueueTestServlet</servlet-name>
+    <servlet-class>com.capgemini.lbs.centralserver.test.QueueTestServlet</servlet-class>
+  </servlet>
+  
+   <!-- Login servlet handles login request -->
+   <servlet>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>com.capgemini.lbs.centralserver.servlets.LoginServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/login.ht</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>QueueTestServlet</servlet-name>
+    <url-pattern>/QueueTestServlet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- Remote service servlet  -->
+   <servlet>
+    <servlet-name>RemoteServiceFacade</servlet-name>
+    <servlet-class>com.capgemini.lbs.centralserver.servlets.RemoteHTTPServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+   <servlet-mapping>
+    <servlet-name>RemoteServiceFacade</servlet-name>
+    <url-pattern>/RemoteServiceFacade</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>RemoteServiceFacade</servlet-name>
+    <url-pattern>/remoteServiceFacade.ht</url-pattern>
+  </servlet-mapping>
+  
+   <servlet>
+    <description></description>
+    <display-name>ManifestExtractorServlet</display-name>
+    <servlet-name>ManifestExtractorServlet</servlet-name>
+    <servlet-class>com.capgemini.lbs.centralserver.servlets.ManifestExtractorServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ManifestExtractorServlet</servlet-name>
+    <url-pattern>/ManifestExtractorServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description>Extract Data From Central Server</description>
+    <display-name>CentralDataExtractorServlet</display-name>
+    <servlet-name>CentralDataExtractorServlet</servlet-name>
+    <servlet-class>com.capgemini.lbs.centralserver.servlets.CentralDataExtractorServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CentralDataExtractorServlet</servlet-name>
+    <url-pattern>/centralDataExtractorServlet.ht</url-pattern>
+  </servlet-mapping>
+  
+  
+   <!-- The following servlet for Manual BODB Process -->
+   <servlet>
+    <description>Extract Data From Central Server (DUMP)</description>
+    <display-name>DumpServlet</display-name>
+    <servlet-name>DumpServlet</servlet-name>
+    <servlet-class>com.capgemini.lbs.centralserver.servlets.DumpServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DumpServlet</servlet-name>
+    <url-pattern>/dumpExtractor.dtdc</url-pattern>
+  </servlet-mapping>
+  
+    <!-- The servlet has created for manual DB Sync process -->
+   <servlet>
+    <description>Persist2QueueServlet</description>
+    <display-name>Persist2QueueServlet</display-name>
+    <servlet-name>persist2QueueServlet</servlet-name>
+    <servlet-class>com.capgemini.lbs.centralserver.servlets.Persist2QueueServlet</servlet-class>
+    <init-param>
+      <param-name>activeFileLocationWin</param-name>
+      <param-value>D:/test-ctbs/dbsync</param-value>
+    </init-param>
+    <init-param>
+      <param-name>activeFileLocationLinux</param-name>
+      <param-value>/test-ctbs/dbsync</param-value>
+    </init-param>
+     <init-param>
+      <param-name>processedFileLocation</param-name>
+      <param-value>D:/test-ctbs/dbsync-pr</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>persist2QueueServlet</servlet-name>
+    <url-pattern>/manualDbSync.dtdc</url-pattern>
+  </servlet-mapping>
+  
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <!--<welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  --></welcome-file-list>
+  
+  <!-- Filters  all the request will pass throught it-->
+	<filter>
+        <filter-name>InterceptingRemoteFilter</filter-name>
+        <filter-class>com.capgemini.lbs.centralserver.filters.InterceptingRemoteFilter</filter-class>
+    <init-param>
+        <param-name>response</param-name>
+        <param-value>DTDC Intercepting Filter</param-value>
+    </init-param>
+	</filter>
+	<filter-mapping>
+    <filter-name>InterceptingRemoteFilter</filter-name>
+    <url-pattern>*.faces</url-pattern>
+    <url-pattern>*.htm</url-pattern>
+    <url-pattern>*.ht</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+	</filter-mapping>
+	<!-- Filters -->
+	
+</web-app>

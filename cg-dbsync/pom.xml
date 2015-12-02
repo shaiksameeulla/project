@@ -1,0 +1,73 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<properties>
+		<org.springframework.version>3.0.3.RELEASE</org.springframework.version>
+		<tomcat_home>D:\TomcatServers\New\apache-tomcat-6.0.29\webapps</tomcat_home>
+		<base_dir>../</base_dir>
+	</properties>
+	<parent>
+		<groupId>com.dtdc</groupId>
+		<version>1.0-SNAPSHOT</version>
+		<artifactId>app</artifactId>
+	</parent>
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.dtdc</groupId>
+	<artifactId>cg-dbsync</artifactId>
+	<packaging>pom</packaging>
+	<version>1.0-SNAPSHOT</version>
+	<name>CTBS Plus CG Dbsync</name>
+	<url>http://maven.apache.org</url>
+	<!-- Shared version number properties -->
+	
+	<dependencies>
+		<dependency>
+			<groupId>com.dtdc</groupId>
+			<artifactId>ctbs-framework</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dtdc</groupId>
+			<artifactId>ctbs-domain</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dtdc</groupId>
+			<artifactId>ctbs-tranfer-object</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dtdc</groupId>
+			<artifactId>ctbs-asynch-queue-consumer</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<copy todir="${base_dir}/cg-dbsync/lib" file="${base_dir}/ctbs-asynch-queue-consumer/target/ctbs-asynch-queue-consumer.jar" overwrite="true"/>
+								<copy todir="${base_dir}/cg-dbsync/lib" file="${base_dir}/ctbs-framework/target/ctbs-framework-1.0-SNAPSHOT.jar" overwrite="true"/>
+								<copy todir="${base_dir}/cg-dbsync/lib" file="${base_dir}/ctbs-domain/target/ctbs-domain-1.0-SNAPSHOT.jar" overwrite="true"/>
+								<copy todir="${base_dir}/cg-dbsync/lib" file="${base_dir}/ctbs-transfer-object/target/ctbs-tranfer-object-1.0-SNAPSHOT.jar" overwrite="true"/>
+								<copy todir="${base_dir}/cg-dbsync/lib" overwrite="true">
+									<fileset dir="${base_dir}/ctbs-core-jar-def/ctbs-jars"/>
+								</copy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		
+	</build>
+</project>

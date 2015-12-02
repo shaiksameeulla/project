@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+
+	<!-- <jee:jndi-lookup id="myDataSource" jndi-name="java:comp/env/jdbc/DTDCds"/> -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<!-- <property name="location" value="classpath:jdbc.properties" />-->
+		 <property name="location" value="src/com/capgemini/lbs/resources/jdbc.properties"/>	
+		<!-- Below Line use for Junit Testing -->
+		   
+	</bean>
+	
+	<!-- 
+	<bean id="DTDCDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.userName}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+	 -->
+	 
+	<bean id="DTDCDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">  
+	    <!-- Connection properties -->
+		<property name="driverClass" value="${jdbc.driverClassName}"/>
+		<property name="jdbcUrl" value="${jdbc.url}"/>
+		<property name="user" value="${jdbc.userName}"/>
+		<property name="password" value="${jdbc.password}"/>
+		
+		<!-- Basic Pool Configuration -->
+		<property name="initialPoolSize" value="${initialPoolSize}"/>
+		<property name="minPoolSize" value="${minPoolSize}"/>
+		<property name="maxPoolSize" value="${maxPoolSize}"/><!-- No of connecton -->
+		<property name="maxIdleTime" value="${maxIdleTime}"/>
+		<property name="acquireIncrement" value="${acquireIncrement}"/>
+		
+		<!-- Configuring Connection Testing -->		
+		<property name="idleConnectionTestPeriod" value="${idleConnectionTestPeriod}"/>
+		<property name="preferredTestQuery" value="${preferredTestQuery}"/>
+		
+		
+		<!-- Configuring Statement Pooling -->
+		<property name="maxStatements" value="${maxStatements}"/> <!-- 0 means: statement caching is turned off.  -->
+		<property name="numHelperThreads" value="${numHelperThreads}"/>
+		
+		<!-- Configuring Recovery From Database Outages -->
+		<property name="acquireRetryAttempts" value="${acquireRetryAttempts}"/>
+		<property name="AcquireRetryDelay" value="${AcquireRetryDelay}"/>
+		<property name="BreakAfterAcquireFailure" value="${BreakAfterAcquireFailure}"/>
+		
+		<!--Other DataSource Configuration-->
+		<property name="checkoutTimeout" value="${checkoutTimeout}"/>
+		
+		<!--Configuring to Debug and Workaround Broken Client Applications, Don't use these in production'-->		
+		<property name="unreturnedConnectionTimeout" value="${unreturnedConnectionTimeout}"/>
+		<property name="debugUnreturnedConnectionStackTraces" value="${debugUnreturnedConnectionStackTraces}"/>
+
+		<property name="maxIdleTimeExcessConnections" value="${maxIdleTimeExcessConnections}" />
+		<property name="maxConnectionAge" value="${maxConnectionAge}" />
+		
+	</bean>
+	<bean id="hibernateSessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="DTDCDataSource"/>
+
+
+		<property name="mappingResources">
+			<list>
+			 <value>ConsignmentSeries.hbm.xml</value>   
+				<value>PartyType.hbm.xml</value>     
+				<value>Item.hbm.xml</value>
+				<value>Service.hbm.xml</value>
+				<value>Agent.hbm.xml</value>
+				<value>Consignee.hbm.xml</value>
+				<value>AutoSaveCnBooking.hbm.xml</value>
+				<value>UserPageAccess.hbm.xml</value>
+				<value>ShortApproval.hbm.xml</value>
+				<value>ShortApprovalDetails.hbm.xml</value>
+				<value>Channel.hbm.xml</value>
+				<value>Document.hbm.xml</value>
+				<value>Product.hbm.xml</value>
+				<value>Booking.hbm.xml</value>
+				<value>Office.hbm.xml</value>
+				<value>Franchisee.hbm.xml</value>
+				<value>Stationary.hbm.xml</value>
+				<value>Geography.hbm.xml</value>
+				<value>Employee.hbm.xml</value>
+				<value>Customer.hbm.xml</value>
+				<value>ConsigneeAddress.hbm.xml</value>
+				<value>Pickup.hbm.xml</value>
+				<value>PickupLog.hbm.xml</value>
+				<value>Route.hbm.xml</value>
+				<value>Manifest.hbm.xml</value>
+				<value>Delivery.hbm.xml</value>
+				<value>Reason.hbm.xml</value>
+				<value>CustAddress.hbm.xml</value>
+				<value>ManifestType.hbm.xml</value>
+				<value>Mode.hbm.xml</value>
+				<value>VehicleTripSheet.hbm.xml</value>
+				<value>HeldUpRelease.hbm.xml</value>
+				<value>HeldUpReleaseItems.hbm.xml</value>
+				<value>StandardType.hbm.xml</value>
+				<value>StdHandlingInst.hbm.xml</value>
+				<value>Commodity.hbm.xml</value>
+				<value>BookingItemList.hbm.xml</value>
+				<!-- <value>AgentVendorInvoiceExcel.hbm.xml</value> -->
+				<value>Vehicle.hbm.xml</value>
+				<value>Driver.hbm.xml</value>
+				<value>Rto.hbm.xml</value>
+				<value>CnRtoReqVer.hbm.xml</value>
+				<value>Warehouse.hbm.xml</value>
+				<!-- <value>AgentVendorInvoiceInfo.hbm.xml</value> -->
+				<value>Vendor.hbm.xml</value>						
+			 	<!-- <value>ExcelMap.hbm.xml</value>	 -->
+			 	<value>Octroi.hbm.xml</value>	
+			 	<value>StdBank.hbm.xml</value>	
+			 	<value>RateCalculation.hbm.xml</value>
+			 	<value>Area.hbm.xml</value>
+			 	<value>Pincode.hbm.xml</value>
+			 	<value>City.hbm.xml</value>
+			 	<value>State.hbm.xml</value>
+			 	<value>District.hbm.xml</value>
+			 	<value>Zone.hbm.xml</value>
+			 	<value>County.hbm.xml</value>
+			 	<value>Country.hbm.xml</value>
+			 	<value>Continent.hbm.xml</value>
+			 	<value>Currency.hbm.xml</value>                
+			 	<value>Password.hbm.xml</value>	
+			 	<value>Charges.hbm.xml</value>
+			 	<value>MiscExpense.hbm.xml</value>
+			 	<!-- <value>AgentVendorInvoiceHistoryInfo.hbm.xml</value> -->	
+			 	<value>ServiceMapping.hbm.xml</value>	
+			 	<value>PincodeMapping.hbm.xml</value>
+			 	<value>ReversePickUp.hbm.xml</value>
+			 	<value>ConfigurableParams.hbm.xml</value>
+			 	<value>RtnToOrg.hbm.xml</value>		
+			 	<value>OpsOffice.hbm.xml</value>		
+			 	<value>WayBillDetails.hbm.xml</value>		
+			 	<value>Airport.hbm.xml</value>
+			 	<value>CoLoader.hbm.xml</value>	
+			 	<value>FranchiseeMapping.hbm.xml</value>
+			 	<value>VehicleMnfst.hbm.xml</value>	
+			 	<value>VehicleMnfstLoad.hbm.xml</value>	
+			 	<value>Billing.hbm.xml</value>	
+			 	<value>Tax.hbm.xml</value>			 	
+			 	<value>EntryTaxConfig.hbm.xml</value>
+			 	<value>EntryTaxDetails.hbm.xml</value>
+			 	<value>EntryTaxPaymentDtls.hbm.xml</value>	
+			 	<value>AlertHistory.hbm.xml</value>	 
+			 	<value>StdAlert.hbm.xml</value>	
+			 	<value>PickUpProduct.hbm.xml</value>	 	
+			 	<value>CustomerMapping.hbm.xml</value>
+			 	<value>AgentAddress.hbm.xml</value>
+			 	<value>DeliveryManagement.hbm.xml</value>     	 
+			 	<value>PickUpConfig.hbm.xml</value> 
+			 	<value>Dispatch.hbm.xml</value>
+			 	<value>DispatchBagManifest.hbm.xml</value> 
+			 	<value>SpecialCustomerDataMap.hbm.xml</value>
+			 	<value>SpecialCustomerData.hbm.xml</value>
+			 	<value>DeliveryCharges.hbm.xml</value>
+			 	<value>DiscountContract.hbm.xml</value>
+			 	<value>DiscountContractDetl.hbm.xml</value>
+			 	<value>DiscountContractDetlSlab.hbm.xml</value>
+			 	<value>ApplPrivilige.hbm.xml</value>
+                <value>ApplScreen.hbm.xml</value>
+                <value>Authentication.hbm.xml</value>
+                <value>Group.hbm.xml</value>
+                <value>LogInOutDetl.hbm.xml</value>
+                <value>Mappings.hbm.xml</value>
+                <value>Roles.hbm.xml</value>
+                <value>SystemAuth.hbm.xml</value>
+                <value>DispatchReceiver.hbm.xml</value> 
+                <value>DispatchReceiveBagManifest.hbm.xml</value>  
+                <value>User.hbm.xml</value>               
+                <value>TransitTime.hbm.xml</value>
+                <value>TransitDeleveryDays.hbm.xml</value>
+                <value>DeliveryConfigDO.hbm.xml</value>
+                <value>TranshipmentType.hbm.xml</value>
+                <value>RelationDO.hbm.xml</value>               
+                <value>CustomerGroup.hbm.xml</value>
+                <value>RayalityConfig.hbm.xml</value>                  
+                <value>ConsignerInfo.hbm.xml</value>
+                <value>ConsignerAddress.hbm.xml</value>
+                <value>FranchiseePincodeMapping.hbm.xml</value>
+                <value>RouteVia.hbm.xml</value>
+                <value>Bookinglog.hbm.xml</value>                
+                <value>EntryTaxCommodityMap.hbm.xml</value>
+                <value>SapCtbsIntegration.hbm.xml</value>
+                <value>PaymentMode.hbm.xml</value>
+                <value>CashCollection.hbm.xml</value>
+                <value>InternationalCommodity.hbm.xml</value>
+                <value>InternationalPaperworkItems.hbm.xml</value>   
+                <value>Event.hbm.xml</value>
+                <value>EventAppl.hbm.xml</value> 
+                <value>EventPlc.hbm.xml</value>
+                <value>PaperWorkItem.hbm.xml</value>
+                <value>DelvDays.hbm.xml</value>
+                <value>ApplScreenElement.hbm.xml</value>
+                <value>EODProcessFile.hdm.xml</value>
+                <value>Category.hbm.xml</value>
+                <value>StateMapping.hbm.xml</value>
+                <value>Lane.hbm.xml</value>
+                <value>Exception.hbm.xml</value>
+                <value>Process.hbm.xml</value>
+                <value>ShortApprovalTrans.hbm.xml</value>
+                <value>ItemDeliverySchedule.hbm.xml</value>
+                <value>RiskSurcharge.hbm.xml</value>
+                <value>RickSurchargeDetail.hbm.xml</value>
+                 <value>Company.hbm.xml</value>
+                 <value>IdentityProofDoc.hbm.xml</value>
+                 <value>VasProductCharges.hbm.xml</value>
+                 <value>vasInternational.hbm.xml</value>
+                 <value>Train.hbm.xml</value>
+                 <value>PickupDailySheet.hbm.xml</value>
+                 <value>HandHeldDevice.hbm.xml</value>
+                 <value>AgentContact.hbm.xml</value>
+                 <value>UploadDocs.hbm.xml</value>         
+                 <value>Department.hbm.xml</value>       
+                 <value>RateMaster.hbm.xml</value> 
+                 <value>AgentZoneCountryMapping.hbm.xml</value>
+                 <value>IntlRateZone.hbm.xml</value> 
+			 	 <value>ServiceModeRelation.hbm.xml</value> 
+			 	 <value>ItemMapping.hbm.xml</value>
+				 <value>AgentEnterprise.hbm.xml</value>
+				 <value>BookingDuplicate.hbm.xml</value>
+				 <value>Agency.hbm.xml</value>
+                <value>CountryCityMapping.hbm.xml</value>
+                <value>AreaMapping.hbm.xml</value>
+				<value>PincodeAgentMapping.hbm.xml</value>
+				<value>PincodeServiceRelation.hbm.xml</value>
+				<value>Bank.hbm.xml</value>
+				<value>BankOfficeMapping.hbm.xml</value>
+				<value>CollectionAgent.hbm.xml</value>
+				<value>PlainOffice.hbm.xml</value>
+				<value>ConsignmentSeriesMapping.hbm.xml</value>
+				<value>DestinationType.hbm.xml</value>
+				<value>PrepaidCnConfig.hbm.xml</value>
+				<value>DispatchRecieveRateDetails.hbm.xml</value>
+				<value>CashCollectionCenter.hbm.xml</value>
+				<value>Otc.hbm.xml</value>
+				<value>GeoGroup.hbm.xml</value>
+				<value>Flight.hbm.xml</value>
+				<value>BookingDBSync.hbm.xml</value>
+				<value>Notification.hbm.xml</value>
+				<value>Transport.hbm.xml</value>
+				<value>DirectPartyMapping.hbm.xml</value>
+				<value>CustomerServiceMapping.hbm.xml</value>
+				<value>Courier.hbm.xml</value>				
+			</list>
+		</property>
+
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+				<prop key="hibernate.connection.autocommit">${hibernate.connection.autocommit}</prop>
+				<prop key="hibernate.connection.release_mode">${hibernate.connection.release_mode}</prop>
+			</props>
+		</property>
+	</bean>
+
+
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory" ref="hibernateSessionFactory"/>
+	</bean>
+
+	<!-- Configuring transaction manager -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="DTDCDataSource"/>
+	</bean>
+
+</beans>

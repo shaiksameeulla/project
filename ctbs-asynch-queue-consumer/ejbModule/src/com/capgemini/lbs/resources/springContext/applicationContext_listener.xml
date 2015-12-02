@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<import resource="dtdc-hibernate_listener.xml" />
+	<import resource="dtdc-dao_listener.xml" />
+
+	<!-- For booking start -->
+
+	<bean id="CashBookingService"
+		class="src.com.dtdc.mdbServices.booking.CashBookingMDBServiceImpl">
+		<property name="cashBookingMDBDAO" ref="cashBookingMDBDAO" />
+	</bean>
+
+	<bean id="franchiseeBookingService"
+		class="src.com.dtdc.mdbServices.booking.FranchiseeBookingMDBServiceImpl">
+		<property name="franchiseeBookingDAO" ref="franchiseeBookingDAO" />
+	</bean>
+
+	<bean id="directPartyBookingService"
+		class="src.com.dtdc.mdbServices.booking.DirectPartyBookingMDBServiceImpl">
+		<property name="dpBookingDAO" ref="dpBookingDAO" />
+	</bean>
+
+	<bean id="mnpBookingService"
+		class="src.com.dtdc.mdbServices.booking.MnpBookingMDBServiceImpl">
+		<property name="mnpBookingDAO" ref="mnpBookingDAO" />
+	</bean>
+
+	<!-- For booking end -->
+
+	<!--<bean id="vehicleManifestService" class="src.com.dtdc.mdbServices.manifest.VehicleManifestMDBServiceImpl"> 
+		<property name="vehicleManifestMDBDAO" ref="vehicleManifestMDBDAO" /> </bean> -->
+	<bean id="purchaseRequisitionService"
+		class="src.com.dtdc.mdbServices.purchase.requistion.PurchaseRequisitionMBDServiceImpl">
+		<property name="purchaseMBDDAO" ref="purchaseMBDDAO" />
+	</bean>
+
+	<bean id="reqForQuotationService"
+		class="src.com.dtdc.mdbServices.purchase.quotation.ReqForQuotationMBDServiceImpl">
+		<property name="purchaseMBDDAO" ref="purchaseMBDDAO" />
+	</bean>
+    
+    <bean id="storeReqSlipService"
+        class="src.com.dtdc.mdbServices.purchase.requistion.StoreReqSlipServiceMBDImpl">
+        <property name="storeReqSlipMBDDAO" ref="storeReqSlipMBDDAO" />
+    </bean>
+    
+	<!-- For Outgoing Manifesting -->
+
+	<bean id="outgoingManifestService"
+		class="src.com.dtdc.mdbServices.manifest.OutgoingManifestMDBServiceImpl">
+		<property name="outgoingManifestMDBDAO" ref="outgoingManifestMDBDAO" />
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+		<property name="deliveryManifestMDBDAO" ref="deliveryManifestMDBDAO" />
+	</bean>
+
+	<bean id="agentManifestIntlMDBService"
+		class="src.com.dtdc.mdbServices.manifest.AgentManifestIntlMDBServiceImpl">
+		<property name="agentManifestMDBDAO" ref="agentManifestMDBDAO" />
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+		<property name="outgoingManifestMDBDAO" ref="outgoingManifestMDBDAO" />
+	</bean>
+	
+	<!-- For Manifest Module: START -->
+
+	
+	<bean id="selfSectorManifestMDBService"
+		class="src.com.dtdc.mdbServices.manifest.SelfSectorManifestMDBServiceImpl">
+		<property name="selfSectorManifestMDBDAO" ref="selfSectorManifestMDBDAO" />
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+	</bean>
+	
+	<bean id="paperworkManifestMDBService"
+		class="src.com.dtdc.mdbServices.manifest.PaperWorkManifestMDBServiceImpl">
+		<property name="paperWorkManifestMDBDAO" ref="paperWorkManifestMDBDAO" />
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+	</bean>
+	
+	<bean id="packetManifestMDBService"
+		class="src.com.dtdc.mdbServices.manifest.PacketManifestMDBServiceImpl">
+		<property name="packetManifestMDBDAO" ref="packetManifestMDBDAO" />
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+	</bean>
+	
+	<!-- For Manifest Module: END -->
+
+	<!-- For Delivery Module -->
+	<bean id="deliveryManifestService"
+		class="src.com.dtdc.mdbServices.delivery.DeliveryManifestMDBServiceImpl">
+		<property name="deliveryManifestMDBDAO" ref="deliveryManifestMDBDAO" />
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+	</bean>
+	
+	<bean id="pickupDomesticService"
+		class="src.com.dtdc.mdbServices.pickup.PickUpMDBServiceImpl">
+		<property name="pickUpMDBDAO" ref="pickUpMDBDAO" />
+	</bean>
+	
+	<!-- MOVED TO CTBS-CONFIG 
+	<bean id="agentSoftBillService"
+		class="src.com.dtdc.mdbServices.invoice.AgentSoftBillMDBServiceImpl">
+		<property name="agentSoftBillDao" ref="agentSoftBillDao" />
+	</bean>
+	 -->
+	 
+	<bean id="dispatchService"
+		class="src.com.dtdc.mdbServices.dispatch.DispatchMDBServiceImpl">
+		<property name="dispatchMDBDao" ref="dispatchMDBDao" />
+	</bean>
+	
+	<!-- Entry Tax START-->
+  
+    <bean id="octroiService" class="src.com.dtdc.mdbServices.entrytax.EntryTaxMDBServiceImpl">
+          <property name="octroiDAO" ref="octroiDAO"/>
+    </bean>
+    <!-- Entry Tax  END-->
+    
+	<!-- DMC Configuration Start -->
+    <bean id="dmcReportService" class="src.com.dtdc.mdbServices.dmc.DmcReportMDBServiceImpl">
+          <property name="delvryMangmntCellDAO" ref="delvryMangmntCellDAO"/>
+    </bean>  
+    <!-- DMC Configuration End -->
+    
+	<bean id="miscExpenseService"
+		class="src.com.dtdc.mdbServices.expense.MiscExpenseMDBServiceImpl">
+		<property name="miscExpenceDao" ref="miscExpenceDao" />
+	</bean>
+	<bean id="podService"
+		class="src.com.dtdc.mdbServices.manifest.PODMDBServiceImpl">
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+		<property name="podDao" ref="podDao" />
+	</bean>
+	
+	<!-- HeldUp/Release Service Configuration Start -->
+    <bean id="heldUpReleaseService" class="src.com.dtdc.mdbServices.heldup.HeldUpReleaseMDBServiceImpl">
+          <property name="heldUpReleaseDAO" ref="heldUpReleaseDAO"/>
+          <property name="ctbsApplicationDAO" ref="ctbsApplicationMDBDAO" />
+    </bean>  
+    <!-- HeldUp/Release Service Configuration End -->
+    
+    <bean id="deliveryRunSheetService"
+		class="src.com.dtdc.mdbServices.delivery.DeliveryRunSheetMDBServiceImpl">
+		<property name="deliveryRunMDBDAO" ref="deliveryRunMDBDAO" />
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+		<property name="nonDeliveryRunMDBDAO" ref="nonDeliveryRunMDBDAO" />
+	</bean>
+	
+	<bean id="nonDeliveryRunSheetService"
+		class="src.com.dtdc.mdbServices.delivery.NonDeliveryRunSheetServiceImpl">
+		<property name="nonDeliveryRunMDBDAO" ref="nonDeliveryRunMDBDAO" />
+	</bean>
+	
+    <bean id="incomingMasterBagManifestService"
+		class="src.com.dtdc.mdbServices.manifest.MasterBagManifestMDBServiceImpl">
+		<property name="masterBagManifestMDBDAO" ref="masterBagManifestMDBDAO" />
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+    </bean>	
+    
+    <bean id="bagManifestMDBService"
+            class="src.com.dtdc.mdbServices.manifest.BagManifestMDBServiceImpl">
+            <property name="bagManifestMDBDAO" ref="bagManifestMDBDAO" />
+            <property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+      </bean>
+    
+    <bean id="rtoManifestIncomingService" class="src.com.dtdc.mdbServices.manifest.RTOManifestIncomingMDBServiceImpl">
+		<property name="rtoManifestIncomingMDBDAO" ref="rtoManifestIncomingMDBDAO" />
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+	</bean>	    
+
+	<bean id="rtoManifestOutgoingService" class="src.com.dtdc.mdbServices.manifest.RTOManifestOutgoingMDBServiceImpl">
+		<property name="rtoManifestOutgoingMDBDAO" ref="rtoManifestOutgoingMDBDAO" />
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+	</bean>	 
+	
+	<bean id="splCustomerBookingService" class="src.com.dtdc.mdbServices.booking.SplCustomerBookingServiceImpl">
+		<property name="splCustomerBookingDAO" ref="splCustomerBookingDAO" />
+	</bean>
+	
+	<bean id="franchiseeBookingIntlService" class="src.com.dtdc.mdbServices.booking.FranchiseeBookingIntlMDBServiceImpl">
+		<property name="franchiseeBookingIntlDAO" ref="franchiseeBookingIntlMDBDAO" />
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+	</bean>
+	
+	<bean id="directPartyBookingIntlService" class="src.com.dtdc.mdbServices.booking.DirectPartyBookingIntlMDBServiceImpl">
+		<property name="dpBookingIntlDAO" ref="directPartyBookingIntlMDBDAO" />
+	</bean>
+	
+	<bean id="cashBookingIntlService" class="src.com.dtdc.mdbServices.booking.CashBookingIntlMDBServiceImpl">
+		<property name="cashBookingInternationalDAO" ref="cashBookingIntlMDBDAO" />
+	</bean>
+	
+	<bean id="bookingMDBService" class="src.com.dtdc.mdbServices.booking.BookingMDBServiceImpl">
+		<property name="bookingMDBDAO" ref="bookingMDBDAO" />
+	</bean>
+	
+	<bean id="roboManifestService" class="src.com.dtdc.mdbServices.manifest.ROBOManifestMDBServiceImpl">
+		<property name="roboManifestMDBDAO" ref="roboManifestMDBDAO" />
+		<property name="ctbsApplicationMDBDAO" ref="ctbsApplicationMDBDAO" />
+	</bean>
+	<bean id="persist2QueueService" class="com.capgemini.lbs.framework.bs.Persist2QueueServiceImpl">
+		<property name="windowsFileLocation" value="${windows.dbsync.file.location}"/>
+		<property name="linuxFileLocation" value="${linux.dbsync.file.location}"/>
+	</bean>
+</beans>
