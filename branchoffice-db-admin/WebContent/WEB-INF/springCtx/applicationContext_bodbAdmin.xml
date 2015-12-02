@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+	
+	<aop:aspectj-autoproxy />
+	<import resource="dtdc-hibernate.xml"/>
+	
+	<bean id="centralDataextractor" class="com.dtdc.bodbadmin.dataextractor.CentralDataExtractor" scope="singleton">
+	 	<property name="localDBDataPersistService" ref="localDBDataPersistService" />
+	 	<property name="messageProp" ref="messageProp" />
+	 	<property name="userHttpClient" ref="userHttpClient" />
+	 </bean>
+	 
+	 <bean id="centralMasterDataextractor" class="com.dtdc.bodbadmin.dataextractor.CentralMasterDataExtractor" scope="singleton">
+	 	<property name="localDBDataPersistService" ref="localDBDataPersistService" />
+	 	<property name="messageProp" ref="messageProp" />
+	 	<property name="userHttpClient" ref="userHttpClient" />
+	 </bean>
+	 
+	 <bean name="centralMasterDataextractorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralMasterDataextractor" />
+		<property name="targetMethod" value="masterDataExtractor" />
+		
+	</bean>
+	
+	<bean id="masterCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="centralMasterDataextractorJob" />
+		<property name="cronExpression" value="0 */15 * * * ?" />		
+	</bean>
+	
+	 <bean id="xmlParser" class="com.dtdc.bodbadmin.xmlutil.CTBSXMLParser">
+	</bean>
+	
+	<bean id="messageProp"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:dataextractor.properties" />
+	</bean>
+	 
+	 <bean id="userHttpClient" class="com.dtdc.bodbadmin.integration.UserHttpClient">
+		<property name="jsonClient" ref="jsonClient" />
+		<property name="createLoggedInRequest" ref="createLoggedInRequest" />
+		<property name="httpClient" ref="httpClient" />
+	</bean>
+
+	<bean id="jsonClient" class="com.dtdc.bodbadmin.integration.DataExtractorClient">
+		<property name="createLoggedInRequest" ref="createLoggedInRequest" />
+		<property name="httpClient" ref="httpClient" />
+	</bean>
+
+	<bean id="createLoggedInRequest" class="com.dtdc.bodbadmin.integration.CreateLoggingInRequest" >
+		<property name="httpClient" ref="httpClient" />
+	</bean>
+	
+	<bean id="httpClient" class="org.apache.commons.httpclient.HttpClient" />
+	
+	<bean id="domainObjectConverter" class="com.dtdc.bodbadmin.utility.TransferObjectToDomainObjectConverter" />
+	
+	<bean id="localDBDataPersistService" class="com.dtdc.bodbadmin.bs.LocalDBDataPersistServiceImpl">
+		<property name="domainObjectConverter" ref="domainObjectConverter" />
+		<property name="localDBDataPersistDAO" ref="localDBDataPersistDAO" />
+	</bean>
+	
+	<bean id="localDBDataPersistDAO" class="com.dtdc.bodbadmin.dao.LocalDBDataPersistDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+<!--  Quartz and trigger details to populate a hash map-->
+
+	<bean name="centralDataextractorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="centralDataextractor" />
+		<property name="targetMethod" value="dataExtractor" />
+		
+	</bean>
+	
+	
+	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="centralDataextractorJob" />
+		<property name="cronExpression" value="0 */10 * * * ?" />		
+	</bean>
+	
+	
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="schedulerName" value="masterBodbAdminTriggers"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="masterCronTrigger" />				
+			</list>
+			
+		</property>
+	</bean>
+	
+		<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="schedulerName" value="bodbAdminTriggers"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="cronTrigger" />
+			</list>
+			
+		</property>
+	</bean>
+		
+</beans>
