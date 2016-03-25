@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app 
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+
+	<display-name>udaan-central-server</display-name>
+  
+	<context-param>
+		<param-name>contextConfigLocation</param-name> 
+		<param-value>
+			/WEB-INF/springContext/udaan-central-applicationContext.xml,
+		 	/WEB-INF/cxf/cxf-service-beans.xml
+		 </param-value> 
+	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class> 
+	</listener>
+	<servlet>
+	    <servlet-name>requestHandler</servlet-name>
+	    <servlet-class>com.cg.lbs.bcun.servlet.OutboutCentralHttpRequestHandlerServlet</servlet-class>
+	    <load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+	    <servlet-name>statusHandler</servlet-name>
+	    <servlet-class>com.cg.lbs.bcun.servlet.OutboundPacketStatusHandlerServlet</servlet-class>
+	    <load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+	    <servlet-name>centralDataRequest</servlet-name>
+	    <servlet-class>com.cg.lbs.bcun.servlet.CentralDataRequestServlet</servlet-class>
+	    <load-on-startup>1</load-on-startup>
+	</servlet>
+	<!-- #######################################Apache CFX Start##################################### -->
+	<servlet>
+		<display-name>CXF Servlet</display-name>
+		<servlet-name>CXFServlet</servlet-name>
+		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CXFServlet</servlet-name>
+		<url-pattern>/webservice/*</url-pattern>
+	</servlet-mapping>
+	<!-- #######################################Apache CFX END##################################### -->
+	<servlet-mapping>
+	    <servlet-name>requestHandler</servlet-name>
+	    <url-pattern>/requestHandler.ht</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+	    <servlet-name>statusHandler</servlet-name>
+	    <url-pattern>/statusHandler.ht</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+	    <servlet-name>centralDataRequest</servlet-name>
+	    <url-pattern>/centralDataRequest.ht</url-pattern>
+	</servlet-mapping>
+	
+	<!-- The following servlet for Manual BCUN Process START-->
+	<!-- 1. BCUN Manual Download process 2. Bcun Manual Upload process-->
+	
+	<!-- 1. BCUN Manual Download process START-->
+   <servlet>
+    <description>Extract Data From Central Server (Manual Download From Central server)</description>
+    <display-name>bcunServlet</display-name>
+    <servlet-name>bcunServlet</servlet-name>
+    <servlet-class>com.cg.lbs.bcun.servlet.ManualDownloadServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>bcunServlet</servlet-name>
+    <url-pattern>/bcunServlet.ff</url-pattern>
+  </servlet-mapping>
+   <servlet>
+   <description>Extract Data From Central Server (Manual Download From Central server)</description>
+    <servlet-name>manualDownload</servlet-name>
+    <jsp-file>/manualDownload.jsp</jsp-file>
+  
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>manualDownload</servlet-name>
+    <url-pattern>/manualDownload.ff</url-pattern>
+  </servlet-mapping>
+  <!-- 1. BCUN Manual Download process END-->
+  
+  <!-- 1. BCUN Manual Upload process START-->
+   <servlet>
+    <description>Upload data to Central Server (Manual Upload To Central server)</description>
+    <display-name>bcunUploadServlet</display-name>
+    <servlet-name>bcunUploadServlet</servlet-name>
+    <servlet-class>com.cg.lbs.bcun.servlet.ManualUploadServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>bcunUploadServlet</servlet-name>
+    <url-pattern>/bcunUploadServlet.ff</url-pattern>
+  </servlet-mapping>
+   <servlet>
+   <description>Upload data to Central Server (Manual Upload To Central server)</description>
+    <servlet-name>manualUpload</servlet-name>
+    <jsp-file>/manualUpload.jsp</jsp-file>
+  
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>manualUpload</servlet-name>
+    <url-pattern>/manualUpload.ff</url-pattern>
+  </servlet-mapping>
+  <!-- 1. BCUN Manual Upload process END-->
+  
+  <!-- The following servlet for Manual BCUN Process END -->
+  <!-- Remote service servlet  -->
+   <servlet>
+    <servlet-name>TwoWayWriteHTTPServlet</servlet-name>
+    <servlet-class>com.cg.lbs.bcun.servlet.TwoWayWriteHTTPServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+   <servlet-mapping>
+    <servlet-name>TwoWayWriteHTTPServlet</servlet-name>
+    <url-pattern>/TwoWayWriteHTTPServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>TwoWayWriteHTTPServlet</servlet-name>
+    <url-pattern>/TwoWayWriteHTTPServlet.ht</url-pattern>
+  </servlet-mapping>
+  
+  <!-- Remote Authenication service servlet  -->
+   <servlet>
+    <servlet-name>bcunAuthenticationServlet</servlet-name>
+    <servlet-class>com.cg.lbs.bcun.servlet.LoginServlet</servlet-class>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
+   <servlet-mapping>
+    <servlet-name>bcunAuthenticationServlet</servlet-name>
+    <url-pattern>/bcunLoginServlet.ht</url-pattern>
+  </servlet-mapping>
+ 
+  <servlet>
+    <description>For manualDownload Authentication</description>
+    <display-name>manualDownloadAuthenticServlet</display-name>
+    <servlet-name>manualDownloadAuthenticServlet</servlet-name>
+    <servlet-class>com.capgemini.lbs.centralserver.servlets.AuthenticationServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>manualDownloadAuthenticServlet</servlet-name>
+    <url-pattern>/manualDownloadAuthenticServlet.ff</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <description>Extract Data From Central Server (Manual Download From Central server)</description>
+    <servlet-name>invalidBcunUser</servlet-name>
+    <jsp-file>/invalidUser.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>invalidBcunUser</servlet-name>
+    <url-pattern>/invalidBcunUser.ff</url-pattern>
+  </servlet-mapping>
+  
+	<!-- The Usual Welcome File List -->
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	<!-- Session time out in minute60*12-->
+	<session-config>
+	<session-timeout>20</session-timeout>
+	</session-config>	
+</web-app>
