@@ -1,0 +1,36 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.ff</groupId>
+	<artifactId>bcun-asynch-queue-listener</artifactId>
+	<packaging>ear</packaging>
+	<version>1.0</version>
+   
+   <name>EAR assembly[bcun-asynch-queue-consumer]</name>
+   <parent>
+      <groupId>com.ff</groupId>
+      <artifactId>bcun-asynch-queue</artifactId>
+      <version>1.0</version>
+   </parent>
+   <dependencies>
+      <dependency>
+         <groupId>com.ff</groupId>
+         <artifactId>bcun-asynch-queue-consumer</artifactId>
+         <type>ejb</type>
+		 <version>1.0</version>
+      </dependency>
+      </dependencies>
+   <build>
+      <plugins>
+         <plugin>
+            <artifactId>maven-ear-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifest>
+                     <addClasspath>true</addClasspath>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+</project>
