@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<!-- ####################################BCUN Data Sync FTP Scheduler############################################ -->
+	<bean id="inboundCentralScheduler" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass"
+			value="com.cg.lbs.bcun.scheduler.inbound.InboundCentralScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="inboundFileProcessor" value-ref="inboundCentralDataProcessor" />
+			</map>
+		</property>
+	</bean>
+	<bean id="inboundCentralSimpleTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<!-- see the example of method invoking job above -->
+		<property name="jobDetail" ref="inboundCentralScheduler" />
+		<!-- 30 seconds 0 */7 00-18,21-23 * * ?" -->
+		<property name="cronExpression" value="0 1/4 * * * ?" />
+	</bean>
+	<bean id="inboundCentralSimpleTriggerFact"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="schedulerName" value="inboundCentralSimpleTriggerSCH" />
+		<property name="quartzProperties">
+			<props>
+				<!-- ThreadPool -->
+				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+				<prop key="org.quartz.threadPool.threadCount">1</prop>
+				<prop key="org.quartz.threadPool.threadPriority">5</prop>
+			</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="inboundCentralSimpleTrigger" />
+			</list>
+		</property>
+	</bean>
+	
+	
+	<!-- ####################################BCUN Data INBOUND  CENTRAL Scheduler############################################ -->
+	<!-- ####################################BCUN Data INBOUND  ZIP FILE EXTRACTOR SCHEDULER############################################ -->
+	
+	
+	<bean id="inboundCentralFileExtractorScheduler" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass"
+			value="com.cg.lbs.bcun.scheduler.inbound.InboundCentralFileExtractorScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="inboundFileProcessor" value-ref="inboundCentralDataProcessor" />
+			</map>
+		</property>
+	</bean>
+	<bean id="inboundCentralFileExtractorTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<!-- see the example of method invoking job above -->
+		<property name="jobDetail" ref="inboundCentralFileExtractorScheduler" />
+		<!-- 30 seconds 0 */7 00-18,21-23 * * ?" -->
+		<property name="cronExpression" value="0 2/4 * * * ?" />
+	</bean>
+	<bean id="inboundCentralFileExtractorSimpleTriggerFact"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="schedulerName" value="inboundCentralFileExtractorSCH" />
+		<property name="quartzProperties">
+			<props>
+				<!-- ThreadPool -->
+				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+				<prop key="org.quartz.threadPool.threadCount">1</prop>
+				<prop key="org.quartz.threadPool.threadPriority">5</prop>
+			</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="inboundCentralFileExtractorTrigger" />
+			</list>
+		</property>
+	</bean>
+	<!-- ####################################BCUN Data INBOUND  ZIP FILE EXTRACTOR SCHEDULER############################################ -->
+</beans>

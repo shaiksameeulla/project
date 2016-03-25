@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+		<!-- outbound schedulers -->
+	<!-- This scheduler is used to prepare master blob data at central server -->
+	<import resource="classpath:bcun-master-data-daily-scheduler.xml"/>
+	
+	<!-- This scheduler is used to prepare master blob data at central server -->
+	<import resource="classpath:bcun-master-data-weekly-scheduler.xml"/>
+	
+	<!-- This scheduler is used to prepare other transaction data blob data at central server -->
+	 <import resource="classpath:bcun-outbound-central-scheduler.xml"/>
+	 
+	<!-- This Category A scheduler is used to prepare other transaction blob data at central server for Category A office-->
+	 <import resource="classpath:bcun-outbound-central-category-a-scheduler.xml"/>
+	 
+	<!-- This Category B scheduler is used to prepare other transaction blob data at central server for Category B office -->
+	 <import resource="classpath:bcun-outbound-central-category-b-scheduler.xml"/>
+	 
+	<!-- This Category C scheduler is used to prepare other transaction blob data at central server for Category C office -->
+	 <import resource="classpath:bcun-outbound-central-category-c-scheduler.xml"/>
+	 
+	<!-- This Category D scheduler is used to prepare other transaction blob data at central server for Category D office -->
+	 <import resource="classpath:bcun-outbound-central-category-d-scheduler.xml"/>
+	 
+	<!-- This Category E scheduler is used to prepare other transaction blob data at central server for Category E office -->
+	 <import resource="classpath:bcun-outbound-central-category-e-scheduler.xml"/>
+	 
+	
+	<!-- This scheduler is used to prepare consignment blob data at central server -->
+	 <import resource="classpath:bcun-outbound-central-consignment-scheduler.xml"/> 
+	 
+	<!-- This scheduler is used to prepare manifest blob data at central server -->
+	 <import resource="classpath:bcun-outbound-central-manifest-scheduler.xml"/> 
+		
+	<!-- This scheduler is used to prepare manifest blob data at central server for Category A office -->
+	 <import resource="classpath:bcun-outbound-central-manifest-category-a-scheduler.xml"/>
+	 
+	<!-- This scheduler is used to prepare manifest blob data at central server for Category B office -->
+	 <import resource="classpath:bcun-outbound-central-manifest-category-b-scheduler.xml"/>
+	 
+	<!-- This scheduler is used to prepare manifest blob data at central server for Category C office -->
+	 <import resource="classpath:bcun-outbound-central-manifest-category-c-scheduler.xml"/>
+	 
+	<!-- This scheduler is used to prepare manifest blob data at central server for Category D office -->
+	 <import resource="classpath:bcun-outbound-central-manifest-category-d-scheduler.xml"/>
+	 
+	<!-- This scheduler is used to prepare manifest blob data at central server for Category E office -->
+	 <import resource="classpath:bcun-outbound-central-manifest-category-e-scheduler.xml"/>
+	
+	<!-- This scheduler is used to prepare pickup blob data at central server -->
+	 <import resource="classpath:bcun-outbound-central-pickup-scheduler.xml"/>
+	
+	<!-- This scheduler is used to prepare stock blob data at central server -->
+	 <import resource="classpath:bcun-outbound-central-stock-scheduler.xml"/>
+	
+	<!-- This scheduler is used to prepare umc blob data at central server -->
+	 <import resource="classpath:bcun-outbound-central-umc-scheduler.xml"/>
+	 
+	 <!-- This scheduler is used to prepare Drs blob data at central server -->
+<!-- 	<import resource="classpath:bcun-outbound-central-drs-scheduler.xml" /> -->
+	
+	<!-- This scheduler is used to prepare transactional master data blob at central server -->
+	 <import resource="classpath:bcun-outbound-central-transactional-master-scheduler.xml"/>
+	 
+	<!-- This scheduler is used to prepare and upload(in queue/DB) all inbound data -->
+	<import resource="classpath:bcun-inbound-central-scheduler.xml"/>
+	
+	<!-- This scheduler is used to prepare create Blob data at central server for Bcun Reconciliation -->
+	<import resource="classpath:bcun-outbound-central-data-reconcillation-scheduler.xml"/> 
+	<!-- This scheduler is used to download the file and update at central side-->
+	<import resource="classpath:bcun-inbound-central-reconciliation-scheduler.xml"/>  
+	
+	<!-- This scheduler is used for cleaning activities at central server -->
+	<import resource="classpath:bcun-cleanup-schedulers.xml" />
+		 
+	<!-- This scheduler is used to re process error file of all inbound data -->
+	<import resource="classpath:bcun-inbound-central-error-file-process-scheduler.xml"/>
+	
+	<!--  -->
+	
+	<import resource="classpath:bcun-service.xml" />
+	<import resource="classpath:bcun-dao.xml" /> 
+</beans>

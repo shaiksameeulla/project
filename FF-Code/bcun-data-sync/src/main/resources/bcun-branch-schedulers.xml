@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	
+	<!-- This scheduler is used to prepare and upload booking data to central server -->
+	 <import resource="classpath:bcun-inbound-branch-booking-scheduler.xml"/>  
+	
+	<!-- This scheduler is used to prepare and upload manifest data to central server -->
+	 <import resource="classpath:bcun-inbound-branch-manifest-scheduler.xml"/> 
+	
+	<!-- This scheduler is used to prepare and upload drs data to central server -->
+	<import resource="classpath:bcun-inbound-branch-drs-scheduler.xml"/> 
+	
+	<!-- This scheduler is used to prepare and upload pickup data to central server -->
+	<import resource="classpath:bcun-inbound-branch-pickup-scheduler.xml"/> 
+	
+	<!-- This scheduler is used to prepare and upload other data(apart from booking, manifest, pickup and drs) to central server -->
+	<import resource="classpath:bcun-inbound-branch-scheduler.xml"/> 
+	
+	<!-- This scheduler is used to download all(master and transaction) blob  data to bran server from central server -->
+	<import resource="classpath:bcun-outbound-branch-data-extractor-scheduler.xml"/>
+	
+	<!-- This scheduler is used cleaning purpose -->
+	<import resource="classpath:bcun-cleanup-schedulers.xml"/>
+	
+	<!-- This scheduler is used to process downloaded master data blob/xml and will insert into database -->
+	<import resource="classpath:bcun-outbound-branch-master-data-processor-scheduler.xml"/>
+	
+	<!-- This scheduler is used to process downloaded transaction data blob/xml and will insert into database in branch server-->
+	<import resource="classpath:bcun-outbound-branch-trans-data-processor-scheduler.xml"/>
+	
+	<!-- This scheduler is used to re process error file and will insert into database in branch server-->
+	<import resource="classpath:bcun-outbound-branch-error-file-process-scheduler.xml"/>
+	
+	<!-- Scheduler for FTP Client To upload file to Central server for further processing -->
+	<import resource="classpath:bcun-inbound-branch-ftp-scheduler.xml"/>
+	<!-- This scheduler is used to process downloaded reconcillation data blob/xml and will insert into database in branch server  -->
+	<import resource="classpath:bcun-outbound-branch-reconcile-data-processor-scheduler.xml"/>
+	<import resource="classpath:bcun-inbound-branch-reconciliation-scheduler.xml"/>
+	
+	<import resource="classpath:bcun-service.xml" />
+	<import resource="classpath:bcun-dao.xml" />
+	
+	<!--For Authentication-->
+	<import resource="classpath:bcun-central-authentication-service.xml" />
+	<!--Two Way Write Service Injected-->
+	<import resource="classpath:bcun-twowaywrite-service.xml" />
+	<!--Manual Inbound process start-->
+	<import resource="classpath:bcun-inbound-branch-manual-processor.xml" />
+	<!--Manual Inbound process End-->
+</beans>

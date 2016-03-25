@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+		
+
+	<!--Two Way Write Service Configuration START -->
+
+	<bean id="twoWayWriteHttpRemoteReq" class="com.cg.lbs.bcun.service.twowaywrite.TwoWayWriteHttpRemoteReq">
+		<property name="httpClient" ref="httpClient"/>
+		<property name="requestUtil" ref="requestUtil"/>		
+	</bean>
+	
+	<bean id="twoWayWriteService" class="com.cg.lbs.bcun.service.twowaywrite.TwoWayWriteServiceImpl">
+		<property name="twoWayWriteHttpRemoteReq" ref="twoWayWriteHttpRemoteReq" />
+		<property name="bcunDataSyncDao" ref="bcunDataSyncDao" />
+		<property name="processingBrCode" value="${branch.office.code}"/>
+	</bean>
+	
+	<bean id="twoWayWriteProceesCall" class="com.cg.lbs.bcun.utility.TwoWayWriteProcessCall">
+		<property name="twoWayWriteService" ref="twoWayWriteService" />
+		<property name="twoWayWriteEnableCode" value="${branch.twoWayWrite.enabled}"/>
+	</bean>
+	
+	<!--Two Way Write Service Configuration END -->
+	
+</beans>
