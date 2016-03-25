@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<!-- ############################################################################## 
+	PATTERN FORMATS GLOSSARY ############################################################################## 
+	%n - newline %m - your log message %p - message priority (FATAL, ERROR, WARN, 
+	INFO, DEBUG or custom) %r - millisecs since program started running %% - 
+	percent sign in output ############################SOME MORE CLUTTER IN YOUR 
+	LOG############################ %c - name of your category (logger), %c{2} 
+	will outputs last two components %t - name of current thread %x - Nested 
+	Diagnostic Context (NDC) (you supply it!) ############################SLOW 
+	PERFORMANCE FORMATS############################ %d - date and time, also 
+	%d{ISO8601}, %d{DATE}, %d{ABSOLUTE}, %d{HH:mm:ss,SSS}, %d{dd MMM yyyy HH:mm:ss,SSS} 
+	and so on %l - Shortcut for %F%L%C%M %F - Java source file name %L - Java 
+	source line number %C - Java class name, %C{1} will output the last one component 
+	%M - Java method name ############################FORMAT MODIFIERS############################ 
+	%-any_letter_above - Left-justify in min. width (default is right-justify) 
+	%20any_letter_above - 20 char. min. width (pad with spaces if reqd.) %.30any_letter_above 
+	- 30 char. max. width (truncate beginning if reqd.) %-10.10r - Example. Left-justify 
+	time elapsed within 10-wide field. Truncate from beginning if wider than 
+	10 characters. ################################################################################################################ -->
+
+
+<log4j:configuration>
+	<appender name="appender" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${catalina.base}/logs/udaan-config-admin.log"/>
+		<!-- <param name="MaxFileSize" value="10MB" />
+		<param name="MaxBackupIndex" value="10" /> -->
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH" />
+		<param name="Append" value="false" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d [%t] %p - %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="configSchedulers" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${catalina.base}/logs/udaan-config-admin-schedulers.log"/>
+		<!-- <param name="MaxFileSize" value="10MB" />
+		<param name="MaxBackupIndex" value="10" /> -->
+		<param name="DatePattern" value="'.'yyyy-MM-dd-HH" />
+		<param name="Append" value="false" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d [%t] %p - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="c3p0fileappender" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="${catalina.base}/logs/udaan-config-admin-c3p0.log" />
+
+		<param name="MaxFileSize" value="10MB" />
+		<param name="MaxBackupIndex" value="10" />
+		<param name="Append" value="false" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d [%t] %p - %m%n" />
+		</layout>
+	</appender>
+
+	
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d [%t] %p - %m%n" />
+		</layout>
+	</appender>
+	<appender name="c3p0App" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d [%t] %p - %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="configSchedulers" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="${catalina.base}/logs/udaan-config-admin-scheduler.log" />
+
+		<param name="MaxFileSize" value="10MB" />
+		<param name="MaxBackupIndex" value="10" />
+		<param name="Append" value="false" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d [%t] %p - %m%n" />
+		</layout>
+	</appender>
+
+	<category name="com.mchange" additivity="false">
+		<priority value="ERROR" />
+		<appender-ref ref="c3p0fileappender" />
+	</category>
+	
+	<category name="com.ff.admin.scheduler" additivity="false">
+		<priority value="debug" />
+		<appender-ref ref="configSchedulers" />
+	</category>
+	
+	
+
+	<root>
+		<priority value="debug" />
+		<appender-ref ref="appender" />
+		
+		<!--
+		<appender-ref ref="console"/>
+		<appender-ref ref="c3p0fileappender"/>
+		<appender-ref ref="bcunInboundAppender"/>
+		<appender-ref ref="bcunOutboundAppender"/> -->
+	</root>
+</log4j:configuration>
+

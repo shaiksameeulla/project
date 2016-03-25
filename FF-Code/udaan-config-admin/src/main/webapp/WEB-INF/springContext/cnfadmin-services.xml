@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+	
+	<import resource="classpath:universe-service.xml"/> 
+	<import resource="classpath:rate-calculation-service.xml"/>
+	
+	<bean id="pettyCashRecalculationProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:PettyCashRecalculation.properties"></property>
+	</bean>
+	
+	<!-- stock management service START -->
+	
+	<bean id="stockCommonService"
+		class="com.ff.admin.stockmanagement.common.service.StockCommonServiceImpl ">
+		 <property name="stockCommonDAO" ref="stockCommonDAO" />
+		<property name="stockUniversalService" ref="stockUniversalService" /> 
+	</bean>  
+	
+	<bean id="stockRequisitionService"
+		class="com.ff.admin.stockmanagement.stockrequisition.service.StockRequisitionServiceImpl ">
+		<property name="stockRequisitionDAO" ref="stockRequisitionDAO" />
+		<property name="stockCommonService" ref="stockCommonService" />
+	</bean>  
+	
+	<bean id="stockIssueService" 
+		class="com.ff.admin.stockmanagement.stockissue.service.StockIssueServiceImpl">
+		<property name="stockIssueDAO" ref="stockIssueDAO" />
+		<property name="stockCommonService" ref="stockCommonService" />
+	</bean>
+	
+	<bean id="stockReceiptService" 
+		class="com.ff.admin.stockmanagement.stockreceipt.service.StockReceiptServiceImpl">
+		<property name="stockReceiptDAO" ref="stockReceiptDAO" />
+		<property name="stockCommonService" ref="stockCommonService" />
+	</bean>
+	
+	<bean id="stockReturnService" 
+		class="com.ff.admin.stockmanagement.stockreturn.service.StockReturnServiceImpl">
+		<property name="stockReturnDAO" ref="stockReturnDAO" />
+		<property name="stockCommonService" ref="stockCommonService" />
+	</bean>
+	
+	<bean id="stockCancellationService" 
+		class="com.ff.admin.stockmanagement.stockcancel.service.StockCancellationServiceImpl">
+		<property name="stockCancellationDAO" ref="stockCancellationDAO" />
+		<property name="stockCommonService" ref="stockCommonService" />
+	</bean>
+	
+	<bean id="stockTransferService" 
+		class="com.ff.admin.stockmanagement.stocktransfer.service.StockTransferServiceImpl">
+		<property name="stockTransferDAO" ref="stockTransferDAO" />
+		<property name="stockCommonService" ref="stockCommonService" />
+	</bean>
+	
+	<bean id="autoRequisitionService" 
+		class="com.ff.admin.stockmanagement.autorequisition.service.AutoRequisitionServiceImpl">
+		<property name="autoRequisitionDAO" ref="autoRequisitionDAO" />
+		<property name="stockCommonService" ref="stockCommonService" />
+	</bean>
+	
+	<bean id="stockScheduledService"
+		class="com.ff.admin.stockmanagement.common.service.StockScheduledServiceImpl ">
+		 <property name="stockScheduledDAO" ref="stockScheduledDAO" />
+		<property name="stockUniversalService" ref="stockUniversalService" /> 
+	</bean> 
+	
+	<bean id="stockReductionService" class="com.ff.admin.stockmanagement.stockreduction.service.StockReductionServiceImpl">
+		<property name="stockReductionDAO" ref="stockReductionDAO" />
+		<property name="stockCommonService" ref="stockCommonService" />
+	</bean>
+	<bean id="stockExcelUploadService" class="com.ff.admin.stockmanagement.excelupload.service.StockExcelUploadServiceImpl">
+		<property name="stockExcelUploadDAO" ref="stockExcelUploadDAO" />
+		<property name="stockCommonService" ref="stockCommonService" />
+	</bean>
+	
+	<!-- stock management service END -->
+	
+	<!--  routing start -->
+	<bean id="routeServicedService" 
+		class="com.ff.admin.routeservice.service.RouteServicedServiceImpl">
+		<property name="routeServicedDAO" ref="routeServicedDAO" />
+		<property name="routeServicedCommonService" ref="routeServicedCommonService" />
+	</bean>	
+	<!-- routing end -->
+
+	<!-- Start Held Up -->
+	<bean id="heldUpService" class="com.ff.admin.heldup.service.HeldUpServiceImpl">
+		<property name="heldUpDAO" ref="heldUpDAO" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="globalUniversalService" ref="globalUniversalService" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+	</bean>
+
+	<bean id="heldUpConverter" class="com.ff.admin.heldup.converter.HeldUpConverter">
+		<property name="heldUpService" ref="heldUpService" />
+	</bean>
+	<!-- End Held Up -->
+	
+    <!-- Start Tracking -->
+	<bean id="consignmentTrackingService" class="com.ff.admin.tracking.consignmentTracking.service.ConsignmentTrackingServiceImpl">
+	<property name="consignmentTrackingDAO" ref="consignmentTrackingDAO" />
+	<property name="trackingUniversalService" ref="trackingUniversalService" />
+	<property name="geographyCommonService" ref="geographyCommonService" />
+	<property name="businessCommonService" ref="businessCommonService" />
+	</bean>
+	
+  <bean id="consgTrackingConverter" class="com.ff.admin.tracking.consignmentTracking.converter.ConsignmentTrackingConverter">
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="businessCommonService" ref="businessCommonService" />
+	</bean>
+	
+	<bean id="manifestTrackingService" class="com.ff.admin.tracking.manifestTracking.service.ManifestTrackingServiceImpl">
+		<property name="manifestTrackingDAO" ref="manifestTrackingDAO" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+	</bean>
+	
+	<bean id="gatepassTrackingService" class="com.ff.admin.tracking.gatepassTracking.service.GatepassTrackingServiceImpl">
+		<property name="gatepassTrackingDAO" ref="gatepassTrackingDAO" />
+	</bean>
+	
+	
+	<bean id="trackingCommonService" class="com.ff.admin.tracking.common.service.TrackingCommonServiceImpl">
+		<property name="trackingCommonDAO" ref="trackingCommonDAO" />
+	</bean>
+	
+	<bean id="bulkImportTrackingService" class="com.ff.admin.tracking.bulkImportTracking.service.BulkImportTrackingServiceImpl">
+		<property name="trackingCommonService" ref="trackingCommonService" />
+	</bean>
+	
+	<bean id="multipleTrackingService" class="com.ff.admin.tracking.multipleTracking.service.MultipleTrackingServiceImpl">
+		<property name="trackingCommonService" ref="trackingCommonService" />
+	</bean>
+	
+	<bean id="manifestTrackingConverter" class="com.ff.admin.tracking.manifestTracking.converter.ManifestTrackingConverter">
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+	</bean>
+	
+	<!-- End Tracking -->
+	
+	<!-- Start MEC -->
+	<bean id="mecCommonService" class="com.ff.admin.mec.common.service.MECCommonServiceImpl">
+		<property name="mecCommonDAO" ref="mecCommonDAO" />
+		<property name="mecUniversalService" ref="mecUniversalService" />
+		<property name="rateCalculationUniversalService" ref="rateCalculationUniversalService" />
+	</bean>
+	
+	<bean id="liabilityPaymentService" class="com.ff.admin.mec.liability.service.LiabilityPaymentServiceImpl">
+		<property name="liabilityDAO" ref="liabilityDAO" />
+		<property name="mecCommonService" ref="mecCommonService" />
+	</bean>
+	
+	<bean id="expenseEntryService" class="com.ff.admin.mec.expense.service.ExpenseEntryServiceImpl">
+		<property name="expenseEntryDAO" ref="expenseEntryDAO" />
+		<property name="mecCommonService" ref="mecCommonService" />
+	</bean>
+	<bean id="billCollectionService" class="com.ff.admin.mec.collection.service.BillCollectionServiceImpl">
+		<property name="businessCommonService" ref="businessCommonService" />
+		<property name="collectionCommonDAO" ref="collectionCommonDAO" />
+		<property name="billCollectionDAO" ref="billCollectionDAO" />
+		<property name="mecCommonService" ref="mecCommonService" />
+	</bean>
+	<bean id="collectionCommonService" class="com.ff.admin.mec.collection.service.CollectionCommonServiceImpl">
+		<property name="collectionCommonDAO" ref="collectionCommonDAO" />
+		<property name="mecUniversalService" ref="mecUniversalService" />
+	</bean>
+	<bean id="validateCollectionService" class="com.ff.admin.mec.collection.service.ValidateCollectionServiceImpl">
+		<property name="validateCollectionDAO" ref="validateCollectionDAO" />
+	</bean>
+	<bean id="cnCollectionService" class="com.ff.admin.mec.collection.service.CNCollectionServiceImpl">
+		<!-- <property name="mecCommonService" ref="mecCommonService" /> -->
+		<property name="collectionCommonDAO" ref="collectionCommonDAO" />
+	</bean>
+	<bean id="validateExpenseService" class="com.ff.admin.mec.expense.service.ValidateExpenseServiceImpl">
+		<property name="validateExpenseDAO" ref="validateExpenseDAO" />
+	</bean>
+	<!-- Petty Cash Scheduler Bean -->
+	<bean id="pettyCashReportService" class="com.ff.admin.mec.pettycash.service.PettyCashReportServiceImpl">
+		<property name="pettyCashReportDAO" ref="pettyCashReportDAO" />
+		<property name="mecCommonService" ref="mecCommonService" />
+		<property name="pettyCashRecalculationProperties" ref="pettyCashRecalculationProperties"/>
+		<property name="globalUniversalDAO" ref="globalUniversalDAO"/>
+	</bean>
+	
+	<bean id="mecEmailService" class="com.ff.admin.mec.email.service.MECEmailServiceImpl">
+		<property name="mecCommonService" ref="mecCommonService" />
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+	</bean>
+	<!-- End MEC -->
+	
+	<!--  lead Management Module Start -->
+ <bean id="createLeadService" class="com.ff.admin.leads.service.CreateLeadServiceImpl">
+		<property name="createLeadDAO" ref="createLeadDAO" />
+		<property name="leadsCommonService" ref="leadsCommonService" />
+</bean>	
+
+<bean id="leadManagementUtils" class="com.ff.admin.leads.utils.LeadManagementUtils">
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+</bean> 
+ <bean id="leadsCommonService" class="com.ff.admin.leads.service.LeadsCommonServiceImpl">
+	<property name="leadCommonDAO" ref="leadCommonDAO" />
+	<!-- <property name="organizationCommonService" ref="organizationCommonService" /> -->
+	<property name="globalUniversalService" ref="globalUniversalService" />
+</bean> 
+
+<bean id="leadsViewService" class="com.ff.admin.leads.service.LeadsViewServiceImpl">
+		<property name="leadsCommonService" ref="leadsCommonService" />
+		<property name="globalUniversalService" ref="globalUniversalService" />
+		<property name="leadsViewDAO" ref="leadsViewDAO" />
+</bean>	 
+
+<bean id="errorHandlingService" class="com.ff.admin.errorHandling.service.ErrorHandlingServiceImpl">
+	<property name="errorHandlingCommonService" ref="errorHandlingCommonService" />
+</bean>	 
+
+<bean id="errorHandlingCommonService" class="com.ff.admin.errorHandling.service.ErrorHandlingCommonServiceImpl">
+	<property name="errorHandlingCommonDAO" ref="errorHandlingCommonDAO" />
+</bean>  
+
+<bean id="leadsPlanningService" class="com.ff.admin.leads.service.LeadsPlanningServiceImpl">
+		<property name="leadCommonDAO" ref="leadCommonDAO" />
+		<property name="leadsCommonService" ref="leadsCommonService" />
+</bean>	 
+
+ <bean id="leadValidationService" class="com.ff.admin.leads.service.LeadsValidationServiceImpl">
+		<property name="leadsCommonService" ref="leadsCommonService" />
+		<property name="leadValidationDAO" ref="leadValidationDAO" />
+</bean>	
+
+<bean id="sendEmailService" class="com.ff.admin.leads.service.SendEmailServiceImpl">
+		<property name="leadsCommonService" ref="leadsCommonService" />
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+		<!-- <property name="emailSenderService" ref="emailSenderService" /> -->
+</bean>
+<bean id="sendSMSService" class="com.ff.admin.leads.service.SendSMSServiceImpl">
+		<property name="leadsCommonService" ref="leadsCommonService" />
+        <property name="smsSenderServic" ref="smsSenderServic" />
+</bean>	 
+<!--  lead Management Module End -->
+	
+	<!-- Start Billing -->
+	<bean id="billingCommonService" class="com.ff.admin.billing.service.BillingCommonServiceImpl">
+		<property name="billingCommonDAO" ref="billingCommonDAO" />
+		<property name="billingUniversalService" ref="billingUniversalService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="globalUniversalService" ref="globalUniversalService" />
+		<property name="businessCommonService" ref="businessCommonService" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+		<property name="pickupManagementCommonService" ref="pickupManagementCommonService" />
+		<!-- <property name="rateCalcFactory" ref="rateCalcFactory" /> -->
+		<property name="rateCalculationUniversalService" ref="rateCalculationUniversalService" />
+	</bean>
+
+
+	<bean id="billPrintingService" class="com.ff.admin.billing.service.BillPrintingServiceImpl">
+		<property name="billPrintingDAO" ref="billPrintingDAO" />
+		<property name="billingCommonService" ref="billingCommonService" />
+		<property name="billingUniversalService" ref="billingUniversalService" />
+</bean>	
+
+<bean id="invoiceRunSheetPrintingService" class="com.ff.admin.billing.service.InvoiceRunSheetPrintingServiceImpl">
+		<property name="billingCommonService" ref="billingCommonService" />
+		<property name="billPrintingService" ref="billPrintingService" />
+</bean>	
+
+<bean id="invoiceRunSheetUpdateService" class="com.ff.admin.billing.service.InvoiceRunSheetUpdateServiceImpl">
+		<property name="billingCommonService" ref="billingCommonService" />
+</bean>	
+
+
+<bean id="reBillingService" class="com.ff.admin.billing.service.ReBillingServiceImpl">
+		<property name="billingCommonService" ref="billingCommonService" />
+		<property name="billingUniversalService" ref="billingUniversalService" />
+		<property name="billPrintingService" ref="billPrintingService" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+		<property name="reBillingDAO" ref="reBillingDAO" />
+		<property name="rateCalculationUniversalService" ref="rateCalculationUniversalService" />
+</bean>	
+
+<bean id="reBillingGDRService" class="com.ff.admin.billing.service.ReBillingGDRServiceImpl">
+		<property name="billingCommonService" ref="billingCommonService" />
+		<property name="billingUniversalService" ref="billingUniversalService" />
+		<property name="billPrintingService" ref="billPrintingService" />
+		<property name="reBillingDAO" ref="reBillingDAO" />
+</bean>	
+
+<bean id="billingCommonConverter" 
+	class="com.ff.admin.billing.converter.BillingCommonConverter">
+	<property name="billingCommonService" ref="billingCommonService" />
+</bean>
+	<!-- End Billing -->
+	
+	<!-- START COMPLAINTS -->
+	
+	<bean id="complaintsUtils" class="com.ff.admin.complaints.utils.ComplaintsUtils">
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+	</bean>
+	
+	<bean id="complaintsCommonService" class="com.ff.admin.complaints.service.ComplaintsCommonServiceImpl">
+		<property name="globalUniversalService" ref="globalUniversalService" />
+		<property name="complaintsCommonDAO" ref="complaintsCommonDAO"></property>
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="rateCalculationUniversalService" ref="rateCalculationUniversalService" />
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+	</bean>
+	
+	<!--START FRONTLINE -->
+	
+	<bean id="serviceRequestForServiceReqService" class="com.ff.admin.complaints.service.ServiceRequestForServiceReqServiceImpl">
+		<property name="complaintsCommonService" ref="complaintsCommonService" />
+		<property name="complaintsCommonDAO" ref="complaintsCommonDAO" />
+	</bean>
+	
+	<bean id="serviceRequestForConsignment" class="com.ff.admin.complaints.service.ServiceRequestForConsignmentImpl">
+		<property name="complaintsCommonService" ref="complaintsCommonService" />
+		<!-- <property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" /> -->
+		<!-- <property name="emailSenderService" ref="emailSenderService" /> -->
+		<property name="smsSenderService" ref="smsSenderService" />
+		<property name="mecUniversalDAO" ref="mecUniversalDAO" />	
+		<property name="complaintsCommonDAO" ref="complaintsCommonDAO"/>
+		<property name="serviceRequestForConsignmentDAO" ref="serviceRequestForConsignmentDAO"/>
+		<property name="consignmentTrackingService" ref="consignmentTrackingService" />
+		
+	</bean>
+	
+	<!-- END FRONTLINE-->
+
+	<!--START BACKLINE -->
+	
+	<bean id="complaintsBacklineSummaryService" class="com.ff.admin.complaints.service.ComplaintsBacklineSummaryServiceImpl">
+		<property name="complaintsCommonService" ref="complaintsCommonService" />
+		<property name="complaintsCommonDAO" ref="complaintsCommonDAO"/>
+		<property name="complaintsBacklineSummaryDAO" ref="complaintsBacklineSummaryDAO"/>
+	</bean>
+	
+	<bean id="solveComplaintService" class="com.ff.admin.complaints.service.SolveComplaintServiceImpl">
+		<property name="complaintsCommonService" ref="complaintsCommonService" />
+		<property name="solveComplaintDAO" ref="solveComplaintDAO"/>
+	</bean>
+	
+	<bean id="paperworkService" class="com.ff.admin.complaints.service.PaperworkServiceImpl">
+		<property name="paperworkDAO" ref="paperworkDAO" />	
+		<property name="complaintsCommonDAO" ref="complaintsCommonDAO" />	
+	</bean>
+	
+	<!-- END BACKLINE -->
+	<!-- OutstandingReport Kamal -->
+	
+	<bean id="outstandingReportService" 
+		class="com.ff.admin.report.service.OutstandingReportServiceImpl">
+		<property name="outstandingReportDAO" ref="outstandingReportDAO" />
+		<property name="organizationCommonDAO" ref="organizationCommonDAO" />
+	</bean>	
+	
+	<!-- END COMPLAINTS -->
+	<!-- Strat Coloading -->
+	<bean id="coloadingService" class="com.ff.admin.coloading.service.ColoadingServiceImpl">
+	<property name="geographyCommonService" ref="geographyCommonService" />
+	<property name="businessCommonService" ref="businessCommonService" />
+	<property name="coloadingDAO" ref="coloadingDAO" />
+	</bean>
+    <bean id="coloadingRateCalculationService" class="com.ff.admin.coloading.service.ColoadingRateCalculationServiceImpl">
+		<property name="coloadingRateCalculationDAO" ref="coloadingRateCalculationDAO" />
+	</bean> 
+	
+	
+	<!-- End Coloading -->
+	
+	
+	<!-- PINCODE MASTER STARTING -->
+	<bean id="pincodeMasterService" class="com.ff.admin.master.service.PincodeMasterServiceImpl">
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="pincodeMasterDao" ref="pincodeMasterDao" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />	
+	</bean>
+	
+	<bean id="vendorMappingService" class="com.ff.admin.master.service.VendorMappingServiceImpl">
+		<property name="vendorMappingDAO" ref="vendorMappingDAO" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+	</bean>
+	
+	<bean id="holidayService" class="com.ff.admin.master.service.HolidayServiceImpl">
+		<property name="holidayDAO" ref="holidayDAO" />
+	</bean>
+	
+	<!-- PINCODE MASTER ENDING -->
+	<!-- START COMPLAINTS -->
+	<bean id="serviceRequestFollowupService" 
+		class="com.ff.admin.complaints.service.ServiceRequestFollowupServiceImpl">
+		<property name="serviceRequestFollowupDAO" ref="serviceRequestFollowupDAO" />
+		<property name="complaintsCommonService" ref="complaintsCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService"></property>
+		<property name="organizationCommonService" ref="organizationCommonService" />
+	</bean>
+	
+	<bean id="criticalLegalComplainService" 
+		class="com.ff.admin.complaints.service.CriticalLegalComplaintServiceImpl">
+		<property name="serviceRequstLegalComplaintDAO" ref="serviceRequstLegalComplaintDAO" />
+	</bean>
+	
+	<!-- END COMPLAINTS -->
+	
+	
+	<!-- Stop Delivery Start -->
+	  <bean id="stopDeliveryService" class="com.ff.admin.stopdelivery.service.StopDeliveryServiceImpl">
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+		<property name="stopDeliveryDAO" ref="stopDeliveryDAO" />
+		<property name="deliveryUniversalService" ref="deliveryUniversalService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="emailSenderUtil" ref="emailSenderUtil"></property>
+		<property name="geographyCommonService" ref="geographyCommonService"></property>
+		<property name="udaanContextService" ref="udaanContextService"></property>
+	</bean>
+	<!-- Stop Delivery End -->
+	
+	<bean id="criticalComplaintService" class="com.ff.admin.complaints.service.CriticalComplaintServiceImpl">
+		<property name="criticalComplaintDAO" ref="criticalComplaintDAO" />
+		<property name="complaintsCommonService" ref="complaintsCommonService" />
+	</bean>
+	
+	
+	<bean id="criticalClaimComplaintService" class="com.ff.admin.complaints.service.CriticalClaimComplaintServiceImpl">
+		<property name="criticalClaimComplaintDAO" ref="criticalClaimComplaintDAO" />
+	</bean>
+	
+	<bean id="jobServicesService" class="com.ff.admin.jobservice.service.JobServicesServiceImpl">
+		<property name="jobServicesUniversalService" ref="jobServicesUniversalService" />
+	</bean>
+	
+	
+	
+	         <!-- Cust Modification  Start -->
+	   <bean id="custModificationService" class="com.ff.admin.billing.service.CustModificationServiceImpl">
+	   <property name="geographyCommonService" ref="geographyCommonService" />
+	   <property name="custModificationDAO" ref="custModificationDAO" />	
+	   <property name="cnModificationCommonService" ref="cnModificationCommonService"></property>
+	   <property name="cnModificationCommonDAO" ref="cnModificationCommonDAO" />
+	   <property name="serviceOfferingCommonService" ref="serviceOfferingCommonService"/>
+	  </bean>
+	  
+	   <bean id="cnModificationCommonService" class="com.ff.admin.billing.service.CnModificationCommonServiceImpl">
+			<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" /> 
+			<property name="geographyCommonService" ref="geographyCommonService" />	
+			<property name="cnModificationCommonDAO" ref="cnModificationCommonDAO" />
+			<property name="rateCalculationUniversalService" ref="rateCalculationUniversalService" />
+			<property name="globalUniversalService" ref="globalUniversalService" />
+	  </bean>
+	      <!-- Cust Modification  End  -->
+	
+	<bean id="pickUpCommissionService" class="com.ff.admin.service.PickUpCommissionCalculationServiceImpl">
+		<property name="pickUpCommissionDao" ref="pickUpCommissionCalculationDAO" />
+	</bean>
+	
+	<bean id="deliveryCommissionCalcService" class="com.ff.admin.pndcommission.service.DeliveryCommissionCalculationServiceImpl">
+		<property name="deliveryCommissionCalcDAO" ref="deliveryCommissionCalcDAO" />
+	</bean>
+	<!-- Bulk Cust Modification  Start -->
+	   <bean id="bulkCustModificationService" class="com.ff.admin.billing.service.BulkCustModificationServiceImpl">
+		<property name="bulkCustModificationDAO" ref="bulkCustModificationDAO" />
+		<property name="geographyCommonService" ref="geographyCommonService" />		
+	  </bean>
+	      <!-- Bulk Cust Modification  End  -->
+	<!-- Notification Module Bean Start -->
+	<bean id="bulkSmsOnDemandService" class="com.ff.admin.notification.service.BulkSmsOnDemandServiceImpl">
+		<property name="geographyCommonService" ref="geographyCommonService"/>
+		<property name="organizationCommonService" ref="organizationCommonService"/>
+		<property name="bulkSmsOnDemandDAO" ref="bulkSmsOnDemandDAO"/>
+		<property name="trackingNotificationService" ref="trackingNotificationService"></property>
+	</bean>
+	<!-- Notification Module Bean End -->
+</beans>

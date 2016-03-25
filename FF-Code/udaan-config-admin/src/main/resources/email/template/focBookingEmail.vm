@@ -1,0 +1,43 @@
+Dear ${focBookingEmailTO.employeName}&nbsp;[${focBookingEmailTO.employeeId}]
+<br/>
+<br/>	
+Followings are the FOC Bookings done under your approval
+<br/><br/>
+<table border=1 style="border-collapse:collapse; text-align: center; font-style:normal">
+	<thead style="background-color:#C0C0C0">
+		<td>
+			Consignment Numbers
+		</td>
+		<td>
+			Date of Booking
+		</td>
+		<td>
+			Destination City
+		</td>
+		<td>
+			Destination Pincode
+		</td>
+		<td>
+			Origin City
+		</td>
+		<td>
+			Price
+		</td>
+	</thead>
+	#foreach($bookingTO in $focBookingEmailTO.bookingTOs)
+	<tr>
+		<td style="text-align: center">$bookingTO.consgNumber</td>
+		<td style="text-align: center">$bookingTO.bookingDate</td>
+		<td style="text-align: center"></td>
+		<td style="text-align: center"></td>
+		<td style="text-align: center"></td>
+		<td style="text-align: center"></td>
+	</tr>
+	#end		
+	</table>
+	
+<br/>
+<br/>
+From<br/>
+System Generated Mail <br/>
+Test User

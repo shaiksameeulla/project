@@ -1,0 +1,625 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE struts-config PUBLIC
+          "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN"
+          "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+          
+<struts-config>
+
+
+	<!-- ================================================ Form Bean Definitions -->
+
+	<form-beans>
+	
+	   <!-- Start Stock-->
+	   
+		<form-bean name="createRequisitionForm" type="com.ff.admin.stockmanagement.stockrequisition.form.StockRequisitionForm" />
+		<form-bean name="stockIssueForm" type="com.ff.admin.stockmanagement.stockissue.form.StockIssueForm" />
+		<form-bean name="stockIssueEmpForm" type="com.ff.admin.stockmanagement.stockissue.form.StockIssueEmployeeForm" />
+		<form-bean name="stockReturnForm" type="com.ff.admin.stockmanagement.stockreturn.form.StockReturnForm"/>
+		<form-bean name="stockReceiptForm" type="com.ff.admin.stockmanagement.stockreceipt.form.StockReceiptForm" />
+		<form-bean name="stockTransferForm" type="com.ff.admin.stockmanagement.stocktransfer.form.StockTransferForm" />
+		<form-bean name="stockCancellationForm" type="com.ff.admin.stockmanagement.stockcancel.form.StockCancellationForm" />
+		<form-bean name="listStockRequisitionForm" type="com.ff.admin.stockmanagement.stockrequisition.form.ListStockRequisitionForm" />
+		<form-bean name="stockExcelUploadForm" type="com.ff.admin.stockmanagement.excelupload.form.StockExcelUploadForm" />
+		
+		<!-- END Stock-->
+		
+		<form-bean name="pureRouteForm" type="com.ff.admin.routeservice.form.PureRouteForm" />
+		<form-bean name="transshipmentRouteForm" type="com.ff.admin.routeservice.form.TransshipmentRouteForm" />
+		<form-bean name="routeServicedByForm" type="com.ff.admin.routeservice.form.RouteServicedByForm" />		
+		<!-- Start Held Up-->
+		<form-bean name="heldUpForm" type="com.ff.admin.heldup.form.HeldUpForm" />		
+		<!-- End Held Up-->
+		
+		<!-- Start Tracking-->
+		<form-bean name="consignmentTrackingForm" type="com.ff.admin.tracking.consignmentTracking.form.ConsignmentTrackingForm" />		
+		<form-bean name="manifestTrackingForm" type="com.ff.admin.tracking.manifestTracking.form.ManifestTrackingForm" />				
+		<form-bean name="gatepassTrackingForm" type="com.ff.admin.tracking.gatepassTracking.form.GatepassTrackingForm" />
+		<form-bean name="multipleTrackingForm" type="com.ff.admin.tracking.multipleTracking.form.MultipleTrackingForm" />
+		<!-- EndTracking-->
+		
+		<!-- Misc. Expense & Collections Start -->
+		<form-bean name="expenseEntryForm" type="com.ff.admin.mec.expense.form.ExpenseEntryForm" />
+		<form-bean name="validateExpenseForm" type="com.ff.admin.mec.expense.form.ValidateExpenseForm" />
+		<form-bean name="liabilityPaymentForm" type="com.ff.admin.mec.liability.form.LiabilityPaymentForm" />
+		<form-bean name="billCollectionForm" type="com.ff.admin.mec.collection.form.BillCollectionForm" />
+	 	<form-bean name="cnCollectionForm" type="com.ff.admin.mec.collection.form.CNCollectionForm" />
+	 	<form-bean name="validateCollectionForm" type="com.ff.admin.mec.collection.form.ValidateCollectionForm" />
+	 	<form-bean name="pettyCashReportForm" type="com.ff.admin.mec.pettycash.form.PettyCashReportForm" />
+	 	<form-bean name="bulkCollectionValidationForm" type="com.ff.admin.mec.collection.form.BulkCollectionValidationForm"/>
+		<!-- Misc. Expense & Collections End -->
+		
+		<form-bean name="bulkImportForm" type="com.ff.admin.tracking.bulkImportTracking.form.BulkImportForm" />
+		
+		<!-- Start Leads -->	
+		<form-bean name="createLeadForm"
+			type="com.ff.admin.leads.form.CreateLeadForm" />	
+		<form-bean name="leadsViewForm"
+			type="com.ff.admin.leads.form.LeadsViewForm" />
+			
+					
+		<form-bean name="errorHandlingForm" type="com.ff.admin.errorHandling.form.ErrorHandlingForm"/>
+			
+		<form-bean name="viewUpdateFeedbackForm" type="com.ff.admin.leads.form.ViewUpdateFeedbackForm"/>	
+		
+		<form-bean name="sendEmailForm"
+			type="com.ff.admin.leads.form.SendEmailForm" />
+			
+		<form-bean name="sendSMSForm" type="com.ff.admin.leads.form.SendSMSForm" />
+			
+		<!-- End Leads -->
+		
+		<!-- Start Billing -->	
+		<form-bean name="invoiceRunSheetPrintingForm" type="com.ff.admin.billing.form.InvoiceRunSheetPrintingForm" />	
+		<form-bean name="billPrintingForm" type="com.ff.admin.billing.form.BillPrintingForm" />	
+		<form-bean name="reBillingForm" type="com.ff.admin.billing.form.ReBillingForm" />	
+		<form-bean name="reBillingGDRForm" 	type="com.ff.admin.billing.form.ReBillingGDRForm" />
+			
+		<!-- End Billing -->	
+		
+		<!-- COMPLAINTS START -->
+		<form-bean name="serviceRequestForServiceForm" type="com.ff.admin.complaints.form.ServiceRequestForServiceForm" />
+		<form-bean name="searchServiceRequestForm" type="com.ff.admin.complaints.form.SearchServiceRequestForm" />
+		<form-bean name="serviceRequestForConsignmentForm" type="com.ff.admin.complaints.form.ServiceRequestForConsignmentForm"/>
+		<form-bean name="backlikeSummaryForm" type="com.ff.admin.complaints.form.ComplaintsBacklineSummaryForm" />
+		<form-bean name="outstandingReportForm" type="com.ff.admin.report.form.OutstandingReportForm" />
+		<form-bean name="paperworkForm" type="com.ff.admin.complaints.form.PaperworkForm" />
+		<form-bean name="serviceRequestFollowupForm" type="com.ff.admin.complaints.form.ServiceRequestFollowupForm" />
+		<form-bean name="solveComplaintForm" type="com.ff.admin.complaints.form.SolveComplaintForm" />
+		<!-- COMPLAINTS END -->
+		
+		<!-- COLOADING START -->
+ 			<form-bean name="airColoadingForm" type="com.ff.admin.coloading.form.AirColoadingForm" />
+ 			<form-bean name="trainColoadingForm" type="com.ff.admin.coloading.form.TrainColoadingForm" />
+ 			<form-bean name="vehiclesContractColoadingForm" type="com.ff.admin.coloading.form.VehiclesContractColoadingForm" />
+ 			<form-bean name="vehicleServiceEntryForm" type="com.ff.admin.coloading.form.VehicleServiceEntryForm" />
+ 			<form-bean name="cdAwbModificationForm" type="com.ff.admin.coloading.form.CdAwbModificationForm" />
+ 			<form-bean name="surfaceRateEntryForm" type="com.ff.admin.coloading.form.SurfaceRateEntryForm" />
+ 			<form-bean name="fuelRateEntryForm" type="com.ff.admin.coloading.form.FuelRateEntryForm" />
+		<!-- COLOADING END -->
+		
+		
+		<!-- Masters Start -->
+		<form-bean name="PinCodeMasterForm" type="com.ff.admin.master.form.PinCodeMasterForm" />
+		<form-bean name="vendorMappingForm" type="com.ff.admin.master.form.VendorMappingForm"/>
+		<form-bean name="holidayForm" type="com.ff.admin.master.form.HolidayForm"/>
+		<!-- Masters End -->
+		
+		<!-- Complaint START -->
+		<form-bean name="criticalComplaintForm" type="com.ff.admin.complaints.form.CriticalComplaintForm" />
+		
+		<form-bean name="criticalClaimComplaintForm" type="com.ff.admin.complaints.form.CriticalClaimComplaintForm" />
+		<form-bean name="legalComplaintForm" type="com.ff.admin.complaints.form.LegalComplaintForm" />
+		<!-- Complaint END -->
+		
+		<!-- Stop Delivery Start -->
+		<form-bean name="stopDeliveryForm" type="com.ff.admin.stopdelivery.form.StopDeliveryForm"/>
+		<!-- Stop Delivery End -->
+		
+		<!-- Job Service Start -->
+		<form-bean name="jobServiceForm" type="com.ff.admin.jobservice.form.JobServiceForm"/>
+		<!-- Job Service End -->
+		
+		<!-- Cust Modification  Start -->
+		<form-bean name="custModificationForm" type="com.ff.admin.billing.form.CustModificationForm"/>
+		<!-- Cust Modification  End -->
+		
+		<!-- Added by shaheed for pincode search -->
+		<form-bean name="searchByPincodeForm" type="com.ff.universe.serviceOffering.form.SearchByPincodeForm"/>
+		
+		<form-bean name="searchByBranchForm" type="com.ff.universe.serviceOffering.form.SearchByBranchForm"/>
+		<!-- Ended by Shaheed -->
+		
+		<!-- Bulk Cust Modification  Start -->
+		<form-bean name="bulkCustModificationForm" type="com.ff.admin.billing.form.BulkCustModificationForm"/>
+		<!-- Bulk Cust Modification  End -->
+		<form-bean name="bulkSmsOnDemandForm" type="com.ff.admin.notification.form.BulkSmsOnDemandForm"/>
+	</form-beans>
+		
+		
+		<!-- ========================================= Global Exception Definitions -->
+
+	<global-exceptions>
+		<exception   key="CGS000"  type="java.lang.Exception"    path="/pages/snippets/error.jsp" />
+	</global-exceptions>
+
+
+	<!-- =========================================== Global Forward Definitions -->
+
+	<global-forwards>
+	
+	</global-forwards>
+	
+	<!-- =========================================== Action Mappings -->
+	
+	<action-mappings>
+	
+	<!-- Added by shaheed -->
+		<action path="/searchByPincode" type="com.ff.universe.serviceOffering.action.SearchByPincodeAction"
+			name="searchByPincodeForm" scope="request" parameter="submitName">
+			<forward name="success" path="searchByPincode" />
+		</action>
+		
+		<action path="/searchByBranch" type="com.ff.universe.serviceOffering.action.SearchByBranchAction"
+			name="searchByBranchForm" scope="request" parameter="submitName">
+			<forward name="success" path="searchByBranch" />
+		</action>
+	<!-- Ended by shaheed -->
+	
+	<!--  Stock Module Start -->
+		<action path="/createRequisition" type="com.ff.admin.stockmanagement.stockrequisition.action.StockRequisitionAction"
+			name="createRequisitionForm" scope="request" parameter="submitName">	
+			<forward name="success" path="createRequisition" />
+		</action>
+		<action path="/listViewRequisition" type="com.ff.admin.stockmanagement.stockrequisition.action.ListStockRequisitionAction"
+			name="listStockRequisitionForm" scope="request" parameter="submitName">	
+			<forward name="success" path="listViewRequisition" />
+		</action>
+		<action path="/approveRequisition" type="com.ff.admin.stockmanagement.stockrequisition.action.StockRequisitionAction"
+			name="createRequisitionForm" scope="request" parameter="submitName">	
+			<forward name="success" path="approveRequisition" />
+		</action>
+		
+		<!-- Stock Issue Start -->
+		<action path="/stockIssue" type="com.ff.admin.stockmanagement.stockissue.action.StockIssueAction"
+			name="stockIssueForm" scope="request" parameter="submitName">	
+			<forward name="success" path="stockIssue" />
+			<forward name="url" path="/pages/stockmanagement/stockIssueToBAPrint.jsp" />
+		</action>
+		<action path="/stockIssueCustomer" type="com.ff.admin.stockmanagement.stockissue.action.StockIssueCustomerAction"
+			name="stockIssueEmpForm" scope="request" parameter="submitName">	
+			<forward name="success" path="stockIssueCustomer" />
+		</action>
+		<action path="/stockIssueEmployee" type="com.ff.admin.stockmanagement.stockissue.action.StockIssueEmployeeAction"
+			name="stockIssueEmpForm" scope="request" parameter="submitName">	
+			<forward name="success" path="stockIssueEmployee" />
+		</action>
+		<!-- Stock Issue End -->
+		
+		<!-- Stock Receipt Start -->
+		<action path="/stockReceipt" type="com.ff.admin.stockmanagement.stockreceipt.action.StockReceiptAction"
+			name="stockReceiptForm" scope="request" parameter="submitName">	
+			<forward name="success" path="stockReceipt" />
+		</action>
+		<action path="/stockReceiptRho" type="com.ff.admin.stockmanagement.stockreceipt.action.StockReceiptAction"
+			name="stockReceiptForm" scope="request" parameter="submitName">	
+			<forward name="success" path="stockReceiptRho" />
+		</action>
+		<!-- Stock Receipt End -->
+		
+		<!-- Stock Return Start-->
+		
+		<action path="/stockReturn" type="com.ff.admin.stockmanagement.stockreturn.action.StockReturnAction"
+			name="stockReturnForm" scope="request" parameter="submitName">	
+			<forward name="success" path="stockReturn" />
+		</action>
+		<action path="/stockReturnRho" type="com.ff.admin.stockmanagement.stockreturn.action.StockReturnToRhoAction"
+			name="stockReturnForm" scope="request" parameter="submitName">	
+			<forward name="success" path="stockReturnRho" />
+		</action>
+		
+		<!-- Stock Return End-->
+		
+		<!-- Stock Transfer Start-->
+		<action path="/stockTransfer" type="com.ff.admin.stockmanagement.stocktransfer.action.StockTransferAction"
+			name="stockTransferForm" scope="request" parameter="submitName">	
+			<forward name="success" path="stockTransfer" />
+		</action>
+		<!-- Stock Transfer End-->
+		
+		<action path="/stockCancel" type="com.ff.admin.stockmanagement.stockcancel.action.StockCancellationAction"
+			name="stockCancellationForm" scope="request" parameter="submitName">	
+			<forward name="success" path="stockCancel" />
+		</action>
+		<action path="/stockExcelUpload" type="com.ff.admin.stockmanagement.excelupload.action.StockExcelUploadAction"
+			name="stockExcelUploadForm" scope="request" parameter="submitName">	
+			<forward name="success" path="stockExcelUpload" />
+		</action>
+		
+		<!--  Stock Module Start -->
+		
+		<!-- Route Service Start-->
+		<action path="/pureRoute" type="com.ff.admin.routeservice.action.RouteServiceAction"
+			name="pureRouteForm" scope="request" parameter="submitName">	
+			<forward name="success" path="pureRoute" />			
+		</action>
+		<action path="/transshipmentRoute" type="com.ff.admin.routeservice.action.TransshipmentRouteServiceAction"
+			name="transshipmentRouteForm" scope="request" parameter="submitName">	
+			<forward name="success" path="transshipmentRoute" />
+		</action>
+		<action path="/routeServicedBy" type="com.ff.admin.routeservice.action.RouteServicedByAction"
+			name="routeServicedByForm" scope="request" parameter="submitName">	
+			<forward name="success" path="routeServicedBy" />
+		</action>
+		<!-- Route Service End-->
+					
+		<!-- Start Held Up-->
+		<action path="/heldUp" type="com.ff.admin.heldup.action.HeldUpAction"
+			name="heldUpForm" scope="request" parameter="submitName">	
+			<forward name="viewHeldUp" path="viewHeldUp"/>
+		</action>
+		<!-- End Held Up-->
+		
+	
+		<!-- <action path="/consignmentTrackingHeader1" type="com.ff.admin.tracking.consignmentTracking.action.ConsignmentTrackingAction"
+			name="consignmentTrackingForm" scope="request" parameter="submitName">	
+			<forward name="SUCCESS" path="viewConsignmentTrackingHeader"/>
+		</action> -->
+		
+		
+		
+		
+		<!-- End Tracking-->
+		<!-- End Rate-->
+		
+		<!-- Misc. Expense & Collections Start -->
+		
+		<action path="/expenseEntry" type="com.ff.admin.mec.expense.action.ExpenseEntryAction"
+			name="expenseEntryForm" scope="request" parameter="submitName">	
+			<forward name="expenseOffice" path="expenseOffice"/>
+			<forward name="expenseEmployee" path="expenseEmployee"/>
+			<forward name="expenseConsignment" path="expenseConsignment"/>
+			<forward name="validateExpenseOffice" path="/pages/mec/expense/expenseOffice.jsp"/>
+			<forward name="validateExpenseEmployee" path="/pages/mec/expense/expenseEmployee.jsp"/>
+			<forward name="validateExpenseConsignment" path="/pages/mec/expense/expenseConsignment.jsp"/>
+		</action>
+		
+		<action path="/validateExpense" type="com.ff.admin.mec.expense.action.ValidateExpenseAction"
+			name="validateExpenseForm" scope="request" parameter="submitName">	
+			<forward name="validateExpense" path="validateExpense"/>
+		</action>
+		
+		<action path="/billCollection" type="com.ff.admin.mec.collection.action.BillCollectionAction"
+			name="billCollectionForm" scope="request" parameter="submitName">	
+			<forward name="viewBillCollection" path="viewBillCollectionPage"/>
+			<forward name="validateBillCollectionEntry" path="validateBillCollectionEntry"/>
+		</action>
+		
+		<action path="/cnCollection" type="com.ff.admin.mec.collection.action.CNCollectionAction"
+			name="cnCollectionForm" scope="request" parameter="submitName">	
+			<forward name="viewCnCollection" path="viewCNCollectionPage"/>
+		</action>
+		
+		<action path="/validateCollection" type="com.ff.admin.mec.collection.action.ValidateCollectionAction"
+			name="validateCollectionForm" scope="request" parameter="submitName">	
+			<forward name="viewValidateCollection" path="viewValidateCollectionPage"/>
+		</action>
+		
+		<action path="/bulkCollectionValidation" type="com.ff.admin.mec.collection.action.BulkCollectionValidationAction" 
+			name="bulkCollectionValidationForm" scope="request" parameter="submitName">
+			<forward name="viewBulkCollectionValidation" path="bulkCollectionValidation"/>
+		</action>
+		
+		<action path="/payLiability" type="com.ff.admin.mec.liability.action.LiabilityPaymentAction"
+			name="liabilityPaymentForm" scope="request" parameter="submitName">	
+			<forward name="SUCCESS" path="liabilityPayment"/>
+			<forward name="getLiabilityDetails" path="liabilityPayment"/>
+			<forward name="saveOrUpdateLiability" path="liabilityPayment"/>
+			<forward name="searchLiabilityDetails" path="liabilityPayment"/>
+		</action>
+		
+		<action path="/pettyCashReport" type="com.ff.admin.mec.pettycash.action.PettyCashReportAction"
+			name="pettyCashReportForm" scope="request" parameter="submitName">	
+			<forward name="pettyCashReport" path="pettyCashReport" />
+			<forward name="pettyCashReportViewer" path="/pages/mec/pettycash/pettyCashReportViewer.jsp" />
+		</action>
+		
+		<!-- Misc. Expense & Collections End-->
+		
+			<!-- Start Tracking-->
+		<action path="/manifestTrackingHeader" type="com.ff.admin.tracking.manifestTracking.action.ManifestTrackingAction"
+			name="manifestTrackingForm" scope="request" parameter="submitName">	
+			<forward name="SUCCESS" path="viewManifestTracking"/>
+			<forward name="officepopup" path="/pages/tracking/officePopup.jsp"/>
+		</action>
+		
+		<action path="/consignmentTrackingHeader" type="com.ff.admin.tracking.consignmentTracking.action.ConsignmentTrackingAction"
+			name="consignmentTrackingForm" scope="request" parameter="submitName">	
+			<forward name="SUCCESS" path="viewConsignmentTracking"/>
+			<forward name="officepopup" path="/pages/tracking/officePop.jsp"/>
+			<forward name="trackingPopup" path="trackingPopup"/>
+		</action>
+		
+		<action path="/consignmentTrackingHeader1" type="com.ff.admin.tracking.consignmentTracking.action.ConsignmentTrackingAction"
+			name="consignmentTrackingForm" scope="request" parameter="submitName">	
+			<forward name="SUCCESS" path="viewConsignmentTrackingHeader"/>
+		</action>
+		
+		<action path="/gatePassTracking" type="com.ff.admin.tracking.gatepassTracking.action.GatepassTrackingAction"
+			name="gatepassTrackingForm" scope="request" parameter="submitName">	
+			<forward name="SUCCESS" path="viewGatepassTracking"/>
+		</action>
+		
+		<action path="/multipleTracking" type="com.ff.admin.tracking.multipleTracking.action.MultipleTrackingAction"
+			name="multipleTrackingForm" scope="request" parameter="submitName">	
+			<forward name="SUCCESS" path="viewMultipleTracking"/>
+		</action>
+		
+		<action path="/bulkImportTracking" type="com.ff.admin.tracking.bulkImportTracking.action.BulkImportAction"
+			name="bulkImportForm" scope="request" parameter="submitName">	
+			<forward name="SUCCESS" path="bulkImportTracking"/>
+		</action>
+		
+		<!-- End Tracking-->
+		
+		<!-- Start Leads -->
+		<action path="/createLead" type="com.ff.admin.leads.action.CreateLeadAction"
+			name="createLeadForm" scope="request" parameter="submitName">
+			<forward name="Success" path="createLead" />
+			<forward name="saveLead" path="createLead" />
+		</action>
+		
+		<action path="/leadsView" type="com.ff.admin.leads.action.LeadsViewAction"
+			name="leadsViewForm" scope="request" parameter="submitName">
+			<forward name="Success" path="leadsView" />
+		</action>
+		
+		<action path="/errorHandling" type="com.ff.admin.errorHandling.action.ErrorHandlingAction"
+			name="errorHandlingForm" scope="request" parameter="submitName">
+			<forward name="Success" path="errorHandling"/>
+			<forward name="newJsp" path="/pages/errorHandling/errorHandlingDetails.jsp"/>
+		</action>		
+		
+		<action path="/leadPlanning"  type="com.ff.admin.leads.action.LeadsPlanningAction" 
+		name="viewUpdateFeedbackForm" scope="request" parameter="submitName">
+		<!-- <forward name="Success" path="leadPlanning" />  /pages/leads/leadsPlanning.jsp -->
+		<forward name="Success" path="/pages/leads/leadsPlanning.jsp" />
+		<forward name="leadFeedback" path="/pages/leads/leadsFeedback.jsp" /> 
+		</action>
+		
+	<!-- 	<action path="/leadFeedback"  type="com.ff.admin.leads.action.LeadsPlanningAction" 
+		name="viewUpdateFeedbackForm" scope="request" parameter="submitName">
+		<forward name="leadFeedback" path="leadFeedback" /> /pages/leads/leadsFeedback.jsp
+		<forward name="leadFeedback" path="/pages/leads/leadsFeedback.jsp" /> 
+		</action> -->
+		
+		<action path="/leadValidation"  type="com.ff.admin.leads.action.LeadsValidationAction" 
+		name="createLeadForm" scope="request" parameter="submitName">
+		<forward name="Success" path="leadValidation" />
+		<forward name="Email" path="/pages/leads/sendEmail.jsp" />
+		<forward name="SMS" path="/pages/leads/sendSMS.jsp" />
+		<forward name="PLAN" path="/pages/leads/leadsPlanning.jsp" />
+		<forward name="FEEDBACK" path="/pages/leads/leadsFeedback.jsp" />
+		<forward name="viewRateQuotation" path="/rateQuotation.do?submitName=viewRateQuotation"/>
+		<forward name="viewEcommerceRateQuotation" path="/rateQuotation.do?submitName=viewEcommerceRateQuotation"/>
+		</action>
+
+		<action path="/sendEmail" type="com.ff.admin.leads.action.SendEmailAction"
+			name="sendEmailForm" scope="request" parameter="submitName">
+			<forward name="Success" path="/pages/leads/sendEmail.jsp" />
+		</action>
+		
+		<action path="/sendSMS" type="com.ff.admin.leads.action.SendSMSAction"
+			name="sendSMSForm" scope="request" parameter="submitName">
+			<forward name="Success" path="/pages/leads/sendSMS.jsp" />
+		</action>
+		<!-- <action path="/email" forward="/pages/leads/sendEmail.jsp" /> -->
+		
+	<!-- End Leads -->
+	
+	<!-- Start Billing -->
+	<action path="/invoiceRunSheetPrinting" type="com.ff.admin.billing.action.InvoiceRunSheetPrintingAction"
+			name="invoiceRunSheetPrintingForm" scope="request" parameter="submitName">
+			<forward name="Success" path="invoiceRunSheetPrinting" />
+		</action>
+		
+	<action path="/invoiceRunSheetUpdate" type="com.ff.admin.billing.action.InvoiceRunSheetUpdateAction"
+			name="invoiceRunSheetPrintingForm" scope="request" parameter="submitName">
+			<forward name="Success" path="invoiceRunSheetUpdate" />
+		</action>
+	
+	<action path="/billPrinting" type="com.ff.admin.billing.action.BillPrintingAction"
+			name="billPrintingForm" scope="request" parameter="submitName">
+			<forward name="Success" path="billPrinting" />
+			<forward name="customerBillPrint" path="/pages/billing/Bill.jsp" />
+		</action>
+		
+		<action path="/reBilling" type="com.ff.admin.billing.action.ReBillingAction"
+			name="reBillingForm" scope="request" parameter="submitName">
+			<forward name="Success" path="reBilling" />
+		</action>
+		
+	<action path="/reBillingGDR" type="com.ff.admin.billing.action.ReBillingGDRAction"
+			name="reBillingGDRForm" scope="request" parameter="submitName">
+			<forward name="Success" path="reBillingGDR" />
+		</action>
+		
+		
+	
+	<!-- End Billing -->
+		
+	<!-- COMPLAINTS START -->	
+		<action path="/serviceRequestForService" type="com.ff.admin.complaints.action.ServiceRequestForServiceAction"
+			name="serviceRequestForServiceForm" scope="request" parameter="submitName">	
+			<forward name="serviceRequestForService" path="serviceRequestForService"/>
+		</action>
+		<action path="/searchServiceRequest" type="com.ff.admin.complaints.action.SearchServiceRequestAction"
+			name="searchServiceRequestForm" scope="request" parameter="submitName">	
+			<forward name="success" path="searchServiceRequest"/>
+		</action>
+		<action path="/complaintTrasfer" type="com.ff.admin.complaints.action.ServiceRequestForServiceAction"
+			name="serviceRequestForServiceForm" scope="request" parameter="submitName">
+			<forward name="success" path="/pages/complaints/complaintTransfer.jsp" />
+		</action>
+		
+		<action path="/serviceRequestForConsignment" type="com.ff.admin.complaints.action.ServiceRequestForConsignmentAction"
+			name="serviceRequestForConsignmentForm" scope="request" parameter="submitName">	
+			<forward name="serviceRequestForConsignment" path="serviceRequestForConsignment"/>
+			<forward name="serviceTrackingConsig" path="serviceTrackingConsig"/>
+			<forward name="viewtrackingPOPup" path="/pages/complaints/popup_ChildCN.html" />
+			
+		</action>
+		
+		<action path="/backlikeSummary" type="com.ff.admin.complaints.action.ComplaintsBacklineSummaryAction"
+			name="backlikeSummaryForm" scope="request" parameter="submitName">
+			<forward name="backlineSummary" path="backlikeSummary" />
+			<forward name="Success" path="/pages/complaints/complaintsBacklineSummary.jsp" />
+		</action>
+		
+		<!-- complaints -->
+		<action path="/paperwork" type="com.ff.admin.complaints.action.PaperworkAction"
+			name="paperworkForm" scope="session" parameter="submitName">
+			<forward name="success" path="/pages/complaints/complaint.jsp" />
+		</action>
+		<!-- complaints -->
+		
+		<action path="/serviceRequestFollowup" type="com.ff.admin.complaints.action.ServiceRequestFollowupAction"
+			name="serviceRequestFollowupForm" scope="session" parameter="submitName" input="/pages/complaints/complaintFollowUp.jsp">	
+			<forward name="SUCCESS" path="paperwork"/>
+		</action>
+		
+		<action path="/solveComplaint" type="com.ff.admin.complaints.action.SolveComplaintAction"
+			name="solveComplaintForm" scope="request" parameter="submitName">
+			<forward name="success" path="/pages/complaints/solveComplaint.jsp" />
+		</action>
+	<!-- COMPLAINTS END -->
+	
+	<!-- Report section Kamal -->
+	<action path="/outstandingReport" type="com.ff.admin.report.action.OutstandingReportAction"
+			name="outstandingReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="outstandingReport" />
+		</action>
+		<!-- COLOADING START -->
+		<action path="/airColoading" type="com.ff.admin.coloading.action.ColoadingAction"
+			name="airColoadingForm"  scope="request" parameter="submitName">
+			<forward  name="airSuccess" path="airColoading" />
+		</action>
+		<action path="/trainColoading" type="com.ff.admin.coloading.action.ColoadingAction"
+			name="trainColoadingForm"  scope="request" parameter="submitName">
+			<forward  name="trainSuccess" path="trainColoading" />
+		</action>
+		<action path="/vehiclesContractColoading" type="com.ff.admin.coloading.action.ColoadingVehiclesContractAction"
+			name="vehiclesContractColoadingForm"  scope="request" parameter="submitName">
+			<forward  name="vehiclesSuccess" path="vehiclesContractColoading" />
+		</action>
+		<action path="/vehicleServiceEntry" type="com.ff.admin.coloading.action.ColoadingVehicleServiceEntryAction"
+			name="vehicleServiceEntryForm"  scope="request" parameter="submitName">
+			<forward  name="vehicleServiceEntrySuccess" path="vehicleServiceEntry" />
+		</action>
+		<action path="/cdAwbModification" type="com.ff.admin.coloading.action.ColoadingCdAwbModificationAction"
+			name="cdAwbModificationForm"  scope="request" parameter="submitName">
+			<forward  name="viewCdAwbModification" path="cdAwbModification" />
+		</action>
+		<action path="/surfaceRateEntry" type="com.ff.admin.coloading.action.ColoadingSurfaceRateEntryAction"
+			name="surfaceRateEntryForm"  scope="request" parameter="submitName">
+			<forward  name="surfaceRateEntrySuccess" path="surfaceRateEntry" />
+		</action>
+		<action path="/fuelRateEntryColoading" type="com.ff.admin.coloading.action.ColoadingFuelRateEntryAction"
+			name="fuelRateEntryForm"  scope="request" parameter="submitName">
+			<forward  name="fuelRateEntrySuccess" path="fuelRateEntryColoading" />
+		</action>
+		<!-- COLOADING END -->
+		<!-- MASTER START  -->
+		<action path="/pincodeMaster" type="com.ff.admin.master.action.PincodemasterAction"
+			name="PinCodeMasterForm" scope="request" parameter="submitName">	
+			<forward name="Success" path="pincodeMaster" />
+		</action>
+		
+		<action path="/vendorMapping" type="com.ff.admin.master.action.VendorMappingAction"
+			name="vendorMappingForm" scope="request" parameter="submitName">
+			<forward name="Success" path="vendorMapping" />
+		</action>
+		<action path="/holiday" type="com.ff.admin.master.action.HolidayAction"
+			name="holidayForm" scope="request" parameter="submitName">
+			<forward name="Success" path="holiday" />
+			<forward name="SuccessCreate" path="createHoliday" />
+			<forward name="SuccessEdit" path="/pages/masters/editHoliday.jsp" />
+		</action>
+		<!--MASTER END -->
+		
+		<!-- Complaint START -->
+		
+		<action path="/criticalComplaint" type="com.ff.admin.complaints.action.CriticalComplaintAction"
+			name="criticalComplaintForm" scope="request" parameter="submitName" input="/pages/complaints/criticalComplaint.jsp">
+			<forward name="viewCriticalComplaint" path="paperwork"/>
+		</action>
+		
+		<action path="/criticalClaimComplaint" type="com.ff.admin.complaints.action.CriticalClaimComplaintAction"
+		name="criticalClaimComplaintForm" scope="request" parameter="submitName" input="/pages/complaints/criticalClaimComplaint.jsp">
+				<forward name="viewCriticalClaimComplaint" path="paperwork" />
+		</action>
+		
+		<action path="/legalComplaint" type="com.ff.admin.complaints.action.LegalComplaintAction"
+			name="legalComplaintForm" scope="session" parameter="submitName">
+			<forward name="success" path="/pages/complaints/legalComplaint.jsp" />
+			<forward name="successPaperWork" path="/pages/complaints/complaint.jsp" />
+		</action>
+		<!-- Complaint END -->
+				
+		<!-- Stop Delivery Start -->
+		 <action path="/stopDelivery" type="com.ff.admin.stopdelivery.action.StopDeliveryAction"
+			name="stopDeliveryForm" scope="request" parameter="submitName">
+			<forward name="Success" path="stopDelivery" />
+		</action>
+		<!-- Stop Delivery End -->
+		
+		
+		<!-- Job Service Start -->
+		 <action path="/jobService" type="com.ff.admin.jobservice.action.JobServiceAction"
+			name="jobServiceForm" scope="request" parameter="submitName">
+			<forward name="success" path="jobService" />
+			<forward name="jobServiceView" path="jobServiceView" />
+		</action>
+		<!-- Job Service End -->
+		
+		<!-- Cust Modification Start -->
+		  <action path="/custModification" type="com.ff.admin.billing.action.CustModificationAction"
+			name="custModificationForm" scope="request" parameter="submitName">
+			<forward name="success" path="custModification" />
+			<!-- <forward name="jobServiceView" path="jobServiceView" /> -->
+		</action>
+		<!-- Cust Modification End -->
+		
+		<!-- Bulk Cust Modification Start by bmodala -->
+		  <action path="/bulkCustModification" type="com.ff.admin.billing.action.BulkCustModificationAction"
+			name="bulkCustModificationForm" scope="request" parameter="submitName">
+			<forward name="success" path="bulkCustModification" />
+		</action>
+		<!-- Bulk Cust Modification End -->
+		<action path="/bulkSmsOnDemand" type="com.ff.admin.notification.action.BulkSmsOnDemandAction" 
+			name="bulkSmsOnDemandForm" scope="request" parameter="submitName">
+			<forward name="bulkSmsOnDemand" path="bulkSmsOnDemand"/>
+		</action>
+	</action-mappings>
+	
+	
+	<controller processorClass="org.apache.struts.action.RequestProcessor" /> 
+	
+	<message-resources parameter="UdaanCnfadminApplicationResources_en_US" />
+	<message-resources  parameter="UdaanCnfadminErrorMessageResources" key="errorBundle"/>
+	<message-resources parameter="UniversalMessageResources"
+		key="universalResourceBundle" />
+		
+		<message-resources parameter="frameworkErrorMessages"
+		key="frameworkResourceBundle" />
+		<message-resources parameter="RateCalculationMessageResources_en_US"
+		key="rateResourceBundle" />
+	
+	<plug-in className="org.apache.struts.tiles.TilesPlugin">
+		<set-property property="definitions-config" value="/WEB-INF/rate-tiles-defs.xml,/WEB-INF/cnfadmin-tiles-def.xml,/WEB-INF/login-tiles-defs.xml"/>
+      	<set-property property="moduleAware" value="true"/>
+      	<set-property property="definitions-parser-validate" value="true"/>
+	</plug-in>
+   
+</struts-config>

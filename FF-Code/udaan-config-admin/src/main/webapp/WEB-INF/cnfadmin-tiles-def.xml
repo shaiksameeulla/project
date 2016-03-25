@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+	"-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN"
+	"http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd">
+<tiles-definitions>
+ 	<definition name="udaanBaseLayout" path="/pages/snippets/udaanCommonLayout.jsp">
+        <put name="header" value="/pages/snippets/udaanHeader.jsp" />
+        <put name="topMenu" value="/pages/snippets/udaanModuleMenus.jsp" />
+        <put name="body"   value="/pages/snippets/udaanEmpty.jsp" />
+       <!--  <put name="leftMenu"   value="/pages/snippets/udaanLeftNavigationModuleSpecificMenus.jsp" /> -->
+        <put name="footer" value="/pages/snippets/udaanFooter.jsp" />       
+    </definition>
+
+    <definition name="welcomeLayOut" extends="udaanBaseLayout">
+		<put name="body" value="/pages/snippets/udaanEmpty.jsp" />
+	</definition>
+	
+	<definition name="popupLayOut" path="/pages/snippets/udaanCommonLayout.jsp">
+		<put name="header" value="/pages/snippets/udaanEmpty.jsp" />
+        <put name="topMenu" value="/pages/snippets/udaanEmpty.jsp" />
+        <put name="body"   value="/pages/snippets/udaanEmpty.jsp" />
+        <put name="footer" value="/pages/snippets/udaanEmpty.jsp" />
+	</definition>
+	
+	<!-- UMC starts -->
+	<definition name="createCustLoginPage" extends="udaanBaseLayout">
+		<put name="body" value="/login/jsp/createCustomer.jsp" />
+	</definition>
+	<definition name="createEmpLoginPage" extends="udaanBaseLayout">
+		<put name="body" value="/login/jsp/createEmployee.jsp" />
+	</definition>
+	<!-- UMC ends -->
+	
+	<!-- Stock Module start -->
+	
+   	<definition name="createRequisition" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockRequisition.jsp" />
+	</definition>
+    <definition name="approveRequisition" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/approveStockRequisition.jsp" />
+	</definition>
+	<definition name="listViewRequisition" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockRequisitionListView.jsp" />
+	</definition>
+    
+    <!-- Stock Issue Start -->
+    <definition name="stockIssue" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockIssue.jsp" />
+	</definition> 
+	<definition name="stockIssueCustomer" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockIssueCustomer.jsp" />
+	</definition> 
+	<definition name="stockIssueEmployee" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockIssueEmployee.jsp" />
+	</definition>  
+	<!-- Stock Issue End -->
+
+	<!-- Stock Receipt Start -->
+	<definition name="stockReceipt" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockAcknowledgement.jsp" />
+	</definition>
+	<definition name="stockReceiptRho" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockAcknowledgementAtRho.jsp" />
+	</definition>
+	
+	
+	<!-- Stock Receipt End -->
+
+	<!-- Stock Receipt Start -->
+	<definition name="stockReceipt" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockAcknowledgement.jsp" />
+	</definition>
+	<!-- Stock Receipt End -->
+	
+	<!-- Stock Return Start-->
+	<definition name="stockReturn" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockReturn.jsp" />
+	</definition> 
+	<definition name="stockReturnRho" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockReturnToRho.jsp" />
+	</definition> 
+	<!-- Stock Return End-->
+	
+	<!-- Stock Transfer Start-->
+	<definition name="stockTransfer" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockTransfer.jsp" />
+	</definition> 
+	<!-- Stock Transfer End-->
+	
+	
+	<!-- Stock Cancellation Start-->
+	<definition name="stockCancel" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockCancellation.jsp" />
+	</definition> 
+	<!-- Stock Cancellation End-->
+<definition name="stockExcelUpload" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stockmanagement/stockExcelUpload.jsp" />
+	</definition> 
+	<!-- Stock Module END -->
+	<!-- Routing Start-->
+	<definition name="pureRoute" extends="udaanBaseLayout">
+		<put name="body" value="/pages/routeservice/pureRoute.jsp" />
+	</definition> 
+		 
+	 <definition name="transshipmentRoute" extends="udaanBaseLayout">
+		<put name="body" value="/pages/routeservice/transshipmentRoute.jsp" />
+	</definition>
+	
+	<definition name="routeServicedBy" extends="udaanBaseLayout">
+		<put name="body" value="/pages/routeservice/routeServicedBy.jsp" />
+	</definition> 
+	 
+	<!-- Routing End--> 
+	
+    <!-- Start Held Up-->
+    <definition name="viewHeldUp"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/heldup/heldUp.jsp" />
+    </definition>
+    <!-- End Held Up-->
+    
+    <!-- Start Tracking-->
+    <definition name="viewConsignmentTrackingHeader"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/tracking/trackingHeader.jsp" />
+    </definition>
+    
+    <definition name="viewConsignmentTracking"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/tracking/trackingConsignment.jsp" />
+    </definition>
+    
+    <definition name="viewManifestTracking"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/tracking/trackingManifest.jsp" />
+    </definition>
+    
+    <definition name="viewGatepassTracking"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/tracking/trackingGatepass.jsp" />
+    </definition>
+    
+    
+    
+    <definition name="viewMultipleTracking"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/tracking/trackingMultiple.jsp" />
+    </definition>
+    
+    
+     <definition name="bulkImportTracking"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/tracking/trackingBulkImport.jsp" />
+    </definition>
+    
+    
+    <!-- End Tracking-->
+    
+    <!-- Misc. Expense & Collections Start-->
+	<definition name="expenseOffice" extends="udaanBaseLayout">
+		<put name="body" value="/pages/mec/expense/expenseOffice.jsp" />
+	</definition> 
+	
+	<definition name="expenseEmployee" extends="udaanBaseLayout">
+		<put name="body" value="/pages/mec/expense/expenseEmployee.jsp" />
+	</definition>
+	
+	<definition name="expenseConsignment" extends="udaanBaseLayout">
+		<put name="body" value="/pages/mec/expense/expenseConsignment.jsp" />
+	</definition>
+		
+	<definition name="validateExpense" extends="udaanBaseLayout">
+		<put name="body" value="/pages/mec/expense/validateExpense.jsp" />
+	</definition>
+	
+	<definition name="liabilityPayment" extends="udaanBaseLayout">
+		<put name="body" value="/pages/mec/liability/liabilityPayment.jsp" />
+	</definition>
+	
+	<definition name="viewBillCollectionPage" extends="udaanBaseLayout">
+		<put name="body" value="/pages/mec/collection/billCollection.jsp" />
+	</definition>
+	
+	<definition name="viewCNCollectionPage" extends="udaanBaseLayout">
+		<put name="body" value="/pages/mec/collection/cnCollection.jsp" />
+	</definition>
+	
+	<definition name="viewValidateCollectionPage" extends="udaanBaseLayout">
+		<put name="body" value="/pages/mec/collection/validateCollection.jsp" />
+	</definition>
+	
+	<definition name="validateBillCollectionEntry" path ="/pages/mec/collection/validateCollectionEntry.jsp">
+	</definition>
+	
+	<definition name="pettyCashReport" extends="udaanBaseLayout">
+		<put name="body" value="/pages/mec/pettycash/pettyCashReport.jsp" />
+	</definition>
+	
+	<!-- Misc. Expense & Collections End--> 
+	
+	<!-- Start Leads-->
+    <definition name="createLead"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/leads/createLead.jsp" />
+    </definition>
+    
+<!--     <definition name="leadsView"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/leads/leadsView.jsp" />
+    </definition>  -->
+    
+     <definition name="leadsView"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/leads/leadsViewSearchedBy.jsp" />
+    </definition> 
+    
+    <!--  <definition name="leadPlanning"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/leads/leadsPlanning.jsp" />
+    </definition>
+    
+    <definition name="leadFeedback"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/leads/leadsFeedback.jsp" />
+    </definition> -->
+    
+     <definition name="leadValidation"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/leads/leadValidation.jsp" />
+    </definition>
+    
+    <!-- End Leads-->
+    
+    <!-- Start Billing-->
+    
+    <definition name="invoiceRunSheetPrinting"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/billing/invoiceRunSheetPrinting.jsp" />
+    </definition>
+    
+     <definition name="billPrinting"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/billing/billPrinting.jsp" />
+    </definition>
+    
+     <definition name="invoiceRunSheetUpdate"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/billing/invoiceRunSheetUpdate.jsp" />
+    </definition>
+    
+    <definition name="reBilling"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/billing/reBilling.jsp" />
+    </definition>
+    
+    <definition name="reBillingGDR"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/billing/reBillingGDR.jsp" />
+    </definition>
+    <!-- End Billing-->
+    
+    <!-- Complaints Management Module Started -->
+    <definition name="serviceRequestForService" extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/complaints/serviceRequestForService.jsp" />
+    </definition>
+     <definition name="searchServiceRequest" extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/complaints/searchServiceRequest.jsp" />
+    </definition>
+    
+    
+     <definition name="serviceRequestForConsignment" extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/complaints/serviceRequestForConsignment.jsp" />
+    </definition>
+    <definition name="serviceTrackingConsig" extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/complaints/ServiceTrackingConsig.jsp" />
+    </definition>
+    <!-- Complaints Management Module End -->
+    
+    <!-- Tiles def for report section Kamal -->
+    <definition name="outstandingReport"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/report/outstandingReport.jsp" />
+    </definition>
+    <!-- Tiles def for report section ended Kamal -->
+    
+    <!-- COMPLAINTS START -->
+    
+	<definition name="backlikeSummary"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/complaints/complaintsBacklineSummary.jsp" />
+    </definition>
+    
+    <definition name="trackingPopup" extends="popupLayOut">
+		<put name="body" value="/pages/tracking/trackingConsignment.jsp" />
+	</definition>
+    <!-- COMPLAINTS END -->
+    
+    <!-- COLOADING START -->
+	<definition name="airColoading" extends="udaanBaseLayout">
+		<put name="body" value="/pages/coloading/airColoading.jsp" />
+	</definition>
+	<definition name="trainColoading" extends="udaanBaseLayout">
+		<put name="body" value="/pages/coloading/trainColoading.jsp" />
+	</definition>
+	<definition name="vehiclesContractColoading" extends="udaanBaseLayout">
+		<put name="body" value="/pages/coloading/vehiclesContractColoading.jsp" />
+	</definition>
+	<definition name="vehicleServiceEntry" extends="udaanBaseLayout">
+		<put name="body" value="/pages/coloading/vehicleServiceEntry.jsp" />
+	</definition>
+	<definition name="cdAwbModification" extends="udaanBaseLayout">
+		<put name="body" value="/pages/coloading/cdAwbModification.jsp" />
+	</definition>
+	<definition name="surfaceRateEntry" extends="udaanBaseLayout">
+		<put name="body" value="/pages/coloading/surfaceRateEntry.jsp" />
+	</definition>
+	<definition name="fuelRateEntryColoading" extends="udaanBaseLayout">
+		<put name="body" value="/pages/coloading/fuelRateEntry.jsp" />
+	</definition>
+	<!-- COLOADING END -->
+    
+    <!--Masters Start -->
+    
+   	<definition name="pincodeMaster" extends="udaanBaseLayout">
+		<put name="body" value="/pages/masters/pincodeMaster.jsp" />
+	</definition>
+	
+	 <definition name="vendorMapping" extends="udaanBaseLayout">
+		<put name="body" value="/pages/masters/vendorMapping.jsp" />
+	</definition>
+	
+	 <definition name="holiday" extends="udaanBaseLayout">
+		<put name="body" value="/pages/masters/holidayMaster.jsp" />
+	</definition>
+	
+	<definition name="createHoliday" extends="udaanBaseLayout">
+		<put name="body" value="/pages/masters/createHoliday.jsp" />
+	</definition>
+    <!-- Masters End -->
+    
+    <definition name="paperwork" extends="udaanBaseLayout">
+		<put name="body" value="/pages/complaints/complaint.jsp" />
+	</definition>
+	
+	    <!-- Stop Delivery Start --> 
+    <definition name="stopDelivery" extends="udaanBaseLayout">
+		<put name="body" value="/pages/stopdelivery/stopDelivery.jsp" />
+	</definition> 
+	<!--Stop Delivery End  -->
+	
+	    <!-- Job service Start --> 
+    <definition name="jobService" extends="udaanBaseLayout">
+		<put name="body" value="/pages/jobservice/jobService.jsp" />
+	</definition>
+	<definition name="jobServiceView" extends="udaanBaseLayout">
+		<put name="body" value="/pages/jobservice/jobServiceView.jsp" />
+	</definition> 
+	<!--Job service End  -->
+	
+	<!-- Cust Modification Start -->
+	 <definition name="custModification" extends="udaanBaseLayout">
+		<put name="body" value="/pages/billing/cnModification.jsp" />
+	</definition> 
+	<!-- Cust Modification End -->
+	
+	<!-- Added by Shaheed -->
+	<definition name="searchByPincode" extends="udaanBaseLayout">
+		<put name="body" value="/pages/serviceability/pincodeSearch.jsp" />
+	</definition>
+	
+	<definition name="searchByBranch" extends="udaanBaseLayout">
+		<put name="body" value="/pages/serviceability/branchSearch.jsp" />
+	</definition> 
+	
+	<!-- Bulk Cust Modification Start by bmodala -->
+	<definition name="bulkCustModification" extends="udaanBaseLayout">
+		<put name="body" value="/pages/billing/bulkCnModification.jsp" />
+	</definition>
+	<!-- Bulk Cust Modification End -->
+	
+     <definition name="errorHandling"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/errorHandling/errorHandlingSearchedBy.jsp" />
+    </definition> 	
+    
+	<!-- Notification Module screens Start -->
+	<definition name="bulkSmsOnDemand"  extends="udaanBaseLayout" >   
+ 		<put name="body" value="/pages/notification/bulkSmsOnDemand.jsp" />
+    </definition> 
+	<!-- Notification Module screens End -->
+	
+	<!-- Bulk Collection Validation  -->
+	<definition name="bulkCollectionValidation" extends="udaanBaseLayout">
+		<put name="body" value="/pages/mec/collection/bulkCollectionValidation.jsp"/>
+	</definition>
+	
+</tiles-definitions>

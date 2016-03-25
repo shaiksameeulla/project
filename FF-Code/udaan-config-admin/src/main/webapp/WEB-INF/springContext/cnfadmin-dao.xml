@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+	
+	<import resource="classpath:universe-dao.xml" /> 
+	<import resource="classpath:rate-calculation-dao.xml" />
+
+	<bean id="cgBaseDAO" class="com.capgemini.lbs.framework.dao.CGBaseDAO" abstract="true" >
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="cgBaseDAOSupport" class="com.capgemini.lbs.framework.dao.CGBaseDAOSupport" abstract="true" >
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<!-- stock management  DAO Start  -->
+	
+	<bean id="stockCommonDAO" class="com.ff.admin.stockmanagement.common.dao.StockCommonDAOImpl" parent="cgBaseDAO"/>
+	<bean id="stockRequisitionDAO" class="com.ff.admin.stockmanagement.stockrequisition.dao.StockRequisitionDAOImpl" parent="cgBaseDAO"/>
+	<bean id="stockIssueDAO" class="com.ff.admin.stockmanagement.stockissue.dao.StockIssueDAOImpl" parent="cgBaseDAO"/>
+	<bean id="stockReceiptDAO" class="com.ff.admin.stockmanagement.stockreceipt.dao.StockReceiptDAOImpl" parent="cgBaseDAO"/>
+	<bean id="stockReturnDAO" class="com.ff.admin.stockmanagement.stockreturn.dao.StockReturnDAOImpl" parent="cgBaseDAO"/>
+	<bean id="stockCancellationDAO" class="com.ff.admin.stockmanagement.stockcancel.dao.StockCancellationDAOImpl" parent="cgBaseDAO"/>
+	<bean id="stockTransferDAO" class="com.ff.admin.stockmanagement.stocktransfer.dao.StockTransferDAOImpl" parent="cgBaseDAO"/>
+	<bean id="autoRequisitionDAO" class="com.ff.admin.stockmanagement.autorequisition.dao.AutoRequisitionDAOImpl" parent="cgBaseDAO"/>
+	<bean id="stockScheduledDAO" class="com.ff.admin.stockmanagement.common.dao.StockScheduledDAOImpl" parent="cgBaseDAO"/>
+	<bean id="outstandingReportDAO" class="com.ff.admin.report.dao.OutstandingReportDAOImpl" parent="cgBaseDAO"/>
+	<bean id="organizationCommonDAO" class="com.ff.universe.organization.dao.OrganizationCommonDAOImpl" parent="cgBaseDAO"/>
+	<bean id="stockReductionDAO" class="com.ff.admin.stockmanagement.stockreduction.dao.StockReductionDAOImpl" parent="cgBaseDAO"/>
+	<bean id="stockExcelUploadDAO" class="com.ff.admin.stockmanagement.excelupload.dao.StockExcelUploadDAOImpl" parent="cgBaseDAO"/>
+	
+ 	<!-- stock management  DAO END  -->
+ 	
+ 	<!-- Routing  DAO START  -->
+ 	<bean id="routeServicedDAO" class="com.ff.admin.routeservice.dao.RouteServicedDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<!-- Routing  DAO END  -->
+		
+    <!-- Start Held Up-->
+	<bean id="heldUpDAO" class="com.ff.admin.heldup.dao.HeldUpDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+    <!-- End Held Up-->
+    
+    <!-- Start Tracking-->
+	<bean id="consignmentTrackingDAO" class="com.ff.admin.tracking.consignmentTracking.dao.ConsignmentTrackingDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="manifestTrackingDAO" class="com.ff.admin.tracking.manifestTracking.dao.ManifestTrackingDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="gatepassTrackingDAO" class="com.ff.admin.tracking.gatepassTracking.dao.GatepassTrackingDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="trackingCommonDAO" class="com.ff.admin.tracking.common.dao.TrackingCommonDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+		<bean id="bulkImportTrackingDAO" class="com.ff.admin.tracking.bulkImportTracking.dao.BulkImportTrackingDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+    <!-- End Tracking-->
+    
+    <!-- Start MEC -->
+	<bean id="mecCommonDAO" class="com.ff.admin.mec.common.dao.MECCommonDAOImpl" parent="cgBaseDAO" />
+	<bean id="expenseEntryDAO" class="com.ff.admin.mec.expense.dao.ExpenseEntryDAOImpl" parent="cgBaseDAO" />
+	<bean id="collectionCommonDAO" class="com.ff.admin.mec.collection.dao.CollectionCommonDAOImpl" parent="cgBaseDAO" />
+	<bean id="liabilityDAO" class="com.ff.admin.mec.liability.dao.LiabilityDAOImpl" parent="cgBaseDAO" />
+	<bean id="billCollectionDAO" class="com.ff.admin.mec.collection.dao.BillCollectionDAOImpl" parent="cgBaseDAO" />
+	<bean id="validateExpenseDAO" class="com.ff.admin.mec.expense.dao.ValidateExpenseDAOImpl" parent="cgBaseDAO" />
+    <bean id="validateCollectionDAO" class="com.ff.admin.mec.collection.dao.ValidateCollectionDAOImpl" parent="cgBaseDAO" />
+    <bean id="pettyCashReportDAO" class="com.ff.admin.mec.pettycash.dao.PettyCashReportDAOImpl" parent="cgBaseDAO" />
+    <!-- End MEC -->
+    
+    <!--  Lead Management Module START-->
+	
+	<bean id="leadCommonDAO" class="com.ff.admin.leads.dao.LeadCommonDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="createLeadDAO" class="com.ff.admin.leads.dao.CreateLeadDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="leadsViewDAO" class="com.ff.admin.leads.dao.LeadsViewDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="leadValidationDAO" class="com.ff.admin.leads.dao.LeadsValidationDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<!--  Lead Management Module END-->
+    
+	<!-- Start Billing -->
+	<bean id="billingCommonDAO" class="com.ff.admin.billing.dao.BillingCommonDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="billPrintingDAO" class="com.ff.admin.billing.dao.BillPrintingDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="reBillingDAO" class="com.ff.admin.billing.dao.ReBillingDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<!-- End Billing -->
+	
+	<!-- START COMPLAINTS -->
+	<bean id="complaintsCommonDAO" class="com.ff.admin.complaints.dao.ComplaintsCommonDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="paperworkDAO" class="com.ff.admin.complaints.dao.PaperworkDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="serviceRequestFollowupDAO" class="com.ff.admin.complaints.dao.ServiceRequestFollowupDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="serviceRequestForConsignmentDAO" class="com.ff.admin.complaints.dao.ServiceRequestForConsignmentDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+		
+	<bean id="complaintsBacklineSummaryDAO" class="com.ff.admin.complaints.dao.ComplaintsBacklineSummaryDAOImpl" parent="cgBaseDAO" />
+	
+	
+	<bean id="serviceRequstLegalComplaintDAO" class="com.ff.admin.complaints.dao.ServiceRequestLegalComplaintDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="solveComplaintDAO" class="com.ff.admin.complaints.dao.SolveComplaintDAOImpl" parent="cgBaseDAO" />
+	
+	<!-- END COMPLAINTS -->
+	<!-- Strat Coloading -->
+	<bean id="coloadingDAO" class=" com.ff.admin.coloading.dao.ColoadingDAOImpl" parent="cgBaseDAO"/>
+	<bean id="coloadingRateCalculationDAO" class=" com.ff.admin.coloading.dao.ColoadingRateCalculationDAOImpl" parent="cgBaseDAO"/>
+	<!-- End Coloading -->
+	<!-- Start Master -->
+	<bean id="pincodeMasterDao" class="com.ff.admin.master.dao.PincodeMasterDaoImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="vendorMappingDAO" class="com.ff.admin.master.dao.VendorMappingDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="holidayDAO" class="com.ff.admin.master.dao.HolidayDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<!-- End Master -->
+		
+	<!-- Stop Delivery Start -->
+	 <bean id="stopDeliveryDAO" class="com.ff.admin.stopdelivery.dao.StopDeliveryDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<!-- Stop Delivery End -->
+	
+	<!-- Critical Complaints START -->
+	<bean id="criticalComplaintDAO" class="com.ff.admin.complaints.dao.CriticalComplaintDAOImpl" parent="cgBaseDAO" />
+	<!-- Critical Complaints END -->
+	
+	<bean id="criticalClaimComplaintDAO" class="com.ff.admin.complaints.dao.CriticalClaimComplaintDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	
+	<bean id="custModificationDAO" class="com.ff.admin.billing.dao.CustModificationDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="cnModificationCommonDAO" class="com.ff.admin.billing.dao.CnModificationCommonDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="pickUpCommissionCalculationDAO" class="com.ff.admin.dao.PickUpCommissionCalculationDaoImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="deliveryCommissionCalcDAO" class="com.ff.admin.pndcommission.dao.DeliveryCommissionCalculationDAOImpl" parent="cgBaseDAO" />
+	<!-- Bulk Cust Modification starts -->
+	<bean id="bulkCustModificationDAO" class="com.ff.admin.billing.dao.BulkCustModificationDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<!-- Bulk Cust Modification ends -->
+	
+	<bean id="errorHandlingCommonDAO" class="com.ff.admin.errorHandling.dao.ErrorHandlingCommonDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="bulkSmsOnDemandDAO" class="com.ff.admin.notification.dao.BulkSmsOnDemandDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+</beans>	
+	

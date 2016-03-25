@@ -1,0 +1,673 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+
+   
+   <!-- ############# Create Auto Requisition Scheduler Start ############# -->
+    <bean id="autoRequisitionScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.AutoRequisitionScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="autoRequisitionService" value-ref="autoRequisitionService"/>	
+			</map>
+		</property>
+		
+	</bean>
+	<bean id="autoRequisitionTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<!-- see the example of method invoking job above -->
+	 	<property name="jobDetail" ref="autoRequisitionScheduler"/>
+		<!-- 30 seconds   0 */7 00-18,21-23  * * ?" -->
+	  	<property name="cronExpression" value="0 0 10,17 * * ?" />
+	</bean>
+	<bean id="autoRequisitionTriggerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="autoRequisitionScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="autoRequisitionTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	 <!-- ############# Create Auto Requisition Scheduler END ############# -->
+	 
+	  <!-- ############# Create Consolidated Requisition Scheduler Start ############# -->
+    <bean id="reqConsolidateScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.RequisitionConsolidatorScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="autoRequisitionService" value-ref="autoRequisitionService"/>	
+			</map>
+		</property>
+		
+	</bean>
+	<bean id="reqConsolidatorTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<!-- see the example of method invoking job above -->
+	 	<property name="jobDetail" ref="reqConsolidateScheduler"/>
+		<!-- 30 seconds   0 */7 00-18,21-23  * * ?" -->
+	  	<property name="cronExpression" value="0 55 9,16 * * ?" />
+	</bean>
+	<bean id="reqConsolidatorTriggerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="RequisitionConsolidationScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="reqConsolidatorTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	 <!-- ############# Create Consolidated Requisition Schedule END ############# -->
+	 
+	 <!-- ############# Stock Collection integration Scheduler Start ############# -->
+    <bean id="stockCollectionScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.StockExpenseIntegratorScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="stockScheduledService" value-ref="stockScheduledService"/>	
+			</map>
+		</property>
+		
+	</bean>
+	<bean id="stockCollectionTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<!-- see the example of method invoking job above -->
+	 	<property name="jobDetail" ref="stockCollectionScheduler"/>
+	 	<!-- from 12 PM to 6PM every hour twice -->	 	
+	 	<property name="cronExpression" value="0 30 7-11 * * ?" />
+	</bean>
+	<bean id="stockCollectionTriggerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="stockCollectionScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="stockCollectionTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	 <!-- ############# Stock Collection integration Schedule END ############# -->
+	 
+	 <!-- Lead Management Module Scheduler Start-->
+	<bean id="leadManagementPlanCreationScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.LeadManagementPlanCreationScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="leadsCommonService" value-ref="leadsCommonService"/>				
+			</map>
+		</property>
+	</bean>
+
+	<bean id="leadManagementPlanCreationTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<!-- see the example of method invoking job above -->
+	 	<property name="jobDetail" ref="leadManagementPlanCreationScheduler"/>
+	 	
+	 	<!-- <property name="cronExpression" value="0 59 23 * * ?" /> -->
+		<!-- Fire at 11:59pm, once every day -->
+		
+		<!-- <property name="cronExpression" value="0 15 10 ? * MON-FRI" /> -->	  	       	 	
+		<!-- Fire at 10:15am every Monday, Tuesday, Wednesday, Thursday and Friday -->	  	       
+		
+		<property name="cronExpression" value="0 0 12 * * ?" />
+		<!-- Fire at every 2 min -->
+	</bean>	
+	
+	<bean id="leadManagementPlanCreationFactoryFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="leadManagementPlanCreationScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="leadManagementPlanCreationTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Lead Management Module Scheduler End-->
+	 
+	  	<!-- Contract Scheduler Start-->
+		
+	<bean id="ContractExpiryScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.ContractExpiryEmailScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="rateContractService" value-ref="rateContractService"/>				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="ContractExpiryEmailTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	
+	 	<property name="jobDetail" ref="ContractExpiryScheduler"/>
+	 	
+	 	
+	<!--  	<property name="cronExpression" value="0 */2 * * * ?" /> -->
+	 	
+	  	<property name="cronExpression" value="0 0 1 * * ?" />
+	<!-- 	Fire at 11:59pm, once every day -->
+		
+	
+	</bean>	
+	
+	<bean id="ContractExpiryEmailTriggerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="ContractExpiryScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="ContractExpiryEmailTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Contract Scheduler End-->
+	 
+	  <!-- Billing Module Scheduler Start-->
+		
+	<!-- <bean id="billingRateCalProcessScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.BillingRateCalProcessScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="billingCommonService" value-ref="billingCommonService"/>				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="billingRateCalProcessTriger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	
+	 	<property name="jobDetail" ref="billingRateCalProcessScheduler"/>
+	 	
+	 	<property name="cronExpression" value="0 0/3 * * * ?" />
+	
+	</bean>	
+	
+	<bean id="billingRateCalProcessFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="billingRateCalProcessScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="billingRateCalProcessTriger"/> 
+			</list>
+		</property>
+	</bean> -->
+	
+	<!-- Billing Module Scheduler End-->
+	
+	
+	 <!-- ############# DRS Collection integration Scheduler Start ############# -->
+  <bean id="drsCollectionIntegrationScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.universe.drs.scheduler.DrsExpenseIntegratorScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="deliveryUniversalService" value-ref="deliveryUniversalService"/>
+			</map>
+		</property>
+		
+	</bean>
+	<bean id="drsCollectionTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<!-- see the example of method invoking job above -->
+	 	<property name="jobDetail" ref="drsCollectionIntegrationScheduler"/>
+		<!-- 7AM to 6PM & 10PM to 23 PM every 20  minutes -->
+	 	<property name="cronExpression" value="0 */10 * * * ?" />
+	</bean>
+	<bean id="drsCollectionTriggerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="drsCollectionIntegrationScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">3</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="drsCollectionTrigger"/> 
+			</list>
+		</property>
+	</bean> 
+	 <!-- ############# DRS Collection integration Schedule END ############# -->
+
+	
+	<!-- ############ Expense Collection Scheduler START ############ -->
+	<bean id="expenseCollectionScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.ExpenseCollectionScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="mecUniversalService" value-ref="mecUniversalService" />				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="expenseCollectionTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<property name="jobDetail" ref="expenseCollectionScheduler"/>
+	 	<!-- Trigger in 15 minutes -->
+	 	<property name="cronExpression" value="0 */15 1 * * ?" />
+	</bean>	
+	
+	<bean id="expenseCollectionSchedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="expenseCollectionScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<!-- <ref bean="expenseCollectionTrigger"/>  -->
+			</list>
+		</property>
+	</bean>
+	<!-- ############ Expense Collection Scheduler END ############ -->
+	
+	
+	    <!-- Co-loading Module Scheduler Start-->
+		
+	<bean id="coloadingRateCalProcessScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.ColoadingRateCalProcessScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="coloadingRateCalculationService" value-ref="coloadingRateCalculationService"/>				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="coloadinfRateCalProcessTriger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<!-- see the example of method invoking job above -->
+	 	<property name="jobDetail" ref="coloadingRateCalProcessScheduler"/>
+	 	<!-- <property name="cronExpression" value="0 */30 1 * * ?" /> -->
+		<property name="cronExpression" value="0 */5 * * * ?" />
+		<!-- Fire at every 30 min -->
+	</bean>	
+	
+	<bean id="coloadigRateCalProcessFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="coloadingRateCalProcessScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="coloadinfRateCalProcessTriger"/> 
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Monthly for Vehicle(Fixed per month Km ,Per Month + Fuel) -->
+	
+	<bean id="coloadingMonthlyRateCalProcessScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.ColoadingMonthlyRateCalProcessScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="coloadingRateCalculationService" value-ref="coloadingRateCalculationService"/>				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="coloadingMonthlyRateCalProcessTriger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<!-- see the example of method invoking job above -->
+	 	<property name="jobDetail" ref="coloadingMonthlyRateCalProcessScheduler"/>
+	 	
+		<property name="cronExpression" value="0 0 14 * * ?" />
+		<!--Fire at Every hour -->
+	</bean>	
+	
+	<bean id="coloadingMonthlyRateCalProcessFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="coloadingMonthlyRateCalProcessScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="coloadingMonthlyRateCalProcessTriger"/> 
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Co-loading Module Scheduler End-->
+	
+	<!-- ############ Stock Reduction Scheduler START ############ -->
+	
+	<!-- ############ Manifest/Consignment Stock Reduction ############ -->
+	 <bean id="manifestStockReductionScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.ManifestStockReductionScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="stockReductionService" value-ref="stockReductionService" />				
+			</map>
+		</property>
+	</bean>
+	<bean id="manifestStockReductionTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<property name="jobDetail" ref="manifestStockReductionScheduler"/>
+	 	<property name="cronExpression" value="0 */19 5-8 1 * ?" />
+	 	<!-- <property name="cronExpression" value="0 59 20 ? * SUN " /> -->
+	 	
+	</bean>	
+	<bean id="manifestStockReductionSchedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="manifestStockReductionScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="manifestStockReductionTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	
+	<!-- ############ Stock Consolidation ############ -->
+	  <bean id="stockConsumptionConsolidationScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.StockConsumptionConsolidatorScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="stockReductionService" value-ref="stockReductionService" />				
+			</map>
+		</property>
+	</bean>
+	<bean id="stockConsumptionConsolidationTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<property name="jobDetail" ref="stockConsumptionConsolidationScheduler"/>
+	 	<!-- every day after 10 PM -->
+	 	<property name="cronExpression" value="0 1 10,17 * * ?" />
+	</bean>	
+	<bean id="stockConsumptionConsolidationSchedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="stockConsumptionConsolidationScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="stockConsumptionConsolidationTrigger"/> 
+			</list>
+		</property>
+	</bean> 
+	<!-- ############ Stock Reduction Scheduler END ############ -->
+	
+		<!-- ############ PickUp Commission Calculation Scheduler START ############ -->
+	 <bean id="pickUpCommissionScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.PickUpCommissionCalculationScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="pickUpCommissionService" value-ref="pickUpCommissionService"/>	
+			</map>
+		</property>
+		
+	</bean>
+	<bean id="pickUpCommissionTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean"> 
+	 	<!-- see the example of method invoking job above -->
+	 	<property name="jobDetail" ref="pickUpCommissionScheduler"/>  
+		<property name="cronExpression" value="0 59 22 ? * SUN" />
+	</bean>
+	<bean id="pickUpCommissionTriggerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="pickUpCommissionScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="pickUpCommissionTrigger"/> 
+			</list>
+		</property>
+	</bean> 
+	
+	<!-- ############ PickUp Commission Calculation Scheduler END ############ -->
+	
+	<!-- ############ FOC Booking Email Sender START ##############-->
+	
+	<bean id="focBookingEmailSenderScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.FocBookingEmailSenderScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="bookingUniversalService" value-ref="bookingUniversalService"/>				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="focBookingEmailSenderTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<property name="jobDetail" ref="focBookingEmailSenderScheduler"/>
+		<!-- <property name="cronExpression" value="0 0/2 * * * ? " /> -->
+		<property name="cronExpression" value="0 0 11 * * ?" />
+	</bean>	
+	
+	<bean id="focBookingEmailSenderFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="focBookingEmailSenderScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="focBookingEmailSenderTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	
+	<!-- ############ FOC Booking Email Sender END ############ -->
+	
+	<!-- ############ Delivery Commission Calculation Scheduler START ############ -->
+	
+	<bean id="deliveryCommissionCalcScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.DeliveryCommissionCalculationScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="deliveryCommissionCalcService" value-ref="deliveryCommissionCalcService"/>	
+			</map>
+		</property>
+	</bean>
+	<bean id="deliveryCommissionCalcTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<property name="jobDetail" ref="deliveryCommissionCalcScheduler"/>
+	<property name="cronExpression" value="0 59 20 ? * SUN" />
+	</bean>
+	<bean id="deliveryCommissionCalcFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="deliveryCommissionCalcScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="deliveryCommissionCalcTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	
+	<!-- ############ Delivery Commission Calculation Scheduler END ############ -->
+	
+	<!-- ############ MEC Email Scheduler START ############ -->
+	
+	<bean id="mecEmailScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.MECEmailScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="mecEmailService" value-ref="mecEmailService" />				
+			</map>
+		</property>
+	</bean>
+	<bean id="mecEmailTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<property name="jobDetail" ref="mecEmailScheduler"/>
+		<property name="cronExpression" value="0 0 4 * * ?" />
+	</bean>	
+	<bean id="mecEmailSchedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="mecEmailScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="mecEmailTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	
+	<!-- ############ MEC Email Scheduler END ############ -->
+	
+	
+	<!-- ############ Petty Cash Scheduler START ############ -->
+	<bean id="pettyCashScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.PettyCashScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="pettyCashReportService" value-ref="pettyCashReportService" />				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="pettyCashTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<property name="jobDetail" ref="pettyCashScheduler"/>
+	 	<property name="cronExpression" value="0 0 0 * * ?" />
+	 	<!-- <property name="cronExpression" value="0 0/1 * * * ?" /> -->
+	</bean>	
+	
+	<bean id="pettyCashSchedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="pettyCashScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="pettyCashTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	<!-- ############ Petty Cash Scheduler END ############ -->
+	
+	
+	<!-- ############ Petty Cash Recalculation Scheduler START ############ -->
+	<bean id="pettyCashRecalculationScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.PettyCashRecalculationScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="pettyCashReportService" value-ref="pettyCashReportService" />				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="pettyCashRecalculationTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<property name="jobDetail" ref="pettyCashRecalculationScheduler"/>
+	 	<property name="cronExpression" value="0/10 * * 15 * ?" />
+	</bean>	
+	
+	<bean id="pettyCashRecalculationSchedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="pettyCashRecalculationScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="pettyCashRecalculationTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	<!-- ############ Petty Cash Recalculation Scheduler END ############ -->
+	
+	<!-- ############ Re-Billing Rate calculation Scheduler START ############ -->
+	<bean id="rebillingRatecalculationScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.admin.scheduler.ReBillingScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="reBillingService" value-ref="reBillingService" />				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="rebillingRatecalculationTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<property name="jobDetail" ref="rebillingRatecalculationScheduler"/>
+	 	<property name="cronExpression" value="0 0/15 * * * ?" />
+	</bean>	
+	
+	<bean id="reBillingRatecalculationSchedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="rebillingRatecalculationScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="rebillingRatecalculationTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	<!-- ############ Re-Billing Rate calculation Scheduler END ############ -->
+</beans>

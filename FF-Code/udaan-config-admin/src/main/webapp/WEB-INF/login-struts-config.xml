@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE struts-config PUBLIC
+          "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN"
+          "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+
+
+<struts-config>
+
+
+	<!-- ================================================ Form Bean Definitions -->
+
+	<form-beans>
+		<form-bean name="loginPage" type="com.ff.umc.form.LoginForm" />
+		<form-bean name="userManagementRolesForm" type="com.ff.umc.form.UserManagementRoleForm" />
+		<form-bean name="userRoleAssignmentForm" type="com.ff.umc.form.UserRoleAssignmentForm" />
+		<form-bean name="assignApproverForm" type="com.ff.umc.form.AssignApproverForm" />
+		
+		<form-bean name="changePasswordForm" type="com.ff.umc.form.ChangePasswordForm" />
+		<form-bean name="forgotPasswordForm" type="com.ff.umc.form.ForgotPasswordForm" />
+		<form-bean name="createCustomerLoginForm" type="com.ff.umc.form.CreateCustomerForm" />
+		<form-bean name="createEmployeeLoginForm" type="com.ff.umc.form.CreateEmployeeForm" />
+	</form-beans>
+
+
+	<!-- ========================================= Global Exception Definitions -->
+
+	<global-exceptions>
+		<!-- sample exception handler <exception key="expired.password" type="app.ExpiredPasswordException" 
+			path="/changePassword.jsp"/> end sample -->
+	<exception   key="error.global.mesage"  type="com.mysql.jdbc.exceptions.jdbc4.CommunicationsException"    path="/pages/snippets/error.jsp" />
+	 <exception   key="error.global.mesage"  type="com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException"    path="/pages/snippets/error.jsp" />
+	      	
+	</global-exceptions>
+
+
+	<!-- =========================================== Global Forward Definitions -->
+
+	<global-forwards>
+		<!-- sample forward <forward name="welcome" path="/Welcome.do"/> end sample -->
+		<forward name="welcome" path="/welcome.do" />
+
+	</global-forwards>
+
+
+	<!-- =========================================== Action Mapping Definitions -->
+
+	<action-mappings>
+
+		<!-- sample input and input submit actions <action path="/Input" type="org.apache.struts.actions.ForwardAction" 
+			parameter="/pages/Input.jsp"/> <action path="/InputSubmit" type="app.InputAction" 
+			name="inputForm" scope="request" validate="true" input="/pages/Input.jsp"/> 
+			end samples -->
+
+		<action path="/welcome" forward="/login.do?submitName=showForm" />
+		
+		<action path="/home" forward="/login.do?submitName=redirectHome" />
+		
+		<action path="/login" type="com.ff.umc.action.LoginAction"
+			name="loginPage" scope="request" input="/login/jsp/login.jsp"
+			parameter="submitName">
+			<forward name="welcome" path="/login/jsp/login.jsp" />
+			<forward name="success" path="welcomeLayOut" />
+			<forward name="failure" path="/login/jsp/login.jsp" />
+			<forward name="forgotpassword" path="/forgotPassword.do?submitName=showForgotPassword" /> 
+			<forward name="changepassword" path="/changePassword.do?submitName=showChangePassword" />
+			<forward name="showEnterUserID" path="/login/jsp/sendTempPassword.jsp" />
+			
+			
+		</action>
+		
+		<action path="/assignApprover"		
+			type="com.ff.umc.action.AssignApproverAction" name="assignApproverForm"
+			scope="request" input="/login/umc/assignApprover.jsp"
+			parameter="submitName">
+			<forward name="success" path="assignApprover" />
+		</action>
+
+		<action path="/userManagementRoles"
+			type="com.ff.umc.action.RoleManagementAction" name="userManagementRolesForm"
+			scope="request" input="/login/umc/userManagementRoles.jsp"
+			parameter="submitName">
+			<forward name="addUserRoles" path="addUserRoles" />
+		</action>
+		
+		<action path="/roleAssignment"
+			type="com.ff.umc.action.RoleAssignmentAction" name="userRoleAssignmentForm"
+			scope="request" input="/login/umc/assignUserRoles.jsp"
+			parameter="submitName">
+			<forward name="assignUserRoles" path="assignUserRoles" />
+		</action>
+
+		<action path="/changePassword" type="com.ff.umc.action.ChangePasswordAction"
+			name="changePasswordForm" scope="request" parameter="submitName">
+			<forward name="changepassword" path="/login/jsp/changePassword.jsp" />
+			<forward name="welcome" path="/login/jsp/login.jsp" />
+			<forward name="failure" path="/login/jsp/login.jsp" />
+		</action>
+
+		<action path="/forgotPassword" type="com.ff.umc.action.ForgotPasswordAction"
+			name="forgotPasswordForm" scope="request" parameter="submitName">
+			<forward name="forgotpassword" path="/login/jsp/ForgotPassword.jsp" />
+			<forward name="welcome" path="/login/jsp/login.jsp" />
+			<forward name="failure" path="/login/jsp/login.jsp" />
+		</action>
+		
+		<action path="/createCustomerLogin" type="com.ff.umc.action.CreateCustomerAction"
+			name="createCustomerLoginForm" scope="request" parameter="submitName">
+			<forward name="customerLogin" path="createCustLoginPage" />
+			<forward name="createCustLogin" path="createCustLoginPage" />
+			<forward name="showCustDetails" path="createCustLoginPage" />
+			<forward name="resetPassword" path="createCustLoginPage" />
+			<forward name="failure" path="/login/jsp/login.jsp" />
+		</action>
+		
+		<action path="/createEmployeeLogin" type="com.ff.umc.action.CreateEmployeeAction"
+			name="createEmployeeLoginForm" scope="request" parameter="submitName">
+			<forward name="employeeLogin" path="createEmpLoginPage" />
+			<forward name="saveUpdateEmpLogin" path="createEmpLoginPage" />
+			<forward name="searchEmp" path="createEmpLoginPage" />
+			<forward name="resetPassword" path="createEmpLoginPage" />
+			<forward name="failure" path="/login/jsp/login.jsp" />
+		</action>
+		
+		<action path="/logout" type="com.ff.umc.action.LogoutAction"
+			scope="request" parameter="submitName">
+			<forward name="welcome" path="/login/jsp/login.jsp" />
+		</action>
+		
+		<!-- Common Action For Auto Complete -->
+	<action path="/udaanAutocomplete" type="com.ff.universe.autocomplete.AutoCompleteAction" scope="request" parameter="submitName" /> 
+		
+	</action-mappings>
+
+	<message-resources key="loginResource"
+		parameter="LoginApplicationResources_en_Us" />
+	<message-resources key="loginError" parameter="LoginErrorResources_en_Us" />
+
+	<plug-in className="org.apache.struts.tiles.TilesPlugin">
+		<set-property property="definitions-config" value="/WEB-INF/login-tiles-defs.xml" />
+		<set-property property="moduleAware" value="true" />
+	</plug-in>
+
+
+
+</struts-config>
+
