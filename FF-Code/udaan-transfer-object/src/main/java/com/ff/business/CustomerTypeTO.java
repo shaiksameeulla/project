@@ -1,0 +1,59 @@
+/**
+ * 
+ */
+package com.ff.business;
+
+import com.capgemini.lbs.framework.to.CGBaseTO;
+
+/**
+ * @author abarudwa
+ *
+ */
+public class CustomerTypeTO extends CGBaseTO{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Integer customerTypeId;
+	private String customerTypeCode;
+	private String customerTypeDesc;
+	/**
+	 * @return the customerTypeId
+	 */
+	public Integer getCustomerTypeId() {
+		return customerTypeId;
+	}
+	/**
+	 * @param customerTypeId the customerTypeId to set
+	 */
+	public void setCustomerTypeId(Integer customerTypeId) {
+		this.customerTypeId = customerTypeId;
+	}
+	/**
+	 * @return the customerTypeCode
+	 */
+	public String getCustomerTypeCode() {
+		return customerTypeCode;
+	}
+	/**
+	 * @param customerTypeCode the customerTypeCode to set
+	 */
+	public void setCustomerTypeCode(String customerTypeCode) {
+		this.customerTypeCode = customerTypeCode;
+	}
+	/**
+	 * @return the customerTypeDesc
+	 */
+	public String getCustomerTypeDesc() {
+		return customerTypeDesc;
+	}
+	/**
+	 * @param customerTypeDesc the customerTypeDesc to set
+	 */
+	public void setCustomerTypeDesc(String customerTypeDesc) {
+		this.customerTypeDesc = customerTypeDesc;
+	}
+	
+	
+}

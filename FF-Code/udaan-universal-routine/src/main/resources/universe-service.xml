@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+
+	<import resource="classpath:framework-mail-service.xml"/>
+	<import resource="classpath:framework-sms-service.xml"/>
+	
+	<bean id="udaanContextService" class="com.ff.universe.util.UdaanContextService">
+	 <!-- <aop:scoped-proxy/> -->
+	</bean> 
+		
+	
+
+	<!--Email Configuration(Framework) START  -->
+	<!-- In next release we will delete email config beans because its already moved to separate file -->
+<!-- 	<bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		  <property name="resourceLoaderPath" value="classpath:email/template"/>  
+	</bean>
+	
+	<bean id="emailSenderUtil" class="com.capgemini.lbs.framework.email.EmailSenderUtil">
+        <property name="mailSender" ref="emailSender" />
+    </bean>    
+      <bean id="emailSender" class="com.capgemini.lbs.framework.email.EmailSenderImpl">
+        <property name="javaMailSender" ref="javaMailSender"/>
+        <property name="velocityEngine" ref="velocityEngine"/>
+    </bean>
+ 
+    
+    <bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+      <property name="host" value="${email.host}"/>
+      <property name="port" value="${email.port}"/>
+      <property name="protocol" value="${email.protocol}" />
+       <property name="username" value="${email.username}" />
+       <property name="password" value="${email.password}" />
+       <property name="javaMailProperties">
+        <props>
+            <prop key="mail.smtp.auth">true</prop>
+        </props>
+    </property>
+    </bean> -->
+	<!--Email Configuration(Framework) END  -->
+	
+	<bean id="resourceLoaderUtil" class="com.ff.universe.util.ResourceLoaderUtil"/>
+	<bean id="frameWorkResourceUtil" class="com.capgemini.lbs.framework.utils.FrameworkResourceLoaderUtil"/>
+	
+	<bean id="businessCommonService"
+		class="com.ff.universe.business.service.BusinessCommonServiceImpl">
+		<property name="businessCommonDAO" ref="businessCommonDAO" />
+	</bean>
+
+	<bean id="geographyCommonService"
+		class="com.ff.universe.geography.service.GeographyCommonServiceImpl">
+		<property name="geographyServiceDAO" ref="geographyDAO" />
+	</bean>
+
+	<bean id="organizationCommonService"
+		class="com.ff.universe.organization.service.OrganizationCommonServiceImpl">
+		<property name="organizationServiceDAO" ref="organizationDAO" />
+		<property name="organizationCommonDAO" ref="organizationCommonDAO" />
+	</bean>
+
+	<bean id="pickupManagementCommonService"
+		class="com.ff.universe.pickup.service.PickupManagementCommonServiceImpl">
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="businessCommonService" ref="businessCommonService" />
+		<property name="pickupCommonDAO" ref="pickupCommonDAO" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+	</bean>
+
+	<bean id="serviceOfferingCommonService"
+		class="com.ff.universe.serviceOffering.service.ServiceOfferingCommonServiceImpl">
+		<property name="serviceOfferingServiceDAO" ref="serviceOfferingDAO" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+	</bean>
+
+   		
+	<bean id="loadManagementCommonService" class="com.ff.universe.loadmanagement.service.LoadManagementCommonServiceImpl">
+		<property name="loadManagementCommonDAO" ref="loadManagementCommonDAO" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="transportCommonService" ref="transportCommonService" />
+		<property name="routeServicedCommonService" ref="routeServicedCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="stockUniversalService" ref="stockUniversalService" />
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="udaanContextService" ref="udaanContextService"/>
+	</bean>
+	   		
+	<bean id="transportCommonService" class="com.ff.universe.transport.service.TransportCommonServiceImpl">
+		<property name="transportCommonDAO" ref="transportCommonDAO" />
+	</bean>
+		   		
+	<bean id="routeServicedCommonService" class="com.ff.universe.routeserviced.service.RouteServicedCommonServiceImpl">
+		<property name="routeServicedCommonDAO" ref="routeServicedCommonDAO" />
+		<property name="transportCommonService" ref="transportCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="businessCommonService" ref="businessCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+	</bean>
+	
+	<bean id="sequenceGeneratorService"
+		class="com.capgemini.lbs.framework.bs.sequence.SequenceGeneratorServiceImpl ">
+		<property name="sequenceGeneratorDAO" ref="sequenceGeneratorDAO" />
+	</bean>
+	
+	<bean id="umcCommonService"
+		class="com.ff.universe.umc.service.UserManagementCommonServiceImpl">
+		<property name="umcCommonDAO" ref="umcCommonDAO" />
+	</bean>
+	
+	<bean id="stockUniversalService"
+		class="com.ff.universe.stockmanagement.service.StockUniversalServiceImpl">
+		<property name="stockUniversalDAO" ref="stockUniversalDAO" />
+		<property name="businessCommonService" ref="businessCommonService" />
+		<property name="bookingUniversalService" ref="bookingUniversalService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+		<property name="rateUniversalService" ref="rateUniversalService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="globalUniversalService" ref="globalUniversalService" />
+	
+	</bean>
+	
+	<bean id="bookingUniversalService"
+		class="com.ff.universe.booking.service.BookingUniversalServiceImpl">
+		<property name="bookingUniversalDAO" ref="bookingUniversalDAO" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="manifestUniversalService" ref="manifestUniversalService" />
+		<property name="stockUniversalService" ref="stockUniversalService" />
+		<property name="emailSenderUtil" ref="emailSenderUtil" /> 
+	</bean>
+	
+	<bean id="consignmentCommonService"
+		class="com.ff.universe.consignment.service.ConsignmentCommonServiceImpl">
+		<property name="consignmentCommonDAO" ref="consignmentCommonDAO" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+	</bean>
+	<bean id="outManifestUniversalService"
+		class="com.ff.universe.manifest.service.OutManifestUniversalServiceImpl">
+		<property name="bookingUniversalService" ref="bookingUniversalService" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="outManifestUniversalDAO" ref="outManifestUniversalDAO" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="bookingUniversalDAO" ref="bookingUniversalDAO" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="deliveryUniversalService" ref="deliveryUniversalService" />
+	</bean>
+	<bean id="trackingUniversalService"
+		class="com.ff.universe.tracking.service.TrackingUniversalServiceImpl">
+		<property name="trackingUniversalDAO" ref="trackingUniversalDAO" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="businessCommonService" ref="businessCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+	</bean>
+	
+	<bean id="globalUniversalService"
+		class="com.ff.universe.global.service.GlobalUniversalServiceImpl">
+		<property name="globalUniversalDAO" ref="globalUniversalDAO" />
+	</bean>
+	
+	<bean id="manifestUniversalService"
+		class="com.ff.universe.manifest.service.ManifestUniversalServiceImpl">
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		<property name="stockUniversalService" ref="stockUniversalService" />
+	</bean>
+	
+	<bean id="inManifestUniversalService"
+		class="com.ff.universe.manifest.service.InManifestUniversalServiceImpl">
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+	</bean>
+	
+		<!-- DRS Module Start -->
+	 <bean id="deliveryUniversalService"
+		class="com.ff.universe.drs.service.DeliveryUniversalServiceImpl">
+		<property name="deliveryUniversalDAO" ref="deliveryUniversalDAO" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="businessCommonService" ref="businessCommonService" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+	</bean>
+	
+	
+	<!-- DRS Module END -->
+	
+	<!-- RateBenchMark Start -->
+	<bean id="rateUniversalService"
+		class="com.ff.universe.ratemanagement.service.RateUniversalServiceImpl">
+		<property name="rateUniversalDAO" ref="rateUniversalDAO" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+		<property name="bookingUniversalService" ref="bookingUniversalService" />
+		<property name="stockUniversalService" ref="stockUniversalService" />
+		<property name="umcCommonService" ref="umcCommonService"/>
+	</bean>
+	<!-- RateBenchMark END -->
+	
+	<!-- MEC Module START -->
+	<bean id="mecUniversalService"
+		class="com.ff.universe.mec.service.MECUniversalServiceImpl">
+		<property name="mecUniversalDAO" ref="mecUniversalDAO" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="rateUniversalService" ref="rateUniversalService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="businessCommonService" ref="businessCommonService" />
+		<property name="billingUniversalService" ref="billingUniversalService" />
+		<property name="bookingUniversalDAO" ref="bookingUniversalDAO" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+		<property name="globalUniversalService" ref="globalUniversalService" />
+	</bean>
+	<!-- MEC Module END -->
+	
+	<bean id="smsSenderService" class="com.ff.universe.util.SMSSenderServiceImpl">
+	</bean> 
+		
+	<!-- Start Billing -->
+	<bean id="billingUniversalService" class="com.ff.universe.billing.service.BillingUniversalServiceImpl">
+		<property name="billingUniversalDAO" ref="billingUniversalDAO" />
+		<property name="rateUniversalService" ref="rateUniversalService" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+	</bean>
+	<!-- End Billing -->
+	
+	<!-- Job Service -->
+	<bean id="jobServicesUniversalService" class="com.ff.universe.jobservice.service.JobServicesUniversalServiceImpl">
+		<property name="jobServicesUniversalDAO" ref="jobServicesUniversalDAO" />		
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+	</bean>
+	<!-- Job service -->
+	
+	<!-- Print Job Universal Service Start -->
+	
+	<bean id="printerHttpClient" class="org.apache.commons.httpclient.HttpClient">
+		<constructor-arg name="params">
+			<bean name="params" class="org.apache.commons.httpclient.params.HttpClientParams">
+				<!--Here we set the socket time out which is essentially the same thing as the readTimeout.  It is the time we wait for a response-->
+				<property name="soTimeout" value="200000"/>
+				<!--Here we set the connection manager time out which is how long we wait to get an established connection returned from the connection manager.
+				The default is 60 seconds which makes the client just hang.  Now we get more immediate response from our RetryConnection.  But it isn't totally reliable cause of underlying tcp/ip-->
+				<property name="connectionManagerTimeout" value="130000"/>
+			</bean>
+		</constructor-arg>
+		<constructor-arg name="httpConnectionManager">
+			<bean class="org.apache.commons.httpclient.MultiThreadedHttpConnectionManager">
+				<property name="params">
+					<bean class="org.apache.commons.httpclient.params.HttpConnectionManagerParams">
+						<!--Here we set the socket time out which is essentially the same thing as the readTimeout.  It is the time we wait for a response-->
+						<property name="soTimeout" value="180000"/>
+						<!--Here we set the connection time out which is supposed to be how long we wait for the connect to be established. This shortness allows us to catch it and enable the retry function.  The default is 60 seconds which makes the client just hang.  -->
+						<property name="connectionTimeout" value="100000"/>
+						<property name="defaultMaxConnectionsPerHost" value="15"/>
+						<property name="maxTotalConnections" value="30"/>
+					</bean>
+				</property>
+			</bean>                          
+		</constructor-arg>
+	</bean>
+	
+	<bean id="printJobUniversalService" class="com.ff.universe.print.service.PrintJobUniversalServiceImpl">
+		<property name="printerHttpClient" ref="printerHttpClient" />
+	</bean>
+	<!-- Print Job Universal Service End -->
+</beans>

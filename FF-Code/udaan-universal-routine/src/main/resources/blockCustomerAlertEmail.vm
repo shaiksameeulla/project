@@ -1,0 +1,19 @@
+<br/><br/><br/>
+
+Dear $salesPersonName,
+
+Reference to Contract number $rateContractNumber for customer $customerName with Sold to code $soldToCode having 
+
+
+#foreach($contractPaymentBillingLocationDO in $paymentBillingDtls)
+ship to code $contractPaymentBillingLocationDO.shippedToCode has been blocked from pickup, from office $contractPaymentBillingLocationDO.pickupDeliveryLocation.pickupDlvContract.office.officeCode - $contractPaymentBillingLocationDO.pickupDeliveryLocation.pickupDlvContract.office.officeName 
+#end
+
+with respect to date $blockedDate.
+
+
+<br/><br/><br/>
+
+
+
+#parse("footer.vm")
