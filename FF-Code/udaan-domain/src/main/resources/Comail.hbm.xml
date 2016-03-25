@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.manifest.ComailDO" table="ff_f_comail" dynamic-update="true">
+		<id name="coMailId" type="java.lang.Integer">
+			<column name="COMAIL_ID" />
+			<generator class="identity" />
+		</id>
+		
+		<property name="coMailNo" type="java.lang.String" update="false">
+			<column name="COMAIL_NO" />
+		</property>
+		
+		<property name="originOffice" type="java.lang.Integer" update="false" >
+			<column name="ORIGIN_OFFICE" />
+		</property>
+		
+		
+		<property name="destinationOffice" type="java.lang.Integer">
+			<column name="DESTINATION_OFFICE" />
+		</property>
+		
+		
+		<property name="createdDate" column="CREATED_DATE" update="false" />
+		<property name="isStockConsumed" column="IS_STOCK_CONSUMED" />
+		
+	</class>
+	<!-- <query name="isComailNumberUsed">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ComailDO comail 
+			WHERE comail.coMailNo=:comailNo 
+		]]>
+	</query>	 -->
+	
+	 <query name="isComailNumberExist">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ComailDO comail 
+			WHERE comail.coMailNo=:comailNo 
+		]]>
+	</query>	
+	
+	 <!-- Starting Data sync querys -->
+	          	
+	<query name="getUpdateComail"> 
+	<![CDATA[ From com.ff.domain.manifest.ComailDO comail where  comail.coMailNo IN (:coMailNo) ]]>
+	</query>
+	
+	<query name="getComailIdByComailNo"> 
+		<![CDATA[ Select comail.coMailId From com.ff.domain.manifest.ComailDO comail where  comail.coMailNo IN (:coMailNo) ]]>
+	</query>
+	
+	<query name="getComailIdByNo"> 
+		<![CDATA[ Select comail.coMailId From com.ff.domain.manifest.ComailDO comail where  comail.coMailNo = :coMailNo ]]>
+	</query>
+	
+	<query name="getComailDtlsForStockReduction"> 
+		<![CDATA[  From com.ff.domain.manifest.ComailDO comail where  comail.isStockConsumed = 'N'  
+					AND (comail.createdDate BETWEEN :fromDate AND :toDate)
+			ORDER BY comail.createdDate ]]>
+	</query>
+
+</hibernate-mapping>

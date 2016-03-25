@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.masters.ItemTypeDO" table="ff_d_item_type">
+		<id name="itemTypeId" type="java.lang.Integer">
+			<column name="ITEM_TYPE_ID" />
+			<generator class="assigned" />
+		</id>
+		<property name="itemTypeCode" column="ITEM_TYPE_CODE" />
+		<property name="itemTypeName" column="ITEM_TYPE_NAME" />
+
+		<property name="itemHasSeries" column="ITEM_HAS_SERIES" />
+		<property name="isActive" column="CUR_STATUS" />
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+	
+		<!-- <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>  -->
+		<!-- <set name="itemDO" lazy="false" cascade="all-delete-orphan" inverse="true" fetch="join">
+            <key column="ITEM_TYPE_ID"/>
+            <one-to-many class="com.ff.domain.stockmanagement.masters.ItemDO"/>
+    	</set>  -->
+		
+	</class>
+
+<query name="getActiveItemTypesForUsed">
+<![CDATA[
+ FROM com.ff.domain.stockmanagement.masters.ItemTypeDO  materialType where materialType.itemHasSeries =:itemHasSeries order by materialType.itemTypeName 
+ ]]>
+</query>
+
+<query name="getActiveItemTypes">
+<![CDATA[
+ FROM com.ff.domain.stockmanagement.masters.ItemTypeDO  materialType where materialType.isActive =:isActive order by materialType.itemTypeName 
+ ]]>
+</query>
+
+<query name="getItemTypAsMap">
+<![CDATA[
+ select new map(itemType.itemTypeId as typeId,itemType.itemTypeName as typeName)FROM com.ff.domain.stockmanagement.masters.ItemTypeDO  itemType where itemType.isActive =:isActive
+ ]]>
+</query>
+
+<query name="getItemTypeByCode">
+	<![CDATA[
+	 FROM	com.ff.domain.stockmanagement.masters.ItemTypeDO  itemType 
+	 WHERE	itemType.itemTypeCode=:itemTypeCode
+	 ]]>
+</query>
+	
+</hibernate-mapping>

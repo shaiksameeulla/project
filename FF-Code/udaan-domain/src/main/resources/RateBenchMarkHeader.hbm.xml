@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkHeaderDO" table="ff_d_rate_bench_mark_header">
+		<id name="rateBenchMarkHeaderId" type="java.lang.Integer" column="RATE_BENCH_MARK_HEADER_ID">
+			<generator class="native" />
+		</id>
+				
+        <property name="rateBenchMarkEffectiveFrom" column="RATE_BENCH_MARK_EFFECTIVE_FROM"/>
+        <property name="rateBenchMarkEffectiveTo" column="RATE_BENCH_MARK_EFFECTIVE_TO"/>
+        <many-to-one name="rateIndustryCategoryDO" class="com.ff.domain.ratemanagement.masters.RateIndustryCategoryDO"  lazy="false"  fetch="join">
+        <column name="RATE_INDUSTRY_CAETGORY" ></column>
+        </many-to-one>
+        <many-to-one name="rateCustomerCategoryDO" class="com.ff.domain.ratemanagement.masters.RateCustomerCategoryDO"  lazy="false"  fetch="join">
+        <column name="RATE_CUSTOMER_CATEGORY" ></column>
+        </many-to-one>
+        <many-to-one name="approver" class="com.ff.domain.organization.EmployeeDO"  lazy="false"  fetch="join">
+        <column name="APPROVER" ></column>
+        </many-to-one>
+        
+        
+        <set name="rateBenchMarkProductDO" table = "ff_d_rate_bench_mark_product" cascade="all"  
+		inverse="true" lazy="false" fetch="select">
+		 
+		<key column="RATE_BENCH_MARK_HEADER" />
+		<one-to-many class="com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkProductDO" />
+		 
+		</set>
+		
+		<property name="isApproved" column="BENCH_MARK_APPROVED"/>
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+    </class>
+    
+    
+    	
+	<query name="updateRateBenchMarkEffectiveToDate">
+		<![CDATA[
+ 			update com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkHeaderDO header
+ 			set header.rateBenchMarkEffectiveTo =:rateBenchMarkEffectiveTo,
+ 				header.dtToBranch = 'N'
+ 			where header.rateBenchMarkHeaderId =:rateBenchMarkHeaderId
+ 			]]>
+	</query>
+    
+    <query name="updateRateBenchMarkApproverDetails">
+		<![CDATA[
+ 			update com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkHeaderDO header
+ 			set header.approver =:approver,
+ 				header.dtToBranch = 'N'
+ 			where header.rateBenchMarkHeaderId =:rateBenchMarkHeaderId
+ 			]]>
+	</query>
+	
+	  <query name="isEmpIdCorpApprover">
+		<![CDATA[
+ 			from  com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkHeaderDO header
+ 			where header.approver.employeeId =:empId
+ 			]]>
+	</query>
+	
+	
+    <query name="getBenchMarkDetailsByHeaderId">
+		<![CDATA[
+ 			from  com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkHeaderDO header
+ 			where header.rateBenchMarkHeaderId =:rateBenchMarkHeaderId
+ 			]]>
+	</query>
+
+</hibernate-mapping>

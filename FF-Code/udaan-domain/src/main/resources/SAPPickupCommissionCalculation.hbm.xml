@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.SAPPickUpComissionCalculationStagingDO" table="ff_f_sap_pickup_commission_calculation">
+
+		<id name="sapPickUpCommissionId" type="java.lang.Integer">
+			<column name="SAP_PICKUP_COMMISSION_ID" />
+			<generator class="native" />
+		</id>
+		
+		
+		<property name="empCode">
+			<column name="EMPLOYEE_CODE" />
+		</property>
+
+		
+		<property name="product_grup" >
+			<column name="PRODUCT_GROUP" />
+		</property>
+
+		<property name="pickupCount" >
+			<column name="PICKUP_COUNT" />
+		</property>
+
+		<property name="netValue" >
+			<column name="NET_VALUE" />
+		</property>
+
+		<property name="calculatedFor" >
+			<column name="CALCULATED_FOR" />
+		</property>
+
+		<property name="createdBy" >
+			<column name="CREATED_BY" />
+		</property> 
+		
+		<property name="dtSapOutbound">
+			<column name="DT_SAP_OUTBOUND" />
+		</property> 
+		
+		<property name="sapTimeStamp">
+			<column name="SAP_TIMESTAMP" />
+		</property> 
+		
+		<property name="exception">
+			<column name="EXCEPTION" />
+		</property> 
+		
+
+	</class>
+	
+		<query name="getPickUpCommissionCalcultnSAP">
+	<![CDATA[
+		 FROM	com.ff.domain.pickup.SAPPickUpComissionCalculationStagingDO sapPickUpCommissionCalcultnStagingDO
+		 WHERE	sapPickUpCommissionCalcultnStagingDO.dtSapOutbound=:sapStatus and ( sapPickUpCommissionCalcultnStagingDO.exception IS NULL or LENGTH(sapPickUpCommissionCalcultnStagingDO.exception ) < 1)
+	]]>
+	</query>
+		
+		
+		<query name="updatePickUpCommissioncalculatnInStagingTable">
+	<![CDATA[
+		 update 	com.ff.domain.pickup.SAPPickUpComissionCalculationStagingDO sapPickUpCommissionCalcultnStagingDO
+		 set sapPickUpCommissionCalcultnStagingDO.dtSapOutbound=:dtSapOutbound,
+		 sapPickUpCommissionCalcultnStagingDO.sapTimeStamp=:sapTimestamp,
+		 sapPickUpCommissionCalcultnStagingDO.exception=:exception
+		 where sapPickUpCommissionCalcultnStagingDO.empCode=:employee_code
+		 
+	]]>
+	</query>
+		
+		
+	
+</hibernate-mapping>		

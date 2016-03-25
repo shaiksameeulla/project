@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.manifest.ConsignmentReturnDO" table="ff_f_consignment_return">
+		<id name="consignmentReturnId" type="java.lang.Integer" column="CONSIGNMENT_RETURN_ID">
+			<generator class="native" />
+		</id>
+		
+        <property name="isEmailValidated" column="IS_EMAIL_VALIDATED"/>
+        <property name="returnType" column="RETURN_TYPE"/>
+        <property name="contactNumber" column="CONTACT_NUMBER"/>
+        <property name="processNumber" column="PROCESS_NUMBER"/>
+      
+		<property name="drsDateTime"  column="DRS_DATE_TIME" type="java.util.Date"/>
+		
+        <property name="dtToBranch" column="DT_TO_BRANCH"/>
+        <property name="dtToCentral" column="DT_TO_CENTRAL"/>
+        <property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL"/>
+		
+		<property name="createdDate"  column="CREATED_DATE" type="java.util.Date" update="false"/>
+		<property  name="updatedDate" column="UPDATE_DATE"	type="java.util.Date"/>    
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer" update="false"/>
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/>
+		
+		<!-- Start of Changes by <48206> for opsman on 20/09/2013  -->
+		<property name="dtToOpsman" column="DT_TO_OPSMAN"/>
+		<property name="dtFromOpsman" column="DT_FROM_OPSMAN"/>
+		<!-- End of Changes by <48206> for opsman on 20/09/2013  -->
+		
+		<many-to-one name="officeDO" class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="OFFICE" />
+		</many-to-one>
+		
+		<many-to-one name="consignmentDO" class="com.ff.domain.consignment.ConsignmentDO" lazy="false" fetch="join">
+			<column name="CONSIGNMENT" />
+		</many-to-one>
+		
+		<many-to-one name="processDO"  class="com.ff.domain.tracking.ProcessDO" lazy="false" fetch="join">
+			<column  name="UPDATED_PROCESS_FROM" />
+		</many-to-one>
+				
+		 <set name="consignmentReturnReasonDOs" table="ff_f_consignment_return_reason" cascade="all" lazy="false" fetch="subselect">
+            <key>
+                <column name="CONSIGNMENT_RETURN"/>
+            </key>
+            <one-to-many class="com.ff.domain.manifest.ConsignmentReturnReasonDO"/>
+        </set>	
+							
+	</class>	
+		
+	<query name="getConsignmentReturnByConsgNoOfficeIdReturnType">
+		<![CDATA[ FROM com.ff.domain.manifest.ConsignmentReturnDO consignmentReturn 
+		          WHERE consignmentReturn.consignmentDO.consgNo IN(:consignmentNumber)
+		          AND consignmentReturn.officeDO.officeId IN(:officeId)
+		          AND consignmentReturn.returnType=:returnType
+		]]>
+	</query>
+					
+	<query name="getConsignmentReturnByConsgNoReturnType">
+		<![CDATA[ FROM com.ff.domain.manifest.ConsignmentReturnDO consignmentReturn 
+		          WHERE consignmentReturn.consignmentDO.consgNo IN(:consignmentNumber)
+		          AND consignmentReturn.returnType=:returnType
+		]]>
+	</query>
+						
+	<query name="updateRtoEmailValidated">
+		<![CDATA[ UPDATE com.ff.domain.manifest.ConsignmentReturnDO consignmentReturn 
+					SET consignmentReturn.isEmailValidated=:isEmailValidated
+		          	WHERE 
+		          	consignmentReturn.consignmentReturnId IN(:consignmentReturnIds)
+		]]>
+	</query>
+	
+	<!-- Data Sync For RTH/RTO Consignment Return Module Start -->
+	<!--
+	<query name="getUnsyncInboundRthRtoConsgReturn">
+		<![CDATA[	From com.ff.domain.manifest.ConsignmentReturnDO consignmentReturn
+					where consignmentReturn.dtToCentral='N'
+		]]>
+	</query>
+	
+	<query name="getConsignmentReturnIdByConsgNoOfficeIdReturnType">
+		<![CDATA[ SELECT consignmentReturn.consignmentReturnId 
+				  FROM com.ff.domain.manifest.ConsignmentReturnDO consignmentReturn 
+		          WHERE consignmentReturn.consignmentDO.consgNo IN(:consignmentNumber)
+		          AND consignmentReturn.officeDO.officeId IN(:officeId)
+		          AND consignmentReturn.returnType=:returnType
+		]]>
+	</query>
+		
+	<query name="getUnsyncOutboundRthConsgReturnHubOfficeIds">
+		<![CDATA[
+				  SELECT office.officeId 
+				  FROM com.ff.domain.organization.OfficeDO office
+				  WHERE office.officeTypeDO.offcTypeCode='HO'
+				  AND office.cityId IN (
+					  SELECT consignmentReturn.officeDO.cityId
+					  FROM com.ff.domain.manifest.ConsignmentReturnDO consignmentReturn 
+			          WHERE consignmentReturn.consignmentReturnId IN(:consignmentReturnId)
+		          	  AND consignmentReturn.returnType='H'
+			          AND consignmentReturn.dtToBranch='N' 
+		          )
+		]]>
+	</query>	
+			
+	<query name="getUnsyncOutboundRthConsgReturn">
+		<![CDATA[
+				  FROM com.ff.domain.manifest.ConsignmentReturnDO consignmentReturn 
+		          WHERE consignmentReturn.dtToBranch='N'
+		          AND consignmentReturn.returnType='H'
+		          AND consignmentReturn.officeDO.cityId IN (
+					  SELECT office.cityId 
+					  FROM com.ff.domain.organization.OfficeDO office
+					  WHERE office.officeTypeDO.offcTypeCode='HO'
+					  AND office.officeId IN (:branchId)
+		          )
+		]]>
+	</query>
+	 -->
+	<!-- Data Sync For RTH/RTO Consignment Return Module  End -->
+</hibernate-mapping>

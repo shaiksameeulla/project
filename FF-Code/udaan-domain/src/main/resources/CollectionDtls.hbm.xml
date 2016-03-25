@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.collection.CollectionDtlsDO"
+		table="ff_f_collection_entries" dynamic-update="true">
+		<id name="entryId" type="java.lang.Integer">
+			<column name="COLLECTION_ENTRIES_ID" />
+			<generator class="native" />
+		</id>
+		<property name="position" column="POSITION" />
+		<property name="collectionAgainst" column="COLLECTION_AGAINST" />
+		<property name="billNo" column="BILL_NO" />
+		<property name="billAmount" column="BILL_AMOUNT" />
+		<property name="recvAmount" column="RECEIVED_AMOUNT" />
+		<property name="tdsAmount" column="TDS_AMOUNT" />
+		<property name="deduction" column="DEDUCTION" />
+		<property name="totalBillAmount" column="TOTAL_BILL_AMOUNT" />
+		<property name="remarks" column="REMARKS" />
+		<property name="receiptNo" column="RECEIPT_NO" />
+		<property name="collectionType" column="COLLECTION_TYPE" />
+		<property name="collectionFor" column="COLLECTION_FOR" />
+		<property name="consgDeliveryDate" column="CONSG_DELIVERY_DATE" />
+		<property name="balanceAmount" column="BALANCE_AMOUNT" insert="false" update="false"/>
+		
+		
+
+		<!-- common attributes START -->
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="createdBy" column="CREATED_BY" update="false" />
+		<property name="createdDate" column="CREATION_DATE" update="false" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<!-- common attributes END -->
+
+		<!-- Many -to- one relationships START -->
+		<many-to-one name="collectionDO"
+			class="com.ff.domain.mec.collection.CollectionDO" lazy="false" fetch="join">
+			<column name="COLLECTION_ID" />
+		</many-to-one>
+		<many-to-one name="consgDO"
+			class="com.ff.domain.consignment.ConsignmentDO" lazy="false" fetch="join">
+			<column name="CONSIGNMENT_ID" />
+		</many-to-one>
+		<many-to-one name="reasonDO" class="com.ff.domain.serviceOffering.ReasonDO"
+			lazy="false" fetch="join">
+			<column name="REASON_ID" />
+		</many-to-one>
+		<!-- Many -to- one relationships END -->
+	</class>
+
+	<query name="getLiabilityEntries">
+		<![CDATA[ 
+			select collectionDetails	FROM 
+				com.ff.domain.mec.collection.CollectionDtlsDO collectionDetails
+				inner join collectionDetails.collectionDO as collectionDO
+				inner join collectionDetails.consgDO as consgDO
+			WHERE 
+				collectionDetails.collectionType IN ('COD','LC')
+				AND
+				collectionDO.collectionCategory='C'
+				AND 
+				 collectionDO.status='V'
+							AND
+				consgDO.customer=:custId
+					AND consgDO.consgId NOT IN 
+					(	SELECT 
+							liabilityDtls.consgId 
+						FROM 
+							com.ff.domain.mec.LiabilityDetailsDO liabilityDtls
+						WHERE 
+							liabilityDtls.codLcAmt=liabilityDtls.paidAmt
+					)
+				AND collectionDetails.collectionFor <> 'C'
+				and consgDO.createdDate >='2015-04-01 00:00:00'
+				
+		]]>
+	</query>
+	
+	<query name="getLiabilityEntriesFromCollection">
+		<![CDATA[ 
+			select new com.ff.domain.mec.LiabilityCollectionWrapperDO(collectionDetails.entryId,consgDO.consgId,consgDO.consgNo,collectionDetails.billAmount,collectionDetails.totalBillAmount,consgDO.createdDate,collectionDetails.balanceAmount)	FROM 
+				com.ff.domain.mec.collection.CollectionDtlsDO collectionDetails
+				inner join collectionDetails.collectionDO as collectionDO
+				inner join collectionDetails.consgDO as consgDO
+			WHERE collectionDetails.collectionType IN ('COD','LC')
+				AND	collectionDO.collectionCategory='C'
+				AND collectionDO.status='V'
+				AND	consgDO.customer=:custId
+				AND collectionDetails.collectionFor <> 'C'
+				AND consgDO.createdDate >='2015-04-01 00:00:00'
+				AND (collectionDetails.balanceAmount <> 0 OR collectionDetails.balanceAmount is null)
+				AND consgDO.consgId NOT IN 
+					(SELECT liabilityDtls.consgId 
+						FROM 
+							com.ff.domain.mec.LiabilityDetailsDO liabilityDtls
+						WHERE 
+							liabilityDtls.consgId = consgDO.consgId 
+							AND
+							liabilityDtls.paidAmt=collectionDetails.totalBillAmount )
+							
+							AND collectionDetails.updatedDate = (select MAX(collectionDetails1.updatedDate) from com.ff.domain.mec.collection.CollectionDtlsDO collectionDetails1  where collectionDetails1.consgDO.consgId = consgDO.consgId)
+				
+		]]>
+	</query>
+
+	<query name="getAllDeliverdConsgDtlsByDate">
+		<![CDATA[
+			FROM com.ff.domain.mec.collection.CollectionDtlsDO colldtls	
+			WHERE (colldtls.consgDeliveryDate BETWEEN :currentDate AND :nextDate) 
+				AND colldtls.collectionDO.collectionId IN (
+				SELECT collection.collectionId FROM com.ff.domain.mec.collection.CollectionDO collection 
+				WHERE collection.collectionOfficeDO.officeId=:orgOffId 
+				AND collection.status IN ('O')
+			) ORDER BY colldtls.consgDeliveryDate
+		]]>
+	</query>
+
+	<query name="getAllDeliveredConsgDtlsForCollectionDtls">
+		<![CDATA[
+			FROM com.ff.domain.delivery.DeliveryDetailsDO deliveryDtls 
+			WHERE deliveryDtls.consignmentDO.consgId NOT IN 
+			(SELECT collDtls.consgDO.consgId FROM com.ff.domain.mec.collection.CollectionDtlsDO collDtls
+				WHERE collDtls.consgDO.consgId IS NOT NULL 
+				AND collDtls.consgDeliveryDate IS NOT NULL) 
+			AND deliveryDtls.deliveryStatus=:deliveryStatus 
+			AND deliveryDtls.consignmentDO.orgOffId=:officeId
+			AND (deliveryDtls.deliveryDate BETWEEN :currentDate AND :nextDate)
+			AND deliveryDtls.recordStatus='A' 
+			ORDER BY deliveryDtls.deliveryDate
+		]]>
+	</query>
+
+	<query name="getAllDeliveredConsgDtlsForExpenseDtls">
+		<![CDATA[
+			FROM com.ff.domain.delivery.DeliveryDetailsDO deliveryDtls 
+			WHERE deliveryDtls.consignmentDO.consgId IN 
+			(SELECT collDtls.consgDO.consgId FROM com.ff.domain.mec.collection.CollectionDtlsDO collDtls
+				WHERE collDtls.consgDO.consgId IS NOT NULL AND collDtls.consgDeliveryDate IS NULL) 
+			AND deliveryDtls.deliveryStatus=:deliveryStatus 
+			AND deliveryDtls.consignmentDO.orgOffId=:officeId
+			AND deliveryDtls.recordStatus='A' ORDER BY deliveryDtls.deliveryDate
+		]]>
+	</query>
+
+	<query name="updateCnDeliveryDate">
+		<![CDATA[
+			UPDATE com.ff.domain.mec.collection.CollectionDtlsDO collDtls 
+			SET collDtls.consgDeliveryDate=:deliveryDate
+			WHERE collDtls.consgDO.consgId=:consgId 
+			AND collDtls.consgDeliveryDate IS NULL
+		]]>
+	</query>
+
+	<query name="getConsgStatusConsignee">
+		<![CDATA[
+			FROM	com.ff.domain.mec.collection.CollectionDtlsDO collnDtls
+			WHERE 	collnDtls.collectionFor='C'
+			AND		collnDtls.sapStatus='N'
+		]]>
+	</query>
+
+	<query name="getCountOfConsgStatusConsignee">
+		<![CDATA[
+			SELECT COUNT(*)
+			FROM	com.ff.domain.mec.collection.CollectionDtlsDO collnDtls
+			WHERE 	collnDtls.collectionFor='C'
+			AND		collnDtls.sapStatus='N'
+		]]>
+	</query>
+
+	<query name="updateConsgCollStatus">
+		<![CDATA[
+			UPDATE	com.ff.domain.mec.collection.CollectionDtlsDO collnDtls
+			SET		collnDtls.sapStatus=:sapStatus
+			WHERE	collnDtls.entryId=:entryId
+			
+		]]>
+	</query>
+
+	<query name="getCollectionAmtOfThatDay">
+		<![CDATA[
+			SELECT SUM(collnDtls.totalBillAmount) FROM com.ff.domain.mec.collection.CollectionDtlsDO collnDtls 
+			WHERE collnDtls.collectionType IN (:collectionType) AND 
+			(collnDtls.consgDeliveryDate BETWEEN :prevDate AND :currentDate) AND 
+			collnDtls.collectionDO.collectionId IN (
+				SELECT collection.collectionId FROM com.ff.domain.mec.collection.CollectionDO collection 
+				WHERE 
+				LENGTH(collection.txnNo)<= 13 AND 
+				collection.collectionOfficeDO.officeId=:officeId AND 
+				collection.status NOT IN (:status) AND
+				collection.paymentModeDO.paymentId IN (
+					SELECT payment.paymentId FROM 
+					com.ff.domain.serviceOffering.PaymentModeDO payment WHERE 
+					payment.paymentCode IN (:paymentMode)
+					)
+				)
+		]]>
+	</query>
+
+	<query name="getDebutorsCollectionOfThatDay">
+		<![CDATA[
+			SELECT SUM(collnDtls.recvAmount) FROM com.ff.domain.mec.collection.CollectionDtlsDO collnDtls 
+			WHERE collnDtls.collectionDO.collectionId IN (
+				SELECT collection.collectionId FROM	com.ff.domain.mec.collection.CollectionDO collection 
+				WHERE
+				LENGTH(collection.txnNo)<= 13 AND 
+				collection.CollectionDate=:prevDate AND
+				collection.collectionOfficeDO.officeId=:officeId AND 
+				collection.status NOT IN (:status) AND 
+				collection.paymentModeDO.paymentId IN (
+					SELECT payment.paymentId FROM com.ff.domain.serviceOffering.PaymentModeDO payment WHERE 
+					payment.paymentCode IN (:paymentMode)
+				) 
+				AND (collnDtls.collectionAgainst =:collectionAgainst OR collnDtls.collectionAgainst ='O')
+			)
+		]]>
+	</query>
+
+	<query name="getCollectionDtlsFromDeliveryDtls">
+		<![CDATA[
+			SELECT collnDtls FROM com.ff.domain.mec.collection.CollectionDtlsDO collnDtls 
+			WHERE 
+				collnDtls.collectionDO IS NULL AND
+				collnDtls.consgDeliveryDate IS NULL AND
+				collnDtls.consgDO.consgId IN (:consgIds)
+		]]>
+	</query>
+
+	<query name="getChequeDepositSlipDtls">
+		<![CDATA[
+			SELECT collDtls.collectionDO 
+			FROM com.ff.domain.mec.collection.CollectionDtlsDO collDtls 
+			WHERE collDtls.collectionDO IS NOT NULL 
+			AND collDtls.collectionDO.paymentModeDO.paymentCode=:paymentMode
+			AND collDtls.collectionDO.status!=:status
+			AND 
+			(
+				(collDtls.collectionDO.collectionCategory='C' AND collDtls.collectionFor='F') 
+				OR
+				(collDtls.collectionDO.collectionCategory='B')
+			)
+			AND collDtls.collectionDO.collectionOfficeDO.reportingRHO=:reportingRHOId
+			ORDER BY 
+				collDtls.collectionDO.collectionOfficeDO.officeName,
+				collDtls.collectionDO.collectionOfficeDO.officeCode
+		]]>
+	</query>
+	<query name="getDeliveredCollectionDtls">
+		<![CDATA[
+			SELECT count(entryId) from com.ff.domain.mec.collection.CollectionDtlsDO collDtls 
+			inner join collDtls.consgDO consg
+			WHERE consg.consgNo=:consgNo 
+			AND collDtls.consgDeliveryDate IS NOT NULL
+		]]>
+	</query>
+
+</hibernate-mapping>

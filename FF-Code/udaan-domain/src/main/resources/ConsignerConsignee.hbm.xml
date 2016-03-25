@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.business.ConsigneeConsignorDO" table="ff_d_consigner_consignee">
+		<id name="partyId" type="java.lang.Integer">
+			<column name="PARTY_ID" />
+			<generator class="native" />
+		</id>
+		<property name="partyCode" type="java.lang.String">
+			<column name="PARTY_CODE" />
+		</property>
+		<property name="firstName" type="java.lang.String">
+			<column name="FIRST_NAME" />
+		</property>
+		<property name="lastName" type="java.lang.String">
+			<column name="LAST_NAME" />
+		</property>
+		<property name="partyType" type="java.lang.String">
+			<column name="PARTY_TYPE" />
+		</property>
+		<property name="phone" type="java.lang.String">
+			<column name="PHONE" />
+		</property>
+		<property name="mobile" type="java.lang.String">
+			<column name="MOBILE" />
+		</property>
+		<property name="fax" type="java.lang.String">
+			<column name="FAX" />
+		</property>
+		<property name="businessName" type="java.lang.String">
+			<column name="BUSINESS_NAME" />
+		</property>
+		<property name="email" type="java.lang.String">
+			<column name="EMAIL" />
+		</property>
+		<property name="address" type="java.lang.String">
+			<column name="ADDRESS" />
+		</property>
+		<property name="relation" type="java.lang.String">
+			<column name="RELATIONSHIP" />
+		</property>
+		<property name="createdBy" type="java.lang.Integer">
+            <column name="CREATED_BY" />
+         </property>
+          <property name="updatedBy" type="java.lang.Integer">
+            <column name="UPDATE_BY" />
+         </property>
+         
+          <property name="createdDate" type="java.util.Date">
+            <column name="CREATION_DATE" />
+         </property>
+         <property name="updatedDate" type="java.util.Date">
+            <column name="UPDATE_DATE" />
+         </property>
+         <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> 
+		</class>		
+		
+		<!-- Getting Consignee details -->
+		<query name="getConsigneeConsignorDtls">
+		<![CDATA[
+			FROM com.ff.domain.business.ConsigneeConsignorDO cnrCneDO 
+			WHERE cnrCneDO.partyId=(SELECT consg.consignee.partyId 
+									FROM com.ff.domain.consignment.ConsignmentDO consg 
+									WHERE consg.consgNo=:consgNumber)
+		]]>
+		</query>
+		<!-- Getting Consigner details -->
+		<query name="getConsignorDtls">
+		<![CDATA[
+			FROM com.ff.domain.business.ConsigneeConsignorDO cnrCneDO 
+			WHERE cnrCneDO.partyId=(SELECT consg.consignor.partyId 
+									FROM com.ff.domain.consignment.ConsignmentDO consg 
+									WHERE consg.consgNo=:consgNumber)
+		]]>
+		</query>
+	
+</hibernate-mapping>

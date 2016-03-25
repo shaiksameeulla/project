@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.masters.SAPItemDO" table="ff_f_sap_item">
+		<id name="Id" type="java.lang.Long">
+			<column name="ID" />
+			<generator class="native" />
+		</id>
+		<property name="itemTypeCode" column="ITEM_TYPE_CODE" />
+		<property name="itemTypeName" column="ITEM_TYPE_NAME" />
+		<property name="itemHasSeries" column="ITEM_HAS_SERIES" />
+		<property name="itemCode" column="ITEM_CODE"/>
+		<property name="itemName" column="ITEM_NAME"/>
+		<property name="itemSeries" column="ITEM_SERIES" />
+		<property name="description" column="DESCRIPTION" />
+		<property name="uom" column="UNIT_OF_MEASURE" />
+		<property name="seriesLength" column="SERIES_LENGTH" />
+		<property name="isError" column="IS_ERROR" />
+		<property name="errorDesc" column="ERROR_DESCRIPTION" />
+		
+		<!--  common attributes  START-->
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="sapStatusInBound" column="DT_SAP_INBOUND" />
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<!--  common attributes  END-->
+	</class>
+	
+	
+</hibernate-mapping>

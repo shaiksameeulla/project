@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.complaints.ServiceRequestLegalComplaintDO" table="ff_f_service_request_complaint_legal">
+		<id name="serviceRequestComplaintLegal" type="java.lang.Integer" column="SERVICE_REQUEST_COMPLAINT_LEGAL_ID">
+			<generator class="native" />
+		</id>
+		<property name="serviceRequestComplaintId" column="SERVICE_REQUEST_COMPLAINT_ID" />
+		<property name="investigationFeedback" column="INVESTIGATION_FEEDBACK" />
+		<property name="forwardedToFfclLawyer" column="FORWARDED_TO_FFCL_LAWYER" />
+		<property name="forwardedToFfclLawyerDate" column="FORWARDED_TO_FFCL_LAWYER_DATE" />
+		<property name="advocateNoticeFileDate" column="ADVOCATE_NOTICE_DATE" />
+		<property name="hearing1_date" column="HEARING1_DATE" />
+		<property name="hearing2_date" column="HEARING2_DATE" />
+		<property name="hearing3_date" column="HEARING3_DATE" />
+		<property name="hearing4_date" column="HEARING4_DATE" />
+		<property name="hearing5_date" column="HEARING5_DATE" />
+		<property name="hearing6_date" column="HEARING6_DATE" />
+		<property name="lawyerFees" column="LAWYER_FEES" />
+		<property name="remarks" column="REMARK" />
+		<property name="hearing1" column="HEARING1" />
+		<property name="hearing2" column="HEARING2" />
+		<property name="hearing3" column="HEARING3" />
+		<property name="hearing4" column="HEARING4" />
+		<property name="hearing5" column="HEARING5" />
+		<property name="hearing6" column="HEARING6" />
+		<property name="legalComplaintStatus" column="LEGAL_COMPLAINT_STATUS" />
+		<!--  common attributes  START-->
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<!--  common attributes  END-->
+	
+		<!-- Many -to- one relationships START -->
+		<many-to-one name="advocateNoticePaperDO" class="com.ff.domain.complaints.ServiceRequestPapersDO" 
+			lazy="false" fetch="join" cascade="all">
+			<column name="ADVOCATE_NOTICE_PAPER" />
+		</many-to-one>
+		<!-- Many -to- one relationships END -->
+	
+	</class>
+	
+</hibernate-mapping>
+
+

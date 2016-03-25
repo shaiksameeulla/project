@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.umc.LogInOutDetlDO" table="ff_d_login_history">
+		<id name="logInOutId"  type="java.lang.Integer" >
+			<column name="LOGIN_HISTORY_ID" />
+            <generator class="native"/>
+		</id>
+		
+		<property name="userId" type="java.lang.Integer">
+			<column name="USER_ID" />
+		</property>
+		<property name="logInDate"  column="LOGIN_START"/>
+			
+		<property name="logOutDate">
+			<column name="LOGIN_END" />
+		</property>
+		
+		<property name="macAddress" type="java.lang.String">
+	   		<column name="MAC_ADDRESS"/>
+	  	</property>
+	 	<property name="jSessionId" type="java.lang.String">
+	   		<column name="JSESSION_ID"/>
+	  	</property> 
+	  	<property name="officeId" type="java.lang.Integer">
+	   		<column name="OFFICE_ID"/>
+	  	</property> 
+	  	
+	  	
+   	<property name="dtToBranch" >
+            <column name="DT_TO_BRANCH" />
+        </property>
+        
+         <property name="dtToCentral" >
+            <column name="DT_TO_CENTRAL" />
+        </property> 
+  
+		
+		
+	</class>
+	
+	 <!--  <query name="getLastLoginLogoutRecord">
+        <![CDATA[ from com.ff.domain.umc.LogInOutDetlDO logdo where  logInOutId=
+        (select max(logdo1.logInOutId) from com.ff.domain.umc.LogInOutDetlDO logdo1 where logdo1.userId=:userId)]]>
+    </query> -->
+    
+    
+   <query name="getUnsyncInboundLoginHistory">
+		<![CDATA[from com.ff.domain.umc.LogInOutDetlDO loginHistory where loginHistory.dtToCentral='N']]>
+	</query>
+	
+   <!--  <query name="getTodaysLastLoginLogoutRecord">
+        <![CDATA[ from com.ff.domain.umc.LogInOutDetlDO logdo where  logInOutId=
+        (select max(logdo1.logInOutId) from com.ff.domain.umc.LogInOutDetlDO logdo1 
+        	where logdo1.logInName=:login_name and logInDate=:currentDate)]]>
+    </query> -->
+      
+      
+      <query name="updateLogoutDate">
+		<![CDATA[UPDATE com.ff.domain.umc.LogInOutDetlDO loginHistory set loginHistory.logOutDate=:logOutDate  where loginHistory.logInOutId=:logInOutId ]]>
+	</query>
+	
+	 <query name="getLastLoginLogoutRecord">
+        <![CDATA[ from com.ff.domain.umc.LogInOutDetlDO logdo where  logInDate=
+        (select max(logdo1.logInDate) from com.ff.domain.umc.LogInOutDetlDO logdo1 where logdo1.userId=:userId)]]>
+    </query>
+      
+    </hibernate-mapping>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pndcommission.SAPDeliveryCommissionCalcDO" table="ff_f_sap_delivery_commission_calc">
+		<id name="sapDlvCommId" type="java.lang.Integer">
+			<column name="SAP_DELIVERY_COMM_ID" />
+			<generator class="native" />
+		</id>
+		<property name="employeeCode" column="EMPLOYEE_CODE" />
+		<property name="productGroup" column="PRODUCT_GROUP" />
+		<property name="calculatedForPeriod" column="CALCULATED_FOR_PERIOD" />
+		<property name="deliveredCount" column="DELIVERED_COUNT" />
+		<property name="dlvDay1" column="DELIVERED_DAY_1" />
+		<property name="dlvDay2" column="DELIVERED_DAY_2" />
+		<property name="dlvDay3" column="DELIVERED_DAY_3" />
+		<property name="dlvDay4Beyond" column="DELIVERED_DAY_4_BEYOND" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE" />
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		
+	</class>
+	
+<query name="getSAPDlvCommissionDtls">
+	<![CDATA[
+		FROM com.ff.domain.pndcommission.SAPDeliveryCommissionCalcDO sapDlvCommCalc
+		WHERE sapDlvCommCalc.sapStatus=:sapStatus
+	]]>
+</query>
+
+</hibernate-mapping>

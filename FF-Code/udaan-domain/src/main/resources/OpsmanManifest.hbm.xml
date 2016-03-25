@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.manifest.OpsmanManifestDO" table="ff_f_manifest">
+		<id name="manifestId" type="java.lang.Integer" column="MANIFEST_ID">
+			<generator class="native" />
+		</id>
+		
+		<property name="manifestNo" column="MANIFEST_NO" type="java.lang.String" />
+		<property name="manifestType" column="MANIFEST_TYPE" type="java.lang.String" />
+		<property name="manifestEmbeddedIn" column="MANIFEST_EMBEDDED_IN" type="java.lang.Integer"/>
+		<property name="misrouteTypeCode" column="MISROUTE_TYPE_CODE" type="java.lang.String" />
+		<property name="manifestWeight" column="MANIFEST_WEIGHT" type="java.lang.Double" />
+		<property name="manifestDate" column="MANIFEST_DATE" type="java.util.Date"/>
+		<property name="noOfElements" column="NO_OF_ELEMENTS" type="java.lang.Integer" />
+		<property name="containsOnlyCoMail" column="CONTAINS_ONLY_COMAIL" type="java.lang.String" />
+		<property name="manifestStatus" column="MANIFEST_STATUS" type="java.lang.String" />
+		<property name="allowSpecificContent" column="ALLOW_SPECIFIC_CONTENT"/>
+		<property name="bagLockNo" column="BAG_LOCK_NO" type="java.lang.String" />
+		<property name="multipleDestination" column="MULTIPLE_DESTINATION" />
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer" update="false"/>
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer" />
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date" update="false"/>
+		<property name="updatedDate" column="UPDATE_DATE" type="java.util.Date" />
+		<property name="manifestedProductSeries" column="MANIFESTED_PRODUCT_SERIES" type="java.lang.Integer"/>
+		
+		<property name="manifestDirection" type="java.lang.String">
+			<column name="MANIFEST_DIRECTION" />
+		</property>
+		<property name="manifestOpenType" type="java.lang.String">
+			<column name="MANIFEST_OPEN_TYPE" />
+		</property>
+		<property name="bplManifestType" type="java.lang.String">
+			<column name="BPL_MANIFEST_TYPE" />
+		</property>
+		<property name="loadLotId" type="java.lang.Integer">
+			<column name="LOAD_LOT_ID" />
+		</property>
+		<property name="thirdPartyType" type="java.lang.String">
+			<column name="THIRD_PARTY_TYPE" />
+		</property>
+		<property name="vendorId" type="java.lang.Integer">
+			<column name="VENDOR_ID" />
+		</property>
+		<property name="originOffice" type="java.lang.Integer">
+			<column name="ORIGIN_OFFICE" />
+		</property>
+		
+		<property name="destOffice" type="java.lang.Integer">
+			<column name="DESTINATION_OFFICE" />
+		</property>
+		
+		<property name="officeType" type="java.lang.Integer">
+			<column name="OFFICE_TYPE_FILTER" />
+		</property>		
+		
+		<property name="updatingProcess" type="java.lang.Integer">
+			<column name="UPDATING_PROCESS" />
+		</property>
+		
+		<property name="destinationCity" type="java.lang.Integer">
+			<column name="DESTINATION_CITY" />
+		</property>
+		
+		<property name="manifestLoadContent" type="java.lang.Integer">
+			<column name="MANIFEST_LOAD_CONTENT" />
+		</property>
+
+		<property name="operatingOffice" column="OPERATING_OFFICE" type="java.lang.Integer" />
+
+		<property name="manifestProcessCode" column="MANIFEST_PROCESS_CODE"/>
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL" />
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		<property  name="dtToOpsman" type="java.lang.String">
+			<column name="DT_TO_OPSMAN"/>
+		</property>
+		
+		<set name="consignments" table="ff_f_consignment_manifested" cascade="all" lazy="false"  fetch="join">
+			<key>
+				<column name="MANIFEST_ID" />
+			</key>
+			<many-to-many column="CONSIGNMENT_ID" unique="true"	class="com.ff.domain.consignment.OpsmanConsignmentDO"/>
+		</set>
+		
+		<set name="embeddedManifestDOs" cascade="all" lazy="false" table="ff_f_manifest" fetch="join">
+			<key>
+				<column name="MANIFEST_EMBEDDED_IN"/>
+			</key>
+			<one-to-many class="com.ff.domain.manifest.OpsmanManifestDO"/>
+		</set>
+		
+	</class>
+ 
+ 	<!-- Start of Changes by <48206> for opsman on 20/09/2013  -->
+	
+	<query name="getOpsmanInboundManifest">
+		<![CDATA[FROM com.ff.domain.manifest.OpsmanManifestDO manifest WHERE 
+				 manifest.manifestDirection='O' and
+				 manifest.manifestEmbeddedIn is null and
+				 manifest.dtFromOpsman!='Y' and
+				 manifest.dtToOpsman='N' and
+				 manifest.dtToBranch!='R' and 
+				 manifest.manifestProcessCode not in ('RTOH','DSPT','OPKT','BOUT') and
+				 manifest.originOffice in (:officeIds)
+				 ]]>
+	</query>
+	
+	<query name="getOpsmanInboundManifestForRtoh">
+		<![CDATA[FROM com.ff.domain.manifest.OpsmanManifestDO manifest
+				 WHERE manifest.dtToOpsman='N' and
+				 manifest.dtToBranch!='R' and 
+				 manifest.dtFromOpsman!='Y' and 
+				 manifest.manifestEmbeddedIn is null and
+				 manifest.manifestDirection='O' and
+				 manifest.manifestProcessCode = 'RTOH' and
+				 manifest.originOffice in (:officeIds)
+				 ]]> 
+	</query>
+
+	<query name="updateManifestData">
+		<![CDATA[UPDATE com.ff.domain.manifest.OpsmanManifestDO manifest
+				 SET manifest.dtToOpsman = :status
+				 WHERE 
+				 manifest.manifestId in (:manifestId)
+				 ]]>
+	</query>
+	
+	<query name="getManifestByOperatOfficeNoTypeAndProcessForOpsman">
+		<![CDATA[
+			FROM com.ff.domain.manifest.OpsmanManifestDO manifest 
+			WHERE manifest.manifestNo=:manifestNo
+			and manifest.operatingOffice=:operatingOffice
+			and manifest.manifestType=:manifestType
+			and manifest.manifestProcessCode=:manifestProcessCode
+		]]>
+	</query>
+	
+	<query name="getOriginManifestData">
+		<![CDATA[
+			FROM com.ff.domain.manifest.OpsmanManifestDO manifest 
+			WHERE manifest.manifestNo=:manifestNo
+			and manifest.manifestDirection='O'
+			and manifest.originOffice=manifest.operatingOffice
+		]]>
+	</query>
+	
+	<!-- End of Changes by <48206> for opsman on 20/09/2013  -->
+</hibernate-mapping>

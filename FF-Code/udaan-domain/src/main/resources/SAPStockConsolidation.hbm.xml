@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.reduction.SAPStockConsolidationDO" 
+		table="ff_f_sap_stock_consolidation">
+		<id name="transactionId" type="java.lang.Long">
+			<column name="TRANSACTION_ID" />
+			<generator class="native" />
+		</id>
+		<property name="transactionDate" column="TRANSACTION_DATE" />
+		<property name="consumedStockQuantity" column="CONSUMED_STOCK_QUANTITY" />
+		<property name="generatedTransactionNumber" column="GENERATED_TRANSACTION_NUMBER" />
+		<property name="sapTransferStatus" column="SAP_TRANSFER_STATUS" />
+
+		<!-- Many-to-one relationships START -->
+		<many-to-one name="itemDO" class="com.ff.domain.stockmanagement.masters.ItemDO" 
+			lazy="false" fetch="join">
+			<column name="ITEM_ID" />
+		</many-to-one>
+		<many-to-one name="transactionCreatedOfficeDO" class="com.ff.domain.organization.OfficeDO" 
+			lazy="false" fetch="join">
+			<column name="TRANSATION_CREATED_OFFICE" />
+		</many-to-one>
+		<!-- Many-to-one relationships END -->
+	</class>
+
+<query name="getMaxTxnNo">
+	<![CDATA[
+		SELECT MAX(stock.generatedTransactionNumber) FROM 
+		com.ff.domain.stockmanagement.operations.reduction.SAPStockConsolidationDO stock where
+		
+		stock.transactionCreatedOfficeDO.officeId=:officeId
+		AND
+		 stock.generatedTransactionNumber like :prefix  
+		 AND
+		 length(stock.generatedTransactionNumber) = :numberLength
+	]]>
+</query>
+
+<query name="getSAPStockConsolidationDtls">
+	<![CDATA[
+		FROM com.ff.domain.stockmanagement.operations.reduction.SAPStockConsolidationDO stock
+		WHERE stock.sapTransferStatus=:sapTransferStatus
+	]]>
+</query>
+
+</hibernate-mapping>

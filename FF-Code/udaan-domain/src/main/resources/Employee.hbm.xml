@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.organization.EmployeeDO" table="ff_d_employee">
+		<id name="employeeId" type="java.lang.Integer">
+			<column name="EMPLOYEE_ID" />
+			<generator class="assigned" />
+		</id>
+		<property name="empCode" type="java.lang.String">
+			<column name="EMP_CODE" length="25" />
+		</property>
+		<property name="firstName" type="java.lang.String">
+			<column name="FIRST_NAME" length="50" />
+		</property>
+		<property name="lastName" type="java.lang.String">
+			<column name="LAST_NAME" length="50" />
+		</property>
+
+		<property name="empPhone" type="java.lang.String">
+			<column name="PHONE" length="25" />
+		</property>
+
+		<!-- <property name="empFax" type="java.lang.String">
+			<column name="FAX" length="50" />
+		</property>
+		<property name="dateOfJoin" type="java.util.Date">
+			<column name="DATE_OF_JOIN" length="10" />
+		</property> -->
+		<property name="designation" type="java.lang.String">
+			<column name="DESIGNATION" length="50" />
+		</property>
+
+		<property name="empType" type="java.lang.String">
+			<column name="EMP_TYPE" length="50" />
+		</property>
+		<!-- <property name="managerCode" type="java.lang.String"> <column name="MANAGER" 
+			length="25" /> </property> -->
+		<property name="departmentId" type="java.lang.Integer">
+			<column name="DEPARTMENT" length="25" />
+		</property>
+		<!-- <property name="gender" type="java.lang.String"> <column name="GENDER" 
+			length="2" /> </property> <property name="maritalStatus" type="java.lang.String"> 
+			<column name="MARITAL_STATUS" length="2" /> </property> <property name="age" 
+			type="java.util.Date"> <column name="AGE" length="0" /> </property> <property 
+			name="education" type="java.lang.String"> <column name="EDUCATION" length="50" 
+			/> </property> <property name="dateOfBirth" type="java.util.Date"> <column 
+			name="DATE_OF_BIRTH" length="10" /> </property> <property name="street1" 
+			type="java.lang.String"> <column name="ADDRESS_1" length="50" /> </property> 
+			<property name="street2" type="java.lang.String"> <column name="ADDRESS_2" 
+			length="50" /> </property> <property name="street3" type="java.lang.String"> 
+			<column name="ADDRESS_3" length="50" /> </property> -->
+		<property name="city">
+			<column name="CITY" />
+		</property>
+		<property name="officeId" type="java.lang.Integer">
+			<column name="OFFICE" />
+		</property>
+		<property name="emailId" type="java.lang.String">
+			<column name="EMAIL_ID" length="50" />
+		</property>
+		<property name="empVirtual" type="java.lang.String">
+			<column name="EMPLOYEE_VIRTUAL" length="1" />
+		</property>
+		 <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="empStatus">
+			<column name="EMP_STATUS" />
+		</property>
+
+	</class>
+
+	<query name="getEmpDetailsByName">
+      <![CDATA[ Select employee.empCode,employee.employeeId from com.ff.domain.organization.EmployeeDO employee where employee.firstName like :firstName]]>
+	</query>
+
+	<query name="getEmployeeDetailsByEmpId">
+      <![CDATA[ Select employee.employeeId,employee.firstName,employee.lastName,employee.empCode,employee.emailId from com.ff.domain.organization.EmployeeDO employee where employee.employeeId =:employeeId]]>
+	</query>
+
+
+	<query name="getEmpDOByCode">
+	<![CDATA[ FROM com.ff.domain.organization.EmployeeDO emp where emp.empCode=:empCode]]>
+	</query>
+
+	<query name="getAllEmployees">
+	<![CDATA[ FROM com.ff.domain.organization.EmployeeDO emp where emp.empVirtual='N' and emp.officeId is not NULL ]]>
+	</query>
+	
+	<query name="getEmpBycity">
+	<![CDATA[ FROM com.ff.domain.organization.EmployeeDO emp where emp.empVirtual='N'
+	 and emp.officeId is not NULL 
+	 and emp.city=:cityId
+	 and emp.empStatus=:status
+	 ]]>
+	</query>
+
+
+	<query name="updateEmailbyEmpId">
+	<![CDATA[ UPDATE  com.ff.domain.organization.EmployeeDO employee  set employee.emailId =:emailId,employee.dtToBranch='N'  where employee.employeeId =:employeeId ]]>
+	</query>
+
+	<query name="getEmployeesByOfficeId">
+		<![CDATA[ FROM com.ff.domain.organization.EmployeeDO emp where emp.officeId=:officeId and emp.empVirtual ='N' and emp.empStatus='A']]>
+	</query>
+
+	<query name="getEmployeesDtlsByDepartmentType">
+		<![CDATA[ FROM com.ff.domain.organization.EmployeeDO emp 
+		where emp.empVirtual ='N' 
+		and emp.departmentId in 
+		(select dept.departmentId from com.ff.domain.organization.DepartmentDO dept where dept.departmentName=:departmentName ) 
+		order by emp.designation]]>
+	</query>
+
+	<query name="getEmpByCode">
+      <![CDATA[ 
+      		FROM	com.ff.domain.organization.EmployeeDO emp
+      		WHERE 	empCode=:empCode	
+      ]]>
+	</query>
+
+	<query name="getEmployeesDtlsByDesignationType">
+      <![CDATA[ 
+      		FROM	com.ff.domain.organization.EmployeeDO emp
+      		WHERE 	emp.designation=:designation	
+      ]]>
+	</query>
+	
+	
+	<!-- <query name="getEmployeesDtlsByDepartmentTypeAndEmpDesign">
+		
+		<![CDATA[ FROM com.ff.domain.organization.EmployeeDO emp 
+			where emp.empVirtual ='N' and emp.departmentId in (select dept.departmentId from com.ff.domain.organization.DepartmentDO dept where dept.departmentName=:departmentName ) 
+		 	and emp.designation=:designation and emp.officeId=:officeId]]>
+		 	
+	</query> -->
+	<query name="getUnSyncEmployees">
+      <![CDATA[from com.ff.domain.organization.EmployeeDO employee where employee.dtToBranch='N' ]]>
+	</query>
+	
+	<query name="getOfficeIdByEmpId">
+		<![CDATA[select emp.officeId FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId=:employeeId]]>
+	</query>
+	
+	<query name="getAllEmployeesByRoleAndOffice">
+		<![CDATA[
+		SELECT distinct emp 
+		FROM com.ff.domain.umc.EmployeeUserDO as empUser
+		INNER JOIN empUser.empDO as emp
+		WHERE 	emp.empVirtual='N'
+		AND		emp.empStatus='A'
+		AND 	emp.officeId IN (	SELECT 	officeDO.officeId 
+									FROM  	com.ff.domain.organization.OfficeDO as officeDO 
+									WHERE 	officeDO.reportingRHO  IN (:officeId)
+									OR 		officeDO.officeId IN (:officeId ))
+		AND	empUser.userId IN (	SELECT  userDO.userId FROM com.ff.domain.umc.UserRightsDO as userRoles
+		 						INNER JOIN userRoles.userDO as userDO
+		 						INNER JOIN userRoles.roleDO as roles
+		 						WHERE 	roles.roleName =:roleName
+		 						AND		userRoles.status='A'
+		 						AND		roles.status='A'
+		 						AND 	userDO.active='Y')
+		]]>
+	</query>
+	<query name="getEmployeesforContractAlert">
+		<![CDATA[
+		FROM com.ff.domain.organization.EmployeeDO emp
+		WHERE (emp.officeId IN (:officeIdList) OR emp.officeId IN (SELECT ofc.officeId FROM com.ff.domain.organization.OfficeDO ofc where ofc.officeTypeDO.offcTypeCode =:corpOfcType) OR emp.employeeId IN
+		 	  (SELECT empuser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO empuser WHERE empuser.userId IN 
+			  (SELECT usrOfcRights.user.userId FROM com.ff.domain.umc.UserOfficeRightsMappingDO usrOfcRights WHERE 
+			  ((usrOfcRights.office.officeId =:rhoOfficeId  and usrOfcRights.mappedTo = 'R') OR (usrOfcRights.office.officeId =:officeId and usrOfcRights.mappedTo = 'A')))))
+			  AND  emp.employeeId IN (SELECT empuser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO empuser WHERE empuser.userId IN 
+			  	  (SELECT usrRights.userDO.userId FROM com.ff.domain.umc.UserRightsDO usrRights WHERE 
+			  	  (usrRights.roleDO.roleId IN (select appRights.rolesTypeDO.roleId FROM com.ff.domain.umc.ApplRightsDO appRights where appRights.appscreenTypeDO.screenCode =:scrnCode ))))
+		
+		]]>
+	</query>
+	
+</hibernate-mapping>

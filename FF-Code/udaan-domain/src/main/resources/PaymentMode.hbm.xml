@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+
+
+
+<hibernate-mapping>
+	<class name="com.ff.domain.serviceOffering.PaymentModeDO" table="ff_d_payment_mode">
+		<id name="paymentId" type="java.lang.Integer">
+			<column name="PAYMENT_ID" />
+			<generator class="native" />
+		</id>
+		<property name="paymentCode" type="java.lang.String">
+			<column name="PAYMENT_CODE" />
+		</property>
+		<property name="paymentType" type="java.lang.String">
+			<column name="PAYMENT_TYPE" />
+		</property>
+		<property name="description" type="java.lang.String">
+			<column name="DESCRIPTION" />
+		</property>
+		<property name="status" type="java.lang.String">
+			<column name="STATUS" />
+		</property>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+		</class>
+		
+		 <query name="getPaymentDetails">
+	<![CDATA[ FROM com.ff.domain.serviceOffering.PaymentModeDO )]]>
+	</query>
+	
+	 <query name="getPaymentDetailsById">
+	<![CDATA[ FROM com.ff.domain.serviceOffering.PaymentModeDO payment WHERE payment.paymentId=:paymentId]]>
+	</query>
+	
+	<query name="getPaymentModeDtls">
+	<![CDATA[
+		FROM com.ff.domain.serviceOffering.PaymentModeDO paymentMode 
+		WHERE paymentMode.paymentId IN 
+			(SELECT processMap.paymentModeDO.paymentId FROM com.ff.domain.serviceOffering.PaymentModeProcessMapDO processMap 
+		WHERE processMap.processDO.processId IN 
+			(SELECT process.processId FROM com.ff.domain.tracking.ProcessDO process 
+		WHERE process.processCode=:processCode) AND processMap.status=:status) 
+		AND paymentMode.status=:status 
+	]]>
+	</query>
+	
+	<query name="getPaymentMode">
+	<![CDATA[
+		FROM com.ff.domain.serviceOffering.PaymentModeDO paymentMode 
+		WHERE paymentMode.paymentCode=:payModeCode and  paymentMode.paymentId IN 
+			(SELECT processMap.paymentModeDO.paymentId FROM com.ff.domain.serviceOffering.PaymentModeProcessMapDO processMap 
+		WHERE processMap.processDO.processId IN 
+			(SELECT process.processId FROM com.ff.domain.tracking.ProcessDO process 
+		WHERE process.processCode=:processCode) AND processMap.status=:status) 
+		AND paymentMode.status=:status 
+	]]>
+	</query>
+	
+</hibernate-mapping>

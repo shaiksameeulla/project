@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.ff.domain.pickup.SapEmployeePickupDO" table="ff_f_sap_employee_pickup" >
+        <id name="pickupId" type="java.lang.Integer">
+            <column name="PICKUP_ID" />
+            <generator class="native" />
+        </id>
+        <property name="officeCode" type="string">
+            <column name="OFFICE_CODE" length="20" not-null="true" />
+        </property>
+        <property name="empCode" type="string">
+            <column name="EMP_CODE" length="25" not-null="true" />
+        </property>
+        <property name="startDate" type="timestamp">
+            <column name="START_DATE" length="19" not-null="true" />
+        </property>
+        <property name="endDate" type="timestamp">
+            <column name="END_DATE" length="19" not-null="true" />
+        </property>
+        <property name="pickupCount" type="java.lang.Integer">
+            <column name="PICKUP_COUNT" />
+        </property>
+        <property name="deliveryCount" type="java.lang.Integer">
+            <column name="DELIVERY_COUNT" />
+        </property>
+    </class>
+</hibernate-mapping>

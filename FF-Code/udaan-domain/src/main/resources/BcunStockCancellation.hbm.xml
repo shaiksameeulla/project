@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<class name="com.ff.domain.stockmanagement.operations.cancel.BcunStockCancellationDO" table="ff_f_stock_cancellation" dynamic-update="true">
+		<id name="stockCancelledId" type="java.lang.Long">
+			<column name="STOCK_CANCELLED_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name = "cancellationNumber" column = "CANCELLATION_NUMBER" />
+		<property name = "reason" column = "REASON" />
+		<property name = "cancelledDate" column = "CANCELLED_DATE" />
+		<property name = "issueNumber" column = "ISSUE_NUMBER" />
+		<property name = "quantity" column = "QUANTITY" />
+		
+		<property name="officeProductCodeInSeries" column="OFFICE_PRODUCT_CODE_IN_SERIES" />
+		<property name="startLeaf" column="START_LEAF" />
+		<property name="endLeaf" column="END_LEAF" />
+		<property name="startSerialNumber" column="START_SI_NUMBER" />
+		<property name="endSerialNumber" column="END_SI_NUMBER" />
+		
+		<!--  common attributes  START -->
+		
+		<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+		
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		
+		<!--  common attributes  END-->
+		<property name="cancellationOfficId" column="CANCELLATION_OFFICE_ID" type="java.lang.Integer" />	
+				
+		<property name="itemId" column="ITEM_ID" type="java.lang.Integer"  />	
+				
+		<!-- Many -to- one relationships (Common attributes) START-->
+		
+		
+		<!-- Many -to- one relationships (Common attributes) END-->
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		
+		
+	</class>
+
+
+<!-- Query For Data Sync  Start -->		
+
+	
+	<query name="getstockCancelledId">
+		<![CDATA[SELECT cancellationDO.stockCancelledId From com.ff.domain.stockmanagement.operations.cancel.BcunStockCancellationDO cancellationDO where  cancellationDO.cancellationNumber =:cancellationNumber  ]]>
+	</query>
+
+	<!-- Query For BCUN OutBound Data Sync  Started  -->
+		<query name="getUnsyncOutboundStockCancellation">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.cancel.BcunStockCancellationDO cancellationDO
+					where 
+					cancellationDO.dtToBranch='N'
+					   AND
+					 cancellationDO.cancellationOfficId=:branchId
+					
+		]]>
+	</query>
+	
+	<query name="getStockCancellationByNumberForBCN">
+		<![CDATA[  From com.ff.domain.stockmanagement.operations.cancel.BcunStockCancellationDO cancellationDO where  cancellationDO.cancellationNumber =:cancellationNumber ]]>
+	</query>
+	<!-- Query For BCUN OutBound  Data Sync  End-->
+		
+	
+<!-- Query For Data Sync  End -->	
+
+</hibernate-mapping>

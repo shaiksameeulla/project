@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.ff.domain.coloading.ColoadingAirDO" table="ff_d_coloading_air">
+        <id name="id" type="java.lang.Integer">
+            <column name="ID" />
+            <generator class="native" />
+        </id>
+        <property name="originRegionId" type="int">
+            <column name="ORIGIN_REGION_ID" not-null="true" />
+        </property>
+        <property name="originCityId" type="int">
+            <column name="ORIGIN_CITY_ID" not-null="true" />
+        </property>
+        <property name="destinationRegionId" type="int">
+            <column name="DESTINATION_REGION_ID" not-null="true" />
+        </property>
+        <property name="destinationCityId" type="int">
+            <column name="DESTINATION_CITY_ID" not-null="true" />
+        </property>
+        <property name="vendorId" type="int">
+            <column name="VENDOR_ID" length="11" not-null="true" />
+        </property>
+        <property name="effectiveFrom" type="date">
+            <column name="EFFECTIVE_FROM" length="10" not-null="true" />
+        </property>
+        <property name="effectiveTill" type="date">
+            <column name="EFFECTIVE_TILL" length="10" />
+        </property>
+        <property name="cdType" type="string">
+            <column name="CD_TYPE" length="3" not-null="true" />
+        </property>
+         <property name="sspRateAboveKg" type="java.lang.Integer">
+            <column name="SSP_RATE_ABOVE_KG" />
+        </property>
+         <property name="storeStatus" type="char">
+            <column name="STORE_STATUS" length="1" not-null="true" />
+        </property>
+        <property name="createdBy" type="int" update="false">
+            <column name="CREATED_BY" not-null="true" />
+        </property>
+        <property name="updatedBy" type="int">
+            <column name="UPDATED_BY" not-null="true" />
+        </property>
+        <property name="createdDate" type="timestamp" update="false">
+            <column name="CREATED_DATE" length="19" not-null="true" />
+        </property>
+        <property name="updatedDate" type="timestamp">
+            <column name="UPDATED_DATE" length="19" not-null="true" />
+        </property>
+        <set name="coloadingAirAwbs" table="ff_d_coloading_air_awb" cascade="persist,merge,refresh" inverse="true" lazy="false" fetch="select">
+            <key>
+                <column name="AIR_ID" not-null="true" />
+            </key>
+            <one-to-many class="com.ff.domain.coloading.ColoadingAirAwbDO" />
+        </set>
+        <set name="coloadingAirCds" table="ff_d_coloading_air_cd" cascade="persist,merge,refresh" inverse="true" lazy="false" fetch="select">
+            <key>
+                <column name="AIR_ID" not-null="true" />
+            </key>
+            <one-to-many class="com.ff.domain.coloading.ColoadingAirCdDO" />
+        </set>
+    </class>
+</hibernate-mapping>

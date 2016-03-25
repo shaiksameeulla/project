@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.PickupRunsheetHeaderDO" table="ff_f_pickup_runsheet_header">
+		<id name="runsheetHeaderId" type="java.lang.Integer">
+			<column name="RUNSHEET_HEADER_ID" />
+			<generator class="native" />
+		</id>
+		<property name="runsheetNo" type="java.lang.String">
+			<column name="RUNSHEET_NO" />
+		</property>
+		<property name="runsheetDate" type="java.util.Date">
+			<column name="RUNSHEET_DATE" />
+		</property>
+		<property name="runsheetStatus" type="java.lang.String">
+			<column name="RUNSHEET_STATUS" />
+		</property>
+		<property name="createdBy" type="java.lang.Integer">
+            <column name="CREATED_BY" />
+         </property>
+          <property name="updatedBy" type="java.lang.Integer">
+            <column name="UPDATE_BY" />
+         </property>
+         
+          <property name="transactionCreateDate" type="java.util.Date" update="false">
+            <column name="CREATION_DATE" />
+         </property>
+         <property name="transactionModifiedDate" type="java.util.Date">
+            <column name="UPDATE_DATE" />
+         </property> 
+		<many-to-one name="pickupAssignmentHeader" class="com.ff.domain.pickup.RunsheetAssignmentHeaderDO" lazy="false" fetch="join"> 
+        	<column name="PICKUP_ASSIGNMENT_HEADER_ID" />
+        </many-to-one> 
+        
+		 <set name="runsheetDetails" table="ff_f_pickup_runsheet_detail" cascade="all" lazy="false" fetch="join">
+            <key>
+                <column name="RUNSHEET_HEADER_ID" />
+            </key>
+            <one-to-many class="com.ff.domain.pickup.PickupRunsheetDetailDO"/>
+        </set>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtUpdateToCentral">
+			<column name="DT_UPDATE_TO_CENTRAL" />
+		</property>
+	</class>
+	<query name="getRunsheetNumber">
+		<![CDATA[ FROM com.ff.domain.pickup.PickupRunsheetHeaderDO pkupRunsheetHeader 
+					WHERE pkupRunsheetHeader.pickupAssignmentHeader.assignmentHeaderId = :assignmentHeaderId
+					AND DATE_FORMAT(pkupRunsheetHeader.runsheetDate, GET_FORMAT(DATE,'USA')) = DATE_FORMAT(current_date, GET_FORMAT(DATE,'USA'))]]>
+	</query>
+	<query name="getGeneratedMasterRunsheets">
+		<![CDATA[ SELECT pkupRunsheetHeader.pickupAssignmentHeader.assignmentHeaderId 
+					FROM com.ff.domain.pickup.PickupRunsheetHeaderDO pkupRunsheetHeader 
+					WHERE pkupRunsheetHeader.pickupAssignmentHeader.assignmentHeaderId IN (:assignmentHeaderId) 
+					AND DATE_FORMAT(pkupRunsheetHeader.runsheetDate, GET_FORMAT(DATE,'USA')) = DATE_FORMAT(current_date, GET_FORMAT(DATE,'USA'))]]>
+	</query>
+	
+	<query name="getStatusOfMasterPickupAssignment">
+		<![CDATA[ SELECT pkupRunsheetHeader.pickupAssignmentHeader
+					FROM com.ff.domain.pickup.PickupRunsheetHeaderDO pkupRunsheetHeader 
+					WHERE pkupRunsheetHeader.pickupAssignmentHeader.assignmentHeaderId =:assignmentHeaderId 
+					AND DATE_FORMAT(pkupRunsheetHeader.runsheetDate, GET_FORMAT(DATE,'USA')) = DATE_FORMAT(current_date, GET_FORMAT(DATE,'USA'))]]>
+	</query>
+	<query name="getPickupRunsheetDetails">
+		<![CDATA[ FROM com.ff.domain.pickup.PickupRunsheetHeaderDO pkupRunsheetHeader 
+					WHERE pkupRunsheetHeader.runsheetHeaderId IN (:RunsheetHeaderId)]]>
+	</query>
+	
+	<query name="updateRunsheetHeader">
+	<![CDATA[UPDATE com.ff.domain.pickup.PickupRunsheetHeaderDO pkupRunsheetHeader
+				SET pkupRunsheetHeader.runsheetStatus=:status,
+				pkupRunsheetHeader.dtToCentral='N', pkupRunsheetHeader.dtUpdateToCentral='Y' 
+				WHERE pkupRunsheetHeader.runsheetHeaderId IN (:RunsheetHeaderId)]]>
+	</query>
+	<!--Start.....................Generate Pickup run sheet .....................-->
+	<query name="getPickupRunsheetDetailsByRunsheetNo">
+		<![CDATA[ FROM com.ff.domain.pickup.PickupRunsheetHeaderDO pkupRunsheetHeader 
+					WHERE pkupRunsheetHeader.runsheetNo IN (:RunsheetNo)]]>
+	</query>
+	<!--End.....................Generate Pickup run sheet .....................-->
+</hibernate-mapping>	

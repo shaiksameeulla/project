@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Oct 22, 2013 2:03:22 PM by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="com.ff.domain.coloading.ColoadingTrainContractRateDetailsDO" table="ff_d_coloading_train_contract_rate_dtls" >
+        <id name="id" type="java.lang.Integer">
+            <column name="ID" />
+            <generator class="native" />
+        </id>
+         <property name="trainNo" type="string">
+            <column name="TRAIN_NO" length="20" />
+        </property>
+        <many-to-one name="coloadingTrainContract" class="com.ff.domain.coloading.ColoadingTrainContractDO" fetch="select">
+            <column name="CONTRACT_ID" not-null="true" />
+        </many-to-one>
+        <property name="minChargeableRate" type="java.lang.Double">
+            <column name="MIN_CHARGEABLE_RATE" precision="10" />
+        </property>
+        <property name="ratePerKg" type="double">
+            <column name="RATE_PER_KG" precision="10" not-null="true" />
+        </property>
+        <property name="otherChargesPerKg" type="java.lang.Double">
+            <column name="OTHER_CHARGES_PER_KG" precision="10" />
+        </property>
+        <property name="storeStatus" type="char">
+            <column name="STORE_STATUS" length="1" not-null="true" />
+        </property>
+        <property name="createdBy" type="int">
+            <column name="CREATED_BY" not-null="true" />
+        </property>
+        <property name="updatedBy" type="int">
+            <column name="UPDATED_BY" not-null="true" />
+        </property>
+        <property name="createdDate" type="timestamp">
+            <column name="CREATED_DATE" length="19" not-null="true" />
+        </property>
+        <property name="updatedDate" type="timestamp">
+            <column name="UPDATED_DATE" length="19" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>

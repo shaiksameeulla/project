@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.manifest.BcunConsignmentReturnReasonDO" table="ff_f_consignment_return_reason">
+		<id name="consignmentReturnReasonId" type="java.lang.Integer" column="CONSIGNMENT_RETURN_REASON_ID">
+			<generator class="native" />
+		</id>
+		
+        <property name="date" column="DATE" type="java.util.Date"/>
+        <property name="time" column="TIME"/>
+        <property name="remarks" column="REMARKS"/>
+        <property name="reasonId" column="REASON"/>
+		<property name="consignmentReturnId" column="CONSIGNMENT_RETURN" type="java.lang.Integer"/>
+        
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date"/>
+		<property name="updatedDate" column="UPDATE_DATE"  type="java.util.Date"/>    
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer"/>
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/>
+	</class>
+	
+	<query name="getConsignmentReturnReasonsIdByConsgReturnIdReasonIdDateTime">
+		<![CDATA[ Select consignmentReturnReason.consignmentReturnReasonId
+				  FROM com.ff.domain.manifest.BcunConsignmentReturnReasonDO consignmentReturnReason 
+		          WHERE consignmentReturnReason.consignmentReturnId=:consignmentReturnId
+		          AND consignmentReturnReason.reasonId=:reasonId
+		          AND consignmentReturnReason.date=:date
+		          AND consignmentReturnReason.time=:time
+		]]>
+	</query>
+	
+</hibernate-mapping>

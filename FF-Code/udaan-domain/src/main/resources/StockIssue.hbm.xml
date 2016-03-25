@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.issue.StockIssueDO" table="ff_f_stock_issue">
+		<id name="stockIssueId" type="java.lang.Long">
+			<column name="STOCK_ISSUE_ID" />
+			<generator class="native" />
+		</id>
+		<property name="requisitionNumber" column="REQUISITION_NUMBER" update="false"/>
+		<property name="stockIssueNumber" column="ISSUE_NUMBER" update="false" not-null="true"/>
+		<property name="stockIssueDate" column="ISSUE_DATE" update="false" not-null="true"/>
+		<property name="issuedToType" column="ISSUED_TO_TYPE" update="false" not-null="true"/>
+		<property name="shippedToCode" column="SHIPPED_TO_CODE" update="false" />
+		<!-- common attributes START -->
+		<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" not-null="true"/>
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" not-null="true"/>
+		<!-- <property name="centralInboudStatus" column="DT_CENTRAL_INBOUND" />
+		<property name="centralOutboudStatus" column="DT_CENTRAL_OUTBOUND" /> -->
+		<!-- <property name="nodeId" column="TRANS_NODE_ID" /> -->
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapStatusInBound" column="DT_SAP_INBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="createdBy" column="CREATED_BY_USER" />
+		<property name="updatedBy" column="UPDATED_BY_USER" />
+		<!-- common attributes END -->
+	
+		<!-- one-to-one relation Start -->
+		<one-to-one name="issuePaymentDtlsDO" 
+			class="com.ff.domain.stockmanagement.operations.issue.StockIssuePaymentDetailsDO" 
+			property-ref="stockIssueDO" lazy="false" cascade="all-delete-orphan" fetch="join">
+		</one-to-one>
+		<!-- one-to-one relation End -->
+
+		<!-- One-to- Many relationships START -->
+		<set name="issueItemDtlsDO" lazy="false" cascade="all-delete-orphan" inverse="true" fetch="join">
+            <key column="STOCK_ISSUE_ID"/>
+            <one-to-many class="com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO"/>
+    	</set> 
+		<!-- One-to-Many relationships END -->
+		
+		<many-to-one name="issueOfficeDO"
+			class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join" not-null="true">
+			<column name="ISSUE_OFFICE_ID" />
+		</many-to-one>
+		<many-to-one name="issuedToOffice"
+			class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="ISSUED_TO_OFFICE" />
+		</many-to-one>
+		<many-to-one name="issuedToBA"
+			class="com.ff.domain.business.CustomerDO" lazy="false" fetch="join" > 
+			<column name="ISSUED_TO_BA" />
+		</many-to-one> 
+		<many-to-one name="issuedToFranchisee"
+			class="com.ff.domain.business.CustomerDO" lazy="false" fetch="join">
+			<column name="ISSUED_TO_FRANCHISEE" />
+		</many-to-one>
+		<many-to-one name="issuedToPickupBoy"
+			class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join">
+			<column name="ISSUED_TO_PICKUP_BOY" />
+		</many-to-one>
+		<many-to-one name="issuedToCustomer"
+			class="com.ff.domain.business.CustomerDO" lazy="false" fetch="join" >
+			<column name="ISSUED_TO_CUSTOMER" />
+		</many-to-one>
+		
+			<!-- Many-to-one relationships (Common attributes) START -->
+			<!-- <many-to-one name="createdByUser"
+				class="com.ff.domain.umc.UserDO" lazy="false" update="false" fetch="join">
+				<column name="CREATED_BY_USER" />
+			</many-to-one>
+			<many-to-one name="updatedByUser"
+				class="com.ff.domain.umc.UserDO" lazy="false" fetch="join">
+				<column name="UPDATED_BY_USER" />
+			</many-to-one> -->
+			<!-- Many -to- one relationships (Common attributes) END -->
+		
+		<!-- Many-to-one relationships END -->
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		
+		<!-- <property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		
+		<property name="dtToOpsman">
+			<column name="DT_TO_OPSMAN" />
+		</property>
+		 -->
+		
+	</class>
+	<query name="findIssueDtlsByIssueNumber">
+		<![CDATA[
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueDO issue 
+ 		 	WHERE issue.stockIssueNumber=:issueNumber
+ 		 	AND issue.transactionStatus=:transactionStatus
+ 		 	AND issue.issueOfficeDO.officeId=:officeId
+		]]>
+	</query>	
+	
+	<query name="getMaxIssueNumber">
+		<![CDATA[
+ 			select max(issue.stockIssueNumber)FROM com.ff.domain.stockmanagement.operations.issue.StockIssueDO issue 
+ 		 	WHERE  	issue.transactionStatus =:transactionStatus
+ 		 		AND 
+ 		 	issue.issueOfficeDO.officeId =:officeId
+ 		 	AND  length(issue.stockIssueNumber) = :numberLength
+ 		 	AND issue.stockIssueNumber like :prefix
+		]]>
+	</query>
+	<query name="findIssueCustDtlsByIssueNumberForIssueToCustomer">
+		<![CDATA[
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueDO issue
+ 		 	WHERE issue.stockIssueNumber=:issueNumber
+ 		 	AND issue.transactionStatus=:transactionStatus
+ 		 	AND issue.issueOfficeDO.officeId=:officeId
+ 		 	AND issue.issuedToType=:issuedToType
+		]]>
+	</query>
+	
+	<query name="findIssueDtlsByIssueNumberForReceipt">
+	<![CDATA[
+		FROM com.ff.domain.stockmanagement.operations.issue.StockIssueDO issue 
+	 	WHERE issue.stockIssueNumber=:issueNumber
+	 	AND	issue.transactionStatus=:transactionStatus
+	 	AND	issue.issuedToOffice.officeId=:officeId
+	 	AND issue.issuedToType=:issuedToType
+	]]>
+</query>
+<query name="findIssueDtlsByIssueNumberForReturn">
+	<![CDATA[
+		FROM com.ff.domain.stockmanagement.operations.issue.StockIssueDO issue 
+	 	WHERE issue.stockIssueNumber=:issueNumber
+	 	AND	issue.transactionStatus=:transactionStatus
+	 	AND	issue.issuedToOffice.officeId=:officeId
+	 	AND issue.issuedToType=:issuedToType
+	]]>
+</query>
+
+<!--  below Query to check whether req number is processed at RHO (Useful at the time of receipt at Branch) -->
+<query name="isRequistionNumberIssued">
+<![CDATA[
+ 
+ 	select issue.stockIssueId FROM com.ff.domain.stockmanagement.operations.issue.StockIssueDO as issue 
+ 	WHERE issue.requisitionNumber=:requisitionNumber
+ 	
+ 
+ ]]>
+	</query>
+	
+	<query name="isIssueNumberExistForOffice">
+<![CDATA[
+ 
+ 	select issue.issuedToType FROM com.ff.domain.stockmanagement.operations.issue.StockIssueDO issue
+ 		 	WHERE issue.stockIssueNumber=:issueNumber
+ 		 	AND issue.transactionStatus=:transactionStatus
+ 		 	AND issue.issueOfficeDO.officeId=:officeId
+ 	
+ 
+ ]]>
+	</query>
+
+<!-- Query For Data Sync  Started -->
+	
+<!-- 	<query name="getUnsyncInboundStockIssue">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.issue.StockIssueDO issueDO  where issueDO.dtToCentral='N' or issueDO.dtToCentral is null ]]>
+	</query>
+	
+	
+	<query name="getstockIssueId">
+		<![CDATA[SELECT issueDO.stockIssueId From com.ff.domain.stockmanagement.operations.issue.StockIssueDO issueDO where  issueDO.stockIssueNumber = :stockIssueNumber ]]>
+	</query>
+	 -->
+<!-- Query For Data Sync  End -->	
+
+
+
+
+
+	
+</hibernate-mapping>

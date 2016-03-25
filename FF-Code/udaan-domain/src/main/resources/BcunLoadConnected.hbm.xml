@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.loadmanagement.BcunLoadConnectedDO" table="ff_f_load_connected">
+		<id name="loadConnectedId" type="java.lang.Integer" column="LOAD_CONNECTED_ID">
+			<generator class="native" />
+		</id>
+		
+        <property name="dispatchWeight" type="java.lang.Double" column="DISPATCH_WEIGHT"/>
+        <property name="connectWeight" type="java.lang.Double" column="CONNECT_WEIGHT"/>
+        <property name="tokenNumber" column="TOKEN_NUMBER"/>
+        <property name="lockNumber" column="LOCK_NUMBER"/>
+        <property name="remarks" column="REMARKS"/>
+        <property name="receivedStatus" column="RECEIVED_STATUS"/>
+        <property name="recvTransportNumber" column="RECV_TRANSPORT_NUMBER"/>
+        <property name="recvGatepassNumber" column="RECV_GATEPASS_NUMBER"/>
+        <property name="recvVendorName" column="RECV_VENDOR_NAME"/>
+        <property name="recvTransportModeId" column="RECV_TRANSPORT_MODE"/>
+        <property name="loadMovementId" column="LOAD_MOVEMENT"/>
+		
+        <!-- <property name="dtToBranch" column="DT_TO_BRANCH"/>
+        <property name="dtToCentral" column="DT_TO_CENTRAL"/>
+        <property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL"/>
+        
+		<property name="dtToOpsman" column="DT_TO_OPSMAN"/>
+		<property name="dtFromOpsman" column="DT_FROM_OPSMAN"/>
+		
+		<property name="createdDate"  column="CREATED_DATE" type="java.util.Date"/>
+		<property name="updatedDate" column="UPDATE_DATE"	type="java.util.Date"/>    
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer"/>
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/> -->
+		
+		<many-to-one name="manifestDO" class="com.ff.domain.manifest.BcunLoadManifestDO" lazy="false" fetch="join" cascade="all">
+			<column name="MANIFEST"/>
+		</many-to-one>
+		
+	</class>
+		
+	<query name="getLoadConnectedId4Load">
+		<![CDATA[ Select loadConnected.loadConnectedId 
+					From com.ff.domain.loadmanagement.BcunLoadConnectedDO loadConnected 
+					where loadConnected.loadMovementId=:loadMovementId 
+					and loadConnected.manifestDO.manifestNo=:manifestNumber
+		 ]]>
+	</query>
+		
+</hibernate-mapping>

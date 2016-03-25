@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.manifest.ConsignmentManifestDO" table="ff_f_consignment_manifested">
+		<id name="consignmentManifestId" type="java.lang.Integer">
+			<column name="CONSIGNMENT_MANIFESTED_ID" />
+			<generator class="native" />
+		</id>
+        		
+		<many-to-one name="manifest" class="com.ff.domain.manifest.ManifestDO" lazy="false" unique="true" fetch="join">
+		<column name="MANIFEST_ID"/>
+		</many-to-one>	
+		
+		<many-to-one name="consignment" class="com.ff.domain.consignment.ConsignmentDO" lazy="false" unique="true" fetch="join">
+		<column name="CONSIGNMENT_ID"/>
+		</many-to-one>
+	</class>
+	<query name="deleteConsignment">
+		<![CDATA[
+			DELETE FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest
+			WHERE consgManifest.consignment.consgId IN( :consignmentId )
+		]]>
+	</query>
+	
+	
+	
+	<query name="getInManifestDtls">
+		<![CDATA[
+			FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest
+			WHERE consgManifest.manifest.manifestNo=:manifestNumber
+		    AND manifest.manifestProcessCode IN(:processCode) 
+		    AND manifest.updatingProcess.processCode IN(:updateProcessCode)
+		]]>
+	</query>
+	
+<!-- 	<query name="getRemarks">
+		<![CDATA[
+			SELECT consgManifest.remarks FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest
+			WHERE consgManifest.consignment.consgId=:consgId 
+			and consgManifest.manifest.manifestId=:manifestId 
+		]]>
+	</query> -->
+	
+	<!-- <query name="isConsgnNoManifested">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo AND consgManifest.manifest.manifestId IN 
+				(SELECT manifest.manifestId FROM com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestNo IN (SELECT manifestProcess.manifestNo FROM com.ff.domain.manifest.ManifestProcessDO manifestProcess
+			WHERE  manifestProcess.manifestDirection =:manifestDirection AND manifestProcess.originOfficeId =:loginOfficeId)
+			AND manifest.manifestType NOT IN (:allowedConsgManifestedType) 
+			AND manifest.manifestNo NOT IN (:manifestNo))
+		]]>
+	</query> -->
+		
+	<!-- <query name="isConsgnNoManifested">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo AND consgManifest.manifest.manifestId IN 
+				(SELECT manifest.manifestId FROM com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestNo IN (SELECT manifestProcess.manifestNo FROM com.ff.domain.manifest.ManifestProcessDO manifestProcess
+			WHERE  manifestProcess.manifestDirection =:manifestDirection AND manifestProcess.originOfficeId =:loginOfficeId)
+			AND manifest.manifestType NOT IN (:allowedConsgManifestedType) 
+			AND manifest.manifestId NOT IN (
+					SELECT headerManifest.manifestId FROM com.ff.domain.manifest.ManifestDO headerManifest WHERE 
+					headerManifest.manifestNo=:manifestNo AND headerManifest.manifestStatus NOT IN ('C')
+					)
+				)
+		]]>
+	</query> -->
+	
+	<query name="isConsgnNoManifested">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo=:consignmentNo 
+			AND consgManifest.manifest.manifestId IN ( 
+				SELECT manifest.manifestId FROM com.ff.domain.manifest.ManifestDO manifest 
+				WHERE manifest.manifestDirection=:manifestDirection 
+				AND manifest.originOffice.officeId=:loginOfficeId 
+				AND manifest.manifestType NOT IN (:allowedConsgManifestedType) 
+				AND manifest.manifestId NOT IN (
+					SELECT headerManifest.manifestId FROM com.ff.domain.manifest.ManifestDO headerManifest WHERE 
+					headerManifest.manifestNo=:manifestNo AND headerManifest.manifestStatus NOT IN ('C')
+				)
+			)
+		]]>
+	</query>
+	
+	<query name="isConsgnNoManifestedForThirdParty">
+		<![CDATA[
+			FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo 
+			AND consgManifest.manifest.manifestId IN 
+				(SELECT manifest.manifestId FROM com.ff.domain.manifest.ManifestDO manifest 
+				WHERE manifest.manifestDirection=:manifestDirection 
+				AND manifest.originOffice.officeId=:loginOfficeId 
+				AND manifest.manifestType NOT IN (:allowedConsgManifestedType) 
+				AND manifest.manifestId NOT IN (
+					SELECT headerManifest.manifestId FROM com.ff.domain.manifest.ManifestDO headerManifest WHERE 
+					headerManifest.manifestNo=:manifestNo AND headerManifest.manifestStatus NOT IN ('C')
+					)
+				)
+		]]>
+	</query>
+	
+	<query name="isConsgnNoManifestedForBranchManifest">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo AND consgManifest.manifest.manifestId IN 
+				(SELECT manifest.manifestId FROM com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestDirection=:manifestDirection 
+			AND manifest.originOffice.officeId=:loginOfficeId 
+			AND manifest.manifestType NOT IN (:allowedConsgManifestedType) 
+			AND manifest.manifestProcessCode =:manifestprocessCodeForRTO
+			AND manifest.manifestNo NOT IN (:manifestNo))
+		]]>
+	</query>
+	
+	
+	<query name="isConsgnNoInManifested">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo=:consignmentNo
+			and consgManifest.manifest.manifestId IN 
+			(SELECT manifest.manifestId FROM com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestType=:manifestType
+			and manifest.operatingOffice=:loginOfficeId)
+		]]>
+	</query>
+	
+	<query name="isConsignmentClosed">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo AND consgManifest.manifest.manifestId IN
+			 (SELECT manifest.manifestId FROM com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestStatus in ('C','O') AND manifest.manifestType =:manifestDirection)
+		]]>
+	</query> 
+	
+	<query name="isConsignmentClosedForManifest">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo AND consgManifest.manifest.manifestId IN
+			 (SELECT manifest.manifestId FROM com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestStatus =:manifestStatus AND manifest.manifestType =:manifestDirection)
+		]]>
+	</query> 
+	
+	<!-- To check the list of consignments are manifested or not. used for update pickup -->
+	<query name="isConsignmentsManifested">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest  
+			WHERE consgManifest.consignment.consgNo IN (:consignmentsList)
+			AND consgManifest.manifest.manifestType =:manifestType
+		]]>
+	</query> 
+	
+		<query name="getConsgManifestedDetails">
+		<![CDATA[ select consgManifest.consignment
+			      from com.ff.domain.manifest.ConsignmentManifestDO consgManifest where consgManifest.manifest.manifestId=:manifestId]]>
+	</query> 
+	
+	<query name="getManifestConsignmentDtlsByManifestId">
+		<![CDATA[
+			FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest  
+			WHERE consgManifest.manifest.manifestId=:manifestId
+		]]>
+	</query> 
+		
+	<query name="getLessConsgNumbers">
+		<![CDATA[ SELECT consgManifest.consignment.consgNo 
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+		          WHERE consgManifest.consignment.consgNo not IN(:consgNumbers)
+		          AND consgManifest.manifest.manifestId=:manifestId
+		]]>
+	</query>
+					
+	<query name="getConsgManifestIdByManifestIdAndConsgNo">
+		<![CDATA[ Select consgManifest.consignmentManifestId 
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest
+		          WHERE consgManifest.consignment.consgNo IN(:consgNumber)
+		          AND consgManifest.manifest.manifestId=:manifestId
+		]]>
+	</query>	
+		
+	
+		<query name="getManifestedDetails">
+		<![CDATA[  From com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+		           where  consgManifest.manifest.manifestId IN (:deletedId) ]]>
+	</query>
+	
+	<query name="getConsgNumbersByManifestId">
+		<![CDATA[ SELECT consgManifest.consignment.consgNo 
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+		          WHERE consgManifest.manifest.manifestId=:manifestId
+		]]>
+	</query>
+	<!--  Start..POD Manifest -->
+	<query name="isConsgnmentManifested">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo and consgManifest.manifest.manifestId IN 
+				(select manifest.manifestId from com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestProcessCode=:manifestProcessCode AND  manifest.manifestType =:manifestType 
+			AND manifest.manifestDirection =:manifestDirection)
+		]]>
+	</query> 
+	
+	<query name="isConsgnmentInPODManifested">
+		<![CDATA[
+			 FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo and consgManifest.manifest.manifestId IN 
+				(select manifest.manifestId from com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestProcessCode=:manifestProcessCode AND  manifest.manifestType =:manifestType 
+			AND manifest.manifestDirection =:manifestDirection and manifest.originOffice.officeId=:orgoffiecId )
+		]]>
+	</query> 
+	
+	
+	<query name="getManifestedConsignmentDtls">
+		<![CDATA[
+			FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo and consgManifest.manifest.manifestId IN 
+				(select manifest.manifestId from com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestProcessCode=:manifestProcessCode AND  manifest.manifestType =:manifestType AND 
+			manifest.destOffice.officeId=:destOfficeId AND manifest.manifestDirection =:manifestDirection)
+		]]>
+	</query> 
+	
+	<query name="isConsgnmentBelongsToManifest">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo and consgManifest.manifest.manifestId IN 
+				(select manifest.manifestId from com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestProcessCode=:manifestProcessCode AND  manifest.manifestType =:manifestType AND manifest.manifestNo=:manifestNo 
+			AND manifest.manifestDirection =:manifestDirection)
+		]]>
+	</query> 
+	
+	<query name="getConsignmentsOfManifest">
+		<![CDATA[
+			SELECT consgManifest.consignment.consgNo FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE  consgManifest.manifest.manifestId IN 
+				(select manifest.manifestId from com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestProcessCode=:manifestProcessCode AND  manifest.manifestType =:manifestType 
+			AND manifest.manifestNo=:manifestNo 
+			AND manifest.manifestDirection =:manifestDirection)
+		]]>
+	</query> 
+	
+		<query name="getConsignment">
+		<![CDATA[From com.ff.domain.manifest.ConsignmentManifestDO consgManifest where consgManifest.consignment.consgNo=:consgNum ]]>
+	</query>
+		
+	<!-- Starting Data sync querys -->
+	
+	<!-- <query name="getUnsyncInboundConsignmentManifest">
+		<![CDATA[From com.ff.domain.manifest.ConsignmentManifestDO manifest where manifest.dtToCentral='N' or manifest.dtToCentral is null ]]>
+	</query> -->
+	
+	<query name="getUpdateConsignmentManifest"> 
+	<![CDATA[ From com.ff.domain.manifest.ConsignmentManifestDO consignmentmanifest where  consignmentmanifest.manifest.manifestNo IN (:manifestNo) ]]>
+	</query>
+	
+	<!-- <query name="getUnsyncOutboundConsignmentManifest">
+		<![CDATA[from com.ff.domain.manifest.ConsignmentManifestDO consignmentmanifest where consignmentmanifest.manifest.originOffice.officeId=:branchId and (consignmentmanifest.dtToBranch='N' or consignmentmanifest.dtToBranch is null)]]>
+	</query> -->
+	
+	<!-- ending Data sync querys -->	
+		<!--  End..POD Manifest -->
+		
+		<!-- <query name="getChildManifestInformation">
+		<![CDATA[From com.ff.domain.manifest.ConsignmentManifestDO consignmentmanifest where  consignmentmanifest.manifest.manifestNo=:manifestNum]]>
+	</query> -->
+		
+	<!-- Start: RTH/RTO Manifest Queries -->
+	<query name="getManifestDate">
+		<![CDATA[
+			SELECT consgManifest.consignmentManifestId, consgManifest.manifest.manifestDate 
+				FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest
+				WHERE consgManifest.consignment.consgId =:consgId
+				AND consgManifest.manifest.manifestType=:manifestType
+		 	ORDER BY consgManifest.consignmentManifestId
+		]]>
+	</query>
+	<!-- End: RTH/RTO Manifest Queries -->
+			
+	<query name="isConsgNumManifested">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo
+          	AND consgManifest.manifest.operatingOffice IN(:operatingOffice)
+          	AND consgManifest.manifest.manifestProcessCode IN(:processCode) 
+          	AND consgManifest.manifest.updatingProcess.processCode IN(:updateProcessCode)
+          	AND consgManifest.manifest.manifestType=:manifestType
+		]]>
+	</query>
+	
+	<!-- Ami added for Outbound on 21 08 -->
+	<query name="getManifestIdFromConsgId">
+		<![CDATA[ select consgManifest.manifest.manifestId
+			      from com.ff.domain.manifest.ConsignmentManifestDO consgManifest where consgManifest.consignment.consgId=:consgId]]>
+	</query> 
+	
+		<query name="getConsgCountByManifestId">
+		<![CDATA[ SELECT COUNT(*) FROM  com.ff.domain.manifest.ConsignmentManifestDO consgManifest
+					where consgManifest.manifest.manifestId=:manifestIds
+		]]>
+	</query>
+
+	<query name="isConsgNoManifestedForBooking">
+		<![CDATA[
+			SELECT count(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest where consgManifest.consignment.consgId in
+			(SELECT consg.consgId FROM com.ff.domain.consignment.ConsignmentDO consg where consg.consgNo =:consignmentNo) 
+			and consgManifest.manifest.manifestId is not null
+	]]>
+	</query>
+	
+	<query name="isConsgnNoMisroute">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo=:consignmentNo 
+			AND consgManifest.manifest.manifestId IN (SELECT manifest.manifestId 
+				FROM com.ff.domain.manifest.ManifestDO manifest 
+				WHERE manifest.originOffice.officeId=:loginOfficeId
+				AND manifest.manifestType IN (:manifestType))
+		]]>
+	</query>
+	
+				
+	<query name="isConsgManifested4RthValidation">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo
+          	AND consgManifest.manifest.operatingOffice IN(:operatingOffice)
+          	AND consgManifest.manifest.manifestType!=:manifestType
+          	AND consgManifest.manifest.manifestProcessCode not in ('TPDX','TPBP')
+		]]>
+	</query>
+					
+	<query name="getManifestDtlsByConsgNoOperatingOffice">
+		<![CDATA[
+          	
+          	SELECT manifest.manifestType, manifest.manifestProcessCode, 
+				manifest.manifestDate, consg.isExcessConsg
+			FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest
+			inner join consgManifest.consignment as consg
+			inner join consgManifest.manifest as manifest
+			WHERE consg.consgNo =:consignmentNo
+          	AND manifest.operatingOffice IN(:operatingOffice)
+          	order by manifest.createdDate desc
+		]]>
+	</query>	
+					
+	<query name="getManifestDtlsByConsgNoLoginOffice">
+		<![CDATA[
+			SELECT consgManifest.manifest.manifestType, consgManifest.manifest.manifestDirection
+			FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+			WHERE consgManifest.consignment.consgNo =:consignmentNo
+          	AND consgManifest.manifest.operatingOffice IN(:operatingOffice)
+          	order by consgManifest.manifest.createdDate desc
+		]]>
+	</query>	
+	
+	<query name="getManifestDtlsByConsgNoForRTO">
+        <![CDATA[
+            SELECT consgManifest.manifest.manifestType, consgManifest.manifest.manifestDirection, consgManifest.manifest.manifestProcessCode
+            FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+            WHERE consgManifest.consignment.consgNo =:consignmentNo
+            AND  consgManifest.manifest.manifestProcessCode NOT IN ('TPDX','TPBP')
+            order by consgManifest.manifest.createdDate desc
+        ]]>
+    </query>
+    
+    <query name="getManifestDtlsByConsgNoForRTH">
+        <![CDATA[
+            SELECT consgManifest.manifest.manifestType, consgManifest.manifest.manifestDirection, consgManifest.manifest.manifestProcessCode
+            FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+            WHERE consgManifest.consignment.consgNo =:consignmentNo
+            AND consgManifest.manifest.operatingOffice IN(:operatingOffice)
+            AND  consgManifest.manifest.manifestProcessCode NOT IN ('TPDX','TPBP')
+            ORDER BY consgManifest.manifest.createdDate DESC
+        ]]>
+    </query>
+   <!-- Changes here -->
+   <query name="getmanifestDetailsByCon">
+        <![CDATA[
+			 FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+            WHERE consgManifest.consignment.consgNo =:consgNO
+            AND consgManifest.manifest.manifestProcessCode <>'PRDL'
+             ORDER BY consgManifest.manifest.manifestDate DESC LIMIT 1
+            
+        ]]>
+    </query>
+    
+      <query name="getOriginHubInDetailsByCon">
+        <![CDATA[
+			SELECT consgManifest.consignment.consgNo,consgManifest.manifest.manifestDate, consgManifest.manifest.manifestDirection, consgManifest.manifest.manifestProcessCode,
+			consgManifest.manifest.operatingOffice,consgManifest.manifest.manifestNo
+            FROM com.ff.domain.manifest.ConsignmentManifestDO consgManifest 
+            WHERE consgManifest.consignment.consgNo =:consgNO
+            AND consgManifest.manifest.operatingOffice IN(55)
+            AND  consgManifest.manifest.manifestDirection='O'
+            
+        ]]>
+    </query>
+    
+   
+   
+</hibernate-mapping>
+	

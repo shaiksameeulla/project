@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.rateBenchmarkDiscount.RegionRateBenchMarkDiscountDO" table="ff_d_region_rate_bench_mark_discount">
+		<id name="regionRateBenchMarkDiscountId" type="java.lang.Integer">
+			<column name="REGION_RATE_BENCH_MARK_DISCOUNT_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name="discountPercentage" type="java.lang.Double">
+			<column name="DISCOUNT_PERCENTAGE" />
+		</property>
+		
+		<property name="industryCategory" type="java.lang.Integer">
+			<column name="RATE_INDUSTRY_CATEGORY" />
+		</property>
+		
+		<property name="discountApproved" type="java.lang.String">
+			<column name="REG_DISCOUNT_APPROVED" />
+		</property>
+		
+
+		<!-- <many-to-one name="rateIndustryCategoryDO" class="com.ff.domain.ratebenchmark.RateIndustryCategoryDO" lazy="false">
+			<column name="RATE_INDUSTRY_CATEGORY"></column>
+		</many-to-one> 
+		
+		<many-to-one name="region" class="com.ff.domain.geography.RegionDO"
+			lazy="false">
+			<column name="REGION"></column>
+		</many-to-one> -->
+		
+		<property name="region" type="java.lang.Integer">
+			<column name="REGION" />
+		</property>
+		
+		<many-to-one name="employeeDO" class="com.ff.domain.organization.EmployeeDO"
+			lazy="false" fetch="join">
+			<column name="APPROVER"></column>
+		</many-to-one>
+
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+	</class>
+	
+	
+		<query name="getDiscountDetails">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.operations.rateBenchmarkDiscount.RegionRateBenchMarkDiscountDO discount
+			WHERE discount.industryCategory = :industryCatId
+		]]>
+	</query>
+	
+	<query name="submitDiscountDetails">
+		<![CDATA[
+			UPDATE com.ff.domain.ratemanagement.operations.rateBenchmarkDiscount.RegionRateBenchMarkDiscountDO discount
+				SET discount.discountApproved = :Y
+				WHERE discount.industryCategory = :industryCatId
+		]]>
+	</query>
+	
+	<query name="isEmpIdRegionalApprover">
+		<![CDATA[
+			from com.ff.domain.ratemanagement.operations.rateBenchmarkDiscount.RegionRateBenchMarkDiscountDO discount
+				WHERE discount.employeeDO.employeeId = :empId
+		]]>
+	</query>
+
+	<query name="getRagionalApprovalDetails">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.operations.rateBenchmarkDiscount.RegionRateBenchMarkDiscountDO discount
+			WHERE discount.industryCategory = :industryCatId AND discount.region = :regionId
+			 AND REG_DISCOUNT_APPROVED = 'Y' 
+		]]>
+	</query>
+</hibernate-mapping>

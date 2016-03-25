@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping >
+    <class name="com.ff.domain.common.ConfigurableParamsDO" table="ff_d_configurable_params" >
+        <id name="configurableParamsId" type="java.lang.Integer">
+            <column name="PARAM_ID" />
+            <generator class="native" />
+        </id>
+	
+        <property name="paramValue" type="java.lang.String">
+            <column name="PARAM_VALUE" length="100" />
+        </property>
+         <property name="paramName" type="java.lang.String">
+            <column name="PARAM_NAME" length="100"/>
+        </property>
+        <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> 
+        </class>
+        
+    <query name="getConfigurableParms">
+        <![CDATA[ from com.ff.domain.common.ConfigurableParamsDO ]]>
+    </query>
+    
+    <query name="getConfigurableParmByName">
+        <![CDATA[ from com.ff.domain.common.ConfigurableParamsDO configDO where configDO.paramName = :paramName ]]>
+    </query>
+	<query name="getConfigurableParamByNameList">
+        <![CDATA[ from com.ff.domain.common.ConfigurableParamsDO configDO where configDO.paramName IN ( :paramName )]]>
+    </query>
+    
+    <query name="getConfigurableParamMapByNameList">
+        <![CDATA[ select configDO.paramName as name,configDO.paramValue as value from com.ff.domain.common.ConfigurableParamsDO configDO where configDO.paramName IN ( :paramName )]]>
+    </query>
+	<query name="getConfigurableValueByParam">
+        <![CDATA[ select configDO.paramValue from com.ff.domain.common.ConfigurableParamsDO configDO where configDO.paramName =:paramName ]]>
+    </query>
+    
+    <query name="getConfigurableValueForBilling">
+        <![CDATA[ select configDO.paramValue from com.ff.domain.common.ConfigurableParamsDO configDO where configDO.paramName =:paramName ]]>
+    </query>
+    
+    <query name="getConfigurableValueForSAPIntegration">
+        <![CDATA[ 
+        	FROM	com.ff.domain.common.ConfigurableParamsDO configDO 
+        	WHERE	configDO.paramName =:paramName 
+        ]]>
+    </query>
+	
+    <query name="getConfigurableParamMapByNames">
+        <![CDATA[ select new map(configDO.paramName as paramName,configDO.paramValue as paramValue) from com.ff.domain.common.ConfigurableParamsDO configDO where configDO.paramName IN ( :paramNames )]]>
+    </query>
+    
+    <query name="getConfigurableParamsForStockSeries">
+        <![CDATA[ 
+        	FROM	com.ff.domain.common.ConfigurableParamsDO configDO 
+        	WHERE	configDO.paramName=:searchParam 
+        ]]>
+    </query>
+    
+    <query name="updateConfigurableParamValueByParamName">
+    	<![CDATA[ 
+        	UPDATE com.ff.domain.common.ConfigurableParamsDO configDO
+        	SET  configDO.paramValue =:paramValue
+        	WHERE	configDO.paramName=:paramName 
+        ]]>
+    </query>
+    
+</hibernate-mapping>

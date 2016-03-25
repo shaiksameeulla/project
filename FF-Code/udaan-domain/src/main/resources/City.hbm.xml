@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.geography.CityDO" table="ff_d_city">
+		<id name="cityId" type="java.lang.Integer">
+			<column name="CITY_ID" />
+			<generator class="native" />
+		</id>
+		<property name="cityCode" type="java.lang.String">
+			<column name="CITY_CODE" />
+		</property>
+		<property name="cityName" type="java.lang.String">
+			<column name="CITY_NAME" />
+		</property>
+		<property name="state" type="java.lang.Integer">
+			<column name="STATE" />
+		</property>
+		<property name="region" type="java.lang.Integer">
+			<column name="REGION" />
+		</property>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>					
+	</class>
+	
+	 <query name="getCity">
+		<![CDATA[ 
+			SELECT 	city
+			FROM 	com.ff.domain.geography.CityDO city,
+					com.ff.domain.geography.PincodeDO pin
+			WHERE 	city.cityId = pin.cityId
+			AND		pin.pincode=:Pincode
+		]]>
+	</query>
+	
+	<query name="getCitiesByRegion">
+	<![CDATA[ FROM com.ff.domain.geography.CityDO city
+	 		  WHERE city.region IN (:RegionId) 
+	 		  ORDER BY city.cityName
+	 		]]>
+	</query>
+	<query name="getTranshipmentCitiesByRegion">
+	<![CDATA[ FROM com.ff.domain.geography.CityDO city
+	 		  WHERE city.region IN (:RegionId) 
+	 		  AND cityId IN (SELECT transhipment.transshipmentCityId 
+	 		  				FROM com.ff.domain.routeserviced.TransshipmentRouteDO transhipment)
+			  ORDER BY city.cityName	 		  				
+	 		]]>
+	</query>
+	<query name="getCityByCityId">
+		<![CDATA[FROM com.ff.domain.geography.CityDO city where city.cityId=:cityId]]>
+	</query>
+	
+	<query name="getCityByCityCode">
+		<![CDATA[FROM com.ff.domain.geography.CityDO city where city.cityCode=:cityCode]]>
+	</query>
+	
+	<query name="getAllCities">
+		<![CDATA[FROM com.ff.domain.geography.CityDO city order by city.cityName]]>
+	</query>
+	
+	<query name="getCitiesByOfficeIds">
+		<![CDATA[FROM com.ff.domain.geography.CityDO city where city.cityId IN 
+		(select office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId
+		 IN (:officeId))]]>
+	</query>
+
+	 <query name="getCityByPincodeId">
+	<![CDATA[ FROM com.ff.domain.geography.CityDO city 
+				where city.cityId in (select pin.cityId 
+										FROM com.ff.domain.geography.PincodeDO pin 
+										where pin.pincodeId=:pincodeId
+										AND     pin.status='A')]]>
+	</query>
+
+	<query name="getCityByCityName">
+		<![CDATA[
+			FROM	com.ff.domain.geography.CityDO city 
+			where	city.cityName=:cityName 
+		 ]]>
+	</query>
+
+	<query name="getCitiesOfReportedOfficesByRHOOffice">
+		<![CDATA[ 
+		FROM com.ff.domain.geography.CityDO city where city.cityId IN 
+		(select office.cityId from com.ff.domain.organization.OfficeDO office 
+		where office.reportingRHO =:rhoOfficeId
+		 )]]>
+	</query>
+	<query name="getAllCitiesByRHOOfficeAsMap">
+		<![CDATA[ 
+		select new map(city.cityId as typeId,(concat(city.cityCode,'-' ,COALESCE (city.cityName ,'')) ) as typeName) FROM com.ff.domain.geography.CityDO city where city.cityId IN 
+		(select office.cityId from com.ff.domain.organization.OfficeDO office 
+		where office.reportingRHO =:rhoOfficeId
+		OR office.officeId =:rhoOfficeId
+		 )]]>
+	</query>
+	
+	<query name="getCitiesOfAssignedRHOOffices">
+		<![CDATA[ 
+		FROM com.ff.domain.geography.CityDO city where city.cityId IN 
+		(select office.cityId from com.ff.domain.organization.OfficeDO office 
+		where office.reportingRHO IN(:rhoOfficeList)
+		 )]]>
+	</query>
+	
+	
+	<query name="getAssignedOfficeCitiesForUser">
+		<![CDATA[ 
+		FROM com.ff.domain.geography.CityDO city where city.cityId IN 
+		(select office.cityId from com.ff.domain.organization.OfficeDO office 
+		where office.officeId IN 
+		(select useroffice.office.officeId from com.ff.domain.umc.UserOfficeRightsMappingDO useroffice where useroffice.user.userId =:userId)
+		 )]]>
+	</query>
+	
+	<query name="getCityByOfficeId">
+		<![CDATA[
+		SELECT  city
+		FROM 	com.ff.domain.geography.CityDO city,
+			 	com.ff.domain.organization.OfficeDO office 
+		WHERE 	city.cityId = office.cityId
+		AND 	office.officeId =:officeId
+		 ]]>
+	</query>
+		<query name="getCitiesByState">
+	<![CDATA[ FROM com.ff.domain.geography.CityDO city
+	 		  WHERE city.state IN (:stateId) 
+	 		  ORDER BY city.cityName
+	 		]]>
+	</query>
+	<query name="getCitiesByStateAndRegion">
+	<![CDATA[ FROM com.ff.domain.geography.CityDO city
+	 		  WHERE city.state = :stateId and city.region =:regionId
+	 		  ORDER BY city.cityName
+	 		]]>
+	</query>
+	
+	<query name="getCitiesByRegionForBranchUser">
+	<![CDATA[ FROM com.ff.domain.geography.CityDO city
+	 		  WHERE city.cityId IN (select distinct office.cityId
+						 		  from com.ff.domain.organization.OfficeDO office,
+						 		  com.ff.domain.umc.UserOfficeRightsMappingDO rights 
+						 		  where office.officeId = rights.office.officeId
+						 		  and rights.user.userId = :userId
+						 		  and office.officeTypeDO.offcTypeCode = 'BO'
+	 		  					) 
+	 		  OR city.cityId IN (SELECT officeDO.cityId 
+	 		  					 FROM com.ff.domain.umc.EmployeeUserDO AS empuser,
+								 	  com.ff.domain.organization.EmployeeDO AS emp,
+									  com.ff.domain.organization.OfficeDO AS officeDO
+								WHERE   emp.employeeId = empuser.empDO.employeeId
+								AND		emp.officeId = officeDO.officeId
+								and 	officeDO.officeTypeDO.offcTypeCode = 'BO'
+								and 	empuser.userId =:userId)
+	 		  and  city.region = :regionID
+	 		  ORDER BY city.cityName
+	 		]]>
+	</query>
+	
+	<query name="getCitiesByRegionForHubUser">
+	<![CDATA[ FROM com.ff.domain.geography.CityDO city
+	 		  WHERE city.cityId IN (select distinct office.cityId
+	 		  from com.ff.domain.organization.OfficeDO office,
+	 		  com.ff.domain.umc.UserOfficeRightsMappingDO rights 
+	 		  where office.officeId = rights.office.officeId
+	 		  and ( rights.user.userId = :userId
+	 		  and office.officeTypeDO.offcTypeCode = 'HO')
+	 		  or office.reportingHUB = :officeId
+	 		  ) 
+	 		  OR city.cityId IN (select distinct office.cityId 
+	 		  					 from com.ff.domain.organization.OfficeDO office 
+	 		  					 WHERE office.officeId =:officeId)
+	 		  and  city.region = :regionID
+	 		  ORDER BY city.cityName
+	 		]]>
+	</query>
+	
+	<query name="getCitiesByRegionForRhoUser">
+	<![CDATA[ FROM com.ff.domain.geography.CityDO city
+	 		  WHERE city.cityId IN (select distinct office.cityId
+	 		  from com.ff.domain.organization.OfficeDO office,
+	 		  com.ff.domain.umc.UserOfficeRightsMappingDO rights 
+	 		  where office.officeId = rights.office.officeId
+	 		  and ( rights.user.userId = :userId
+	 		  and office.officeTypeDO.offcTypeCode = 'RO')
+	 		  or office.reportingRHO = :officeId
+	 		  )
+	 		  OR city.cityId IN (select distinct office.cityId 
+	 		  					 from com.ff.domain.organization.OfficeDO office 
+	 		  					 WHERE office.officeId =:officeId)
+	 		  and  city.region = :regionID
+	 		  ORDER BY city.cityName
+	 		]]>
+	</query>
+	
+	<query name="getCitiesByMultipleRegionForBranchUser">
+	<![CDATA[ FROM com.ff.domain.geography.CityDO city
+	 		  WHERE city.cityId IN (select distinct office.cityId
+	 		  from com.ff.domain.organization.OfficeDO office,
+	 		  com.ff.domain.umc.UserOfficeRightsMappingDO rights 
+	 		  where office.officeId = rights.office.officeId
+	 		  and rights.user.userId = :userId
+	 		  and office.officeTypeDO.offcTypeCode = 'BO'
+	 		  )
+	 		  and  city.region = :regionID
+	 		  ORDER BY city.cityName
+	 		]]>
+	</query>
+	
+		<query name="getCitiesByMultipleRegionForHubUser">
+	<![CDATA[ FROM com.ff.domain.geography.CityDO city
+	 		  WHERE city.cityId IN (select distinct office.cityId
+	 		  from com.ff.domain.organization.OfficeDO office,
+	 		  com.ff.domain.umc.UserOfficeRightsMappingDO rights 
+	 		  where office.officeId = rights.office.officeId
+	 		  and ( rights.user.userId = :userId
+	 		  and office.officeTypeDO.offcTypeCode = 'HO')
+	 		  or office.reportingHUB = :officeId
+	 		  )
+	 		  and  city.region = :regionID
+	 		  ORDER BY city.cityName
+	 		]]>
+	</query>
+	
+	<query name="getCitiesByMultipleRegionForRhoUser">
+	<![CDATA[ FROM com.ff.domain.geography.CityDO city
+	 		  WHERE city.cityId IN (select distinct office.cityId
+	 		  from com.ff.domain.organization.OfficeDO office,
+	 		  com.ff.domain.umc.UserOfficeRightsMappingDO rights 
+	 		  where office.officeId = rights.office.officeId
+	 		  and ( rights.user.userId = :userId
+	 		  and office.officeTypeDO.offcTypeCode = 'RO')
+	 		  or office.reportingRHO = :officeId
+	 		  )
+	 		  and  city.region = :regionID
+	 		  ORDER BY city.cityName
+	 		]]>
+	</query>
+		
+	
+	
+</hibernate-mapping>

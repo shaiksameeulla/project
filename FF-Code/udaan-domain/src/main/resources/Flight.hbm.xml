@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.transport.FlightDO" table="ff_d_flight">
+		<id name="flightId" type="java.lang.Integer" column="FLIGHT_ID">
+			<generator class="native" />
+		</id>
+
+        <property name="flightNumber" column="FLIGHT_NUMBER" type="java.lang.String"/>
+        <property name="airlineCode" column="AIRLINE_CODE" type="java.lang.String"/>
+        <property name="airlineName" column="AIRLINE_NAME" type="java.lang.String"/>
+        <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+	</class>
+	
+	<query name="getFlightDetails">
+		<![CDATA[ 
+			select	    flight
+			from		com.ff.domain.transport.FlightDO flight,
+						com.ff.domain.transport.TransportDO transport,
+						com.ff.domain.routeserviced.TripDO trip,
+						com.ff.domain.routeserviced.RouteDO route
+			where		flight.flightId = transport.flightDO.flightId
+			and			transport.transportId = trip.transportDO.transportId
+			and 		trip.routeDO.routeId = route.routeId
+			and			transport.transportModeDO.transportModeId = 1
+			and			route.originCityDO.cityId = :origionCityId
+			and			route.destCityDO.cityId = :destCityId
+		]]>
+	</query>			
+	
+</hibernate-mapping>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.routeserviced.BcunTripServicedByDO" table="ff_f_trip_serviced_by">
+		<id name="tripServicedById" type="java.lang.Integer" column="TRIP_SERVICED_BY_ID">
+			<generator class="assigned" />
+		</id>
+		
+		<property name= "operationDays" column = "OPERATION_DAYS" />
+        <property name= "allDays" column = "ALL_DAYS" />
+        <property name = "effectiveFrom" column = "EFFECTIVE_FROM" />
+        <property name = "effectiveTo" column = "EFFECTIVE_TO" />
+        <property name = "active" type="java.lang.String" column = "ACTIVE" />
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		
+		<many-to-one name="servicedByDO" class="com.ff.domain.routeserviced.BcunServicedByDO" lazy="false" fetch="join" cascade="all">
+			<column name="SERVICED_BY" />
+		</many-to-one>
+		
+		<many-to-one name="tripDO" class="com.ff.domain.routeserviced.BcunTripDO" lazy="false" fetch="join" cascade="all">
+			<column name="TRIP" />
+		</many-to-one>
+		
+		<many-to-one name="transportModeDO" class="com.ff.domain.transport.TransportModeDO" lazy="false" fetch="join">
+			<column name="TRANSPORT_MODE" />
+		</many-to-one>
+	</class>
+	
+	
+	<!-- Data Sync For TripServicedBy Module Started-->
+
+	<query name="getUnsyncInboundTripServicedBy">
+		<![CDATA[From com.ff.domain.routeserviced.BcunTripServicedByDO tripServiceBy
+				 where tripServiceBy.dtToCentral='N' or tripServiceBy.dtToCentral is null ]]>
+	</query>
+	
+	<query name="getUnsyncOutboundTripServicedBy">
+		<![CDATA[From com.ff.domain.routeserviced.BcunTripServicedByDO tripServicedBy
+					where tripServicedBy.dtToBranch='N'
+		]]>
+	</query>
+	
+	<query name="getTripServicedByIdByTripServicedBy">
+		<![CDATA[
+ 			SELECT tripServicedBy.tripServicedById FROM 
+ 			com.ff.domain.routeserviced.BcunTripServicedByDO tripServicedBy
+ 			WHERE tripServicedBy.servicedByDO.servicedById=:serviceById
+ 			AND tripServicedBy.tripDO.tripId=:tripId
+ 			AND tripServicedBy.transportModeDO.transportModeId=:transportModeId
+ 			AND tripServicedBy.operationDays=:operationDays
+ 			AND tripServicedBy.effectiveFrom=:effectiveFrom
+ 			AND tripServicedBy.effectiveTo=:effectiveTo
+		]]>
+	</query>
+	<!-- Data Sync For TripServicedBy Module Ended-->
+	
+</hibernate-mapping>

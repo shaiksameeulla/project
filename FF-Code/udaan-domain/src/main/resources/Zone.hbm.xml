@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.geography.ZoneDO" table="ff_d_zone">
+		<id name="zoneId" type="java.lang.Integer">
+			<column name="ZONE_ID" />
+			<generator class="native" />
+		</id>
+		<property name="zoneName" type="java.lang.String">
+			<column name="ZONE_NAME" />
+		</property>
+				
+		<property name="zoneCode" type="java.lang.String">
+			<column name="ZONE_CODE" />
+		</property>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>										
+	</class>
+	<query name="getZoneByZoneId">
+	<![CDATA[
+	FROM com.ff.domain.geography.ZoneDO zone where zone.zoneId =:zoneId
+	]]>
+	</query>
+	<query name="getUnSyncZones">
+      <![CDATA[from com.ff.domain.organization.EmployeeDO employee where employee.dtToBranch='N']]>
+	</query> 
+
+	<query name="getZoneByCityId">
+	<![CDATA[
+		SELECT	zoneDo
+		FROM	com.ff.domain.geography.ZoneDO zoneDo,
+				com.ff.domain.geography.RegionDO regionDO,
+				com.ff.domain.geography.CityDO cityDo
+		where 	zoneDo.zoneId=regionDO.zone
+		AND 	cityDo.region=regionDO.regionId
+		AND 	cityDo.cityId= :cityId
+	]]>
+	</query>	
+	
+</hibernate-mapping>

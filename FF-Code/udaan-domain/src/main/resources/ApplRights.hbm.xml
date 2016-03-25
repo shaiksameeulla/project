@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.umc.ApplRightsDO" table="ff_d_app_rights">
+		<id name="rightsId" type="java.lang.Integer">
+			<column name="RIGHTS_ID" />
+			<generator class="native" />
+		</id>
+		<!-- <property name="rightsCode" type="java.lang.String">
+			<column name="RIGHTS_CODE" />
+		</property>
+		<property name="rightsName" type="java.lang.String">
+			<column name="RIGHTS_NAME" />
+		</property> -->
+		
+		<property name="userId" type="java.lang.Integer">
+            <column name="CREATED_BY" />
+         </property>
+          <property name="updatedBy" type="java.lang.Integer">
+            <column name="UPDATE_BY" />
+         </property>
+         
+          <property name="transactionCreateDate" type="java.util.Date">
+            <column name="CREATION_DATE" />
+         </property>
+         <property name="transactionModifiedDate" type="java.util.Date">
+            <column name="UPDATE_DATE" />
+         </property>
+		<many-to-one name="appscreenTypeDO" class="com.ff.domain.umc.ApplScreenDO" lazy="false" fetch="join">
+			<column name="SCREEN_ID" />
+		</many-to-one>
+		
+		<many-to-one name="rolesTypeDO" class="com.ff.domain.umc.UserRolesDO" lazy="false" fetch="join">
+			<column name="ROLE_ID"/>
+		</many-to-one>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+		<property name="status">
+			<column name="STATUS"/>
+		</property>	
+		
+	</class>
+	
+	<query name="getAppRights">
+		<![CDATA[
+			From com.ff.domain.umc.ApplRightsDO rights 
+		]]>
+	
+	</query>
+	
+	<query name="deleteApplRights">
+		<![CDATA[
+			DELETE From com.ff.domain.umc.ApplRightsDO rights where rights.rolesTypeDO.roleId = :roleId
+		]]>
+	
+	</query>
+	
+	
+	<query name="fetchAppRights">
+		<![CDATA[
+			From com.ff.domain.umc.ApplRightsDO rights where rights.rolesTypeDO.roleId=:roleId
+		]]>
+	
+	</query>
+	
+	<!-- <query name="getAppRightsForMenu">
+		<![CDATA[
+			select s.screenId from com.ff.domain.umc.ApplScreenDO s where s.screenId in(select ar.appscreenTypeDO.screenId From com.ff.domain.umc.ApplRightsDO  ar where ar.rolesTypeDO.roleId in(:userRoles)) and s.appName in(:appsNames)
+		]]>
+	
+	</query> -->
+	
+	 <sql-query name="getWebAppRightsForMenu">
+	<![CDATA[
+	select ar.SCREEN_ID
+ 		from
+        ff_d_app_rights ar 
+    	inner join
+        ff_d_app_scrn src
+         on ar.SCREEN_ID=src.SCREEN_ID
+    	and ar.ROLE_ID in :userRoles 
+    	and (src.APP_NAME ='udaan-web' or src.APP_NAME ='centralized') 
+    	and ar.STATUS = 'A' and src.STATUS = 'A'
+	]]>
+	</sql-query> 
+	
+	 <sql-query name="getReportAppRightsForMenu">
+	<![CDATA[
+	select ar.SCREEN_ID
+ 		from
+        ff_d_app_rights ar 
+    	inner join
+        ff_d_app_scrn src
+         on ar.SCREEN_ID=src.SCREEN_ID
+    	and ar.ROLE_ID in :userRoles 
+    	and src.APP_NAME ='udaan-report' 
+    	and ar.STATUS = 'A' and src.STATUS = 'A'
+	]]>
+	</sql-query> 
+	 <sql-query name="getConfigAdminAppRightsForMenu">
+	<![CDATA[
+	select ar.SCREEN_ID
+ 		from
+        ff_d_app_rights ar 
+    	inner join
+        ff_d_app_scrn src
+         on ar.SCREEN_ID=src.SCREEN_ID
+    	and ar.ROLE_ID in :userRoles 
+    	and (src.APP_NAME='udaan-config-admin' or (src.MODULE_NAME='Report' and src.APP_NAME='centralized' ))
+    	and ar.STATUS = 'A' and src.STATUS = 'A'
+	]]>
+	</sql-query> 
+</hibernate-mapping>
+	

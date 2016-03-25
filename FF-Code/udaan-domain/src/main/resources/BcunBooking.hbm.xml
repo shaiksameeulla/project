@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.booking.BcunBookingDO" table="ff_f_booking">
+		<id name="bookingId" column="BOOKING_ID" type="java.lang.Integer">
+			<generator class="native" />
+		</id>
+
+		<property name="consgNumber" column="CONSG_NUMBER" type="java.lang.String" />
+		<property name="cnStatus" column="TRANS_STATUS" type="java.lang.String" />
+		<property name="status" column="STATUS" type="java.lang.String" />
+		<property name="bookingDate" column="BOOKING_DATE" type="java.util.Date" />
+		<property name="orderDate" column="ORDER_DATE" type="java.util.Date" />
+		<property name="noOfPieces" column="NO_OF_PIECES" type="java.lang.Integer" />
+		<property name="actualWeight" column="ACTUAL_WEIGHT" type="java.lang.Double" />
+		<property name="fianlWeight" column="FINAL_WEIGHT" type="java.lang.Double" />
+		<property name="volWeight" column="VOL_WEIGHT" type="java.lang.Double" />
+		<property name="price" column="PRICE" type="java.lang.Double" />
+		<property name="height" column="HEIGHT" type="java.lang.Double" />
+		<property name="length" column="LENGTH" type="java.lang.Double" />
+		<property name="breath" column="BREATH" type="java.lang.Double" />
+		<property name="pickRunsheetNo" column="PICKUP_RUNSHEET_NO"	type="java.lang.String" />
+		<property name="deliveryDate" column="DLV_DATE_TIME" type="java.util.Date" />
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer" />
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer" />
+
+		<property name="declaredValue" type="java.lang.Double">
+			<column name="DECLARED_VALUE" />
+		</property>
+
+		<property name="trnaspmentChg" column="TRANSPMENT_CHG" type="java.lang.Double" />
+
+		<property name="weightCapturedMode" column="WEIGHT_CAPTURED_MODE"
+			type="java.lang.String" />
+
+		<property name="otherCNContent" column="OTHERS_CN_CONTENT"
+			type="java.lang.String" />
+		<property name="paperWorkRefNo" column="PAPER_WORK_REF_NO"
+			type="java.lang.String" />
+
+		<property name="customerId" column="CUSTOMER" />
+
+		<property name="insurencePolicyNo" column="INSURANCE_POLICY_NO"
+			type="java.lang.String" />
+		<property name="insurenceAmt" column="INSURANCE_AMT" type="java.lang.Double" />
+		<property name="refNo" column="CUST_REF_NO" type="java.lang.String" />
+
+		<property name="bookingType" column="BOOKING_TYPE" />
+		<property name="bookingOfficeId" column="BOOKING_OFF" type="java.lang.Integer" />
+		<property name="approvedBy" column="APPROVED_BY" type="java.lang.Integer" />
+		<property name="pincodeDlvTimeMapId" column="PINCODE_DLV_TIME_MAP_ID" type="java.lang.Integer" />
+		<property name="processNumber" column="PROCESS_NO" type="java.lang.String" />
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date" />
+		<property name="updatedDate" column="UPDATE_DATE" type="java.util.Date" />
+
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		<property name="dtToOpsman">
+			<column name="DT_TO_OPSMAN" />
+		</property>
+		<property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL" />
+		<property name="pincodeId" column="DEST_PINCODE" />
+		<property name="consgTypeId" column="CONSG_TYPE" />
+		<property name="cnContentId" column="CONTENT" />
+		<property name="cnPaperWorkId" column="PAPER_WORK" />
+		<property  name="shippedToCode" column="SHIPPED_TO_CODE" type="java.lang.String"/>
+		
+		<many-to-one name="bookingPayment"  class="com.ff.domain.booking.BookingPaymentDO" lazy="false" fetch="join" cascade="all" unique="true">
+		<column  name="BOOKING_PAYMENT_ID" />
+		</many-to-one> 
+		
+		<property name="insuredBy" column="INSURED_BY" />
+		<property name="updatedProcess" column="UPDTAED_PROCESS_FROM"/>
+		<set name="bokingPrefs" table="ff_f_booking_preference_mapping"
+			cascade="all" lazy="false">
+			<key>
+				<column name="BOOKING_ID" />
+			</key>
+			<one-to-many class="com.ff.domain.booking.BcunBookingPreferenceMappingDO" />
+		</set>
+
+		<many-to-one name="bulkBookingVendorDtls" class="com.ff.domain.booking.BulkBookingVendorDtlsDO" lazy="false" fetch="join"  cascade="all" unique="true">
+			<column name="BULK_BOOKING_VENDOR_ID" />
+		</many-to-one>
+
+	</class>
+	
+	<query name="getUnsyncOutboundBooking">
+		<![CDATA[ From com.ff.domain.booking.BcunBookingDO booking WHERE booking.dtToBranch='N'  and  booking.pincodeId IN 
+		(SELECT branchPincode.pincodeId FROM com.ff.domain.organization.BcunBranchPincodeServiceabilityDO  branchPincode WHERE branchPincode.officeId=:branchId )
+		AND booking.bookingType in (Select bookingTypeDO.bookingTypeId FROM com.ff.domain.booking.BookingTypeDO bookingTypeDO where bookingTypeDO.bookingType='EB') 
+		
+		]]>
+	</query>
+	
+	<!-- <query name="outboundEmotionalBondBookingOfficeFinder">
+		<![CDATA[	SELECT branchPincode.officeId FROM com.ff.domain.organization.BcunBranchPincodeServiceabilityDO branchPincode WHERE branchPincode.pincodeId IN
+		(SELECT booking.pincodeId FROM com.ff.domain.booking.BcunBookingDO booking WHERE booking.bookingOfficeId=:branchId )]]>
+	</query> -->
+	
+	<query name="outboundEmotionalBondBookingOfficeFinder">
+		<![CDATA[	
+		
+		SELECT branchPincode.officeId FROM com.ff.domain.organization.BcunBranchPincodeServiceabilityDO branchPincode WHERE branchPincode.pincodeId =
+	(
+		SELECT pin.pincodeId FROM com.ff.domain.geography.PincodeDO pin WHERE pin.pincode=
+		(
+			select off.pincode FROM com.ff.domain.organization.OfficeDO off WHERE off.officeId =:branchId
+		)
+	)
+		
+		]]>
+	</query>
+	
+	<query name="getBookingId">
+		<![CDATA[SELECT booking.bookingId From com.ff.domain.booking.BcunBookingDO booking where  booking.consgNumber = :consgNumber and booking.cnStatus='A']]>
+	</query>
+	
+	<query name="getBookingDtls">
+		<![CDATA[ From com.ff.domain.booking.BcunBookingDO booking where  booking.consgNumber = :consgNumber and booking.cnStatus='A']]>
+	</query>
+	
+	<query name="getUnsyncInboundBookingOrderRequest">
+		<![CDATA[From com.ff.domain.booking.BcunBookingDO booking where booking.dtToCentral='N' and booking.cnStatus='A']]>
+	</query>
+	
+	
+	<!-- Start of Changes by <48205> for OPSMAN on 06/09/2013 -->
+	<query name="getBookingDtlsByConsgNoForOpsman">
+		<![CDATA[
+			 FROM	com.ff.domain.booking.BcunBookingDO booking 
+			 WHERE	booking.consgNumber=:consgNumber
+		 ]]>
+	</query>
+	
+	<query name="getOpsmanInboundBookingOrderRequest">
+		<![CDATA[From com.ff.domain.booking.BcunBookingDO booking where booking.dtToOpsman = 'N' and booking.bookingDate >= '2013-11-01' and booking.bookingType = 1]]>
+	</query>
+	
+	<sql-query name="getOpsmanInboundBookingConsignmentRecord">
+		<return alias="bcunBookingDO" class="com.ff.domain.booking.BcunBookingDO"/>
+		<return alias="consignmentDO" class="com.ff.domain.consignment.OpsmanConsignmentDO"/>
+		<![CDATA[
+			select b.*,c.* from ff_f_booking b inner join ff_f_consignment c on
+			b.CONSG_NUMBER=c.CONSG_NO 
+			where
+			b.BOOKING_OFF IN (:officeIds) and
+			b.DT_FROM_OPSMAN != 'Y' and
+			b.DT_TO_OPSMAN = 'N' and
+			(c.PRODUCT != 2 and c.PRODUCT != 9)
+		]]>
+	</sql-query>
+	
+	<sql-query name="getLDSeriesBookingsForOpsman">
+		<return alias="bcunBookingDO" class="com.ff.domain.booking.BcunBookingDO"/>
+		<return alias="consignmentDO" class="com.ff.domain.consignment.OpsmanConsignmentDO"/>
+		<![CDATA[
+			select b.*,c.* from ff_f_booking b inner join ff_f_consignment c on
+			b.CONSG_NUMBER=c.CONSG_NO 
+			where
+			b.BOOKING_OFF IN (:officeIds) and
+			b.DT_FROM_OPSMAN != 'Y' and
+			b.DT_TO_OPSMAN = 'N' and
+			(c.PRODUCT = 2 or c.PRODUCT = 9)
+		]]>
+	</sql-query>
+	
+	<query name="updateBookingDataForOpsman">
+		<![CDATA[UPDATE com.ff.domain.booking.BcunBookingDO booking
+				 SET booking.dtToOpsman = :status
+				 WHERE 
+				 booking.bookingId = :bookingId
+				 ]]>
+	</query>
+	<!-- End of Changes by <48205> for OPSMAN on 06/09/2013 -->
+	
+</hibernate-mapping>

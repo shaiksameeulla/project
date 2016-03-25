@@ -1,0 +1,1002 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+      
+	<class
+		name="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO"
+		table="ff_f_rate_quotation">
+		<id name="rateQuotationId" type="java.lang.Integer" column="RATE_QUOTATION_ID">
+			<generator class="native" />
+		</id>
+
+		<many-to-one name="customer"
+			class="com.ff.domain.business.CustomerDO" lazy="false"
+			cascade="all"  fetch="join">
+			<column name="RATE_CUSTOMER" />
+		</many-to-one>
+		
+		
+		<many-to-one name="quotedCustomer"
+			class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO" lazy="false"
+			cascade="all"  fetch="join">
+			<column name="RATE_QUOTED_CUSTOMER" />
+		</many-to-one>
+		
+		<many-to-one name="ratequotationOriginatedFrom"
+			class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO"
+			lazy="false"  fetch="join">
+			<column name="RATE_QUOTATION_ORIGINATED_FROM" />
+		</many-to-one>
+
+
+		<set name="rateFixedChargeDO" table="ff_f_rate_quotation_fixed_charges"
+			cascade="all-delete-orphan" inverse="true" lazy="false"  fetch="join">
+
+			<key column="RATE_QUOTATION" />
+			<one-to-many
+				class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationFixedChargesDO" />
+
+		</set>
+		
+		<set name="codChargeDO" table="ff_f_rate_quotation_cod_charge"
+			cascade="all-delete-orphan" inverse="true" lazy="false"  fetch="join">
+
+			<key column="RATE_QUOTATION" />
+			<one-to-many
+				class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCODChargeDO" />
+
+		</set>
+		
+		
+		 <set name="rateQuotationProductCategoryHeaderDO" table="ff_f_rate_quotation_product_category_header"
+			cascade="all" inverse="true" lazy="false" fetch="join">
+
+			<key column="RATE_QUOTATION" />
+			<one-to-many
+				class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationProductCategoryHeaderDO" />
+
+		</set>
+		
+		<!-- <many-to-one name="rateContractDO" class="com.ff.domain.ratemanagement.masters.RateContractDO" lazy="false">
+			<column name="RATE_CONTRACT_ID" />
+		</many-to-one> -->
+		
+ 		 <!-- <one-to-one name="rateContractDO" class="com.ff.domain.ratemanagement.masters.RateContractDO" foreign-key="rateQuotationDO" /> -->
+ 		 
+ 		 <set name="fixedChargesConfigDO" table="ff_f_rate_quotation_fixed_charges_config"
+			cascade="all-delete-orphan" inverse="true" lazy="false" fetch="join">
+
+			<key column="QUOTATION" />
+			<one-to-many
+				class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationFixedChargesConfigDO" />
+
+		</set>
+ 		 
+ 		 
+		 <!-- <one-to-one name="fixedChargesConfigDO" class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationFixedChargesConfigDO" property-ref="rateQuotationDO" cascade="all-delete-orphan" fetch="join" /> --> 
+		 <one-to-one name="rateQuotationRtoChargesDO" class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationRTOChargesDO" property-ref="rateQuotationDO" cascade="all-delete-orphan" fetch="join" />
+		
+ 		
+ 		<property name="quotationCreatedDate" column="CREATED_DATE" />
+		
+ 		<property name="quotationCreatedBy" column="CREATED_BY" />
+		<property name="approversRemarks" column="APPROVERS_REMARKS" />
+		<property name="excecutiveRemarks" column="EXECUTIVES_REMARKS" />
+		<property name="rateQuotationNo" column="RATE_QUOTATION_NUMBER" />
+		<property name="status" column="STATUS" />
+		<property name="rateQuotationType" column="RATE_QUOTATION_TYPE" />
+		<property name="rateQuotationOriginatedfromType" column="RATE_QUOTATION_ORIGINATED_FROM_TYPE" />
+		<property name="quotationUsedFor" column="QUOTATION_USED_FOR" />
+		<property name="approvalRequired" column="APPROVAL_REQUIRED" />
+		<property name="approvedAt" column="APPROVED_AT" />
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE"/>
+		<property name="quotationCreatedFrom" column="RATE_QUOTATION_CREATED_FROM"/>
+	</class>
+	<query name="updateQuotation">
+		<![CDATA[ UPDATE com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO  rateQuotation
+					SET rateQuotation.approversRemarks=:approversRemarks,
+					rateQuotation.excecutiveRemarks=:excecutiveRemarks
+		          	WHERE 
+		          	rateQuotation.rateQuotationId =:rateQuotationId
+		]]>
+	</query>
+	<query name="searchQuotationDetails">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO rateQuotation
+			 WHERE (rateQuotation.rateQuotationId =:rateQuotationId OR rateQuotation.rateQuotationNo=:quotationNo)
+			 AND rateQuotation.rateQuotationType=:rateQuotationType
+			AND (rateQuotation.quotationCreatedBy=:createdBy OR 
+			 		rateQuotation.quotedCustomer.salesPersonDO.employeeId=(SELECT employee.empDO.employeeId  from com.ff.domain.umc.EmployeeUserDO employee where employee.userId=:createdBy))
+		]]>
+	</query>
+
+	<query name="getUserDObyOfficId">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO rateQuotation
+			 WHERE (rateQuotation.rateQuotationId =:rateQuotationId OR rateQuotation.rateQuotationNo=:quotationNo)
+			 AND (rateQuotation.quotationCreatedBy=:createdBy OR 
+			 		rateQuotation.quotedCustomer.salesPersonDO.employeeId=(SELECT employee.empDO.employeeId  from com.ff.domain.umc.EmployeeUserDO employee where employee.userId=:createdBy))
+		]]>
+	</query>
+	<query name="getUserDOListbyOfficId">
+		<![CDATA[
+			Select userOfficMapping.user FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfficMapping
+			where userOfficMapping.office.officeId=:officeId
+			 
+		]]>
+	</query>
+	
+
+
+	<query name="getRHONameByCreatedById">
+		<![CDATA[
+			SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = (SELECT emp.officeId FROM com.ff.domain.organization.EmployeeDO emp where employeeId =(Select empUser.empDO.employeeId from com.ff.domain.umc.EmployeeUserDO empUser
+			where empUser.userId=:userId)))
+		]]>
+	</query>
+	
+	<query name="getStationNameByCreatedById">
+		<![CDATA[
+			SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT emp.city FROM com.ff.domain.organization.EmployeeDO emp where employeeId =(Select empUser.empDO.employeeId from com.ff.domain.umc.EmployeeUserDO empUser
+			where empUser.userId=:userId))
+		]]>
+	</query>
+	<query name="getSalesOffcNameByCustomer">
+		<![CDATA[
+			SELECT customerNew.salesOfficeDO.officeName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customerNew WHERE customerNew.customerId =:custId
+		]]>
+	</query>
+	<query name="getSalesPersonNameByCustomer">
+		<![CDATA[
+			SELECT customerNew.salesPersonDO.firstName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customerNew WHERE customerNew.customerId =:custId
+		]]>
+	</query>
+	
+	<query name="getQuotatnDtlsforRegionByQuotationNo">
+		<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation 
+			 
+		WHERE (quotation.quotationCreatedBy IN 
+			(SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser 
+			WHERE empuser.empDO.officeId IN 
+				(SELECT offic.officeId FROM com.ff.domain.organization.OfficeDO offic 
+					WHERE offic.mappedRegionDO.regionId IN(:region)
+				)
+			)  or quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT offic.officeId FROM com.ff.domain.organization.OfficeDO offic 
+					WHERE offic.mappedRegionDO.regionId IN(:region)))) 
+			 )
+			AND quotation.approvalRequired IN (:approveRequird)
+			AND (quotation.rateQuotationType = 'N' AND quotation.quotedCustomer.industryCategoryDO.rateIndustryCategoryId =:rateIndustryCategoryIdList) 
+		    AND	quotation.status IN ('S','A','R')
+		    AND ( quotation.approvedAt IN ('RO','RC') OR quotation.approvedAt IS NULL)
+		    AND quotation.rateQuotationNo =:QUOTATION_NO
+		    AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc      	
+			]]>
+	</query> 
+	
+	
+	<query name="getQuotatnDtlsforCorpByQuotationNo">
+		<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status ) 
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation 
+			WHERE 
+			quotation.rateQuotationNo =:QUOTATION_NO
+			AND quotation.status IN ('S','A','R')
+			AND quotation.approvalRequired =:approveRequird
+			AND quotation.approvedAt in(:approveAt)
+			AND (quotation.rateQuotationType = 'N' AND quotation.quotedCustomer.industryCategoryDO.rateIndustryCategoryId in(:rateIndustryCategoryIdList)) 
+			AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc
+		]]>
+	</query> 
+	<query name="updateRateQuotationStatus">
+		<![CDATA[ UPDATE com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO  rateQuotation
+					SET rateQuotation.status=:status,
+					rateQuotation.approvalRequired=:approvalRequired													
+		          	WHERE 
+		          	rateQuotation.rateQuotationId =:rateQuotationId
+		]]>
+	</query>
+	
+	
+	<query name="rateQuotationListView">
+	<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM 
+			com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+			 WHERE (quotation.quotationCreatedBy =:userId
+			 		 or quotation.quotedCustomer.salesPersonDO.employeeId = (
+			 		SELECT empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO where userId =:userId)
+			 or quotation.quotationCreatedBy IN 
+			 (SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser where empuser.empDO.employeeId IN 
+			 	(SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where
+			  		( emp.officeId IN 
+			 			(SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+							WHERE office.officeId IN
+						 	(SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+						userOfc.user.userId =:userId )
+						 ) )
+			 	 or (emp.officeId IN (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId =:userId) ) 
+			  	))  
+			or	quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId IN (
+					SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+					userOfc.user.userId =:userId ) ) or emp.officeId IN (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId =:userId) ) )
+			 )
+			 AND DATE(quotation.quotationCreatedDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+			 AND quotation.status =:status
+			 AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc
+		]]>
+	</query>
+	
+	<query name="rateQuotationListViewForCO">
+	<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM 
+			com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+			 WHERE
+			 DATE(quotation.quotationCreatedDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+			 AND quotation.status =:status
+			 AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc
+		]]>
+	</query>
+	
+	<query name="rateQuotationForCO">
+	<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM 
+			com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+			 WHERE
+			 quotation.rateQuotationNo =:rateQuotationNo
+			 AND quotation.status IN ('A','S','R')
+			 AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc
+		]]>
+	</query>
+	
+	
+	
+	
+	<query name="rateQuotationListViewForALLRHO">
+	<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM 
+			com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+			 WHERE 
+			 DATE(quotation.quotationCreatedDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+			 AND quotation.status =:status
+			 AND quotation.quotationUsedFor = 'Q'
+			 AND (quotation.quotationCreatedBy IN
+			 (  SELECT empUser.userId  from com.ff.domain.umc.EmployeeUserDO empUser WHERE empUser.empDO.officeId IN  
+			 	  (
+			 	SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.reportingRHO IN(:region)  or office2.officeId IN(:region)
+			 	   )
+			 	   	
+			 )  or quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.reportingRHO IN(:region)  or office2.officeId IN(:region))))  
+			 ) order by quotation.quotationCreatedDate desc
+		]]>
+	</query>
+	
+	<query name="rateQuotationListViewForALLRHOWithCity">
+	<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM 
+			com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+			 WHERE 
+			 DATE(quotation.quotationCreatedDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+			 AND quotation.status =:status
+			 AND quotation.quotationUsedFor = 'Q'
+			 AND ( quotation.quotationCreatedBy IN
+			 (  SELECT empUser.userId  from com.ff.domain.umc.EmployeeUserDO empUser WHERE empUser.empDO.officeId IN  
+			 	  (
+			 	SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.cityId IN(:city)
+			 	   )	
+			 )
+			  or quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.cityId IN(:city))))  
+			 ) order by quotation.quotationCreatedDate desc
+		]]>
+	</query>
+	
+ <query name="getRateQuotationForUser">
+	<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM 
+			com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+			 WHERE (quotation.quotationCreatedBy =:userId or quotation.quotedCustomer.salesPersonDO = (
+			 SELECT empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO where userId =:userId)
+			 or quotation.quotationCreatedBy IN (SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser where empuser.empDO.employeeId IN 
+			 (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId IN (
+					SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+					userOfc.user.userId =:userId ) ) or emp.officeId IN (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId =:userId) ) ))  
+			or	quotation.quotedCustomer.salesPersonDO IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId IN (
+					SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+					userOfc.user.userId =:userId ) ) or emp.officeId IN (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId =:userId) ) ) 	
+			 )
+			 AND quotation.rateQuotationNo =:rateQuotationNo
+			 AND quotation.status IN ('S','A','R')
+			 AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc
+		]]>
+	</query>	 
+
+	
+	
+	<query name="rateQuotationForALLRHO">
+	<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM 
+			com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+			 WHERE 
+			 quotation.rateQuotationNo =:rateQuotationNo
+			 AND quotation.status IN ('S','A','R')
+			 AND quotation.quotationUsedFor = 'Q'
+			 AND (quotation.quotationCreatedBy IN
+			 (  SELECT empUser.userId  from com.ff.domain.umc.EmployeeUserDO empUser WHERE empUser.empDO.officeId IN  
+			 	  (
+			 	SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.reportingRHO IN(:region)  or office2.officeId IN(:region)
+			 	   ) 	
+			 )
+			 
+			 or	quotation.quotedCustomer.salesPersonDO IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.reportingRHO IN(:region)  or office2.officeId IN(:region)))) 	
+			 )
+			  order by quotation.quotationCreatedDate desc
+		]]>
+	</query>
+	
+	
+	
+	<query name="approveRejectDomesticQuotation">
+		<![CDATA[ UPDATE com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO  rateQuotation
+					SET rateQuotation.status=:status,
+					rateQuotation.approvedAt =:approveAt
+		          	WHERE 
+		          	rateQuotation.rateQuotationNo in(:QUOTATION_NO) and 
+		          	rateQuotation.quotationUsedFor =:quotationUsdFor
+		]]>
+	</query>
+	
+	<!-- <query name="getRateQuotationDtls">
+		<![CDATA[ from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO  rateQuotation
+					WHERE 
+		          	rateQuotation.quotationCreatedBy =(select empUser.userId from com.ff.domain.umc.EmployeeUserDO empUser where empUser.empDO.employeeId =
+		          	(select employee.employeeId from com.ff.domain.organization.EmployeeDO employee where employee.officeId in 
+		          	(select offic.officeId from com.ff.domain.organization.OfficeDO offic where offic.mappedRegionDO.regionId in
+		          	(select discount.region from com.ff.domain.ratemanagement.operations.rateBenchmarkDiscount.RegionRateBenchMarkDiscountDO discount where 
+		          	discount.employeeDO.employeeId =:empId
+					and discount.industryCategory in =:rateIndustryCategoryIdList))))
+					and rateQuotation.status=:status
+					and rateQuotation.approvalRequired in =:approveRequird
+		]]>
+	</query> -->
+	
+	<!-- This query is called on loading of Approve Quotation screen for the first time using regional login -->
+	 <query name="getRateQuotationDtlsForRegion">
+		<![CDATA[ 
+		SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			  quotation.approvalRequired,
+			 quotation.status )
+		FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+		WHERE ( quotation.quotationCreatedBy IN 
+			(SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser 
+			WHERE empuser.empDO.officeId IN 
+				(SELECT offic.officeId FROM com.ff.domain.organization.OfficeDO offic 
+					WHERE offic.mappedRegionDO.regionId IN(:region)
+				)
+			) or quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT offic.officeId FROM com.ff.domain.organization.OfficeDO offic 
+					WHERE offic.mappedRegionDO.regionId IN(:region) )) 	
+			 )
+			) 
+			AND quotation.approvalRequired IN (:approveRequird)
+			AND (quotation.rateQuotationType = 'N' AND quotation.quotedCustomer.industryCategoryDO.rateIndustryCategoryId =:rateIndustryCategoryIdList)
+			AND quotation.status=:status
+			AND quotation.approvedAt IS NULL
+		    AND DATE(quotation.quotationCreatedDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+		    AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc      	
+		]]>
+	</query> 
+	
+	<query name="getApprovedOrRejctedRateQuotationDtlsForRegion">
+		<![CDATA[ 
+		SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			  quotation.approvalRequired,
+			 quotation.status )
+		FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+		WHERE (quotation.quotationCreatedBy IN 
+			(SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser 
+			WHERE empuser.empDO.officeId IN 
+				(SELECT offic.officeId FROM com.ff.domain.organization.OfficeDO offic 
+					WHERE offic.mappedRegionDO.regionId IN(:region)
+				)
+			)  or quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT offic.officeId FROM com.ff.domain.organization.OfficeDO offic 
+					WHERE offic.mappedRegionDO.regionId IN(:region))) 	
+			 )
+			 )
+			AND quotation.approvalRequired IN (:approveRequird)
+			AND (quotation.rateQuotationType = 'N' AND quotation.quotedCustomer.industryCategoryDO.rateIndustryCategoryId =:rateIndustryCategoryIdList)
+			AND quotation.status IN (:status)
+			AND quotation.approvedAt IN (:approveRequird)
+		    AND DATE(quotation.quotationCreatedDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+		    AND quotation.quotationUsedFor = 'Q'  order by quotation.quotationCreatedDate desc    	
+		]]>
+	</query> 
+	
+	<!-- This query is used when loading Approve Quotation screen by corporate login -->
+	 <query name="searchQuotatnForCorp">
+		<![CDATA[
+		SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status ) 
+		FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+		WHERE quotation.status=:status 
+		AND quotation.approvalRequired =:approveRequird
+		AND quotation.approvedAt =:approveAt
+		AND (quotation.rateQuotationType = 'N' AND quotation.quotedCustomer.industryCategoryDO.rateIndustryCategoryId in(:rateIndustryCategoryIdList)) 
+		AND DATE(quotation.quotationCreatedDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+		AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc
+		
+		]]>
+	</query> 
+
+	<query name="rateQuotationListViewForSE">
+	<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM 
+			com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+			 WHERE (quotation.quotationCreatedBy =:userId
+			 		 or quotation.quotedCustomer.salesPersonDO.employeeId = (
+			 		SELECT empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO where userId =:userId))
+			 AND DATE(quotation.quotationCreatedDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')			 
+			 AND quotation.status =:status
+			 AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc
+		]]>
+	</query>
+	
+	<query name="getRateQuotationForSE">
+	<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM 
+			com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+			 WHERE (quotation.quotationCreatedBy =:userId or quotation.quotedCustomer.salesPersonDO.employeeId = (
+			 SELECT empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO where userId =:userId))
+			 AND quotation.rateQuotationNo =:rateQuotationNo
+			 AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc
+		]]>
+	</query>
+
+
+	<query name="rateQuotationListViewForHO">
+	<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM 
+			com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+			 WHERE 
+			 DATE(quotation.quotationCreatedDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+			 AND quotation.status =:status
+			 AND quotation.quotationUsedFor = 'Q'
+			 AND (quotation.quotationCreatedBy IN
+			 (  SELECT empUser.userId  from com.ff.domain.umc.EmployeeUserDO empUser WHERE empUser.empDO.officeId IN  
+			 	  (
+			 	SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.cityId IN(:city)
+			 	   )	
+			 ) or quotation.quotationCreatedBy IN ( SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser where empuser.empDO.employeeId IN 
+			 (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId IN (
+					SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+					userOfc.user.userId =:userId ) ) 
+					 ) ))
+					 
+			 or quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.cityId IN(:city))))
+			 or quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId IN (
+					SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+					userOfc.user.userId =:userId )))) 
+			)  order by quotation.quotationCreatedDate desc
+		]]>
+	</query>
+
+	<query name="rateQuotationForHO">
+	<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM 
+			com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+			 WHERE 
+			 quotation.status IN ('S','A','R')
+			 AND quotation.quotationUsedFor = 'Q'
+			 AND quotation.rateQuotationNo =:rateQuotationNo
+			 AND (quotation.quotationCreatedBy IN
+			 (  SELECT empUser.userId  from com.ff.domain.umc.EmployeeUserDO empUser WHERE empUser.empDO.officeId IN  
+			 	  (
+			 	SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.cityId IN(:city)
+			 	   )	
+			 ) or quotation.quotationCreatedBy IN ( SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser where empuser.empDO.employeeId IN 
+			 (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId IN (
+					SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+					userOfc.user.userId =:userId ) ) 
+			 ) ))
+			 
+			 or quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.cityId IN(:city))))
+			 
+			 or quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId IN (
+					SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+					userOfc.user.userId =:userId )))) 
+			 )  order by quotation.quotationCreatedDate desc
+		]]>
+	</query>
+	
+	<query name="getEcommerceRateQuotationDtlsForRegion">
+		<![CDATA[ 
+		SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			  quotation.approvalRequired,
+			 quotation.status )
+		FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+		WHERE (quotation.quotationCreatedBy IN 
+			(SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser 
+			WHERE empuser.empDO.officeId IN 
+				(SELECT ofc.officeId FROM com.ff.domain.organization.OfficeDO ofc 
+					WHERE ofc.mappedRegionDO.regionId IN(:region)
+				)
+			)  or quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT ofc.officeId FROM com.ff.domain.organization.OfficeDO ofc 
+					WHERE ofc.mappedRegionDO.regionId IN(:region)))) 
+			)		 
+			AND quotation.approvalRequired IN (:approveRequird)
+			AND quotation.rateQuotationType = 'E'
+			AND quotation.status=:status
+			AND quotation.approvedAt IS NULL
+		    AND DATE(quotation.quotationCreatedDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+		    AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc     	
+		]]>
+	</query> 
+	
+	<!-- This query is used when the user clicks on Search button & selects the status as either approve or rejected using regional login -->
+	<query name="getApprvdOrRjctdEcommerceRateQuotationDtlsForRegion">
+		<![CDATA[ 
+		SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			  quotation.approvalRequired,
+			 quotation.status )
+		FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+		WHERE (quotation.quotationCreatedBy IN 
+			(SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser 
+			WHERE empuser.empDO.officeId IN 
+				(SELECT ofc.officeId FROM com.ff.domain.organization.OfficeDO ofc 
+					WHERE ofc.mappedRegionDO.regionId IN(:region)
+				)
+			)  or quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT ofc.officeId FROM com.ff.domain.organization.OfficeDO ofc 
+					WHERE ofc.mappedRegionDO.regionId IN(:region)))) 
+			)
+			AND quotation.approvalRequired IN (:approveRequird)
+			AND quotation.rateQuotationType = 'E'
+			AND quotation.status IN (:status)
+			AND quotation.approvedAt IN (:approveRequird)
+		    AND DATE(quotation.quotationCreatedDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+		    AND quotation.quotationUsedFor = 'Q'  order by quotation.quotationCreatedDate desc    	
+		]]>
+	</query> 
+	
+	<query name="getEcommQuotatnDtlsforRegionByQuotationNo">
+		<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status )
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation 
+			 
+		WHERE (quotation.quotationCreatedBy IN 
+			(SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser 
+			WHERE empuser.empDO.officeId IN 
+				(SELECT ofc.officeId FROM com.ff.domain.organization.OfficeDO ofc 
+					WHERE ofc.mappedRegionDO.regionId IN(:region)
+				)
+			)  or quotation.quotedCustomer.salesPersonDO.employeeId IN (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT ofc.officeId FROM com.ff.domain.organization.OfficeDO ofc 
+					WHERE ofc.mappedRegionDO.regionId IN(:region)))) 
+			)
+			AND quotation.approvalRequired IN (:approveRequird)
+			AND quotation.rateQuotationType = 'E' 
+		    AND	quotation.status IN ('S','A','R')
+		    AND ( quotation.approvedAt IN ('RO','RC') OR quotation.approvedAt IS NULL)
+		    AND quotation.rateQuotationNo =:QUOTATION_NO
+		    AND quotation.quotationUsedFor = 'Q'  order by quotation.quotationCreatedDate desc    	
+			]]>
+	</query>
+	
+	<query name="searchEcommerceQuotatnForCorp">
+		<![CDATA[
+		SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status ) 
+		FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+		WHERE quotation.status=:status 
+		AND quotation.approvalRequired =:approveRequird
+		AND quotation.approvedAt =:approveAt
+		AND quotation.rateQuotationType = 'E' 
+		AND DATE(quotation.quotationCreatedDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+		AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc
+		
+		]]>
+	</query>
+	
+	<query name="getEcommerceQuotatnDtlsforCorpByQuotationNo">
+		<![CDATA[
+			SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( quotation.quotationCreatedDate , 
+			quotation.rateQuotationId,
+			quotation.rateQuotationNo,
+			quotation.rateQuotationType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId)) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = quotation.quotedCustomer.salesPersonDO.officeId),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = quotation.quotedCustomer.salesPersonDO.officeId))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO customer where customer.customerId = quotation.quotedCustomer.customerId))  ,
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = quotation.quotationCreatedBy)  ,
+			 quotation.quotedCustomer.salesPersonDO.employeeId,
+			 quotation.quotationCreatedBy,
+			 quotation.approvalRequired,
+			 quotation.status ) 
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation 
+			WHERE 
+			quotation.rateQuotationNo =:QUOTATION_NO
+			AND quotation.status IN ('S','A','R')
+			AND quotation.approvalRequired =:approveRequird
+			AND quotation.approvedAt in(:approveAt)
+			AND quotation.rateQuotationType = 'E' 
+			AND quotation.quotationUsedFor = 'Q' order by quotation.quotationCreatedDate desc
+		]]>
+	</query>
+	<query name="searchRateQuotation">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO rateQuotation
+			 WHERE rateQuotation.rateQuotationNo=:quotationNo
+			 AND rateQuotation.quotationUsedFor=:quotationUserFor			
+		]]>
+	</query>
+	<query name="getRateQuotationByQuotationId">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO rateQuotation
+			 WHERE rateQuotation.rateQuotationId=:rateQuotationId		
+		]]>
+	</query>
+	<query name="isRateQuotationExist">
+		<![CDATA[
+			SELECT rateQuotation.rateQuotationId FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO rateQuotation
+			 WHERE rateQuotation.rateQuotationNo=:quotationNo
+			 AND rateQuotation.quotationUsedFor=:quotationUsedFor			
+		]]>
+	</query>
+	<query name="isEcommerceQuotationApprover">
+		<![CDATA[
+			SELECT appRights.rightsId FROM com.ff.domain.umc.ApplRightsDO appRights, com.ff.domain.umc.UserRightsDO userRights
+			 WHERE userRights.roleDO.roleId = appRights.rolesTypeDO.roleId
+			 AND userRights.userDO.userId =:userId and 	appRights.appscreenTypeDO.screenCode =:screenCode
+			 AND appRights.status = 'A'		
+		]]>
+	</query>
+	
+</hibernate-mapping>
+

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.expense.SAPExpenseDO" table="ff_f_sap_expense">
+		<id name="Id" type="java.lang.Long">
+			<column name="ID" />
+			<generator class="native" />
+		</id>
+		<property name="officeCode" column="OFFICE_CODE" />
+		<property name="txNumber" column="TRANSACTION_NO" />
+		<property name="expenseGLCode" column="GL_CODE" />
+		<property name="paymentCode" column="PAYMENT_CODE"/>
+		<property name="bankGLCode" column="BANK_GL"/>
+		<property name="totalExpense" column="TOTAL_EXPENSE" />
+		<property name="chequeDate" column="CHEQUE_DATE" />
+		<property name="chequeNo" column="CHEQUE_NO" />
+		<property name="bankName" column="BANK_NAME" />
+		<property name="postingDate" column="POSTING_DATE" />
+		<property name="reportingRhoCode" column="REPORTING_RHO_CODE" /> 
+		<property name="destinationRHO" column="DESTINATION_RHO" />
+		<property name="serviceChanrge" column="SERVICE_CHARGE" />
+		<property name="serviceTaxBasic" column="SERVICE_TAX_BASIC" />
+		<property name="edOnServiceTax" column="ED_ON_SERVICE_TAX" />
+		<property name="hedOnServiceTax" column="HED_ON_SERVICE_TAX" />
+		<property name="consgNo" column="CONSIGNMENT_NO" />
+		<property name="empCode" column="EMPLOYEE_CODE" />
+		<property name="remark" column="REMARK" />
+		<property name="exception" column="EXCEPTION" />
+		<property name="glIndicator" column="GL_INDICATOR" />
+		
+		<!--  common attributes  START-->
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<!--  common attributes  END-->
+	</class>
+	
+<query name="getExpenseDtlsFromSAPExp">
+	<![CDATA[
+		 FROM	com.ff.domain.mec.expense.SAPExpenseDO sapExpDO
+		 WHERE	sapExpDO.sapStatus=:sapStatus and ( sapExpDO.exception IS NULL or LENGTH(sapExpDO.exception ) < 1)
+	]]>
+</query>
+
+<query name="updateExpenseDetailsSAPFlag">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.mec.expense.SAPExpenseDO sapExpDO
+		SET		sapExpDO.sapStatus=:sapStatus,sapExpDO.sapTimestamp=:sapTimestamp,sapExpDO.exception=:exception
+		WHERE 	sapExpDO.Id=:Id
+	]]>
+</query>
+
+</hibernate-mapping>

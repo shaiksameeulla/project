@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.billing.InvoiceRunSheetDetailDO" table="ff_f_invoice_run_sheet_detail">
+		<id name="invoiceRunSheetDetailId" type="java.lang.Integer" column="INVOICE_RUN_SHEET_DETAIL_ID">
+			<generator class="native" />
+		</id>
+		
+		 <property name="shipToCode" column="SHIP_TO_CODE"/>
+		 <property name="status" column="STATUS"/>
+		 <property name="receiverName" column="RECEIVER_NAME"/>
+		 <property name="createdBy" column="CREATED_BY" type="java.lang.Integer" update="false" />
+         <property name="createdDate" column="CREATED_DATE" type="java.util.Date" update="false" />
+         <property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer" />
+         <property name="updatedDate" column="UPDATE_DATE" type="java.util.Date" />
+		 
+		 <many-to-one name="invoiceRunSheetHeaderDO" class="com.ff.domain.billing.InvoiceRunSheetHeaderDO" lazy="false" fetch="join">
+			<column name="INVOICE_RUN_SHEET_HEADER" />
+		</many-to-one>
+		
+		 <many-to-one name="customerDO" class="com.ff.domain.business.CustomerDO" lazy="false" fetch="join">
+			<column name="CUSTOMER" />
+		</many-to-one>		
+		 
+		  <many-to-one name="billDO" class="com.ff.domain.billing.BillDO" lazy="false" fetch="join">
+			<column name="INVOICE" />
+		</many-to-one>		
+		
+	</class>
+	
+</hibernate-mapping>

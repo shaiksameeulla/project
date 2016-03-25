@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.RunsheetAssignmentDetailDO"
+		table="ff_f_pickup_assignment_detail">
+
+		<id name="assignmentDetailId" type="java.lang.Integer">
+			<column name="PICKUP_ASSIGNMENT_DETAIL_ID" />
+			<generator class="native" />
+		</id>
+
+		<property name="pickupType" type="java.lang.String">
+			<column name="PICKUP_TYPE" />
+		</property>
+
+		<many-to-one name="revPickupRequestDetail"
+			class="com.ff.domain.pickup.ReversePickupOrderDetailDO" column="REQUEST_DETAIL_ID"
+			unique="true" lazy="false" fetch="join" />
+
+		<property name="createdBy" type="java.lang.Integer"> <column name="CREATED_BY" /> </property>
+
+		<property name="createdDate" type="java.util.Date" update="false">
+			<column name="CREATION_DATE" />
+		</property>
+
+		<property name="updatedBy" type="java.lang.Integer"> <column name="UPDATE_BY" /> </property>
+
+		<property name="updatedDate" type="java.util.Date">
+			<column name="UPDATE_DATE" />
+		</property>
+
+		<many-to-one name="runsheetAssignmentHeaderDO"
+			class="com.ff.domain.pickup.RunsheetAssignmentHeaderDO" column="PICKUP_ASSIGNMENT_HEADER_ID"
+			unique="true" lazy="false" fetch="join" />
+
+		<property name="mappedStatus" type="java.lang.String">
+			<column name="MAPPED_STATUS" />
+		</property>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtUpdateToCentral">
+			<column name="DT_UPDATE_TO_CENTRAL" />
+		</property>
+		<!-- Start.. Added By Narasimha for Pickup req#2 dev -->
+		<many-to-one name="pickupDlvLocation"
+			class="com.ff.domain.pickup.PickupDeliveryLocationDO" column="LOCATION_ID"
+			lazy="false" unique="true" fetch="join">
+		</many-to-one>
+		<!-- End.. Added By Narasimha for Pickup req#2 dev -->
+	</class>
+	
+	<!-- NEW NEW NEW : To be used for :: Creating Pickup Assignment for Branch at Branch and at Hub -->
+	<query name="getUnassignedMasterCustomersForBranchAssignmentAtHub">
+              <![CDATA[
+              		SELECT pickupLocation
+                     FROM com.ff.domain.business.CustomerDO customer,
+                     com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO billingLocaction
+                     	LEFT JOIN billingLocaction.rateContractDO rateContractDO
+                        LEFT JOIN billingLocaction.pickupDeliveryLocation pickupLocation
+                        LEFT JOIN pickupLocation.pickupDlvContract deliveryContract
+                        LEFT JOIN customer.customerCategoryDO customerCategoryDO                       
+                     WHERE customerCategoryDO.rateCustomerCategoryCode  IN ('CRDT','CASH','BA','FR')
+                     AND customer.contractNo = rateContractDO.rateContractNo
+                     AND deliveryContract.office.officeId = :selectedOfficeId
+                     AND deliveryContract.contractType = 'P'
+                     AND customer.customerCode IS NOT NULL
+                     AND customer.contractNo IS NOT NULL
+                     AND billingLocaction.status='A'                     
+                     AND customer.status = 'A'                                          
+                     AND deliveryContract.status = 'A'
+                     AND rateContractDO.contractStatus='A'                     
+                     AND pickupLocation.pickupDlvLocId <> all 
+                     (
+                        SELECT detail.pickupDlvLocation.pickupDlvLocId
+                        FROM   com.ff.domain.pickup.RunsheetAssignmentDetailDO detail
+                        WHERE  detail.runsheetAssignmentHeaderDO.pickupAssignmentType.assignmentTypeId = :assignmentType
+                        AND detail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode  IN ('CRDT','CASH','BA','FR')
+                            AND detail.runsheetAssignmentHeaderDO.createdForOfficeId = :selectedOfficeId
+                            AND detail.runsheetAssignmentHeaderDO.createdAtOfficeId = :loginUserOfficeId
+                            AND detail.pickupDlvLocation.pickupDlvContract.customer.customerCode IS NOT NULL 
+                            AND detail.pickupDlvLocation.pickupDlvContract.customer.contractNo IS NOT NULL
+                            AND detail.mappedStatus = 'Y'
+                            AND detail.pickupType = 'S'
+                     )
+                     UNION
+                     SELECT	pickupLocation
+                     FROM   com.ff.domain.pickup.PickupDeliveryLocationDO pickupLocation
+		                     LEFT JOIN	com.ff.domain.pickup.PickupDeliveryContractDO PickupDeliveryContractDO
+		                     LEFT JOIN	pickupLocation.pickupDlvContract deliveryContract
+		                     LEFT JOIN	deliveryContract.customer customer
+                        	 LEFT JOIN	customer.customerCategoryDO customerCategoryDO                      
+                     WHERE customerCategoryDO.rateCustomerCategoryCode = 'ACC'
+                   			AND pickupDlvContract.office.officeId = :selectedOfficeId	
+                   	  		AND pickupLocation.pickupDlvContract.contractType = 'P'
+                   	   		AND customer.customerCode IS NOT NULL
+                    		AND customer.status = 'A'                                         
+                    		AND pickupLocation.pickupDlvContract.status = 'A'                     
+                     		AND pickupLocation.pickupDlvLocId <> all                      (
+                                SELECT    detail.pickupDlvLocation.pickupDlvLocId
+                                FROM com.ff.domain.pickup.RunsheetAssignmentDetailDO detail
+                                WHERE detail.runsheetAssignmentHeaderDO.pickupAssignmentType.assignmentTypeId = :assignmentType
+                                AND 	detail.runsheetAssignmentHeaderDO.createdForOfficeId = :selectedOfficeId
+                                AND		detail.runsheetAssignmentHeaderDO.createdAtOfficeId = :loginUserOfficeId
+                                AND		detail.pickupDlvLocation.pickupDlvContract.customer.customerCode IS NOT NULL	
+               				 	AND		detail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode = 'ACC'
+                                AND		detail.mappedStatus = 'Y'
+                                AND		detail.pickupType = 'S'
+                     )                    
+              ]]>
+	</query>
+	
+	<query name="getUnassignedTemporaryCustomers">
+		<![CDATA[
+			
+			FROM 		com.ff.domain.pickup.ReversePickupOrderDetailDO detail
+			WHERE		detail.assignedBranch = :employeeOfficeId
+			AND			detail.orderRequestStatus = 'C'
+			AND 		detail.detailId not in 
+										(SELECT 	assignmentDetail.revPickupRequestDetail.detailId 
+										 FROM   	com.ff.domain.pickup.PickupRunsheetDetailDO runsheetDetail, 
+													com.ff.domain.pickup.RunsheetAssignmentDetailDO assignmentDetail
+										 WHERE      runsheetDetail.pickupAssignmentDtls.assignmentDetailId = assignmentDetail.assignmentDetailId
+										 AND 		assignmentDetail.revPickupRequestDetail.detailId IS NOT NULL
+										 AND        assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.status = 'A'
+										 AND      	assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.customerCode IS NOT NULL	
+                        				 AND 		((assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode IN ('CRDT','CASH','BA','FR')
+														AND assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.contractNo IS NOT NULL) 
+													OR (assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode = 'ACC' ))) 
+			AND			detail.detailId <> all
+			(
+						SELECT		assignmentDetail.revPickupRequestDetail.detailId
+						FROM 		com.ff.domain.pickup.RunsheetAssignmentDetailDO assignmentDetail
+						WHERE 		assignmentDetail.runsheetAssignmentHeaderDO.pickupAssignmentType.assignmentTypeId = :assignmentType
+						AND			DATE_FORMAT(assignmentDetail.runsheetAssignmentHeaderDO.createdDate, GET_FORMAT(DATE,'USA')) = DATE_FORMAT(current_date, GET_FORMAT(DATE,'USA'))
+						AND			assignmentDetail.runsheetAssignmentHeaderDO.runsheetAssignmentStatus = 'U'
+						AND			assignmentDetail.runsheetAssignmentHeaderDO.createdForOfficeId = :employeeOfficeId
+						AND			assignmentDetail.runsheetAssignmentHeaderDO.employeeFieldStaffId = :employeeId
+						AND         assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.status = 'A'
+						AND      	assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.customerCode IS NOT NULL	
+                        AND 		((assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode IN ('CRDT','CASH','BA','FR')
+										AND assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.contractNo IS NOT NULL) 
+									OR (assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode = 'ACC' ))
+						AND			assignmentDetail.pickupType = 'R'
+						AND 		assignmentDetail.mappedStatus = 'Y' 
+			) 
+		]]>
+	</query>
+	<!-- Query to populate the grid when assignment type is temporary -->
+	<query name="getAssignedTemporaryCustomers">
+		<![CDATA[
+			SELECT		detail
+			FROM 		com.ff.domain.pickup.RunsheetAssignmentDetailDO detail
+			WHERE 		detail.runsheetAssignmentHeaderDO.pickupAssignmentType.assignmentTypeId = :assignmentType
+			AND			DATE_FORMAT(detail.runsheetAssignmentHeaderDO.createdDate, GET_FORMAT(DATE,'USA')) = DATE_FORMAT(current_date, GET_FORMAT(DATE,'USA'))
+			AND			detail.runsheetAssignmentHeaderDO.createdForOfficeId = :employeeOfficeId
+			AND			detail.runsheetAssignmentHeaderDO.createdAtOfficeId = :loginUserOfficeId
+			AND			detail.runsheetAssignmentHeaderDO.runsheetAssignmentStatus = 'U'
+			AND			detail.runsheetAssignmentHeaderDO.employeeFieldStaffId = :employeeId
+			AND         detail.pickupDlvLocation.pickupDlvContract.customer.status = 'A'
+			AND      	detail.pickupDlvLocation.pickupDlvContract.customer.customerCode IS NOT NULL	
+            AND 		((detail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode IN ('CRDT','CASH','BA','FR')
+										AND detail.pickupDlvLocation.pickupDlvContract.customer.contractNo IS NOT NULL) 
+						OR (detail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode = 'ACC' ))                               
+		]]>
+	</query>
+	
+	<query name="getAllReverseCustomers">
+		<![CDATA[
+			FROM 		com.ff.domain.pickup.ReversePickupOrderDetailDO detail
+			WHERE		detail.assignedBranch = :employeeOfficeId
+			AND			detail.orderRequestStatus = 'C' 
+		]]>
+	</query>
+	
+    <query name="getMasterRunsheetAssignmentDetailsByEmpId">
+		<![CDATA[ FROM com.ff.domain.pickup.RunsheetAssignmentDetailDO runsheetAssignmentDetailDO 
+		          WHERE runsheetAssignmentDetailDO.runsheetAssignmentHeaderDO.employeeFieldStaffId=:employeeId
+		          AND runsheetAssignmentDetailDO.runsheetAssignmentHeaderDO.pickupAssignmentType.assignmentTypeCode='P'
+		]]>
+	</query>
+	
+	<query name="getUnassignedStandardCustomersForTemporary">
+		<![CDATA[
+			SELECT 	pickupLocation
+			FROM 	com.ff.domain.business.CustomerDO customer,
+					com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO billingLocaction
+					LEFT JOIN billingLocaction.rateContractDO rateContractDO
+					LEFT JOIN billingLocaction.pickupDeliveryLocation pickupLocation
+					LEFT JOIN pickupLocation.pickupDlvContract deliveryContract
+					LEFT JOIN customer.customerCategoryDO customerCategoryDO
+			WHERE	customerCategoryDO.rateCustomerCategoryCode IN ('CRDT','CASH','BA','FR')
+			AND 	customer.contractNo = rateContractDO.rateContractNo
+			AND		deliveryContract.office.officeId = :employeeOfficeId
+			AND		customer.customerCode IS NOT NULL
+			AND		customer.contractNo IS NOT NULL
+			AND		pickupLocation.pickupDlvContract.contractType = 'P'
+			AND 	rateContractDO.contractStatus='A'
+			AND 	deliveryContract.status = 'A'
+			AND 	billingLocaction.status='A'
+			AND 	customer.status = 'A'
+			AND		pickupLocation.pickupDlvLocId <> all 
+			(
+					SELECT		detail.pickupDlvLocation.pickupDlvLocId
+					FROM		com.ff.domain.pickup.RunsheetAssignmentDetailDO detail
+					WHERE 		detail.runsheetAssignmentHeaderDO.pickupAssignmentType.assignmentTypeId = :assignmentType
+					AND			DATE_FORMAT(detail.runsheetAssignmentHeaderDO.createdDate, GET_FORMAT(DATE,'USA')) = DATE_FORMAT(current_date, GET_FORMAT(DATE,'USA'))
+					AND 		detail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode IN ('CRDT','CASH','BA','FR')
+					AND			detail.runsheetAssignmentHeaderDO.createdForOfficeId = :employeeOfficeId
+					AND			detail.runsheetAssignmentHeaderDO.createdAtOfficeId = :loginUserOfficeId
+					AND			detail.runsheetAssignmentHeaderDO.employeeFieldStaffId = :employeeId
+					AND			detail.runsheetAssignmentHeaderDO.runsheetAssignmentStatus = 'U'
+					AND        	detail.pickupDlvLocation.pickupDlvContract.customer.status = 'A'
+					AND      	detail.pickupDlvLocation.pickupDlvContract.customer.customerCode IS NOT NULL	
+					AND			detail.pickupDlvLocation.pickupDlvContract.customer.contractNo IS NOT NULL
+					AND			detail.pickupType = 'S'
+					AND 		detail.mappedStatus = 'Y'
+			)
+					 
+			UNION
+			 
+			SELECT		pickupLocation
+			FROM		com.ff.domain.business.CustomerDO customer,
+						com.ff.domain.pickup.PickupDeliveryLocationDO pickupLocation
+			WHERE		customer.customerId = pickupLocation.pickupDlvContract.customer.customerId
+			AND			pickupLocation.pickupDlvContract.office.officeId = :employeeOfficeId
+			AND			customer.customerCategoryDO.rateCustomerCategoryCode = 'ACC'
+			AND 		pickupLocation.pickupDlvContract.contractType = 'P'
+			AND         customer.customerCode IS NOT NULL
+			AND			pickupLocation.pickupDlvContract.status = 'A'
+			AND			customer.status = 'A'
+			AND			pickupLocation.pickupDlvLocId <> all 
+			(
+					SELECT		detail.pickupDlvLocation.pickupDlvLocId
+					FROM 		com.ff.domain.pickup.RunsheetAssignmentDetailDO detail
+					WHERE 		detail.runsheetAssignmentHeaderDO.pickupAssignmentType.assignmentTypeId = :assignmentType
+					AND			DATE_FORMAT(detail.runsheetAssignmentHeaderDO.createdDate, GET_FORMAT(DATE,'USA')) = DATE_FORMAT(current_date, GET_FORMAT(DATE,'USA'))
+					AND 		detail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode = 'ACC'
+					AND			detail.runsheetAssignmentHeaderDO.createdForOfficeId = :employeeOfficeId
+					AND			detail.runsheetAssignmentHeaderDO.createdAtOfficeId = :loginUserOfficeId
+					AND			detail.runsheetAssignmentHeaderDO.employeeFieldStaffId = :employeeId
+					AND			detail.runsheetAssignmentHeaderDO.runsheetAssignmentStatus = 'U'
+					AND        detail.pickupDlvLocation.pickupDlvContract.customer.status = 'A'
+					AND      	detail.pickupDlvLocation.pickupDlvContract.customer.customerCode IS NOT NULL
+					AND			detail.pickupType = 'S'
+					AND 		detail.mappedStatus = 'Y'
+			)					
+		]]>
+	</query>
+	
+	<query name="getUnassignedMasterCustomersForHub">
+              <![CDATA[
+                    SELECT		pickupLocation
+					FROM		com.ff.domain.business.CustomerDO customer,
+								com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO billingLocaction
+							LEFT JOIN billingLocaction.rateContractDO rateContractDO
+							LEFT JOIN billingLocaction.pickupDeliveryLocation pickupLocation
+							LEFT JOIN pickupLocation.pickupDlvContract deliveryContract
+							LEFT JOIN customer.customerCategoryDO customerCategoryDO					
+					WHERE	customer.customerCategoryDO.rateCustomerCategoryCode IN ('CRDT','CASH','BA','FR')
+					AND 	customer.contractNo = rateContractDO.rateContractNo
+					AND		deliveryContract.office.officeId = :selectedOfficeId
+					AND		customer.customerCode IS NOT NULL                     
+					AND		customer.contractNo IS NOT NULL                    	
+					AND		pickupLocation.pickupDlvContract.contractType = 'P'
+					AND 	rateContractDO.contractStatus='A'
+					AND 	deliveryContract.status = 'A'
+					AND 	billingLocaction.status='A'
+					AND 	customer.status = 'A'
+					ORDER BY customer.businessName
+					 
+					UNION
+					
+					SELECT	pickupLocation
+					FROM	com.ff.domain.business.CustomerDO customer,
+							com.ff.domain.pickup.PickupDeliveryLocationDO pickupLocation
+					WHERE	customer.customerCategoryDO.rateCustomerCategoryCode = 'ACC'
+					AND		customer.customerId = pickupLocation.pickupDlvContract.customer.customerId
+					AND		pickupLocation.pickupDlvContract.office.officeId = :selectedOfficeId
+					AND		customer.customerCode IS NOT NULL                     	
+					AND		pickupLocation.pickupDlvContract.contractType = 'P'
+					AND		pickupLocation.pickupDlvContract.status = 'A'
+					AND		customer.status = 'A'
+					ORDER BY customer.businessName                    
+              ]]>
+	</query>
+	
+	<!-- NEW NEW NEW : To be used for :: Create Pickup assignment for Branch in HUB -->
+	<!-- HUb Assignment :: The following SQL populates all the assignment made 
+		for the selected employee (populates grid) -->
+	<!-- <query name="getAssignedMasterCustomers">
+		<![CDATA[
+			SELECT		detail
+			FROM 		com.ff.domain.pickup.RunsheetAssignmentDetailDO detail
+			WHERE 		detail.runsheetAssignmentHeaderDO.pickupAssignmentType.assignmentTypeId = :assignmentType
+			AND			detail.runsheetAssignmentHeaderDO.createdForOfficeId = :employeeOfficeId
+			AND			detail.runsheetAssignmentHeaderDO.createdAtOfficeId = :loginUserOfficeId
+			AND			detail.runsheetAssignmentHeaderDO.employeeFieldStaffId = :employeeId
+			AND         detail.pickupDlvLocation.pickupDlvContract.customer.status = 'A'
+			AND      	detail.pickupDlvLocation.pickupDlvContract.customer.customerCode IS NOT NULL	
+            AND 		((detail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode IN ('CRDT','CASH','BA','FR')
+							AND detail.pickupDlvLocation.pickupDlvContract.customer.contractNo IS NOT NULL) 
+						OR (detail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode = 'ACC' ))
+			AND			detail.pickupType = 'S'
+			AND 		detail.mappedStatus = 'Y'
+		]]>
+	</query> -->
+	<query name="getAssignedMasterCustomers">
+		<![CDATA[
+				SELECT		detail
+				FROM 		com.ff.domain.pickup.RunsheetAssignmentDetailDO detail,
+							com.ff.domain.ratemanagement.masters.RateContractDO rateContractDO
+				WHERE 		detail.runsheetAssignmentHeaderDO.pickupAssignmentType.assignmentTypeId = :assignmentType
+				AND 		detail.pickupDlvLocation.pickupDlvContract.customer.contractNo = rateContractDO.rateContractNo
+				AND			detail.runsheetAssignmentHeaderDO.createdForOfficeId = :employeeOfficeId
+				AND			detail.runsheetAssignmentHeaderDO.createdAtOfficeId = :loginUserOfficeId
+				AND			detail.runsheetAssignmentHeaderDO.employeeFieldStaffId = :employeeId
+				AND 		detail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode IN ('CRDT','CASH','BA','FR')
+				AND 		detail.pickupDlvLocation.pickupDlvContract.customer.contractNo IS NOT NULL
+				AND      	detail.pickupDlvLocation.pickupDlvContract.customer.customerCode IS NOT NULL
+				AND         detail.pickupDlvLocation.pickupDlvContract.customer.status = 'A'
+				AND 		rateContractDO.contractStatus='A'
+				AND			detail.pickupType = 'S'
+				AND 		detail.mappedStatus = 'Y'
+				
+				UNION
+				
+				SELECT		detail
+				FROM 		com.ff.domain.pickup.RunsheetAssignmentDetailDO detail
+				WHERE 		detail.runsheetAssignmentHeaderDO.pickupAssignmentType.assignmentTypeId = :assignmentType
+				AND			detail.runsheetAssignmentHeaderDO.createdForOfficeId = :employeeOfficeId
+				AND			detail.runsheetAssignmentHeaderDO.createdAtOfficeId = :loginUserOfficeId
+				AND			detail.runsheetAssignmentHeaderDO.employeeFieldStaffId = :employeeId
+				AND 		detail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode = 'ACC' 
+				AND      	detail.pickupDlvLocation.pickupDlvContract.customer.customerCode IS NOT NULL	
+				AND         detail.pickupDlvLocation.pickupDlvContract.customer.status = 'A'
+				AND			detail.pickupType = 'S'
+				AND 		detail.mappedStatus = 'Y'
+			]]>
+	</query>
+	<!-- Query 1 : retrieves the standard unassigned customers -->
+	<query name="getUnassignedStandardCustomersForTemporaryHub">
+		<![CDATA[
+			SELECT		pickupLocation
+			FROM		com.ff.domain.business.CustomerDO customer,
+						com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO billingLocaction
+					LEFT JOIN billingLocaction.rateContractDO rateContractDO
+					LEFT JOIN billingLocaction.pickupDeliveryLocation pickupLocation
+					LEFT JOIN pickupLocation.pickupDlvContract deliveryContract
+					LEFT JOIN customer.customerCategoryDO customerCategoryDO					
+			WHERE	customer.customerCategoryDO.rateCustomerCategoryCode IN ('CRDT','CASH','BA','FR')
+			AND 	customer.contractNo = rateContractDO.rateContractNo
+			AND		deliveryContract.office.officeId = :selectedOfficeId
+			AND		customer.customerCode IS NOT NULL                     
+			AND		customer.contractNo IS NOT NULL                    	
+			AND		pickupLocation.pickupDlvContract.contractType = 'P'
+			AND 	rateContractDO.contractStatus='A'
+			AND 	deliveryContract.status = 'A'
+			AND 	billingLocaction.status='A'
+			AND 	customer.status = 'A'
+			ORDER BY customer.businessName
+			 
+			UNION
+			
+			SELECT	pickupLocation
+			FROM	com.ff.domain.business.CustomerDO customer,
+					com.ff.domain.pickup.PickupDeliveryLocationDO pickupLocation
+			WHERE	customer.customerCategoryDO.rateCustomerCategoryCode = 'ACC'
+			AND		customer.customerId = pickupLocation.pickupDlvContract.customer.customerId
+			AND		pickupLocation.pickupDlvContract.office.officeId = :selectedOfficeId
+			AND		customer.customerCode IS NOT NULL                     	
+			AND		pickupLocation.pickupDlvContract.contractType = 'P'
+			AND		pickupLocation.pickupDlvContract.status = 'A'
+			AND		customer.status = 'A'
+			ORDER BY customer.businessName
+		]]>
+	</query>
+	    
+	<!-- Query 2 : To populate un-assigned temporary customer -->
+	<query name="getUnassignedTemporaryCustomersHub">
+		<![CDATA[
+			 
+			FROM 		com.ff.domain.pickup.ReversePickupOrderDetailDO detail
+			WHERE		detail.assignedBranch = :selectedOfficeId
+			AND			detail.orderRequestStatus = 'C'
+			AND 		detail.detailId not in 
+										(SELECT 	assignmentDetail.revPickupRequestDetail.detailId 
+										 FROM   	com.ff.domain.pickup.PickupRunsheetDetailDO runsheetDetail, 
+													com.ff.domain.pickup.RunsheetAssignmentDetailDO assignmentDetail
+										 WHERE      runsheetDetail.pickupAssignmentDtls.assignmentDetailId = assignmentDetail.assignmentDetailId
+										 AND 		assignmentDetail.revPickupRequestDetail.detailId IS NOT NULL
+										 AND        assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.status = 'A'
+										 AND      	assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.customerCode IS NOT NULL	
+                        				 AND ((assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode IN ('CRDT','CASH','BA','FR')
+														AND assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.contractNo IS NOT NULL) 
+													OR (assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode = 'ACC' ))) 
+			AND			detail.detailId <> all
+			(
+						SELECT		assignmentDetail.revPickupRequestDetail.detailId
+						FROM 		com.ff.domain.pickup.RunsheetAssignmentDetailDO assignmentDetail
+						WHERE 		assignmentDetail.runsheetAssignmentHeaderDO.pickupAssignmentType.assignmentTypeId = :assignmentType
+						AND			DATE_FORMAT(assignmentDetail.runsheetAssignmentHeaderDO.createdDate, GET_FORMAT(DATE,'USA')) = DATE_FORMAT(current_date, GET_FORMAT(DATE,'USA'))
+						AND			assignmentDetail.runsheetAssignmentHeaderDO.runsheetAssignmentStatus = 'U'
+						AND			assignmentDetail.runsheetAssignmentHeaderDO.createdForOfficeId = :employeeOfficeId
+						AND			assignmentDetail.runsheetAssignmentHeaderDO.employeeFieldStaffId = :employeeId
+						 AND        assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.status = 'A'
+						AND      	assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.customerCode IS NOT NULL	
+                        AND 		((assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode IN ('CRDT','CASH','BA','FR')
+										AND assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.contractNo IS NOT NULL) 
+									OR (assignmentDetail.pickupDlvLocation.pickupDlvContract.customer.customerCategoryDO.rateCustomerCategoryCode = 'ACC' ))
+						AND			assignmentDetail.pickupType = 'R'
+						AND 		assignmentDetail.mappedStatus = 'Y'
+			) 
+			
+		]]>
+	</query>
+	<!-- changed -->	
+
+</hibernate-mapping>

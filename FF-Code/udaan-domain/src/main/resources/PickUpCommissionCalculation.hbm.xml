@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.PickUpCommissionCalculationDO" table="ff_f_pickup_commission_calculation">
+
+		<id name="employee_id" type="java.lang.Integer">
+			<column name="EMPLOYEE_ID" />
+			<generator class="assigned" />
+		</id>
+
+		
+		<property name="product_grup" >
+			<column name="PRODUCT_GROUP" />
+		</property>
+
+		<property name="pickupCount" >
+			<column name="PICKUP_COUNT" />
+		</property>
+
+		<property name="netValue" >
+			<column name="NET_VALUE" />
+		</property>
+
+		<property name="calculatedFor" >
+			<column name="CALCULATED_FOR" />
+		</property>
+
+		<property name="createdBy" >
+			<column name="CREATED_BY" />
+		</property> 
+		
+		<property name="dtSapOutbound">
+			<column name="DT_SAP_OUTBOUND" />
+		</property> 
+		
+		<property name="sapTimeStamp">
+			<column name="SAP_TIMESTAMP" />
+		</property> 
+		
+
+	</class>
+	
+		<query name="getTotalRecordsInPickUpTransactionTable">
+			<![CDATA[	
+				select 	count(*) 
+				from 	com.ff.domain.pickup.PickUpCommissionCalculationDO pickupCommissionCaln 
+				where 	pickupCommissionCaln.dtSapOutbound=:sapStatus
+			]]>
+		</query>
+		
+		<query name="getPickUpCommissionDetailsForSAP">
+			<![CDATA[ from com.ff.domain.pickup.PickUpCommissionCalculationDO pickupCommissionCaln where pickupCommissionCaln.dtSapOutbound=:sapStatus ]]>
+		</query>
+		
+		<query name="updatePickUpCommissioncalculatnInTransactionTable">
+			<![CDATA[ update  com.ff.domain.pickup.PickUpCommissionCalculationDO pickupCommissionCaln set  pickupCommissionCaln.dtSapOutbound=:dtSapOutbound,
+			pickupCommissionCaln.sapTimeStamp=:sapTimestamp 
+			where pickupCommissionCaln.employee_id=:employee_id]]>
+		</query>
+		
+		<query name="getEmpCodeByEmpId">
+      <![CDATA[  from com.ff.domain.organization.EmployeeDO employee where employee.employeeId =:employeeId]]>
+	</query>
+		
+		
+	
+</hibernate-mapping>		

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.manifest.BcunConsignmentManifestDO" table="ff_f_consignment_manifested">
+		<id name="consignmentManifestId" type="java.lang.Integer">
+			<column name="CONSIGNMENT_MANIFESTED_ID" />
+			<generator class="native" />
+		</id>
+        		
+        <property name="manifestId" column="MANIFEST_ID" type="java.lang.Integer"/>
+
+		<many-to-one name="consignment" class="com.ff.domain.consignment.BcunConsignmentDO" lazy="false" unique="true" fetch="join">
+		<column name="CONSIGNMENT_ID"/>
+		</many-to-one>
+		
+	</class>
+	
+</hibernate-mapping>
+	

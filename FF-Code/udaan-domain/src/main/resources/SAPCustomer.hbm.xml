@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.masters.SAPCustomerDO" table="ff_f_sap_customer">
+		<id name="Id" type="java.lang.Long">
+			<column name="ID" />
+			<generator class="native" />
+		</id>
+		<property name="customerNo" column="CUSTOMER_NO" />
+		<property name="contarctNo" column="CONTRACT_NO" />
+		<property name="salesOfcCode" column="SALES_OFFICE_CODE" />
+		<property name="salesPersonCode" column="SALES_PERSON_CODE"/>
+		<property name="industryTypeCode" column="INDUSTRY_TYPE_CODE"/>
+		<property name="customerGroup" column="CUSTOMER_GROUP" />
+		<property name="disChannel" column="DIS_CHANNNEL" />
+		<property name="groupKey" column="GROUP_KEY" />
+		<property name="customerName" column="CUSTOMER_NAME" />
+		<property name="address1" column="ADDRESS_1" />
+		<property name="address2" column="ADDRESS_2" />
+		<property name="address3" column="ADDRESS_3" />
+		<property name="city" column="CITY" />
+		<property name="pincode" column="PINCODE"/>
+		<property name="state" column="STATE"/>
+		<property name="priTitle" column="PRI_TITLE" />
+		<property name="priPersonName" column="PRI_PERSON_NAME" />
+		<property name="priEmail" column="PRI_EMAIL" />
+		<property name="priContactNo" column="PRI_CONTACT_NO" />
+		<property name="priExt" column="PRI_EXT" />
+		<property name="priFax" column="PRI_FAX" />
+		<property name="priMobile" column="PRI_MOBILE" />
+		<property name="secTitle" column="SEC_TITLE" />
+		<property name="secPersonName" column="SEC_PERSON_NAME" />
+		<property name="secEmail" column="SEC_EMAIL"/>
+		<property name="secContactNo" column="SEC_CONTACT_NO"/>
+		<property name="secExt" column="SEC_EXT" />
+		<property name="secMobile" column="SEC_MOBILE" />
+		<property name="secFax" column="SEC_FAX" />
+		<property name="billingCycle" column="BILLING_CYCLE" />
+		<property name="paymentTermsCode" column="PAYMENT_TERMS_CODE" />
+		<property name="plantCode" column="PLANT_CODE" />
+		<property name="tanNo" column="TAN_NO" />
+		<property name="panNo" column="PAN_NO" />
+		<property name="status" column="STATUS" />
+		<property name="legacyCustCode" column="LEGACY_CUST_CODE" />
+		<property name="isError" column="IS_ERROR" />
+		<property name="errorDesc" column="ERROR_DESCRIPTION" />
+		<property name="sapInbound" column="DT_SAP_INBOUND" />
+		<property name="csdTimeStmap" column="CSD_TIMESTAMP" />
+		<property name="exception" column="EXCEPTION" />
+		<property name="createdDate" column="CREATED_DATE" update="false" />
+		<property name="updateDate" column="UPDATE_DATE" />
+	</class>
+	
+<!--  	<query name="getLeadsByRegion">
+		<![CDATA[ FROM com.ff.domain.leads.LeadDO lead 
+					WHERE lead.assignedToEmployeeDO.empDO.officeId=:officeId]]>
+		<![CDATA[
+			select	lead
+			FROM 	com.ff.domain.leads.LeadDO lead,
+				 	com.ff.domain.organization.EmployeeDO emp,
+				 	com.ff.domain.organization.OfficeDO office,
+				 	com.ff.domain.organization.DepartmentDO department
+			where 	lead.assignedToEmployeeDO.empDO.employeeId = emp.employeeId
+			and		office.officeId = emp.officeId
+			and		department.departmentId = emp.departmentId
+			and		office.mappedRegionDO.regionId = :regionId
+			and		department.departmentName=:departmentName
+			and 	lead.createdDate between :effectiveFrom and :effectiveTo			
+			ORDER BY lead.leadNumber
+		]]>
+	</query>  -->
+	
+	<query name="getSapCustomerDataByDateAndInterface">
+		 <![CDATA[ 
+		 		FROM com.ff.domain.ratemanagement.masters.SAPCustomerDO sapCustomer 
+				WHERE sapCustomer.sapInbound = :status
+				and sapCustomer.createdDate between :effectiveFromDate and :effectiveToDate
+		 ]]>
+	</query>		
+	
+</hibernate-mapping>

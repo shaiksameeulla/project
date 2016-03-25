@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.manifest.OutManifestDestinationDO" table="ff_f_outmanifest_destination">
+		<id name="outManifestDestinationId" type="java.lang.Integer">
+			<column name="OUTMANIFEST_DESTINATION_ID" />
+			<generator class="identity" />
+		</id>
+		
+		<many-to-one name="office"
+			class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="OFFICE_ID" />
+		</many-to-one>
+		
+		<property name="manifestId" type="java.lang.Integer">
+			<column name="MANIFEST_ID" />
+		</property>
+				
+	</class>
+		
+		
+	<query name="getUpdateManifestDestination"> 
+	<![CDATA[ From com.ff.domain.manifest.OutManifestDestinationDO outmanifestDestination where  outmanifestDestination.manifestId IN (:manifestId) ]]>
+	</query>
+	
+	<query name="getUnsyncOutboundOutManifestDestination">
+		<![CDATA[select outmanifestDestination.office.officeId from com.ff.domain.manifest.OutManifestDestinationDO outmanifestDestination 
+		where outmanifestDestination.manifestId IN (:manifestId) 
+		
+		]]>
+	</query>
+	
+	<query name="isOutManifestDestnId"> 
+	<![CDATA[ select outDestn.outManifestDestinationId  From com.ff.domain.manifest.OutManifestDestinationDO outDestn 
+	where outDestn.office.officeId IN (:OfficeId) 
+	and  outDestn.manifestId IN (:manifestId) ]]>
+	</query>
+	
+	
+	<!-- Ending Data sync querys -->
+	
+</hibernate-mapping>
+	

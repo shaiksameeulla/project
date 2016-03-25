@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.umc.EmployeeUserDO" table="ff_d_employee_user">
+		<id name="empUserId" type="java.lang.Integer">
+			<column name="EMPLOYEE_USER_ID" />
+			<generator class="native" />
+		</id>
+		<property name="userId" type="java.lang.Integer">
+			<column name="USER_ID" length="11" />
+		</property>
+		
+  		<many-to-one name="empDO" class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join">
+			<column name="EMPLOYEE_ID" />
+		</many-to-one>
+		
+		<property name="createdBy" type="java.lang.Integer">
+            <column name="CREATED_BY" />
+         </property>
+         
+          <property name="updatedBy" type="java.lang.Integer">
+            <column name="UPDATE_BY" />
+         </property>
+         
+          <property name="createdDate" type="java.util.Date">
+            <column name="CREATION_DATE" />
+         </property>
+         
+         <property name="updatedDate" type="java.util.Date">
+            <column name="UPDATE_DATE" />
+         </property>
+         
+          <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		
+		<!-- <property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property> -->
+   
+   </class>
+
+	<query name="getEmpUserDObyUserId">
+        <![CDATA[ from com.ff.domain.umc.EmployeeUserDO employee where employee.userId=:userId ]]>
+	</query>
+	
+	<query name="getEmpUserDObyEmpId">
+        <![CDATA[ from com.ff.domain.umc.EmployeeUserDO employee where employee.empDO.employeeId=:employeeId ]]>
+	</query>
+	
+	<query name="getUnsyncOutboundLoginUser">
+		<![CDATA[from com.ff.domain.umc.EmployeeUserDO employee where employee.empDO.officeId=:branchId and (employee.dtToBranch='N')]]>
+	</query>
+	
+	<query name="getApproversUnderRegion">
+        <![CDATA[ SELECT employee.empDO FROM com.ff.domain.umc.EmployeeUserDO employee WHERE employee.empDO.empVirtual='N' and employee.userId IN
+	        (SELECT appUser.user FROM com.ff.domain.umc.ApproverUserOfficeDO appUser where appUser.office IN
+	        (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office where office.mappedRegionDO.regionId= :regionId))
+         ]]>
+	</query>
+	
+	<query name="getScreenApproversUnderOffice">
+        <![CDATA[ 
+        SELECT employee.empDO FROM com.ff.domain.umc.EmployeeUserDO employee 
+        	WHERE employee.empDO.empVirtual='N' 
+        	and employee.userId IN
+	        (SELECT office.user FROM com.ff.domain.umc.ApproverUserOfficeDO office, 
+	        						 com.ff.domain.umc.AssignApproverDO screen
+	        	where office.user=screen.user
+	        	and (screen.screen=:screenId)
+				and (
+					 (
+					  (office.office is null or office.office =:officeId)
+                         and office.mappedTo is null
+                      ) 
+                    or(
+                        (office.city is null or office.city = (select cityId from com.ff.domain.organization.OfficeDO ofc where ofc.officeId =:officeId))
+                         and office.mappedTo='O'
+                       ) 
+                    or (
+						(office.regionalOffice is null or office.regionalOffice = (select reportingRHO from com.ff.domain.organization.OfficeDO ofc where ofc.officeId =:officeId))
+                         and office.mappedTo='S'
+                        )
+                    or (
+                         office.regionalOffice IS NULL
+                         and office.city  IS NULL
+                         and office.office IS NULL
+                         and office.mappedTo='C'
+                         )
+                    )
+	       )
+         ]]>
+	</query>
+	
+	<query name="getApproversByRegion">
+        <![CDATA[ SELECT employee.empDO FROM com.ff.domain.umc.EmployeeUserDO employee WHERE employee.empDO.empVirtual='N' and employee.userId IN
+	        (SELECT appUser.user FROM com.ff.domain.umc.ApproverUserOfficeDO appUser where appUser.regionalOffice =:regionId)
+         ]]>
+	</query>
+	
+	<query name="getEmployeesDtlsByDepartmentTypeAndEmpDesign">
+		<![CDATA[
+			SELECT
+				new com.ff.domain.leads.EmployeeUserJoinBean(empUser, user.userName)
+			FROM 
+				com.ff.domain.umc.EmployeeUserDO empUser,
+				com.ff.domain.umc.UserDO user,
+				com.ff.domain.organization.DepartmentDO dept
+			WHERE
+				empUser.userId = user.userId
+			AND	empUser.empDO.empVirtual ='N'
+			AND empUser.empDO.departmentId = dept.departmentId
+			AND dept.departmentName = :departmentName
+			AND empUser.empDO.designation = :designation
+			AND empUser.empDO.officeId = :officeId
+		 ]]>	
+	</query>
+	
+	<query name="getEmployeesDtlsByDepartmentTypeAndOfficeId">
+		
+		<![CDATA[ FROM com.ff.domain.umc.EmployeeUserDO empUser 
+			where empUser.empDO.empVirtual ='N' and empUser.empDO.departmentId 
+			in (select dept.departmentId from com.ff.domain.organization.DepartmentDO dept where dept.departmentName=:departmentName ) 
+		 	and empUser.empDO.officeId=:officeId
+		 	order by empUser.empDO.designation]]>
+		 	
+	</query>
+	
+	<query name="getEmployeesDtlsByDepartmentTypeAndRegionId">
+		
+		<![CDATA[ FROM com.ff.domain.umc.EmployeeUserDO empUser 
+			where empUser.empDO.empVirtual ='N' and empUser.empDO.officeId 
+			in (select office.officeId from com.ff.domain.organization.OfficeDO office where office.mappedRegionDO.regionId=:regionId ) 
+		 	and empUser.empDO.departmentId 
+		 	in (select dept.departmentId from com.ff.domain.organization.DepartmentDO dept where dept.departmentName=:departmentName )
+		 	and empUser.empDO.designation=:designation
+		 	]]>
+		 	
+	</query>
+	
+	<query name="getEmployeeUserDtlsByEmpID">
+		<![CDATA[ 
+			FROM com.ff.domain.umc.EmployeeUserDO empUser 
+			where empUser.empDO.employeeId=:employeeId
+	 	]]>
+	</query>
+	
+	</hibernate-mapping>

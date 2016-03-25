@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.BcunPickupRunsheetDetailDO" table="ff_f_pickup_runsheet_detail">
+		<id name="runsheetDetailId" type="java.lang.Integer">
+			<column name="RUNSHEET_DETAIL_ID" />
+			<generator class="native" />
+		</id>
+		<property name="pickupTime" column="PICKUP_TIME"/>			
+		<property name="startCnNo" type="java.lang.String">
+			<column name="START_CN_NO" />
+		</property>
+		<property name="endCnNo" type="java.lang.String">
+			<column name="END_CN_NO" />
+		</property>
+		<property name="cnCount" type="java.lang.Integer">
+			<column name="CN_COUNT" />
+		</property>
+		<property name="transactionCreateDate" type="java.util.Date">
+            <column name="CREATION_DATE" />
+         </property>
+         <property name="transactionModifiedDate" type="java.util.Date">
+            <column name="UPDATE_DATE" />
+         </property> 
+         <property name="createdBy" column="CREATED_BY" type="java.lang.Integer"/>
+         <property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/>
+         <many-to-one name="runsheetHeaderDtls" class="com.ff.domain.pickup.BcunPickupRunsheetHeaderDO" lazy="false" fetch="join">
+        	<column name="RUNSHEET_HEADER_ID" />
+        </many-to-one>
+		<many-to-one name="pickupAssignmentDtls" class="com.ff.domain.pickup.BcunRunsheetAssignmentDetailDO" lazy="false" fetch="join">
+        	<column name="PICKUP_ASSIGNMENT_DETAIL_ID" />
+        </many-to-one>
+	</class>
+	<query name="getRunsheetDetailId">
+		<![CDATA[ SELECT detail.runsheetDetailId FROM com.ff.domain.pickup.BcunPickupRunsheetDetailDO detail 
+					WHERE detail.runsheetHeaderDtls.runsheetNo = :runsheetNo
+					AND detail.pickupAssignmentDtls.pickupAssignmentDtlId = :pickupAssignmentDtlId]]>
+	</query>
+</hibernate-mapping>

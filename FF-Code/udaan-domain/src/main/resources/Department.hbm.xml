@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.organization.DepartmentDO" table="ff_d_department">
+		<id name="departmentId" type="java.lang.Integer">
+			<column name="DEPARTMENT_ID" />
+			<generator class="native" />
+		</id>
+		<property name="departmentName" type="java.lang.String">
+			<column name="DEPARTMENT_NAME" />
+		</property>
+		<property name="departmentDescription" type="java.lang.String">
+			<column name="DEPARTMENT_DESCRIPTION" />
+		</property>
+		<property name="departmentCode" column="DEPARTMENT_CODE" />		
+		<property name="dtToBranch" column="DT_TO_BRANCH" />			
+	</class>
+	
+	<query name="getDeptByDeptName">
+		<![CDATA[
+			FROM	com.ff.domain.organization.DepartmentDO dept
+			WHERE 	dept.departmentName=:departmentName
+		]]>
+	</query>
+	
+	<query name="getDepartmentByCode">
+		<![CDATA[
+			FROM	com.ff.domain.organization.DepartmentDO dept
+			WHERE 	dept.departmentCode=:departmentCode
+		]]>
+	</query>
+</hibernate-mapping>

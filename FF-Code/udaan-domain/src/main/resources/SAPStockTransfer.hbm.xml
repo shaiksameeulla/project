@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.transfer.SAPStockTransferDO" table="ff_f_sap_stock_transfer">
+		<id name="Id" type="java.lang.Long">
+			<column name="ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name="baNo" column="BA_NO" />
+		<property name="itemCode" column="ITEM_CODE" />
+		<property name="returnDate" column="RETURN_DATE" />
+		<property name="returnNumber" column="RETURN_NUMBER" />
+		<property name="returnOfficeCode" column="RETURNING_OFFICE_CODE" />
+		<property name="returnQty" column="RETURNING_QUANTITY" />
+		<property name="issueNumber" column="ISSUE_NUMBER" />
+		<property name="exception" column="EXCEPTION" />
+
+	<!--  common attributes  START-->
+	<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+	<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+	<property name="createdBy" column="CREATED_BY" />
+	<property name="updatedBy" column="UPDATE_BY" />
+	<property name="createdDate" column="CREATED_DATE" />
+	<property name="updatedDate" column="UPDATE_DATE" />
+	
+	</class>
+	<query name="getStockTransferFromStaging">
+		<![CDATA[
+			 FROM	com.ff.domain.stockmanagement.operations.transfer.SAPStockTransferDO stkTransferDO
+			 WHERE	stkTransferDO.sapStatus=:sapStatus and ( stkTransferDO.exception IS NULL or LENGTH(stkTransferDO.exception ) < 1)
+		]]>
+	</query>
+
+	<query name="updateStockTransferSAPFlag">
+		<![CDATA[ 
+			UPDATE	com.ff.domain.stockmanagement.operations.transfer.SAPStockTransferDO stkTransferDO
+			SET		stkTransferDO.sapStatus=:sapStatus,stkTransferDO.sapTimestamp=:sapTimestamp,stkTransferDO.exception=:exception
+			WHERE 	stkTransferDO.Id=:Id
+		]]>
+	</query> 
+</hibernate-mapping>

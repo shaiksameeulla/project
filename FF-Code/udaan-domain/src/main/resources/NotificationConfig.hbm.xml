@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.masters.NotificationConfigDO" table="ff_d_notification_config">
+		<id name="notifyConfigId" type="java.lang.Integer">
+			<column name="NOTIFY_CONF_ID" />
+			<generator class="native" />
+		</id>
+		<many-to-one name="product" class="com.ff.domain.serviceOffering.ProductDO" lazy="false" fetch="join">
+			<column name="PRODUCT_ID"/>
+		</many-to-one>
+		
+		<property name="consgStatus">
+			<column name="CN_STATUS"/>
+		</property>	
+		<property name="applicableToAll">
+			<column name="APPLICABLE_TO_ALL"/>
+		</property>	
+		<property name="customerId">
+			<column name="CUSTOMER"/>
+		</property>
+		<property name="recordStatus">
+			<column name="RECORD_STATUS"/>
+		</property>	
+		<property name="notifyTO">
+			<column name="NOTIFY_TO"/>
+		</property>
+		<property name="template">
+			<column name="MSSAGE_TEMPLATE"/>
+		</property>
+	</class>
+	
+	<query name="getNotificationConfigByProductNStatus">
+		<![CDATA[
+			From com.ff.domain.masters.NotificationConfigDO config where config.recordStatus='A' 
+			and consgStatus =:consgStatus 
+			and config.product.consgSeries =:consgSeries
+			order by config.applicableToAll asc
+		]]>
+	
+	</query>
+	<query name="getNotificationConfig">
+		<![CDATA[
+			From com.ff.domain.masters.NotificationConfigDO config where config.recordStatus='A' 
+			order by config.product.consgSeries, consgStatus, config.applicableToAll asc
+		]]>
+	
+	</query>
+</hibernate-mapping>
+	

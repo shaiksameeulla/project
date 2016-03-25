@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.geography.PincodeDO" table="ff_d_pincode">
+		<id name="pincodeId" type="java.lang.Integer">
+			<column name="PINCODE_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name="pincode" type="java.lang.String">
+			<column name="PINCODE" />
+		</property>
+
+		<property name="cityId" type="java.lang.Integer">
+			<column name="CITY_ID" />
+		</property>
+		
+		<property name="location" type="java.lang.String">
+			<column name="LOCATION" />
+		</property>
+		
+ 		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+		
+		<property name="status" type="java.lang.String">
+			<column name="STATUS" />
+		</property>
+		
+		
+	</class>
+	
+	<query name="getPincode">
+	<![CDATA[ FROM com.ff.domain.geography.PincodeDO pin  where pin.pincodeId=:pincodeId and pin.status='A']]>
+	</query>
+	
+	
+	<query name="validatePincode">
+	<![CDATA[ FROM com.ff.domain.geography.PincodeDO pin  where pin.pincode=:pincode and pin.status='A']]>
+	</query>
+	
+	
+	<query name="validatePincodeServiceability">
+	<![CDATA[FROM com.ff.domain.geography.PincodeDO pin  where pin.pincode=:pincode and pin.status='A' and pin.cityId = 
+	(SELECT office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId =:officeId)
+	]]>
+	</query>
+	
+	<query name="pincodeServiceabilityByCity">
+	<![CDATA[ FROM com.ff.domain.geography.PincodeDO pincode 
+				WHERE pincode.status='A'
+				and pincode.cityId IN (:cityId)
+				AND	pincode.pincodeId = :pincodeId
+	]]>
+	</query>
+	
+	 <query name="getPincodeByCityId">
+	<![CDATA[ FROM com.ff.domain.geography.PincodeDO pincode 
+				WHERE pincode.cityId = :cityId and pincode.status='A']]>
+	</query>
+	
+	 <query name="getAllPincodeWithCity">
+	<![CDATA[ 
+	select new map(pincode.pincodeId as typeId,pincode.pincode as typeName)
+	FROM com.ff.domain.geography.PincodeDO pincode where pincode.status='A'
+				]]>
+	</query>
+	
+	<query name="getAllPincodesWithoutStatus">
+	<![CDATA[ 
+	select new map(pincode.pincodeId as typeId,pincode.pincode as typeName)
+	FROM com.ff.domain.geography.PincodeDO pincode
+				]]>
+	</query>
+	
+	<sql-query name="getPincodeAndCityListForLocationSearch">
+		<![CDATA[  
+			SELECT CONCAT(fdp.LOCATION, ',', fdc.CITY_NAME) AS location
+  				FROM ff_d_pincode fdp INNER JOIN ff_d_city fdc ON fdp.CITY_ID = fdc.CITY_ID
+ 			WHERE fdp.LOCATION IS NOT NULL;
+		 ]]>
+	</sql-query>
+		
+</hibernate-mapping>

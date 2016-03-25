@@ -1,0 +1,614 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.masters.RateContractDO"
+		table="ff_d_rate_contract">
+		<id name="rateContractId" type="java.lang.Integer" column="RATE_CONTRACT_ID">
+			<generator class="native" />
+		</id>
+		<property name="rateContractNo" column="RATE_CONTRACT_NUMBER" />
+		<property name="billingContractType" column="BILLING_CONTRACT_TYPE" />
+		<property name="typeOfBilling" column="TYPE_OF_BILLING" />
+		<property name="modeOfBilling" column="MODE_OF_BILLING" />
+		<property name="billingCycle" column="BILLING_CYCLE" />
+		<property name="paymentTerm" column="PAYMENT_TERM" />
+		<property name="octraiBourneBy" column="OCTRAI_BOURNE_BY" />
+		<property name="contractFor" column="CONTRACT_FOR" />
+		
+		<property name="validFromDate" column="VALID_FROM_DATE" type="java.util.Date" />
+		<property name="validToDate" column="VALID_TO_DATE" type="java.util.Date" />
+
+		<property name="rateContractType" column="RATE_CONTRACT_TYPE" />
+		<property name="contractStatus" column="CONTRACT_STATUS" />
+
+		<property name="customerId" column="CUSTOMER" type="java.lang.Integer" />
+
+		<property name="isRenewed" column="CONTRACT_RENEWED" type="java.lang.String" />
+		
+		<many-to-one name="rateQuotationDO"
+			class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO"
+			lazy="false" cascade="all"  fetch="join">
+			<column name="RATE_QUOTATION" />
+		</many-to-one>
+		
+		<many-to-one name="originatedRateContractDO" class="com.ff.domain.ratemanagement.masters.RateContractDO" lazy="false"  fetch="join">
+			<column name="RATE_CONTRACT_ORIGINATED_FROM" />
+		</many-to-one>
+		
+
+		<!-- One -to- Many relationships START -->
+		<set name="conPayBillLocDO" table="ff_d_contract_payment_billing_location" 
+				lazy="false" cascade="all" inverse="true" fetch="join">
+            <key column="RATE_CONTRACT"/>
+            <one-to-many 
+            	class="com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO"/>
+        </set> 
+        <set name="rateContractSpocDO" table="ff_d_rate_contract_spoc_contact_details" 
+				lazy="false" cascade="all" inverse="true" fetch="join">
+            <key column="RATE_CONTRACT"/>
+            <one-to-many 
+            	class="com.ff.domain.ratemanagement.masters.RateContractSpocDO"/>
+        </set>
+		<!-- One -to- Many relationships END -->
+		<property name="createdBy" column="CREATED_BY"  />
+		<property name="createdDate" column="CREATED_DATE"/>
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+	</class>
+
+	<query name="getRateContractById">
+		<![CDATA[ 
+			FROM com.ff.domain.ratemanagement.masters.RateContractDO rate
+			WHERE rate.rateContractId=:rateContractId 			
+		]]>
+	</query>
+
+	<query name="searchContractDetails">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.masters.RateContractDO rate
+			WHERE 
+			(rate.rateContractId =:contractId OR rate.rateContractNo=:contractNo) AND
+			rate.rateContractType=:rateContractType AND
+			(rate.createdBy=:createdBy OR rate.rateQuotationDO.customer.salesPersonDO.employeeId=
+			(SELECT employee.empDO.employeeId from com.ff.domain.umc.EmployeeUserDO employee where employee.userId=:createdBy))
+		]]>
+	</query>
+
+	<query name="getRateContractsByCustomerIds">
+		<![CDATA[ 
+			FROM com.ff.domain.ratemanagement.masters.RateContractDO rate
+			WHERE rate.customerId IN (:customerIds)
+		]]>
+	</query>
+	
+	<query name="updateContractStatus">
+		<![CDATA[
+			UPDATE com.ff.domain.ratemanagement.masters.RateContractDO contract 
+			SET contract.contractStatus=:contractStatus, 
+			 	dtToBranch =:dtToBranch
+			WHERE contract.rateContractId=:rateContractId
+		]]>
+	</query>
+	
+	<query name="updateRateContractBillingDtls">
+		<![CDATA[
+			UPDATE com.ff.domain.ratemanagement.masters.RateContractDO rateCon
+			SET rateCon.customerId=:customerId,
+				rateCon.validFromDate=:fromDate,
+				rateCon.validToDate=:toDate,
+				rateCon.billingContractType=:billContractType,
+				rateCon.typeOfBilling=:billType,
+				rateCon.modeOfBilling=:billMode,
+				rateCon.billingCycle=:billCycle,
+				rateCon.paymentTerm=:paymentTerm,
+				rateCon.updatedBy=:updatedBy,
+				rateCon.updatedDate=:updatedDate
+			WHERE rateCon.rateContractId=:rateContractId
+		]]>
+	</query>
+
+
+	<query name="getContractsByCustomerCode">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.masters.RateContractDO rate
+			WHERE rate.rateQuotationDO.customer.customerCode =:customerCode
+		]]>
+	</query>
+	
+	<query name="updateContractRenewedStatus">
+		<![CDATA[
+			UPDATE com.ff.domain.ratemanagement.masters.RateContractDO rate 
+			SET rate.isRenewed =:isRenewed,
+			    rate.validToDate =:validToDate,
+			    rate.dtToBranch ='N'
+			WHERE rate.rateContractId =:rateContractId
+		]]>
+	</query>
+	
+	<query name="rateContractListView">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))),
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = 
+			 	(SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId =
+			 	 (SELECT empuser.empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO empuser where empuser.userId = contract.createdBy))),
+			 (SELECT customer.businessName from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = 
+			 	(select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = 
+			 	(select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 	(select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 	(SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 	contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 	contract.rateQuotationDO.quotationCreatedBy,
+			 	contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE (contract.createdBy =:userId 
+			 or contract.createdBy IN (SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser where empuser.empDO.employeeId IN 
+			 (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId IN (
+					SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+					userOfc.user.userId =:userId ) )
+					 or emp.officeId IN (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId =:userId) ) ))  
+			 )
+			 AND DATE(contract.createdDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+			 AND contract.contractStatus =:status
+			 order by contract.createdDate desc			 
+		]]>
+	</query>
+	
+	<query name="rateContractListViewForRHO">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 contract.rateQuotationDO.quotationCreatedBy,
+			 contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE 
+			 DATE(contract.createdDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+			 AND contract.contractStatus =:status
+			 AND contract.createdBy IN
+			 (  SELECT empUser.userId  from com.ff.domain.umc.EmployeeUserDO empUser WHERE empUser.empDO.officeId IN  
+			 	  (
+			 	SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.reportingRHO IN(:region)  or office2.officeId IN(:region)
+			 	   ) 	
+			 ) 
+			 order by contract.createdDate desc
+		]]>
+	</query>
+	
+	
+	
+	<query name="rateContractListViewForALLRHOWithCity">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 contract.rateQuotationDO.quotationCreatedBy,
+			 contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE 
+			 DATE(contract.createdDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+			 AND contract.contractStatus =:status
+			 AND contract.createdBy IN
+			 (  SELECT empUser.userId  from com.ff.domain.umc.EmployeeUserDO empUser WHERE empUser.empDO.officeId IN  
+			 	  (
+			 	SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.cityId IN(:city)
+			 	   )	
+			 ) 
+			 order by contract.createdDate desc
+		]]>
+	</query>
+	
+	
+	<query name="rateContractListViewForHO">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 contract.rateQuotationDO.quotationCreatedBy,
+			 contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE 
+			 DATE(contract.createdDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+			 AND contract.contractStatus =:status
+			 AND (contract.createdBy IN
+			(  SELECT empUser.userId  from com.ff.domain.umc.EmployeeUserDO empUser WHERE empUser.empDO.officeId IN  
+			 	  (
+			 	SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.cityId IN(:city)
+			 	   )	
+			 ) or contract.createdBy IN ( SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser where empuser.empDO.employeeId IN 
+			 (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId IN (
+					SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+					userOfc.user.userId =:userId ) ) 
+			) ))
+			)  
+			order by contract.createdDate desc 
+		]]>
+	</query>
+	
+	
+ <query name="getRateContractForUser">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))),
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = 
+			 	(SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId =
+			 	 (SELECT empuser.empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO empuser where empuser.userId = contract.createdBy))),
+			 (SELECT customer.businessName from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = 
+			 	(select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = 
+			 	(select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 contract.rateQuotationDO.quotationCreatedBy,
+			 contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE (contract.createdBy =:userId
+			 or contract.createdBy IN (SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser where empuser.empDO.employeeId IN 
+			 (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId IN (
+					SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+					userOfc.user.userId =:userId ) ) or emp.officeId IN (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId =:userId) ) ))  
+			 )
+			 AND contract.rateContractNo =:rateContractNo
+			 AND contract.contractStatus IN ('A','I') order by contract.createdDate desc
+		]]>
+	</query>	 
+
+	<query name="rateContractForRHO">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 contract.rateQuotationDO.quotationCreatedBy,
+			 contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE 
+			 contract.rateContractNo =:rateContractNo
+			 AND contract.createdBy IN
+			 (  SELECT empUser.userId  from com.ff.domain.umc.EmployeeUserDO empUser WHERE empUser.empDO.officeId IN  
+			 	  (
+			 	SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.reportingRHO IN(:region) or office2.officeId IN(:region)
+			 	   ) 	
+			 ) order by contract.createdDate desc
+		]]>
+	</query>
+	
+	<query name="rateContractForALLRHO">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 contract.rateQuotationDO.quotationCreatedBy,
+			 contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE 
+			 contract.rateContractNo =:rateContractNo
+			 AND contract.createdBy IN
+			 (  SELECT empUser.userId  from com.ff.domain.umc.EmployeeUserDO empUser WHERE empUser.empDO.officeId IN  
+			 	  (
+			 	SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.reportingRHO IN(:region) 
+			 	   )	
+			 ) order by contract.createdDate desc
+		]]>
+	</query>
+	
+	<query name="rateContractForALLRHOWithCity">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 contract.rateQuotationDO.quotationCreatedBy,
+			 contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE 
+			 contract.rateContractNo =:rateContractNo
+			 AND contract.createdBy IN
+			 (  SELECT empUser.userId  from com.ff.domain.umc.EmployeeUserDO empUser WHERE empUser.empDO.officeId IN  
+			 	  (
+			 	SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.reportingRHO IN(:region) and office2.cityId IN(:city)
+			 	   )	
+			 ) order by contract.createdDate desc
+		]]>
+	</query>
+	
+	<query name="rateContractListViewForCO">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 contract.rateQuotationDO.quotationCreatedBy,
+			 contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE 
+			 DATE(contract.createdDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+			 AND contract.contractStatus =:status order by contract.createdDate desc
+		]]>
+	</query>
+	
+	<query name="getRateContractForCO">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 contract.rateQuotationDO.quotationCreatedBy,
+			 contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE 
+			 contract.rateContractNo =:rateContractNo
+			 AND contract.contractStatus IN ('A','I') order by contract.createdDate desc
+		]]>
+	</query>
+	
+	<query name="rateContractForHO">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 contract.rateQuotationDO.quotationCreatedBy,
+			 contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE 
+			 contract.rateContractNo =:rateContractNo
+			 AND contract.contractStatus IN ('A','I')
+			 AND (contract.createdBy IN
+			 
+			 (  SELECT empUser.userId  from com.ff.domain.umc.EmployeeUserDO empUser WHERE empUser.empDO.officeId IN  
+			 	  (
+			 	SELECT office2.officeId FROM com.ff.domain.organization.OfficeDO office2 WHERE office2.cityId IN(:city)
+			 	   )	
+			 ) or contract.createdBy IN ( SELECT empuser.userId FROM com.ff.domain.umc.EmployeeUserDO empuser where empuser.empDO.employeeId IN 
+			 (SELECT emp.employeeId FROM com.ff.domain.organization.EmployeeDO emp where ( emp.officeId IN 
+			 (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId IN (
+					SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+					userOfc.user.userId =:userId ) ) 
+			 ) ))
+			 ) order by contract.createdDate desc
+		]]>
+	</query>
+	
+	<query name="rateContractListViewForSE">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 contract.rateQuotationDO.quotationCreatedBy,
+			 contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE
+			 DATE(contract.createdDate) between  STR_TO_DATE(:fromDate, '%Y-%m-%d')  and STR_TO_DATE(:toDate, '%Y-%m-%d')
+			 AND contract.contractStatus =:status
+			 AND contract.createdBy =:userId order by contract.createdDate desc
+			 ]]>
+	</query>
+	
+	<query name="getRateContractForSE">
+	<![CDATA[ SELECT  new com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWrapperDO( contract.createdDate , 
+			contract.rateContractId,
+			contract.rateContractNo,
+			contract.rateContractType,
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy))) ,
+			 (SELECT office.officeTypeDO.offcTypeCode FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE office.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)),
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = (SELECT empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO where userId = contract.createdBy)))  ,
+			 (SELECT customer.businessName FROM com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId)  ,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO from com.ff.domain.business.CustomerDO customer where customer.customerId = contract.rateQuotationDO.customer.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = contract.rateQuotationDO.customer.groupKeyDO),
+			 (SELECT euser.empDO.employeeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId = contract.rateQuotationDO.quotationCreatedBy),
+			 contract.rateQuotationDO.customer.salesPersonDO.employeeId,
+			 contract.rateQuotationDO.quotationCreatedBy,
+			 contract.createdBy,
+			 contract.contractStatus )
+			FROM 
+			com.ff.domain.ratemanagement.masters.RateContractDO contract
+			 WHERE 
+			 contract.rateContractNo =:rateContractNo
+			 AND contract.createdBy =:userId order by contract.createdDate desc
+		]]>
+	</query>
+	
+	<query name="getContractByOriginatedContractId">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.masters.RateContractDO rate
+			WHERE rate.originatedRateContractDO.rateContractId =:rateContractId
+		]]>
+	</query>
+	
+	<query name="getContractDtls">
+	<![CDATA[
+		FROM	com.ff.domain.ratemanagement.masters.RateContractDO rate
+		WHERE	rate.rateContractNo=:rateContractNo
+	]]>
+	</query>
+	
+	<query name="updateCustStatus">
+		<![CDATA[
+			UPDATE	com.ff.domain.ratemanagement.masters.RateContractDO rate
+			SET		rate.contractStatus=:contractStatus, rate.dtToBranch=:dtToBranch, rate.updatedDate=:updatedDate
+			WHERE	rate.rateContractNo=:rateContractNo
+		]]>
+	</query>
+	
+	<query name="getContractIdByContractNo">
+		<![CDATA[
+			SELECT  rate.rateContractId FROM com.ff.domain.ratemanagement.masters.RateContractDO rate
+			WHERE	rate.rateContractNo=:rateContractNo
+		]]>
+	</query>
+	
+</hibernate-mapping>

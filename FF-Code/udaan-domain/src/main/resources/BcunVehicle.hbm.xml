@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.transport.BcunVehicleDO" table="ff_d_vehicle">
+		<id name="vehicleId" type="java.lang.Integer" column="VEHICLE_ID">
+			<generator class="assigned" />
+		</id>
+		
+        <!-- <property name="vehicleCode" type="java.lang.String"  >
+        	<column name="VEHICLE_CODE"/>
+		</property>
+        <property name="vehicleName" type="java.lang.String"  >
+        	<column name="VEHICLE_NAME"/>
+		</property>
+        <property name="vehicleDesc" type="java.lang.String"  >
+        	<column name="VEHICLE_DESC"/>
+		</property> -->
+        <property name="vehicleType" type="java.lang.String"  >
+        	<column name="VEHICLE_TYPE"/>
+		</property>
+        <property name="regNumber" type="java.lang.String"  >
+        	<column name="REG_NUMBER"/>
+		</property>
+
+        <property name="regionalOfficeId" column="REGIONAL_OFFICE" type="java.lang.Integer"/>
+
+        <property name="dtToBranch" column="DT_TO_BRANCH"/>
+        
+	</class>
+</hibernate-mapping>

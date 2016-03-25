@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.consignment.ChildConsignmentDO" table="ff_f_child_consignments">
+		<id name="bookingChildCNId" type="java.lang.Integer">
+			<column name="BOOKING_CHILD_CN_ID" />
+			<generator class="identity" />
+		</id>
+		
+		<many-to-one name="consignment"   class="com.ff.domain.consignment.ConsignmentDO" lazy="false" fetch="join" >
+		<column name="CONSG_ID"/>
+		</many-to-one>
+		
+		<property name="childConsgNumber"  type="java.lang.String" >
+		<column name="CHILD_CONSG_NUMBER"/>
+		</property>
+		
+		<property name="childConsgWeight"  type="java.lang.Double">
+		<column name="CHILD_CONSG_WEIGHT"/>
+		</property>
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		
+		
+		</class>
+		 <query name="isChildConsgBooked">
+		<![CDATA[
+			SELECT count(*) from com.ff.domain.consignment.ChildConsignmentDO booking where booking.childConsgNumber = :consgNumber ]]>
+	</query> 
+	
+	 <query name="getChildConsignmentId">
+		<![CDATA[
+			SELECT booking.bookingChildCNId from com.ff.domain.consignment.ChildConsignmentDO booking where booking.childConsgNumber = :consgNumber ]]>
+	</query> 
+		
+	
+	<!-- Starting Data sync querys -->
+	
+	<query name="getUnsyncInboundChildConsignment">
+		<![CDATA[From com.ff.domain.consignment.ChildConsignmentDO childconsignment where childconsignment.dtToCentral='N' or childconsignment.dtToCentral is null ]]>
+	</query>
+	
+	<query name="getUpdateChildConsignment"> 
+	<![CDATA[ From com.ff.domain.consignment.ChildConsignmentDO childconsignment where  childconsignment.childConsgNumber IN (:childConsgNumber) ]]>
+	</query>
+	
+	<query name="getUnsyncOutboundChildConsignment">
+		<![CDATA[from com.ff.domain.consignment.ChildConsignmentDO childconsignment where childconsignment.consignment.orgOffId=:branchId and (childconsignment.dtToBranch='N')]]>
+	</query>
+	
+	<query name="getParentConsDtlsByChildCn">
+		<![CDATA[select childconsignment.consignment from com.ff.domain.consignment.ChildConsignmentDO childconsignment where childconsignment.childConsgNumber IN (:childConsgNumber)]]>
+	</query>
+	
+	<query name="isConsgBookedForStockForChildCn">
+		<![CDATA[
+			SELECT count(*) from com.ff.domain.consignment.ChildConsignmentDO childCn where  childCn.consignment is not null and length(childCn.childConsgNumber) =length(:startLeaf)
+			AND childCn.childConsgNumber between :startLeaf and :endLeaf ]]>
+	</query>
+	
+	<query name="getChildConsListByParentCn">
+		<![CDATA[select childconsignment.childConsgNumber from com.ff.domain.consignment.ChildConsignmentDO childconsignment 
+		inner join childconsignment.consignment as parentCn
+		where parentCn.consgNo=:consgNo
+		
+		]]>
+	</query>
+	<!-- ending Data sync querys -->
+	
+	
+	 
+</hibernate-mapping>

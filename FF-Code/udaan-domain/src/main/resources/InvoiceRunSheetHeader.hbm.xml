@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.billing.InvoiceRunSheetHeaderDO" table="ff_f_invoice_run_sheet_header">
+		<id name="invoiceRunSheetId" type="java.lang.Integer" column="INVOICE_RUN_SHEET_ID">
+			<generator class="native" />
+		</id>
+		
+        <property name="invoiceRunSheetNumber" column="INVOICE_RUN_SHEET_NUMBER"/>
+        <property name="startDate" column="START_DATE" type="java.util.Date" />
+        <property name="endDate" column="END_DATE" type="java.util.Date" />
+        <property name="pickUpBoyName" column="PICKUP_BOY_NAME"/>
+        <property name="createdBy" column="CREATED_BY" type="java.lang.Integer" update="false" />
+        <property name="createdDate" column="CREATION_DATE" type="java.util.Date" update="false"/>
+        <property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer" />
+        <property name="updatedDate" column="UPDATE_DATE" type="java.util.Date" />
+        
+        <many-to-one name="pickUpBoyEmployeeDO" class="com.ff.domain.organization.EmployeeDO" lazy="false">
+			<column name="PICKUP_BOY" />
+		</many-to-one>
+		
+		<many-to-one name="officeDO" class="com.ff.domain.organization.OfficeDO" lazy="false">
+			<column name="OFFICE" />
+		</many-to-one>
+        
+        <set name="invoiceRunSheetDetailDOs" table="ff_f_invoice_run_sheet_detail" cascade="all" lazy="false" fetch="subselect">
+            <key>
+                <column name="INVOICE_RUN_SHEET_HEADER"/>
+            </key>
+            <one-to-many class="com.ff.domain.billing.InvoiceRunSheetDetailDO"/>
+        </set>	
+		
+	</class>
+	
+	<query name="getInvoiceRunSheetDtlsByInvoiceRunSheetNo">
+		<![CDATA[ 	FROM com.ff.domain.billing.InvoiceRunSheetHeaderDO invoiceRunSheet
+					where invoiceRunSheet.invoiceRunSheetNumber=:invoiceRunSheetNumber
+				]]>
+	</query>
+		
+</hibernate-mapping>

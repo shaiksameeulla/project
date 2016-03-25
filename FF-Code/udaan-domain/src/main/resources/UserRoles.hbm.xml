@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.ff.domain.umc.UserRolesDO" table="ff_d_roles">
+        <id name="roleId" type="java.lang.Integer">
+            <column name="ROLE_ID" />
+            <generator class="native" />
+        </id>  
+        <property name="roleType" type="java.lang.String" >
+        <column name="ROLE_TYPE" />
+        </property>        
+        <property name="roleName" type="java.lang.String">
+            <column name="ROLE_NAME" />
+        </property>
+        <property name="roleDesc" type="java.lang.String">
+            <column name="ROLE_DESCRIPTION" />
+         </property>
+          <property name="status" type="java.lang.String">
+            <column name="STATUS" />
+         </property>
+         
+         <property name="userId" type="java.lang.Integer">
+            <column name="CREATED_BY" />
+         </property>
+         
+          <property name="updatedBy" type="java.lang.Integer">
+            <column name="UPDATE_BY" />
+         </property>
+         
+          <property name="transactionCreateDate" type="java.util.Date">
+            <column name="CREATION_DATE" />
+         </property>
+         
+         <property name="transactionModifiedDate" type="java.util.Date">
+            <column name="UPDATE_DATE" />
+         </property>
+         
+         <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+         
+         
+         <set name="applRights" table="ff_d_app_rights" cascade="save-update" lazy="false">
+            <key>
+                <column name="ROLE_ID" />
+            </key>
+            <one-to-many class="com.ff.domain.umc.ApplRightsDO"  />
+        </set>
+         
+      </class> 
+   	<query name="getAllRoles">
+		<![CDATA[
+			From com.ff.domain.umc.UserRolesDO 
+		]]>
+	</query>
+	<query name="getRoleByRoleName">
+		<![CDATA[
+			From com.ff.domain.umc.UserRolesDO r where r.roleName=:roleName
+		]]>
+	</query>
+	<query name="updateUserRole">
+		<![CDATA[
+			update com.ff.domain.umc.UserRolesDO role set role.status =:status,  role.dtToBranch='N' where role.roleId  in (:roleIds) 
+		]]>
+	</query>
+	
+	<query name="getUnsyncOutboundLoginRoles">
+		<![CDATA[select userRole.roleDO from com.ff.domain.umc.UserRightsDO userRole, com.ff.domain.umc.EmployeeUserDO userEmp 
+						 where userRole.userDO.userId=userEmp.userId  and  userEmp.empDO.officeId=:branchId 
+						 and (userRole.roleDO.dtToBranch='N')]]>
+	</query>
+	
+		<query name="isUserRoleExists">
+		<![CDATA[
+			select count(*) from com.ff.domain.umc.UserRolesDO role where role.roleName=:roleName
+		]]>
+	</query>
+	
+    </hibernate-mapping>

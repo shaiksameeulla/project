@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+
+<hibernate-mapping>
+	<class name="com.ff.domain.geography.PincodeMasterProductServiceabilityDO" table="ff_d_pincode_product_serviceability">
+		<id name="pincodeDeliveryTimeMapId" type="java.lang.Integer">
+			<column name="PINCODE_DLV_TIME_MAP_ID" />
+			<generator class="native"/>
+		</id>
+		
+		<property name="deliveryTime" column="DELIVERY_TIME" type="java.lang.String"/>
+		<property name="dlvTimeQualification" column="DLV_TIME_QUALIFICATION" type="java.lang.String"/>
+		
+		<property name="status" column="STATUS" />
+		
+		 <many-to-one name="pincode" class="com.ff.domain.geography.PincodeMasterDO" lazy="false" fetch="join">
+			<column name="PINCODE_ID"/>
+		</many-to-one> 
+		
+		
+		<many-to-one name="originCity" class="com.ff.domain.geography.CityDO" lazy="false" fetch="join">
+			<column name="ORIGIN_CITY_ID" />
+		</many-to-one>
+		
+		<many-to-one name="productGroupId" class="com.ff.domain.serviceOffering.ProductGroupServiceabilityDO" lazy="false" fetch="join">
+			<column name="PROD_GROUP_ID" />
+		</many-to-one>
+			<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+	
+	</class>
+	
+	
+	
+</hibernate-mapping>

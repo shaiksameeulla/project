@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.capgemini.lbs.framework.domain.SequenceGeneratorConfigDO" table="cg_d_sequence_gen">
+		<id name="sequenceGeneratorId" type="java.lang.Integer">
+			<column name="SEQUENCE_GEN_ID" />
+			<generator class="native" />
+		</id>
+		<property name="processType" column="PROCESS_REQUESTING" />
+		<property name="initialValue" column="INITIAL_VALUE" />
+
+		<property name="lastGeneratedNumber" column="LAST_GENERATED_SEQUENCE" />
+		<property name="incrementValue" column="INCREMENT_VALUE" />
+
+		<property name="lastGeneratedDate" column="DATE_TIME_LAST_GENERATED" />
+		<property name="reInitializeRequired" column="REINITIALIZE_REQUIRED" />
+
+		<property name="sequenceLength" column="LENGTH_OF_GENERATED_SEQUENCE" />
+		<property name="reInitInterval" column="REINIT_INTERVAL" />
+
+	</class>
+
+	<!-- for Framework utils  START-->
+	<query name="getSequenceByProcess">
+	<![CDATA[
+	 FROM com.capgemini.lbs.framework.domain.SequenceGeneratorConfigDO seq where seq.processType =:processType 
+	 ]]>
+	</query>
+
+	<query name="updateSeqByGeneratorId">
+	<![CDATA[
+	update com.capgemini.lbs.framework.domain.SequenceGeneratorConfigDO seq 
+	set seq.lastGeneratedNumber =:lastGeneratedNumber 
+	,
+	 seq.lastGeneratedDate =:lastGeneratedDate
+	where  seq.sequenceGeneratorId =:sequenceGeneratorId
+	
+	]]>
+	</query>
+	<!--  for Framework utils  END-->
+</hibernate-mapping>

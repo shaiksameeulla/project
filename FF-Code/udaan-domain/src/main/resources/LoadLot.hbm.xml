@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.manifest.LoadLotDO" table="ff_d_load_lot">
+		<id name="loadLotId" type="java.lang.Integer">
+			<column name="LOAD_LOT_ID" />
+			<generator class="identity" />
+		</id>
+		
+		<property name="loadNo" type="java.lang.Integer">
+			<column name="LOAD_NO" />
+		</property>
+		
+		<property name="loadDesc" type="java.lang.String">
+			<column name="LOAD_DESC" />
+		</property>
+		
+			<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+		
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		
+	</class>
+	
+         <query name="getLoadNo">
+	     <![CDATA[
+		FROM com.ff.domain.manifest.LoadLotDO load
+	      ]]>
+         </query>
+</hibernate-mapping>

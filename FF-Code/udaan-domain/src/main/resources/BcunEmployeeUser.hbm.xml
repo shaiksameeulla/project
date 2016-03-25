@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.umc.BcunEmployeeUserDO" table="ff_d_employee_user">
+		<id name="empUserId" type="java.lang.Integer">
+			<column name="EMPLOYEE_USER_ID" />
+			<generator class="assigned" />
+		</id>
+		<property name="userId" type="java.lang.Integer">
+			<column name="USER_ID" length="11" />
+		</property>
+  		<many-to-one name="employee" class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join">
+			<column name="EMPLOYEE_ID" />
+		</many-to-one>
+         <property name="createdDate" type="java.util.Date">
+            <column name="CREATION_DATE" />
+         </property>
+         
+         <property name="updatedDate" type="java.util.Date">
+            <column name="UPDATE_DATE" />
+         </property>
+         
+          <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+   </class>
+	<query name="getOutboundBranchEmpUser">
+	<![CDATA[ 
+		select empUser FROM com.ff.domain.umc.BcunEmployeeUserDO empUser where 
+		empUser.employee.officeId=:branchId
+		and  
+		(empUser.dtToBranch ='N') 
+	]]>
+	</query>
+	
+	
+	</hibernate-mapping>

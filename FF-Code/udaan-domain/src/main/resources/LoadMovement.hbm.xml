@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.loadmanagement.LoadMovementDO" table="ff_f_load_movement">
+		<id name="loadMovementId" type="java.lang.Integer" column="LOAD_MOVEMENT_ID">
+			<generator class="native" />
+		</id>
+		
+        <property name="movementDirection" type="java.lang.String" column="MOVEMENT_DIRECTION"/>
+        <property name="gatePassNumber" type="java.lang.String" column="GATE_PASS_NUMBER"/>
+        <property name="vehicleType" type="java.lang.String" column="VEHICLE_TYPE"/>
+        <property name="vehicleRegNumber" type="java.lang.String" column="VEHICLE_REG_NUMBER"/>
+        <property name="driverName" type="java.lang.String" column="DRIVER_NAME"/>
+        <property name="loadingDate" type="java.util.Date" column="LOADING_DATE"/>
+        <property name="loadingTime" type="java.lang.String" column="LOADING_TIME"/>
+        <property name="routeServicedTransportType" type="java.lang.String" column="ROUTE_SERVICED_TRANSPORT_TYPE"/>
+        <property name="routeServicedTransportNumber" type="java.lang.String" column="ROUTE_SERVICED_TRANSPORT_NUMBER"/>
+        <property name="receivedAtTime" type="java.lang.String" column="RECEIVED_AT_TIME"/>
+        <property name="receivedStatus" type="java.lang.String" column="RECEIVED_STATUS"/>
+        <property name="receiveType" type="java.lang.String" column="RECEIVE_TYPE"/>
+        <property name="receivedAgainst" type="java.lang.Integer" column="RECEIVED_AGAINST"/>
+        <property name="processNumber" type="java.lang.String" column="PROCESS_NO"/>
+        <property name="receiveNumber" type="java.lang.String" column="RECEIVE_NUMBER"/>
+		<property name="operatingOffice" type="java.lang.Integer" column="OPERATING_OFFICE"/>
+        
+        <property name="dtToBranch" column="DT_TO_BRANCH"/>
+        <property name="dtToCentral" column="DT_TO_CENTRAL"/>
+        <property name="dtFromOpsman" column="DT_FROM_OPSMAN"/>
+        <property name="dtToOpsman">
+			<column name="DT_TO_OPSMAN" />
+		</property>
+        <property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL"/>
+        
+		<property name="createdDate"  column="CREATED_DATE" type="java.util.Date" update="false"/>
+		<property  name="updatedDate" column="UPDATE_DATE"	type="java.util.Date"/>
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer" update="false"/>
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/>
+		
+		<many-to-one name="originOfficeDO" class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="ORIGIN_OFFICE" />
+		</many-to-one>
+		
+		<many-to-one name="destOfficeDO" class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="DEST_OFFICE"/>
+		</many-to-one>	
+					
+		<many-to-one name="tripServicedByDO" class="com.ff.domain.routeserviced.TripServicedByDO" lazy="false" fetch="join">
+			<column name="TRIP_SERVICED_BY"/>
+		</many-to-one>
+							
+		<many-to-one name="vehicleDO" class="com.ff.domain.transport.VehicleDO" lazy="false" fetch="join">
+			<column name="VEHICLE"/>
+		</many-to-one>	
+			
+		<many-to-one name="transportModeDO" class="com.ff.domain.transport.TransportModeDO" lazy="false" fetch="join">
+			<column name="TRANSPORT_MODE" />
+		</many-to-one>
+		
+		<many-to-one name="processDO"  class="com.ff.domain.tracking.ProcessDO" lazy="false" fetch="join">
+			<column  name="UPDATED_PROCESS_FROM" />
+		</many-to-one>
+		
+        <set name="loadConnectedDOs" table="ff_f_load_connected" cascade="all" lazy="false" fetch="subselect">
+            <key>
+                <column name="LOAD_MOVEMENT"/>
+            </key>
+            <one-to-many class="com.ff.domain.loadmanagement.LoadConnectedDO"/>
+        </set>	
+    </class>
+		
+	<query name="getLoadMovementForReceiveLocalByDispatch">
+		<![CDATA[	FROM com.ff.domain.loadmanagement.LoadMovementDO loadMovement
+					where loadMovement.gatePassNumber=:gatePassNumber
+					and loadMovement.originOfficeDO.reportingRHO=:regionalOfficeId
+					and loadMovement.originOfficeDO.officeId!=:loggedInOfficeId
+					and loadMovement.transportModeDO.transportModeCode='Road'
+					and loadMovement.movementDirection='D'
+				]]>
+	</query>
+			
+	<query name="getLoadMovementForReceiveLocalByReceive">
+		<![CDATA[	FROM com.ff.domain.loadmanagement.LoadMovementDO loadMovement
+					where loadMovement.gatePassNumber=:gatePassNumber
+					and loadMovement.destOfficeDO.reportingRHO=:regionalOfficeId
+					and loadMovement.transportModeDO.transportModeCode='Road'
+					and loadMovement.movementDirection='R'
+					and loadMovement.receiveType='L'
+					and loadMovement.vehicleType is not null
+				]]>
+	</query>
+					
+	<query name="isReceiveNumberExist">
+		<![CDATA[	Select loadMovement.loadMovementId FROM 
+					com.ff.domain.loadmanagement.LoadMovementDO loadMovement
+					where loadMovement.receiveNumber=:receiveNumber
+					and loadMovement.movementDirection='R'
+					and loadMovement.receiveType='O'
+				]]>
+	</query>
+	
+	<query name="getGatepassDetails">
+		<![CDATA[From com.ff.domain.loadmanagement.LoadMovementDO gatepass where  gatepass.gatePassNumber=:number]]>
+	</query>
+	
+	<query name="updateLoadMovementDtToCentral">
+		<![CDATA[
+				UPDATE com.ff.domain.loadmanagement.LoadMovementDO loadMovement
+					SET loadMovement.dtUpdateToCentral='Y',
+						loadMovement.dtToCentral='N'
+					WHERE loadMovement.loadMovementId IN (:loadMovementId)
+		]]>
+	</query>
+	
+	<query name="trackByTokenNumber">
+		<![CDATA[
+				FROM com.ff.domain.loadmanagement.LoadMovementDO loadMovement
+					WHERE loadMovement.loadMovementId IN (SELECT loadConnected.loadMovementDO.loadMovementId
+															FROM com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+															WHERE loadConnected.tokenNumber = :tokenNumber)
+		]]>
+	</query>
+</hibernate-mapping>

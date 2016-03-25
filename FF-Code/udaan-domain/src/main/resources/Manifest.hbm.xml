@@ -1,0 +1,800 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.manifest.ManifestDO" table="ff_f_manifest">
+		<id name="manifestId" type="java.lang.Integer" column="MANIFEST_ID">
+			<generator class="native" />
+		</id>
+
+		<property name="manifestNo" column="MANIFEST_NO" type="java.lang.String" not-null="true"/>
+		<property name="manifestType" column="MANIFEST_TYPE" type="java.lang.String"/>
+		<property name="manifestEmbeddedIn" column="MANIFEST_EMBEDDED_IN" />
+
+		<property name="misrouteTypeCode" column="MISROUTE_TYPE_CODE"
+			type="java.lang.String" />
+		<property name="manifestWeight" column="MANIFEST_WEIGHT"
+			type="java.lang.Double" />
+		<property name="manifestDate" column="MANIFEST_DATE" not-null="true"/>
+		<property name="noOfElements" column="NO_OF_ELEMENTS" type="java.lang.Integer" />
+		<property name="containsOnlyCoMail" column="CONTAINS_ONLY_COMAIL"
+			type="java.lang.String" />
+		<property name="manifestStatus" column="MANIFEST_STATUS"
+			type="java.lang.String" not-null="true"/>
+		<property name="bagRFID" column="BAG_RFID" type="java.lang.Integer" />
+		<property name="allowSpecificContent" column="ALLOW_SPECIFIC_CONTENT"
+			type="java.lang.String" />
+		<property name="bagLockNo" column="BAG_LOCK_NO" type="java.lang.String" />
+		<property name="receivedStatus" column="RECEIVED_STATUS" />
+		<property name="remarks" column="REMARKS" />
+		<property name="position" column="POSITION" type="java.lang.Integer" />
+		<property name="multipleDestination" column="MULTIPLE_DESTINATION" />
+		<property name="createdBy" column="CREATED_BY" update="false" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate" column="CREATED_DATE" update="false" not-null="true"/>
+		<property name="updatedDate" column="UPDATE_DATE"/>
+
+		<property name="manifestDirection" type="java.lang.String">
+			<column name="MANIFEST_DIRECTION" />
+		</property>
+		<property name="manifestOpenType" type="java.lang.String">
+			<column name="MANIFEST_OPEN_TYPE" />
+		</property>
+		<property name="bplManifestType" type="java.lang.String">
+			<column name="BPL_MANIFEST_TYPE" />
+		</property>
+		<property name="loadLotId" type="java.lang.Integer">
+			<column name="LOAD_LOT_ID" />
+		</property>
+		<property name="thirdPartyType" type="java.lang.String">
+			<column name="THIRD_PARTY_TYPE" />
+		</property>
+		<property name="vendorId" type="java.lang.Integer">
+			<column name="VENDOR_ID" />
+		</property>
+
+		<property name="operatingOffice" column="OPERATING_OFFICE"
+			type="java.lang.Integer" not-null="true"/>
+
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL" />
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+
+		<many-to-one name="manifestedProductSeries"
+			class="com.ff.domain.serviceOffering.ProductDO" lazy="false">
+			<column name="MANIFESTED_PRODUCT_SERIES" />
+		</many-to-one>
+
+		<property name="manifestProcessCode" column="MANIFEST_PROCESS_CODE"
+			type="java.lang.String" />
+
+		<many-to-one name="originOffice" class="com.ff.domain.organization.OfficeDO"
+			lazy="false" fetch="join">
+			<column name="ORIGIN_OFFICE" />
+		</many-to-one>
+
+		<many-to-one name="officeType"
+			class="com.ff.domain.organization.OfficeTypeDO" lazy="false" fetch="join">
+			<column name="OFFICE_TYPE_FILTER" />
+		</many-to-one>
+
+		<many-to-one name="destOffice" class="com.ff.domain.organization.OfficeDO"
+			lazy="false" fetch="join">
+			<column name="DESTINATION_OFFICE" />
+		</many-to-one>
+
+		<many-to-one name="updatingProcess" class="com.ff.domain.tracking.ProcessDO"
+			lazy="false" fetch="join">
+			<column name="UPDATING_PROCESS" />
+		</many-to-one>
+
+		<many-to-one name="destinationCity" class="com.ff.domain.geography.CityDO"
+			lazy="false" fetch="join">
+			<column name="DESTINATION_CITY"/>
+		</many-to-one>
+
+		<many-to-one name="manifestLoadContent"
+			class="com.ff.domain.serviceOffering.ConsignmentTypeDO" lazy="false"
+			fetch="join">
+			<column name="MANIFEST_LOAD_CONTENT" />
+		</many-to-one>
+
+		<set name="consignments" table="ff_f_consignment_manifested"
+			cascade="all" lazy="true">
+			<key>
+				<column name="MANIFEST_ID" />
+			</key>
+			<many-to-many column="CONSIGNMENT_ID" unique="true"
+				class="com.ff.domain.consignment.ConsignmentDO" />
+		</set>
+
+		<set name="doxConsignments" table="ff_f_consignment_manifested"
+			cascade="all" lazy="true">
+			<key>
+				<column name="MANIFEST_ID" />
+			</key>
+			<many-to-many column="CONSIGNMENT_ID" unique="true"
+				class="com.ff.domain.consignment.ConsignmentDOXDO" />
+		</set>
+
+		<set name="comails" table="ff_f_comail_manifested" cascade="all"
+			lazy="true">
+			<key>
+				<column name="MANIFEST_ID" />
+			</key>
+			<many-to-many column="COMAIL_ID" unique="true"
+				class="com.ff.domain.manifest.ComailDO" />
+		</set>
+
+		<set name="multipleDestinations" table="ff_f_outmanifest_destination"
+			cascade="all" lazy="false">
+			<key>
+				<column name="MANIFEST_ID" />
+			</key>
+			<one-to-many class="com.ff.domain.manifest.OutManifestDestinationDO" />
+		</set>
+
+		<set name="embeddedManifestDOs" cascade="all" lazy="true" table="ff_f_manifest"
+			fetch="subselect">
+			<key>
+				<column name="MANIFEST_EMBEDDED_IN" />
+			</key>
+			<one-to-many class="com.ff.domain.manifest.ManifestDO" />
+		</set>
+
+		<property name="gridItemPosition" column="GRID_ITEM_POSITION" />
+
+	</class>
+
+	<!-- Start:..Manifest Queries -->
+	<query name="getManifestDtlsByManifestNo">
+		<![CDATA[
+			FROM com.ff.domain.manifest.ManifestDO outManifest 
+			WHERE outManifest.manifestNo=:manifestNo
+		]]>
+	</query>
+
+	<query name="updateManifestWeight">
+		<![CDATA[
+			UPDATE com.ff.domain.manifest.ManifestDO manifest 
+				SET manifest.manifestWeight=:manifestWeight,
+				manifest.dtUpdateToCentral='Y',
+				manifest.dtToCentral='N'
+				WHERE manifest.manifestId IN (:manifestId)
+		]]>
+	</query>
+	<query name="updateProcessId">
+		<![CDATA[
+			UPDATE com.ff.domain.manifest.ManifestDO manifest 
+				SET manifest.updatingProcess.processId = :updatedProcessId
+				WHERE manifest.manifestId IN (:manifestIds)
+		]]>
+	</query>
+
+
+
+
+	<query name="isManifested">
+		<![CDATA[
+		SELECT COUNT(*) FROM com.ff.domain.manifest.ManifestDO manifest
+		WHERE manifest.manifestNo=:manifestNo 
+		AND manifest.manifestDirection=:manifestDirection 
+		AND manifest.manifestType='O'
+		AND manifest.originOffice.officeId=:loginOfficeId
+	]]>
+	</query>
+
+
+
+	<query name="isManifestEmbeddedOfTypeIn">
+		<![CDATA[
+          
+          SELECT COUNT(*) FROM com.ff.domain.manifest.ManifestDO manifest 
+  	 WHERE  manifest.manifestId =:manifestEmbeddedId and manifest.manifestType=:manifestType
+         
+             ]]>
+	</query>
+
+
+
+
+
+	<query name="getBPLDtlsByBPLNo">
+		<![CDATA[
+			FROM com.ff.domain.manifest.ManifestDO outManifest 
+			WHERE outManifest.manifestNo=:manifestNo and  
+			outManifest.updatingProcess.processId=:processId
+		]]>
+	</query>
+
+	<query name="isValiedBagLockNo">
+		<![CDATA[
+		SELECT COUNT(*) FROM com.ff.domain.manifest.ManifestDO manifest
+		WHERE manifest.bagLockNo=:bagLockNo 
+		
+	]]>
+	</query>
+
+
+
+	<query name="getEmbededManifestDtls">
+				<![CDATA[
+				FROM com.ff.domain.manifest.ManifestDO manifest1
+				where
+				manifest1.manifestId in ( select m.manifestId from com.ff.domain.manifest.ManifestMappedEmbeddedDO m where m.embeddedIn.manifestId=:manifestId) 
+				
+				]]>
+	</query>
+
+
+	<query name="updateManifestDtls">
+		<![CDATA[
+		UPDATE com.ff.domain.manifest.ManifestDO manifest 
+				SET manifest.manifestWeight =:manifestWeight , manifest.manifestEmbeddedIn =:manifestEmbeddedIn,manifest.manifestType=:manifestType,
+				manifest.updatingProcess=:updatedProcessId 
+				WHERE manifest.manifestId =:manifestId 
+		
+		]]>
+	</query>
+
+	<query name="updatePositionByManifestId">
+		<![CDATA[
+			UPDATE com.ff.domain.manifest.ManifestDO manifest 
+				SET manifest.position = :position
+					WHERE manifest.manifestId = :manifestId
+		]]>
+	</query>
+
+	<!-- End: Manifest Queries -->
+
+	<!-- Start: In Manifest Queries -->
+
+	<query name="getManifestDetails">
+		<![CDATA[ FROM com.ff.domain.manifest.ManifestDO manifest 
+		          WHERE manifest.manifestNo=:manifestNumber
+		          AND manifest.manifestProcessCode IN(:processCode) 
+		          AND manifest.updatingProcess.processCode IN(:updateProcessCode)
+		          ORDER BY manifest.manifestDate DESC
+		]]>
+	</query>
+
+
+	<query name="getEmbeddedManifestDtlsByEmbeddedId">
+		<![CDATA[
+			FROM com.ff.domain.manifest.ManifestDO manifest
+			WHERE manifest.manifestEmbeddedIn = :manifestEmbeddedId
+			order by manifest.manifestId
+		]]>
+	</query>
+
+	<query name="getManifestByNoProcessType">
+		<![CDATA[ FROM com.ff.domain.manifest.ManifestDO manifest 
+		          WHERE manifest.manifestNo=:manifestNumber
+		          AND manifest.destOffice.officeId IN(:destOfficeId)
+		          AND manifest.manifestProcessCode IN(:processCode) 
+		          AND manifest.updatingProcess.processCode IN(:updateProcessCode)
+		          AND manifest.manifestType=:manifestType
+		]]>
+	</query>
+
+	<query name="getManifestByNoProcessConsgType">
+		<![CDATA[ FROM com.ff.domain.manifest.ManifestDO manifest 
+		          WHERE manifest.manifestNo=:manifestNumber
+		          AND manifest.destOffice.officeId IN(:destOfficeId)
+		          AND manifest.manifestProcessCode IN(:processCode) 
+		          AND manifest.updatingProcess.processCode IN(:updateProcessCode)
+		          AND manifest.manifestLoadContent.consignmentCode IN(:consignmentCode)
+		          AND manifest.manifestType=:manifestType
+		]]>
+	</query>
+
+	<query name="isManifestHeaderInManifested">
+		<![CDATA[ SELECT count(*)
+				  FROM com.ff.domain.manifest.ManifestDO manifest 
+		          WHERE manifest.manifestNo=:manifestNumber
+		          AND manifest.operatingOffice IN(:operatingOffice)
+		          AND manifest.manifestType=:manifestType
+		          AND manifest.noOfElements>=1
+		]]>
+	</query>
+
+	<query name="isManifestOutManifested">
+		<![CDATA[ SELECT count(*)
+				  FROM com.ff.domain.manifest.ManifestDO manifest 
+		          WHERE manifest.manifestNo=:manifestNumber
+		          AND manifest.operatingOffice IN(:operatingOffice)
+		          AND manifest.manifestDirection = 'O'
+		]]>
+	</query>
+	<query name="getBagManifestDetailsByPacketNo">
+		<![CDATA[ SELECT manifest.manifestNo, embManifest.manifestNo, embManifest.manifestDirection
+				  FROM com.ff.domain.manifest.ManifestDO embManifest
+				  JOIN embManifest.embeddedManifestDOs manifest
+		          WHERE manifest.manifestNo=:manifestNumber
+		          AND manifest.operatingOffice IN(:operatingOffice)
+		          ORDER BY embManifest.manifestDate DESC
+		]]>
+	</query>
+	<query name="getLessManifestNumbers"> 
+		<![CDATA[ Select manifest.manifestNo 
+			FROM com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestNo not IN(:manifestNumbers) 
+			AND manifest.manifestEmbeddedIn=:manifestEmbeddedId 
+		]]>
+	</query>
+
+	<query name="getManifestNumbersByEmbeddedId"> 
+		<![CDATA[ Select manifest.manifestNo FROM 
+					com.ff.domain.manifest.ManifestDO manifest 
+					WHERE manifest.manifestEmbeddedIn=:manifestEmbeddedId 
+		]]>
+	</query>
+
+	<query name="getManifestIdByEmbeddedIdAndMfNo"> 
+		<![CDATA[ Select manifest.manifestId FROM 
+					com.ff.domain.manifest.ManifestDO 
+					manifest WHERE manifest.manifestNo IN(:manifestNumber) 
+					AND manifest.manifestEmbeddedIn=:manifestEmbeddedId 
+		]]>
+	</query>
+
+	<query name="getManifestId">
+		<![CDATA[ Select manifest.manifestId 
+				  FROM com.ff.domain.manifest.ManifestDO manifest 
+		          WHERE manifest.manifestNo IN(:manifestNumber)
+		          AND manifest.manifestProcessCode IN(:processCode) 
+		          AND manifest.updatingProcess.processCode IN(:updateProcessCode)
+		]]>
+	</query>
+
+	<query name="getManifestedDtls">
+		<![CDATA[  From com.ff.domain.manifest.ManifestDO manifest 
+		where  manifest.manifestNo = :manifestNo 
+		and  manifest.originOffice.officeId = :loginOfficeId 
+		and manifest.manifestProcessCode IN(:processCode)   
+		and manifest.updatingProcess.processCode IN(:processCode)
+		and  manifest.manifestStatus = :manifestStatus ]]>
+	</query>
+
+
+
+	<query name="getManifestHeader">
+		<![CDATA[ FROM com.ff.domain.manifest.ManifestDO manifest 
+		          WHERE manifest.manifestDate>:prevDate
+		          AND manifest.manifestDate<=:todayDate
+		          AND manifest.manifestEmbeddedIn is NULL
+		          AND manifest.manifestProcessCode IN(:processCode) 
+		          AND manifest.updatingProcess.processCode IN(:updateProcessCode)
+		          AND manifest.manifestType=:manifestType
+		]]>
+	</query>
+
+	<query name="getManifestIdByManifestNoOperatingOffice">
+		<![CDATA[ Select manifest.manifestId 
+				  FROM com.ff.domain.manifest.ManifestDO manifest 
+		          WHERE manifest.manifestNo IN(:manifestNumber)
+		          AND manifest.operatingOffice IN(:operatingOffice)
+		          AND manifest.manifestType=:manifestType
+		]]>
+	</query>
+
+	<query name="updateManifestRemarksById">
+		<![CDATA[
+			UPDATE com.ff.domain.manifest.ManifestDO manifest 
+				SET manifest.remarks=:remarks,
+					manifest.dtToCentral='N',
+					manifest.dtUpdateToCentral='Y'
+				WHERE manifest.manifestId IN (:manifestId)
+		]]>
+	</query>
+
+	<query name="isManifestNumInManifested">
+		<![CDATA[
+         	SELECT COUNT(*) FROM 
+	 		com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestNo IN(:manifestNumber)
+			AND manifest.operatingOffice IN(:operatingOffice)
+			AND manifest.manifestType='I'
+			AND manifest.manifestProcessCode IN(:processCode) 
+			AND manifest.updatingProcess.processCode IN(:updateProcessCode) 
+		]]>
+	</query>
+
+	<query name="isBplDoxParcel">
+		<![CDATA[
+         	SELECT COUNT(*) FROM 
+	 		com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestNo IN(:manifestNumber)
+			AND (
+				manifest.manifestProcessCode IN(:processCode)
+				OR manifest.manifestLoadContent.consignmentCode IN(:consignmentCode)
+				)
+		]]>
+	</query>
+
+	<!-- <query name="isManifestNumManifested"> <![CDATA[ SELECT COUNT(*) FROM 
+		com.ff.domain.manifest.ManifestDO manifest WHERE manifest.manifestNo IN(:manifestNumber) 
+		AND manifest.destOffice.officeId IN(:destOfficeId) AND manifest.manifestProcessCode 
+		IN(:processCode) AND manifest.updatingProcess.processCode IN(:updateProcessCode) 
+		AND manifest.manifestType=:manifestType ]]> </query> -->
+
+	<!-- <query name="isManifestNumInManifested"> <![CDATA[ SELECT COUNT(*) 
+		FROM com.ff.domain.manifest.ManifestMappedEmbeddedDO manifestMappedEmbedded 
+		WHERE manifestMappedEmbedded.manifestId IN ( SELECT manifest.manifestId FROM 
+		com.ff.domain.manifest.ManifestDO manifest WHERE manifest.manifestNo IN(:manifestNumber) 
+		) AND manifestMappedEmbedded.embeddedIn.manifestId in( SELECT manifest.manifestId 
+		FROM com.ff.domain.manifest.ManifestDO manifest WHERE manifest.destOffice.officeId 
+		IN(:destOfficeId) AND manifest.manifestType='I' ) ]]> </query> -->
+
+
+	<!-- End: In Manifest Queries -->
+	<!-- Start: POD Manifest Queries -->
+	<query name="isManifestExists">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ManifestDO manifest WHERE
+			manifest.manifestNo=:manifestNo AND 
+			manifest.manifestProcessCode =:manifestProcessCode AND 
+			manifest.manifestType = :manifestType AND 
+			manifest.manifestDirection = :manifestDirection
+		]]>
+	</query>
+	<query name="getManifestDtls">
+		<![CDATA[
+			FROM com.ff.domain.manifest.ManifestDO manifest WHERE 
+			manifest.manifestNo=:manifestNo AND  
+			manifest.manifestProcessCode =:manifestProcessCode AND 
+			manifest.manifestType = :manifestType AND 
+			manifest.destOffice.officeId = :originOfficeId AND
+			manifest.manifestDirection = :manifestDirection
+		]]>
+	</query>
+	
+	<query name="getManifestDtlsForIn">
+		<![CDATA[
+			FROM com.ff.domain.manifest.ManifestDO manifest WHERE 
+			manifest.manifestNo=:manifestNo AND  
+			manifest.manifestProcessCode =:manifestProcessCode AND 
+			manifest.manifestType = :manifestType AND 
+			manifest.originOffice.officeId = :originOfficeId AND
+			manifest.manifestDirection = :manifestDirection
+		]]>
+	</query>
+	<query name="getManifestDtlsOutgoingPOD">
+		<![CDATA[
+			FROM com.ff.domain.manifest.ManifestDO manifest WHERE 
+			manifest.manifestNo=:manifestNo AND  
+			manifest.manifestProcessCode =:manifestProcessCode AND 
+			manifest.manifestType = :manifestType AND 
+			manifest.originOffice.officeId = :originOfficeId AND
+			manifest.manifestDirection = :manifestDirection
+		]]>
+	</query>
+	<!-- End: POD Manifest Queries -->
+
+	<query name="getManifestDtlsByManifestNoOperatingOffice">
+		<![CDATA[ FROM com.ff.domain.manifest.ManifestDO manifest 
+		          WHERE manifest.manifestNo IN(:manifestNo)
+		          AND manifest.operatingOffice IN(:operatingOffice)
+		          ORDER BY manifest.manifestDate DESC
+		]]>
+	</query>
+
+
+	<!-- Dispatch/Receive DB sync Start -->
+
+	<query name="getManifestIdByNoTypeOrgOffId">
+		<![CDATA[  	Select manifest.manifestId
+					From com.ff.domain.manifest.ManifestDO manifest 
+					where  manifest.manifestNo = :manifestNo 
+					and  manifest.originOffice.officeId = :originOfficeId  
+					and  manifest.manifestType = :manifestType 
+				]]>
+	</query>
+	<query name="getManifestIdByNoTypeDestOffId">
+		<![CDATA[  	Select manifest.manifestId
+					From com.ff.domain.manifest.ManifestDO manifest 
+					where  manifest.manifestNo = :manifestNo 
+					and  manifest.destOffice.officeId = :destOfficeId
+					and  manifest.manifestType = :manifestType 
+				]]>
+	</query>
+	<!-- Dispatch/Receive DB sync End -->
+
+
+
+	<query name="getChildManifestInformation">
+		<![CDATA[From com.ff.domain.manifest.ManifestDO manifest where  manifest.manifestEmbeddedIn=:manifestID]]>
+	</query>
+
+	<query name="getComailDetails">
+		<![CDATA[From com.ff.domain.manifest.ManifestDO manifest
+		         where  manifest.manifestNo=:manifestNumber
+		         AND manifest.manifestProcessCode IN(:processCode) 
+		         AND manifest.updatingProcess.processCode IN(:updateProcessCode)
+		         AND manifest.containsOnlyCoMail='Y']]>
+	</query>
+
+
+	<query name="getManifestedDtlsByManifestNoStatusProcessCode">
+		<![CDATA[  From com.ff.domain.manifest.ManifestDO manifest 
+		where  manifest.manifestNo = :manifestNo 
+		and manifest.manifestProcessCode IN(:processCode)   
+		and manifest.updatingProcess.processCode IN(:processCode)
+		and  manifest.manifestStatus = :manifestStatus
+		and manifest.manifestEmbeddedIn is null ]]>
+	</query>
+
+
+	<query name="updateRemarksMisroute">
+		<![CDATA[
+			UPDATE com.ff.domain.manifest.ManifestDO manifest 
+				SET 
+				manifest.remarks=:remarks,
+				manifest.manifestType=:manifestType,
+				manifest.updatingProcess.processId=:updatedProcessId
+				WHERE manifest.manifestId = :manifestId
+		]]>
+	</query>
+
+	<query name="getInManifestedDtls4BPLOutManifestNoLoginOfficeId">
+		<![CDATA[  From com.ff.domain.manifest.ManifestDO manifest 
+		where  manifest.manifestNo = :manifestNo 
+		and  manifest.originOffice.officeId = :loginOfficeId 
+		and manifest.manifestProcessCode IN(:processCode)   
+		and manifest.manifestType=:manifestType  ]]>
+	</query>
+
+
+	<query name="getManifestDtlsByManifestNoAndStatus">
+		<![CDATA[  From com.ff.domain.manifest.ManifestDO manifest 
+		where  manifest.manifestNo = :manifestNo 
+		and manifest.manifestType in (:manifestType)
+		and  manifest.operatingOffice =:loginOfficeId 
+		 ]]>
+	</query>
+
+	<query name="getDirectManifestDtlsByManifestNoAndStatus">
+		<![CDATA[  From com.ff.domain.manifest.ManifestDO manifest 
+		where  manifest.manifestNo =:manifestNo 
+		and manifest.manifestType in (:manifestType)
+		and  manifest.manifestOpenType =:manifestOpenType
+		
+		 ]]>
+	</query>
+
+
+	<query name="getConsgStatusRTO">
+	<![CDATA[ 
+		FROM	com.ff.domain.manifest.ManifestDO manifest
+		WHERE	manifest.manifestType='R' 
+		AND		manifest.manifestId IN (	SELECT  consgManifest.manifest.manifestId
+											FROM  	com.ff.domain.manifest.ConsignmentManifestDO  consgManifest
+											WHERE 	consgManifest.consignment.consgId IN (	SELECT consg.consgId
+																						  	FROM   com.ff.domain.consignment.ConsignmentDO consg
+																						  	WHERE  consg.consgId=:consgId
+																						  	AND	   consg.consgStatus='R'	
+																						  )
+										)
+	]]>
+	</query>
+
+	<query name="getUniqueManifest">
+	<![CDATA[  
+		FROM com.ff.domain.manifest.ManifestDO manifest 
+		WHERE manifest.manifestNo=:manifestNo 
+		AND manifest.manifestProcessCode=:manifestProcessCode
+		AND manifest.manifestType=:manifestType
+		AND manifest.operatingOffice=:operatingOffice
+	]]>
+	</query>
+
+	<query name="getUniqueManifestForCreation">
+	<![CDATA[  
+		FROM com.ff.domain.manifest.ManifestDO manifest 
+		WHERE manifest.manifestNo=:manifestNo 
+		AND manifest.operatingOffice=:operatingOffice
+	]]>
+	</query>
+
+	<query name="isValidateScanedManifestNo">
+		<![CDATA[  
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ManifestDO manifest 
+			WHERE manifest.manifestNo=:manifestNo 
+			AND manifest.manifestDirection=:manifestDirection
+		]]>
+	</query>
+
+	<query name="getManifestsByManifestNos">
+	<![CDATA[  
+		FROM com.ff.domain.manifest.ManifestDO manifest 
+		WHERE manifest.manifestNo IN (:manifestNos)
+		AND manifest.manifestStatus=:manifestStatus
+		AND manifest.operatingOffice=:officeId
+		ORDER BY manifest.manifestNo,manifest.manifestDirection DESC
+	]]>
+	</query>
+
+	<query name="getDirectManifestsByManifestNos">
+	<![CDATA[  
+		FROM com.ff.domain.manifest.ManifestDO manifest 
+		WHERE manifest.manifestNo IN (:manifestNo)
+		and manifest.manifestType in (:manifestType)
+	]]>
+	</query>
+
+	<query name="getMisrouteByManifestNos">
+	<![CDATA[  
+		FROM com.ff.domain.manifest.ManifestDO manifest 
+		WHERE manifest.manifestNo IN (:manifestNos)
+		AND manifest.manifestDirection=:manifestDirection
+		AND manifest.manifestStatus=:manifestStatus
+		AND manifest.operatingOffice=:officeId
+	]]>
+	</query>
+
+	<query name="getManifestIdByManifestNoOriginType">
+	<![CDATA[  
+			Select manifest.manifestId
+					From com.ff.domain.manifest.ManifestDO manifest 
+					where  manifest.manifestNo = :manifestNumber 
+					and  manifest.originOffice.officeId = :OriginOfficeId
+					and  manifest.manifestType = :manifestType 
+	]]>
+	</query>
+
+	<query name="isManifestEmbeddedIn">
+	<![CDATA[
+		SELECT count(*) FROM com.ff.domain.manifest.ManifestDO header, com.ff.domain.manifest.ManifestDO detail 
+			WHERE detail.manifestId =:manifestId
+			AND	  detail.manifestEmbeddedIn = header.manifestId
+			AND   header.operatingOffice =:officeId
+			AND   header.manifestDirection =:manifestDirection
+			AND   header.manifestNo NOT IN (:manifestNo)
+	]]>
+	</query>
+
+	
+	
+	<query name="getNoOfElementsFromIn">
+	<![CDATA[
+		SELECT manifest.noOfElements FROM com.ff.domain.manifest.ManifestDO manifest
+				WHERE manifest.manifestNo=:manifestNo
+				AND manifest.noOfElements>0
+				ORDER BY manifest.manifestDate DESC
+	]]>
+	</query>
+	
+	
+	<query name="getManifestIdByNo">
+	<![CDATA[
+		SELECT manifest.manifestId FROM com.ff.domain.manifest.ManifestDO manifest
+				WHERE manifest.manifestNo=:manifestNo
+				AND manifest.noOfElements>0
+				AND manifest.originOffice.officeId=manifest.operatingOffice
+				ORDER BY manifest.manifestDate DESC
+	]]>
+	</query>
+	
+
+	<!-- <query name="getBagLockStockReductionDtls">
+		<![CDATA[
+			SELECT new com.ff.domain.stockmanagement.wrapper.ManifestStockReductionWrapperDO(manifest.bagLockNo, manifest.manifestDate, manifest.originOffice) 
+			FROM com.ff.domain.manifest.ManifestDO manifest
+			WHERE manifest.bagLockNo NOT IN (
+				SELECT stockConsumption.consignmentManifestNo 
+				FROM com.ff.domain.stockmanagement.operations.reduction.StockConsumptionLevelDO stockConsumption
+				WHERE LENGTH(stockConsumption.consignmentManifestNo)=:itemNoLength
+				)
+			AND LENGTH(manifest.bagLockNo)=:itemNoLength
+			AND manifest.bagLockNo IS NOT NULL
+			AND manifest.manifestDirection=:manifestDirection
+			AND (manifest.manifestDate BETWEEN :fromDate AND :toDate)
+			ORDER BY manifest.manifestDate
+		]]>
+	</query> -->
+
+<!-- 	<query name="getManifestForOut">
+	<![CDATA[
+		SELECT manifest FROM com.ff.domain.manifest.ManifestDO manifest
+		WHERE manifest.manifestNo=:manifestNo
+		AND manifest.operatingOffice=:operatingOffice
+		UNION
+		(SELECT manifest1 FROM com.ff.domain.manifest.ManifestDO manifest1
+		WHERE manifest1.manifestNo=:manifestNo
+		AND manifest1.manifestType = 'O'
+		AND manifest1.noOfElements>0
+		ORDER BY manifest1.manifestDate DESC LIMIT 1)
+	]]>
+	</query> -->
+	<query name="getManifestForOut">
+	<![CDATA[
+		SELECT manifest FROM com.ff.domain.manifest.ManifestDO manifest
+		WHERE manifest.manifestId IN (
+			SELECT manifest1.manifestId FROM com.ff.domain.manifest.ManifestDO manifest1
+			WHERE manifest1.manifestNo=:manifestNo
+			AND manifest1.operatingOffice=:operatingOffice
+		)
+		OR manifest.manifestId IN (
+			SELECT manifest2.manifestId FROM com.ff.domain.manifest.ManifestDO manifest2
+			WHERE manifest2.manifestNo=:manifestNo
+			AND manifest2.manifestType = 'O'
+			AND manifest2.noOfElements>0
+			AND manifest2.manifestDate IN (
+				SELECT max(manifest3.manifestDate) FROM com.ff.domain.manifest.ManifestDO manifest3
+				WHERE manifest3.manifestNo=:manifestNo
+				AND manifest3.manifestType = 'O'
+				AND manifest3.noOfElements>0
+			)
+		)
+	]]>
+	</query>
+	
+	<query name="trackManifestDetails">
+	<![CDATA[
+		SELECT manifest FROM com.ff.domain.manifest.ManifestDO manifest, 
+					com.ff.domain.tracking.ProcessDO process
+		WHERE manifest.manifestProcessCode = process.processCode  
+		AND manifest.manifestNo =:manifestNo 
+		AND manifest.manifestDirection = :manifestDirection 
+		ORDER BY manifest.createdDate,process.processOrder DESC
+	]]>
+	</query>
+	<query name="getMnfstOpenTypeAndBplMnfstType">
+		<![CDATA[ select new map(manifest.manifestOpenType as manifestOpenType ,manifest.bplManifestType as bplManifestType)  From com.ff.domain.manifest.ManifestDO manifest 
+		where  manifest.manifestNo =:manifestNumber 
+		and manifest.manifestType =:manifestType order by manifest.createdDate asc
+		
+		 ]]>
+	</query>
+		
+	<fetch-profile name="manifest-dox">
+		<fetch entity="com.ff.domain.manifest.ManifestDO" association="consignments"
+			style="select" />
+		<fetch entity="com.ff.domain.manifest.ManifestDO" association="comails"
+			style="select" />
+	</fetch-profile>
+
+	<fetch-profile name="manifest-out-dox">
+		<fetch entity="com.ff.domain.manifest.ManifestDO" association="doxConsignments"
+			style="join" />
+		<fetch entity="com.ff.domain.manifest.ManifestDO" association="comails"
+			style="join" />
+	</fetch-profile>
+	
+	<fetch-profile name="manifest-parcel">
+		<fetch entity="com.ff.domain.manifest.ManifestDO" association="consignments"
+			style="select" />
+	</fetch-profile>
+
+	<fetch-profile name="manifest-embedded-in">
+		<fetch entity="com.ff.domain.manifest.ManifestDO" association="embeddedManifestDOs"
+			style="select" />
+	</fetch-profile>
+
+	<fetch-profile name="manifest-parcel-embedded-in">
+		<fetch entity="com.ff.domain.manifest.ManifestDO" association="embeddedManifestDOs"
+			style="select" />
+		<fetch entity="com.ff.domain.manifest.ManifestDO" association="consignments"
+			style="select" />
+	</fetch-profile>
+	
+	<fetch-profile name="manifest-tracking">
+		<fetch entity="com.ff.domain.manifest.ManifestDO" association="consignments"
+			style="select" />
+		<fetch entity="com.ff.domain.manifest.ManifestDO" association="comails"
+			style="select" />
+		<fetch entity="com.ff.domain.manifest.ManifestDO" association="embeddedManifestDOs"
+			style="select" />	
+	</fetch-profile>
+	
+	
+</hibernate-mapping>

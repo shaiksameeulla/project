@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkMatrixDO" table="ff_d_rate_bench_mark_matrix">
+		<id name="rateBenchMarkMatrixId" type="java.lang.Integer" column="RATE_BENCH_MARK_MATRIX_ID">
+			<generator class="native" />
+		</id>
+				
+		<!-- <many-to-one name="rateOriginSectorDO" class="com.ff.domain.ratebenchmark.SectorDO"  lazy="false">
+        <column name="RATE_ORIGIN_SECTORS" ></column>
+        </many-to-one>
+        <many-to-one name="rateDestinationSectorDO" class="com.ff.domain.ratebenchmark.SectorDO"  lazy="false">
+        <column name="RATE_DESTINATION_SECTORS" ></column>
+        </many-to-one>
+        <many-to-one name="weightSlabDO" class="com.ff.domain.ratebenchmark.WeightSlabDO"  lazy="false">
+        <column name="WEIGHT_SLAB" ></column>
+        </many-to-one> -->
+        <property name="rateOriginSector" type="java.lang.Integer" >
+        <column name="RATE_ORIGIN_SECTORS" />
+        </property>
+        <property name="rateDestinationSector" type="java.lang.Integer" >
+        <column name="RATE_DESTINATION_SECTORS" />
+        </property>
+        <property name="weightSlab" type="java.lang.Integer" >
+        <column name="WEIGHT_SLAB" />
+        </property>
+        <many-to-one name="rateBenchMarkMatrixHeaderDO" class="com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkMatrixHeaderDO"  lazy="false"  fetch="join">
+        <column name="RATE_BENCH_MARK_MATRIX_HEADER" ></column>
+        </many-to-one>		
+        <property name="rate" type="java.lang.Double" >
+        <column name="RATE" />
+        </property>
+        <property name="dtToBranch" column="DT_TO_BRANCH"/>
+    </class>
+    
+    
+    <query name="getRateBenchMarkDetailsByIndustryCategoryId">
+		<![CDATA[
+ 				FROM com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkMatrixDO matrix where 
+				matrix.rateBenchMarkMatrixHeaderDO.rateBenchMarkProductDO.rateBenchMarkHeaderDO.rateIndustryCategoryDO.rateIndustryCategoryId=:rateIndustryCategoryId
+				AND matrix.rateBenchMarkMatrixHeaderDO.rateBenchMarkProductDO.rateBenchMarkHeaderDO.rateBenchMarkHeaderId =:rateBenchMarkHeaderId
+				AND matrix.rateBenchMarkMatrixHeaderDO.rateBenchMarkProductDO.rateBenchMarkHeaderDO.rateCustomerCategoryDO.rateCustomerCategoryId =:rateCustomerCategoryId
+				]]>
+	</query>
+	
+	<query name="getRateBenchMarkDetailsByIndustryProductVobSlabAndOrgSectorId">
+		<![CDATA[
+ 				FROM com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkMatrixDO matrix where 
+				matrix.rateBenchMarkMatrixHeaderDO.rateBenchMarkProductDO.rateBenchMarkHeaderDO.rateIndustryCategoryDO.rateIndustryCategoryId=:rateIndustryCategoryId
+				AND matrix.rateBenchMarkMatrixHeaderDO.rateBenchMarkProductDO.rateBenchMarkHeaderDO.rateBenchMarkHeaderId =:rateBenchMarkHeaderId
+				AND matrix.rateBenchMarkMatrixHeaderDO.rateBenchMarkProductDO.rateBenchMarkHeaderDO.rateCustomerCategoryDO.rateCustomerCategoryId =:rateCustomerCategoryId
+				AND matrix.rateBenchMarkMatrixHeaderDO.rateBenchMarkProductDO.rateProductCategoryDO.rateProductCategoryId =:rateProductCategoryId
+				AND matrix.rateBenchMarkMatrixHeaderDO.vobSlab =:vobSlab
+				AND matrix.rateOriginSector =:rateOriginSector
+				]]>
+	</query>
+
+	<query name="getRateBenchMarkDetailsByIndustryProductAndVobSlab">
+		<![CDATA[
+ 				FROM com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkMatrixDO matrix where 
+				matrix.rateBenchMarkMatrixHeaderDO.rateBenchMarkProductDO.rateBenchMarkHeaderDO.rateIndustryCategoryDO.rateIndustryCategoryId=:rateIndustryCategoryId
+				AND matrix.rateBenchMarkMatrixHeaderDO.rateBenchMarkProductDO.rateBenchMarkHeaderDO.rateBenchMarkHeaderId =:rateBenchMarkHeaderId
+				AND matrix.rateBenchMarkMatrixHeaderDO.rateBenchMarkProductDO.rateBenchMarkHeaderDO.rateCustomerCategoryDO.rateCustomerCategoryId =:rateCustomerCategoryId
+				AND matrix.rateBenchMarkMatrixHeaderDO.rateBenchMarkProductDO.rateProductCategoryDO.rateProductCategoryId =:rateProductCategoryId
+				AND matrix.rateBenchMarkMatrixHeaderDO.vobSlab =:vobSlab
+				AND matrix.rateOriginSector IS NULL
+				]]>
+	</query>	
+</hibernate-mapping>

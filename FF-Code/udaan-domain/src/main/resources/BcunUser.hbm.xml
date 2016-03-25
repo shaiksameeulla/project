@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.umc.BcunUserDO" table="ff_d_user">
+
+		<id name="userId" type="java.lang.Integer">
+			<column name="USER_ID" />
+			<generator class="assigned" />
+		</id>
+		<property name="userName" type="java.lang.String">
+			<column name="USER_NAME" />
+		</property>
+	
+		<property name="userType" type="java.lang.String">
+			<column name="USER_TYPE" />
+		</property>
+
+		<property name="locked" type="java.lang.String">
+			<column name="LOCKED" />
+		</property>
+
+		<property name="active" type="java.lang.String">
+			<column name="ACTIVE" />
+		</property>
+		<property name="loginAttempt" type="java.lang.Integer">
+			<column name="LOGIN_ATTEMPT" />
+		</property>
+
+		<property name="lastLoginDate">
+			<column name="LAST_LOGIN_DATE" />
+		</property>
+		<!-- <property name="city" type="java.lang.String">
+			<column name="CITY" />
+		</property> -->
+		<property name="userCode" type="java.lang.String">
+			<column name="USER_CODE" />
+		</property>
+		
+		<property name="createdBy" type="java.lang.Integer">
+            <column name="CREATED_BY" />
+         </property>
+          <property name="updatedBy" type="java.lang.Integer">
+            <column name="UPDATE_BY" />
+         </property>
+         
+          <property name="createdDate" type="java.util.Date">
+            <column name="CREATION_DATE" />
+         </property>
+         <property name="updatedDate" type="java.util.Date">
+            <column name="UPDATE_DATE" />
+         </property>
+         <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+         
+</class>
+	<query name="getOutboundBranchUsers">
+	<![CDATA[ 
+	select user FROM com.ff.domain.umc.BcunUserDO user, com.ff.domain.umc.EmployeeUserDO empUser where 
+	user.userId = empUser.userId
+	and  empUser.empDO.officeId=:branchId
+	and  
+	(user.dtToBranch ='N') 
+	]]>
+	</query>
+
+	
+</hibernate-mapping>

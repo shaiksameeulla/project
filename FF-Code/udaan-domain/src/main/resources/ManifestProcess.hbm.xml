@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.manifest.ManifestProcessDO" table="ff_f_manifest_process">
+		<id name="manifestProcessId" type="java.lang.Integer">
+			<column name="MANIFEST_PROCESS_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name="manifestProcessNo" type="java.lang.String">
+			<column name="MANIFEST_PROCESS_NO" />
+		</property>
+		
+		<property name="manifestProcessCode" type="java.lang.String">
+			<column name="MANIFEST_PROCESS_CODE" />
+		</property>
+		
+		<property name="manifestDirection" type="java.lang.String">
+			<column name="MANIFEST_DIRECTION" />
+		</property>
+		
+		<property name="manifestNo" type="java.lang.String">
+			<column name="MANIFEST_NO" />
+		</property>
+		
+		<property name="manifestOpenType" type="java.lang.String">
+			<column name="MANIFEST_OPEN_TYPE" />
+		</property>
+		
+		<property name="manifestDate" type="java.util.Date">
+			<column name="MANIFEST_DATE" />
+		</property>
+		
+		<property name="originOfficeId" type="java.lang.Integer">
+			<column name="ORIGIN_OFFICE" />
+		</property>
+		
+		<property name="destCityId" type="java.lang.Integer">
+				<column name="DESTINATION_CITY" />
+				</property>
+
+		
+		
+		<property name="destOfficeId" type="java.lang.Integer">
+			<column name="DESTINATION_OFFICE" />
+		</property>
+		
+		<property name="manifestWeight" type="java.lang.Double">
+			<column name="MANIFEST_WEIGHT" />
+		</property>
+		
+		<property name="multipleDestination" type="java.lang.String">
+			<column name="MULTIPLE_DESTINATION" />
+		</property>
+		
+		<property name="noOfElements" type="java.lang.Integer">
+			<column name="NO_OF_ELEMENTS" />
+		</property>
+		
+		<property name="containsOnlyCoMail" type="java.lang.String">
+			<column name="CONTAINS_ONLY_COMAIL" />
+		</property>
+		
+		<property name="manifestStatus" type="java.lang.String">
+			<column name="MANIFEST_STATUS" />
+		</property>
+		
+		<property name="bagRFID" type="java.lang.Integer">
+			<column name="BAG_RFID" />
+		</property>
+		
+		<property name="bplManifestType" type="java.lang.String">
+			<column name="BPL_MANIFEST_TYPE" />
+		</property>
+		
+		<property name="bagLockNo" type="java.lang.String">
+			<column name="BAG_LOCK_NO" />
+		</property>		
+		
+		<property name="loadLotId" type="java.lang.Integer">
+			<column name="LOAD_LOT_ID" />
+		</property>
+		
+		<property name="thirdPartyType" type="java.lang.String">
+			<column name="THIRD_PARTY_TYPE" />
+		</property>
+		
+		<property name="vendorId" type="java.lang.Integer">
+			<column name="VENDOR_ID" />
+		</property>
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		
+		<property name="createdBy" column="CREATED_BY" update="false"/>
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate"  column="CREATED_DATE"  update="false"/>
+		<property  name="updatedDate" column="UPDATE_DATE" />
+		
+		<property  name="dtToOpsman" type="java.lang.String">
+		<column name="DT_TO_OPSMAN"/>
+		</property>
+		
+		<property  name="dtFromOpsman" 	type="java.lang.String">
+		<column name="DT_FROM_OPSMAN"/>
+		</property>
+		
+	</class>
+<!-- 	<query name="getManifestProcessDtls">
+		<![CDATA[
+		FROM com.ff.domain.manifest.ManifestProcessDO manifestPro 
+		WHERE manifestPro.manifestNo IN (SELECT manifest.manifestNo 
+										FROM com.ff.domain.manifest.ManifestDO manifest 
+										WHERE manifest.manifestNo=:manifestNo 
+										AND manifest.originOffice.officeId=:originOfficeId 
+										AND manifest.manifestType=:manifestType	)
+			AND manifestPro.manifestDirection=:manifestDirection
+		]]>
+	</query>
+	
+	
+	<query name="getInManifestProcessDtls">
+		<![CDATA[
+		FROM com.ff.domain.manifest.ManifestProcessDO manifestPro 
+		WHERE manifestPro.manifestNo IN (SELECT manifest.manifestNo 
+										FROM com.ff.domain.manifest.ManifestDO manifest 
+										WHERE manifest.manifestNo=:ManifestNumber 
+										AND manifest.destOffice.officeId=:destOffcId 
+										AND manifest.manifestType=:manifestType 
+										AND manifest.manifestProcessCode=:manifestProcessCode)
+		AND manifestPro.manifestProcessCode=:manifestProcessCode 
+		AND manifestPro.manifestDirection=:manifestDirection
+			
+		]]>
+	</query>
+	
+		<query name="getBPLManifestProcessDtls">
+		<![CDATA[
+		FROM com.ff.domain.manifest.ManifestProcessDO manifestPro 
+		WHERE manifestPro.manifestNo IN (SELECT manifest.manifestNo 
+										FROM com.ff.domain.manifest.ManifestDO manifest 
+										WHERE manifest.manifestId=:manifestId 
+										AND manifest.originOffice.officeId=:originOfficeId 
+										AND manifest.manifestType=:manifestType 
+										AND manifest.manifestProcessCode=:manifestProcessCode)
+		AND manifestPro.manifestProcessCode=:manifestProcessCode 
+		AND manifestPro.manifestDirection=:manifestDirection
+			
+		]]>
+	</query>
+	
+	<query name="getManifestProcessDtlsforComail">
+		<![CDATA[
+		FROM com.ff.domain.manifest.ManifestProcessDO manifestPro 
+		WHERE manifestPro.manifestNo IN (SELECT manifest.manifestNo 
+										FROM com.ff.domain.manifest.ManifestDO manifest 
+										WHERE manifest.manifestNo=:manifestNo 
+										AND manifest.originOffice.officeId=:loginOfficeId 
+										and  manifest.manifestStatus =:manifestStatus)
+			AND manifestPro.manifestProcessCode=:processCode
+		]]>
+	</query> -->
+	
+	<!-- Starting Data sync querys -->
+<!-- 	<query name="getUnsyncInboundManifestProcess">
+		<![CDATA[From com.ff.domain.manifest.ManifestProcessDO manifestPro where (manifestPro.dtToCentral='N') 
+					and manifestPro.manifestStatus='C'  ]]>
+	</query>	
+	
+	<query name="getUpdateManifestProcess"> 
+	<![CDATA[ From com.ff.domain.manifest.ManifestProcessDO manifestPro where  manifestPro.manifestProcessId IN (:manifestProcessId) ]]>
+	</query>
+	
+	<query name="getUnsyncOutboundManifestProcess">
+		<![CDATA[from com.ff.domain.manifest.ManifestProcessDO manifestPro where manifestPro.destOfficeId=:branchId and (manifestPro.dtToBranch='N')]]>
+	</query>
+	
+	<query name="getManifestProcessId">
+		<![CDATA[
+			Select manifestProcess.manifestProcessId
+			FROM com.ff.domain.manifest.ManifestProcessDO manifestProcess 
+			WHERE manifestProcess.manifestNo=:manifestNo
+			and manifestProcess.manifestDirection=:manifestDirection
+			and manifestProcess.manifestProcessCode=:manifestProcessCode
+			and manifestProcess.originOfficeId=:originOfficeId
+			and manifestProcess.destOfficeId=:destOfficeId
+		]]>
+	</query>
+	 -->
+	<!-- Ending Data sync querys -->
+</hibernate-mapping>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.ratemanagement.masters.RateComponentDO"
+		table="ff_d_rate_component">
+		<id name="rateComponentId" type="java.lang.Integer" column="RATE_COMPONENT_ID">
+			<generator class="native" />
+		</id>
+
+		<property name="rateComponentCode" column="RATE_COMPONENT_CODE" />
+
+		<property name="rateComponentDesc" column="RATE_COMPNENT_DESC" />
+		<property name="rateComponentConfig" column="RATE_COMPONENT_CONFIGURATION" />
+		<property name="rateAmountDeviationType" column="RATE_AMOUNT_DERIVATION_TYPE" />
+		<property name="rateComponentType" column="RATE_COMPONENT_TYPE" />
+		<property name="rateGlobalConfigValue" column="RATE_GLOBAL_CONFIG_VALUE" />
+		<property name="componentExpessedIn" column="COMPONENT_EXPRESSED_IN" />
+		<property name="canOverrideGlobalValue" column="CAN_OVRRIDE_GLOBAL_VALUE" />
+		<property name="calculationSequence" column="ORDER_CALCULATION" />
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+
+	</class>
+	<!-- <query name="getProductRateComponentsByQuotation">
+		<![CDATA[
+				SELECT	comp, chrg.value, chrg.rateQuotationDO.rateQuotationId 
+				FROM	com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationFixedChargesDO as chrg   
+				RIGHT OUTER JOIN	 chrg.rateComponentDO as comp
+				WHERE		comp.rateComponentCode = chrg.rateComponentCode
+				AND		(comp.rateComponentType = 'B') 
+				OR  	((comp.rateComponentType != 'B')
+							AND comp.rateComponentId
+							IN	(SELECT applComp.rateComponent.rateComponentId 
+								 FROM 	com.ff.domain.ratemanagement.masters.RateComponentApplicableDO applComp  
+								 WHERE	applComp.product.productCode=:productCode 
+								 AND	applComp.consignmentType.consignmentCode=:consgType)
+						) 
+				ORDER BY comp.calculationSequence
+		]]>
+	</query> -->
+	<sql-query name="getRateComponentListForCash">
+		<return alias="rateComponentDO" class="com.ff.domain.ratemanagement.masters.RateComponentDO"/>
+		<![CDATA[ select  *
+				from  	ff_d_rate_component component  
+				where 	((component.RATE_COMPONENT_TYPE='B')  
+				or 		(component.RATE_COMPONENT_TYPE<>'B'  
+				and 	(component.RATE_COMPONENT_ID in ( select	applicable.Rate_Component  
+					 							  from   	ff_d_rate_component_applicable applicable,  
+															ff_d_product product,  
+															ff_d_consignment_type consgType  
+												  where		applicable.product=product.PRODUCT_ID  
+												  and 		applicable.Consignment_Type=consgType.CONSIGNMENT_TYPE_ID  
+												  and 		product.PRODUCT_CODE=:productCode 
+												  and 		consgType.CONSIGNMENT_CODE=:consgCode        
+												)        
+	   					)
+						)
+      				)   
+      			order by    component.ORDER_CALCULATION 
+      	]]>
+	</sql-query>
+	
+	<sql-query name="getRateComponentListForCreditCustomer">
+		<return alias="rateComponentDO" class="com.ff.domain.ratemanagement.masters.RateComponentDO"/>
+		<![CDATA[ 
+			SELECT component.RATE_COMPONENT_ID AS {rateComponentDO.rateComponentId},
+			       quotation.COMPONENT_VALUE AS {rateComponentDO.rateGlobalConfigValue},
+			       component.RATE_COMPONENT_CODE AS {rateComponentDO.rateComponentCode},
+			       component.RATE_COMPNENT_DESC AS {rateComponentDO.rateComponentDesc},
+			       component.RATE_COMPONENT_CONFIGURATION AS {rateComponentDO.rateComponentConfig},
+			       component.RATE_AMOUNT_DERIVATION_TYPE AS {rateComponentDO.rateAmountDeviationType},
+			       component.ORDER_CALCULATION AS {rateComponentDO.calculationSequence},
+			       component.RATE_COMPONENT_TYPE AS {rateComponentDO.rateComponentType},
+				   component.COMPONENT_EXPRESSED_IN AS {rateComponentDO.componentExpessedIn},
+				   component.CAN_OVRRIDE_GLOBAL_VALUE AS {rateComponentDO.canOverrideGlobalValue},
+				   component.DT_TO_BRANCH AS {rateComponentDO.dtToBranch}
+			  FROM    ff_d_rate_component component
+			       LEFT OUTER JOIN
+			          (SELECT *
+			             FROM ff_f_rate_quotation_fixed_charges
+			            WHERE RATE_QUOTATION =:rateQuotationId) quotation
+			       ON quotation.RATE_COMPONENT_CODE = component.RATE_COMPONENT_CODE
+			 WHERE ((component.RATE_COMPONENT_TYPE = 'B')
+			        OR (component.RATE_COMPONENT_TYPE <> 'B'
+			            AND (component.RATE_COMPONENT_ID IN
+			                    (SELECT applicable.Rate_Component
+			                       FROM ff_d_rate_component_applicable applicable,
+			                            ff_d_product product,
+			                            ff_d_consignment_type consgType
+			                      WHERE applicable.product = product.PRODUCT_ID
+			                            AND applicable.Consignment_Type =
+			                                   consgType.CONSIGNMENT_TYPE_ID
+			                            AND product.PRODUCT_CODE =:productCode
+			                            AND consgType.CONSIGNMENT_CODE =:consigCode))))
+			ORDER BY component.ORDER_CALCULATION
+      	]]>
+	</sql-query>
+	
+	<sql-query name="getRateComponentListForBA">
+		<return alias="rateComponentDO" class="com.ff.domain.ratemanagement.masters.RateComponentDO"/>
+		<![CDATA[ 
+			  SELECT   component.RATE_COMPONENT_ID AS {rateComponentDO.rateComponentId},
+				       addChrg.COMPONENT_VALUE AS {rateComponentDO.rateGlobalConfigValue},
+				       component.RATE_COMPONENT_CODE AS {rateComponentDO.rateComponentCode},
+				       component.RATE_COMPNENT_DESC AS {rateComponentDO.rateComponentDesc},
+				       component.RATE_COMPONENT_CONFIGURATION AS {rateComponentDO.rateComponentConfig},
+				       component.RATE_AMOUNT_DERIVATION_TYPE AS {rateComponentDO.rateAmountDeviationType},
+				       component.ORDER_CALCULATION AS {rateComponentDO.calculationSequence},
+				       component.RATE_COMPONENT_TYPE AS {rateComponentDO.rateComponentType},
+					   component.COMPONENT_EXPRESSED_IN AS {rateComponentDO.componentExpessedIn},
+					   component.CAN_OVRRIDE_GLOBAL_VALUE AS {rateComponentDO.canOverrideGlobalValue},
+					   component.DT_TO_BRANCH AS {rateComponentDO.dtToBranch}
+			  FROM    ff_d_rate_component component
+			       LEFT OUTER JOIN
+			          (SELECT *
+			             FROM ff_f_rate_ba_additional_charges
+			            WHERE BA_RATE_HEADER =:headerId AND PRIORITY_IND =:priorityInd) addChrg
+			       ON addChrg.RATE_COMPONENT_CODE = component.RATE_COMPONENT_CODE
+			 WHERE ((component.RATE_COMPONENT_TYPE = 'B')
+			        OR (component.RATE_COMPONENT_TYPE <> 'B'
+			            AND (component.RATE_COMPONENT_ID IN
+			                    (SELECT applicable.Rate_Component
+			                       FROM ff_d_rate_component_applicable applicable,
+			                            ff_d_product product,
+			                            ff_d_consignment_type consgType
+			                      WHERE applicable.product = product.PRODUCT_ID
+			                            AND applicable.Consignment_Type =
+			                                   consgType.CONSIGNMENT_TYPE_ID
+			                            AND product.PRODUCT_CODE =:productCode
+			                            AND consgType.CONSIGNMENT_CODE =:consigCode))))
+			ORDER BY component.ORDER_CALCULATION
+      	]]>
+	</sql-query>
+	
+	<sql-query name="getRateComponentListForCashAccUser">
+		<return alias="rateComponentDO" class="com.ff.domain.ratemanagement.masters.RateComponentDO"/>
+		<![CDATA[ 
+				 SELECT    component.RATE_COMPONENT_ID AS {rateComponentDO.rateComponentId},
+					       addChrg.COMPONENT_VALUE AS {rateComponentDO.rateGlobalConfigValue},
+					       component.RATE_COMPONENT_CODE AS {rateComponentDO.rateComponentCode},
+					       component.RATE_COMPNENT_DESC AS {rateComponentDO.rateComponentDesc},
+					       component.RATE_COMPONENT_CONFIGURATION AS {rateComponentDO.rateComponentConfig},
+					       component.RATE_AMOUNT_DERIVATION_TYPE AS {rateComponentDO.rateAmountDeviationType},
+					       component.ORDER_CALCULATION AS {rateComponentDO.calculationSequence},
+					       component.RATE_COMPONENT_TYPE AS {rateComponentDO.rateComponentType},
+					       component.COMPONENT_EXPRESSED_IN AS {rateComponentDO.componentExpessedIn},
+					       component.CAN_OVRRIDE_GLOBAL_VALUE AS {rateComponentDO.canOverrideGlobalValue},
+					       component.DT_TO_BRANCH AS {rateComponentDO.dtToBranch}
+				  FROM    ff_d_rate_component component
+				       LEFT OUTER JOIN
+				          (SELECT *
+				             FROM ff_f_rate_cash_additional_charges
+				            WHERE CASH_RATE_HEADER =:headerId AND PRIORITY_IND =:priorityInd) addChrg
+				       ON addChrg.COMPONENT_CODE = component.RATE_COMPONENT_CODE
+				 WHERE ((component.RATE_COMPONENT_TYPE = 'B')
+				        OR (component.RATE_COMPONENT_TYPE <> 'B'
+				            AND (component.RATE_COMPONENT_ID IN
+				                    (SELECT applicable.Rate_Component
+				                       FROM ff_d_rate_component_applicable applicable,
+				                            ff_d_product product,
+				                            ff_d_consignment_type consgType
+				                      WHERE applicable.product = product.PRODUCT_ID
+				                            AND applicable.Consignment_Type =
+				                                   consgType.CONSIGNMENT_TYPE_ID
+				                            AND product.PRODUCT_CODE =:productCode
+				                            AND consgType.CONSIGNMENT_CODE =:consigCode))))
+				ORDER BY component.ORDER_CALCULATION
+      	]]>
+	</sql-query>
+	
+
+</hibernate-mapping>

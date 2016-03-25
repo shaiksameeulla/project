@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.umc.bcun.BcunUserOfficeRightsDO" table="ff_d_user_office_rights">
+		<id name="userRightappingId" type="java.lang.Integer">
+			<column name="USER_MAPPING_ID" />
+			<generator class="assigned" />
+		</id>
+		
+		<property name="userId" column="USER_ID" />
+		<property name="officeId" column="OFFICE_ID" />
+		<property name="mappedTo" column="MAPPED_TO" />
+		<property name="status" column="STATUS" />
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		
+	</class>
+	<query name="getUnsyncOutboundUserOfficeRight">
+		<![CDATA[from com.ff.domain.umc.bcun.BcunUserOfficeRightsDO userOfficeRights where userOfficeRights.officeId=:branchId and userOfficeRights.dtToBranch='N']]>
+	</query>
+	
+</hibernate-mapping>
+	

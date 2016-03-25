@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.routeserviced.BcunTripDO" table="ff_f_trip">
+		<id name="tripId" type="java.lang.Integer" column="TRIP_ID">
+			<generator class="assigned" />
+		</id>
+				
+        <property name="arrivalTime" type="java.lang.String" column="ARRIVAL_TIME"/>
+        <property name="departureTime" type="java.lang.String" column="DEPARTURE_TIME"/>
+        <property name="active" type="java.lang.String" column="ACTIVE"/>
+        
+        <property name="dtToBranch" column="DT_TO_BRANCH"/>
+        <property name="dtToCentral" column="DT_TO_CENTRAL"/>
+        <property name="dtFromOpsman" column="DT_FROM_OPSMAN"/>
+        <property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL"/>
+        
+		<many-to-one name="transportDO" class="com.ff.domain.transport.BcunTransportDO" lazy="false" fetch="join" cascade="all">
+			<column name="TRANSPORT" />
+		</many-to-one>
+		 				
+		<many-to-one name="routeDO" class="com.ff.domain.routeserviced.BcunRouteDO" lazy="false" fetch="join" cascade="all">
+			<column name="ROUTE"/>
+		</many-to-one>
+		 				
+		<!-- <many-to-one name="originPortDO" class="com.ff.domain.transport.PortDO" lazy="false" fetch="join" cascade="all">
+			<column name="ORIGIN_PORT" />
+		</many-to-one>
+		 				
+		<many-to-one name="destPortDO" class="com.ff.domain.transport.PortDO" lazy="false" fetch="join" cascade="all">
+			<column name="DESTINATION_PORT" />
+		</many-to-one> -->
+	</class>
+		
+</hibernate-mapping>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.business.VendorOfficeMapDO" table="ff_d_vendor_office_map">
+		<id name="vendorOfficeMappingId" column="VENDOR_OFFICE_MAP_ID" type="java.lang.Integer" >
+			<generator class="native" />
+		</id>
+		<property name="vendorOfficeRegionId" column="VENDOR_OFFICE_REGION_ID" type="java.lang.Integer" />
+		<!-- <property name="vendorId" column="VENDOR_ID" /> -->
+		<many-to-one name="officeDO"
+			class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="OFFICE_ID" />
+		</many-to-one>
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		<property name="status" column="STATUS" />
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATED_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATED_DATE" />
+	</class>
+
+<query name="updateVendorOfficecMapping">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.business.VendorOfficeMapDO vendorOfcMapDO 
+		SET		vendorOfcMapDO.status=:status
+		WHERE	vendorOfcMapDO.officeDO.officeId=:officeId
+	]]>
+</query>
+
+<query name="getSelectedOfficesForVendor">
+	<![CDATA[ 
+ 		SELECT 
+		offMap.officeDO  
+		FROM  com.ff.domain.business.VendorOfficeMapDO offMap,com.ff.domain.business.VendorRegionMapDO regMap
+		WHERE regMap.vendorRegionMappingId = offMap.vendorOfficeRegionId
+		AND regMap.vendorDO.vendorId=:vendorId
+		AND regMap.regionId=:regionId
+		AND offMap.officeDO.cityId=:cityId
+	]]>
+</query>
+
+<!-- <query name="getSelectedOfficesForVendor">
+	<![CDATA[ 13 3 160 
+ 		SELECT * FROM ff_d_office as office
+		RIGHT JOIN ff_d_vendor_office_map as offMap ON office.OFFICE_ID = offMap.OFFICE_ID
+		LEFT JOIN ff_d_vendor_region_map as regMap ON
+		offMap.VENDOR_OFFICE_REGION_ID =regMap.VENDOR_REGION_MAP_ID
+		LEFT JOIN ff_d_city as city ON city.CITY_ID = office.CITY_ID
+		WHERE 
+		regMap.VENDOR_ID=:vendorId
+		AND
+		regMap.REGION_MAPPED_TO=:regionId
+		AND
+		city.CITY_ID=:city;
+	]]>
+</query> -->
+
+</hibernate-mapping>

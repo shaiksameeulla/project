@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class
+		name="com.ff.domain.stockmanagement.operations.requisition.StockRequisitionDO"
+		table="ff_f_stock_requisition">
+		<id name="stockRequisitionId" type="java.lang.Long">
+			<column name="REQUISITION_ID" />
+			<generator class="native" />
+		</id>
+		<property name="requisitionNumber" column="REQUISITION_NUMBER" />
+		<property name="reqCreatedDate" column="REQ_CREATED_DATE_TIME" />
+		<property name="approvedDate" column="APPROVED_DATE" />
+
+		<property name="isPrConsolidated" column="IS_PR_CONSOLIDATED" />
+		<property name="isAutoRequisition" column="IS_AUTO_REQUISITION" />
+
+		<!-- common attributes START -->
+		<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+		<!-- <property name="centralInboudStatus" column="DT_CENTRAL_INBOUND" />
+		<property name="centralOutboudStatus" column="DT_CENTRAL_OUTBOUND" /> -->
+		<!-- <property name="nodeId" column="TRANS_NODE_ID" /> -->
+		<!-- <property name="sapStatus" column="DT_SAP" /> -->
+		<!-- <property name="sapStatus" column="DT_SAP_OUTBOUND" /> <property name="sapStatusInBound" 
+			column="DT_SAP_INBOUND" /> <property name="sapTimestamp" column="SAP_TIMESTAMP" 
+			/> -->
+		<property name="createdBy" column="CREATED_BY_USER" />
+		<property name="updatedBy" column="UPDATED_BY_USER" />
+		<property name="approvedByUserId" column="APPROVED_BY_USER" />
+
+
+		<!-- common attributes END -->
+
+
+
+		<!-- One -to- Many relationships START -->
+		<set name="requisionItemDtls" lazy="false" cascade="all-delete-orphan"
+			inverse="true" fetch="join">
+			<key column="REQUISITION_ID" />
+			<one-to-many
+				class="com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO" />
+		</set>
+		<!-- One -to- Many relationships END -->
+
+		<!-- Many -to- one relationships START -->
+		<many-to-one name="supplyingOfficeDO" class="com.ff.domain.organization.OfficeDO"
+			lazy="false" fetch="join">
+			<column name="SUPPLY_OFFICE_ID" />
+		</many-to-one>
+
+		<many-to-one name="requisitionOfficeDO" class="com.ff.domain.organization.OfficeDO"
+			lazy="false" fetch="join">
+			<column name="REQUISITION_OFFICE_ID" />
+		</many-to-one>
+
+		<!-- <many-to-one name="approvedByUserDO" class="com.ff.domain.umc.UserDO" 
+			lazy="false" fetch="join"> <column name="APPROVED_BY_USER" /> </many-to-one> -->
+
+
+
+		<!-- Many -to- one relationships (Common attributes) START -->
+		<!-- <many-to-one name="createdByUserDO" class="com.ff.domain.umc.UserDO" 
+			lazy="false" fetch="join"> <column name="CREATED_BY_USER" /> </many-to-one> 
+			<many-to-one name="updatedByUserDO" class="com.ff.domain.umc.UserDO" lazy="false" 
+			fetch="join"> <column name="UPDATED_BY_USER" /> </many-to-one> -->
+		<!-- Many -to- one relationships (Common attributes) END -->
+
+
+		<!-- Many -to- one relationships END -->
+	</class>
+
+	<query name="findReqDtlsByReqNumber">
+<![CDATA[
+from com.ff.domain.stockmanagement.operations.requisition.StockRequisitionDO req 
+where req.requisitionNumber=:requisitionNumber
+ AND  
+ req.transactionStatus =:transactionStatus
+ AND req.requisitionOfficeDO.officeId = :officeId
+  AND req.isPrConsolidated='N'
+ ]]>
+</query>
+	<query name="findReqDtlsByReqNumberForApprove">
+<![CDATA[ select req
+from com.ff.domain.stockmanagement.operations.requisition.StockRequisitionDO as req 
+left outer join req.supplyingOfficeDO as office 
+left outer join office.officeTypeDO as  officeType
+where req.requisitionNumber=:requisitionNumber
+ 	AND  
+ req.transactionStatus =:transactionStatus
+  AND req.isPrConsolidated='N'
+ 	AND 
+ (office.officeId =:officeId
+ 	AND 
+ officeType.offcTypeCode =:offTypeCode)
+ 
+ ]]>
+	</query>
+
+	<query name="getMaxRequisitionNumber">
+<![CDATA[
+select max(req.requisitionNumber)from com.ff.domain.stockmanagement.operations.requisition.StockRequisitionDO req 
+where  req.transactionStatus =:transactionStatus
+AND req.requisitionNumber like :prefix
+AND  length(req.requisitionNumber) = :numberLength
+ AND req.requisitionOfficeDO.officeId = :officeId
+ ]]>
+	</query>
+
+	<query name="findReqDtlsByReqNumberForIssue">
+<![CDATA[
+ from com.ff.domain.stockmanagement.operations.requisition.StockRequisitionDO req 
+where req.requisitionNumber=:requisitionNumber
+ AND  
+ req.transactionStatus =:transactionStatus
+ AND req.supplyingOfficeDO.officeId = :officeId
+ 
+ ]]>
+	</query>
+
+	<query name="findReqDtlsByReqNumberForReceipt">
+<![CDATA[
+ from com.ff.domain.stockmanagement.operations.requisition.StockRequisitionDO req 
+	WHERE  req.requisitionNumber=:requisitionNumber
+	 AND req.requisitionOfficeDO.officeId = :officeId
+ 	 AND  req.transactionStatus =:transactionStatus
+ 	 AND req.isPrConsolidated='N'
+ 
+ ]]>
+	</query>
+	<query name="findReqDtlsByReqNumberForReceiptAtRho">
+<![CDATA[
+ from com.ff.domain.stockmanagement.operations.requisition.StockRequisitionDO req 
+	WHERE req.requisitionNumber=:requisitionNumber
+	 AND req.requisitionOfficeDO.officeId = :officeId 
+	 AND req.isPrConsolidated='Y'
+ 	 AND  req.transactionStatus =:transactionStatus
+ 
+ ]]>
+	</query>
+<query name="searchReqDtlsByRequisitonOffice">
+<![CDATA[
+from com.ff.domain.stockmanagement.operations.requisition.StockRequisitionDO req 
+where  req.transactionStatus =:transactionStatus
+ AND req.supplyingOfficeDO.officeId = :loggedInOfficeId
+ AND req.requisitionOfficeDO.officeId = :officeId
+ AND req.reqCreatedDate between :fromDate and :toDate
+ ]]>
+</query>
+<query name="searchAllReqDtlsBySupplyingOffice">
+<![CDATA[
+from com.ff.domain.stockmanagement.operations.requisition.StockRequisitionDO req 
+where  req.transactionStatus =:transactionStatus
+ AND req.supplyingOfficeDO.officeId = :loggedInOfficeId
+ AND req.reqCreatedDate between :fromDate and :toDate
+ ]]>
+</query>
+
+	<!-- <query name="getRequisitionDetailsForSAP"> <![CDATA[ FROM com.ff.domain.stockmanagement.operations.requisition.StockRequisitionDO 
+		reqDtls WHERE reqDtls.isPrConsolidated='Y' AND reqDtls.sapStatus =:sapStatus 
+		]]> </query> -->
+
+</hibernate-mapping>

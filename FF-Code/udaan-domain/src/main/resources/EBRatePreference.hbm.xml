@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.masters.EBRatePreferenceDO"
+		table="ff_d_eb_preference_rate">
+		<id name="ebRatePrefId" type="java.lang.Integer">
+			<column name="EB_PREF_RATE_ID" />
+			<generator class="native" />
+		</id>
+
+		<property name="applicability">
+			<column name="APPLICABILITY" />
+		</property>
+
+		<property name="rate">
+			<column name="RATE" />
+		</property>
+
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+
+		<many-to-one name="ebRateConfigDO"
+			class="com.ff.domain.ratemanagement.masters.EBRateConfigDO" lazy="false"  fetch="join">
+			<column name="EB_RATE_CONFIG_ID" />
+		</many-to-one>
+
+		<many-to-one name="bookingPreferenceDetailsDO"
+			class="com.ff.domain.booking.BookingPreferenceDetailsDO" lazy="false"
+			cascade="all"  fetch="join">
+			<column name="PREFERENCE" />
+		</many-to-one>
+
+	</class>
+
+	<query name="deactivatePreferences">
+		<![CDATA[
+			UPDATE com.ff.domain.ratemanagement.masters.EBRatePreferenceDO ratePref
+				SET ratePref.applicability = 'N'
+				WHERE ratePref.ebRatePrefId  IN(:prefIds)
+		]]>
+	</query>
+	<query name="getEBRatePreferenceDetails">
+		<![CDATA[
+			FROM 	com.ff.domain.ratemanagement.masters.EBRatePreferenceDO ratePref
+			WHERE 	ratePref.bookingPreferenceDetailsDO.preferenceCode  IN (:prefCodes)
+			AND		((ratePref.ebRateConfigDO.originState.stateId IS NULL) OR (ratePref.ebRateConfigDO.originState.stateId=:state))
+			AND		(:currentDate >= ratePref.ebRateConfigDO.validFromDate)
+			AND		ratePref.ebRateConfigDO.status = 'S'
+			ORDER BY ratePref.ebRateConfigDO.validFromDate desc, ratePref.ebRateConfigDO.originState.stateId desc
+		]]>
+	</query>
+
+
+	<query name="getBookingPrefDetails">
+		<![CDATA[
+		SELECT  ratePref.bookingPreferenceDetailsDO
+			FROM 	com.ff.domain.ratemanagement.masters.EBRatePreferenceDO ratePref
+			WHERE  
+					ratePref.ebRateConfigDO.status = 'S' and
+					(:currentDate >= ratePref.ebRateConfigDO.validFromDate)
+					 and ratePref.ebRateConfigDO.validToDate IS NULL
+					 and ratePref.applicability='Y'
+					 and ((0 = (select count(*) from com.ff.domain.ratemanagement.masters.EBRateConfigDO  ebr
+							where ebr.originState.stateId =:stateId) AND  ratePref.ebRateConfigDO.originState.stateId IS NULL)
+					 		  OR  ratePref.ebRateConfigDO.originState.stateId =:stateId)
+		]]>
+	</query>
+	<query name="isProductValidForEBCashContract">
+		<![CDATA[
+			SELECT  ratePref.ebRatePrefId
+			FROM 	com.ff.domain.ratemanagement.masters.EBRatePreferenceDO ratePref
+			WHERE 	ratePref.bookingPreferenceDetailsDO.preferenceCode  IN (:prefCodes)
+			AND		((ratePref.ebRateConfigDO.originState IS NULL) OR (ratePref.ebRateConfigDO.originState = (SELECT c.state 
+																											  FROM com.ff.domain.geography.CityDO c 
+																											  WHERE c.cityCode=:cityCode)))
+			AND		(:currentDate >= ratePref.ebRateConfigDO.validFromDate)
+			AND		ratePref.ebRateConfigDO.status = 'S'
+		]]>
+	</query>
+
+</hibernate-mapping>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+
+	
+	<class name="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSpecialDestinationDO"  table="ff_f_rate_quotation_special_destination">
+		<id name="rateQuotationSpecialDestinationId" type="java.lang.Integer" column="RATE_QUOTATION_SPECIAL_DESTINATION_ID">
+			<generator class="native" />
+		</id>
+		
+		  <!-- <property name="pinCode">
+        	<column name="RATE_QUOTATION_PINCODE"/>
+		</property>  -->
+		
+		<property name="stateId">
+        	<column name="STATE_ID"/>
+		</property>
+		
+		<property name="rate" type="java.lang.Double">
+        	<column name="RATE"/>
+		</property>
+		
+		<property name="order" type="java.lang.Integer">
+        	<column name="DESTINATION_ORDER"/>
+		</property>
+		
+		<property name="originSector">
+        	<column name="RATE_QUOTATION_ORIGIN_SECTOR"/>
+		</property>
+		
+		<many-to-one name="specialDestinationCityDO" class="com.ff.domain.geography.CityDO"  lazy="false"  fetch="join">
+		<column name="RATE_QUOTATION_SPECIAL_DESTINATION_CITY" />
+		</many-to-one>
+		
+		<many-to-one name="rateQuotationWeightSlabDO" class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWeightSlabDO"  lazy="false"  fetch="join">
+		<column name="RATE_QUOTATION_WEIGHT_SLAB" />
+		</many-to-one>
+		
+		<many-to-one name="rateQuotationProductCategoryHeaderDO" class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationProductCategoryHeaderDO"  lazy="false"  fetch="join">
+		<column name="RATE_QUOTATION_PRODUCT_CATEGORY_HEADER" />
+		</many-to-one>
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+		<property name="createdDate" column="CREATED_DATE" />
+ 		<property name="createdBy" column="CREATED_BY" />
+        <property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE"/>
+		<property name="rateConfiguredType" column="RATE_CONFIGURED_FOR_TYPE"/>
+    </class>
+    
+<!--     <query name="getRateQuotationSpecialDestination">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSpecialDestinationDO sd
+				  WHERE sd.rateQuotationProductCategoryHeaderDO.rateQuotationProductCategoryHeaderId=
+				  (
+				  	SELECT header.rateQuotationProductCategoryHeaderId FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationProductCategoryHeaderDO header
+				  		WHERE header.rateProductCategory.rateProductCategoryId=
+				  		(
+				  			select rpc.rateProductCategoryId from com.ff.domain.ratemanagement.masters.RateProductProductCategoryMapDO rpc
+				  			WHERE rpc.productId=
+				  			(
+				  				select p.productId FROM com.ff.domain.serviceOffering.ProductDO p WHERE p.productCode=:productSeries
+				  			)
+				  		)
+				  		and header.rateQuotationDO.rateQuotationId=
+					  		(
+					  			SELECT quotation.rateQuotationId FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+					  				WHERE quotation.customer.customerCode=:customerCode
+					  		)
+				  ) and sd.specialDestinationCityDO.cityId=
+				  (
+				  	select p.cityId FROM com.ff.domain.geography.PincodeDO p WHERE p.pincode=:pincode 
+				  )
+				  
+				  order by sd.rateQuotationWeightSlabDO.order
+				  
+		]]>
+	</query> -->
+	
+<!-- 	<query name="getSpecialDestinationSlabs">
+		<![CDATA[
+				  SELECT sd
+			      FROM 	com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSpecialDestinationDO sd
+			      INNER JOIN sd.rateQuotationProductCategoryHeaderDO productHeader
+			      INNER JOIN sd.rateQuotationWeightSlabDO weightSlabDO
+				  WHERE ((sd.specialDestinationCityDO.cityId=:cityId) OR (sd.specialDestinationCityDO.cityId IS NULL)
+				  AND (((:originConsidered = 'N') AND (sd.originSector IS NULL))
+                                OR ((:originConsidered = 'Y') AND  (sd.originSector =:originSector)))
+				  AND productHeader.rateQuotationProductCategoryHeaderId=:rateQuotationProductCategoryHeaderId
+				  ORDER BY sd.specialDestinationCityDO.cityId DESC, weightSlabDO.order
+		]]>
+	</query> -->
+	
+	<query name="deleteSpecialDestinationSlabRates">
+	<![CDATA[
+			DELETE FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSpecialDestinationDO sd 
+			WHERE sd.rateQuotationProductCategoryHeaderDO.rateQuotationProductCategoryHeaderId =:rateQuotationProductCategoryHeaderId
+			
+		]]>
+	</query>
+	
+	<query name="deleteRateQuotationOriginSectorSplDestSlabRateRecords">
+	<![CDATA[
+			DELETE FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSpecialDestinationDO sd 
+			WHERE sd.rateQuotationProductCategoryHeaderDO.rateQuotationProductCategoryHeaderId =:rateQuotationProductCategoryHeaderId 
+			AND sd.originSector =:originSector
+		]]>
+	</query>
+</hibernate-mapping>

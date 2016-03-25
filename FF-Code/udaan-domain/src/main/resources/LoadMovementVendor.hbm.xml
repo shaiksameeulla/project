@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.business.LoadMovementVendorDO" table="ff_d_vendor">
+		<id name="vendorId" type="java.lang.Integer" column="VENDOR_ID">
+			<generator class="assigned" />
+		</id>
+		
+        <property name="vendorCode" type="java.lang.String" column="VENDOR_CODE" />
+        <property name="firstname" type="java.lang.String" column="FIRST_NAME" />
+        <property name="lastName" type="java.lang.String" column="LAST_NAME" />
+        <property name="phone" type="java.lang.String" column="PHONE" />
+        <property name="businessName" type="java.lang.String" column="BUSINESS_NAME" />
+        <property name="mobile" column="MOBILE" />
+        <property name="fax" column="FAX" />
+        <property name="companyType" column="COMPANY_TYPE" />
+        <property name="service" column="SERVICE" />
+        <property name="email" column="EMAIL" />
+        <property name="address" column="ADDRESS" />
+        <property name="pincode" column="PINCODE" />
+        <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> 
+      <!--   <property name="vendorType" type="java.lang.String" column="VENDOR_TYPE" /> -->
+        
+        <many-to-one name = "vendorTypeDO" class ="com.ff.domain.business.VendorTypeDO" lazy="false" >
+        	<column name="VENDOR_TYPE" />
+		</many-to-one>
+        	
+         <many-to-one name="officeDO" class="com.ff.domain.organization.OfficeDO" lazy="false">
+			<column name="OFFICE_MAPPED_TO" />
+		</many-to-one>
+		
+		<!-- <many-to-one name="regionDO" class="com.ff.domain.geography.RegionDO" lazy="false">
+			<column name="REGION_MAPPED_TO" />
+		</many-to-one> -->
+		<set  name="vendorRegionMappingDO" lazy="false" cascade="all" inverse="true" fetch="join">
+            <key column="VENDOR_ID"/>
+            <one-to-many class="com.ff.domain.business.VendorRegionMapDO"/>
+        </set> 
+			 
+	</class>
+	
+	
+	<!-- <query name="getPartyNamesFromPartyType">
+	<![CDATA[ 
+	
+	FROM com.ff.domain.business.LoadMovementVendorDO  vendor
+	inner join vendor.vendorTypeDO as vendorType
+	 where vendorType.vendorTypeCode = :vendorTypeCode and
+	  vendor.vendorId IN 
+	  		(select vendorRegion.vendorDO.vendorId from com.ff.domain.business.VendorRegionMapDO vendorRegion where EXISTS (
+	  		
+	  		from  com.ff.domain.business.VendorOfficeMapDO vendorOffice
+	  		inner join vendorOffice.officeDO as office
+	  		inner join office.mappedRegionDO as regionDo
+	  		 where office.officeId=:officeId
+	  		 AND vendorRegion.regionId = regionDo.regionId
+	  		
+	  		
+	  		))
+	  		
+	  		 ]]>
+	</query> -->
+	
+	<query name="getPartyNamesFromPartyType">
+	<![CDATA[ 
+	
+	FROM com.ff.domain.business.LoadMovementVendorDO  vendor
+	where
+	vendor.vendorTypeDO.vendorTypeCode=:vendorTypeCode
+	and 
+	vendor.vendorId in
+			(select vendorRegion.vendorDO.vendorId from com.ff.domain.business.VendorRegionMapDO vendorRegion
+	where 
+	vendorRegion.regionId=
+			(select office.mappedRegionDO.regionId from com.ff.domain.organization.OfficeDO office where office.officeId=:officeId )
+	 and
+	vendorRegion.status='A'
+	 and
+	vendorRegion.vendorRegionMappingId in
+		 (select venderOffice.vendorOfficeRegionId from com.ff.domain.business.VendorOfficeMapDO venderOffice
+			where venderOffice.officeDO.officeId=:officeId
+			and venderOffice.status='A'))
+	  		 ]]>
+	</query>
+	
+	
+	<!-- <query name="getPartyNamesForCC">
+		<![CDATA[ FROM com.ff.domain.business.LoadMovementVendorDO  ccDO]]>
+	</query> -->
+	
+	<query name="getPartyNameByPartyId">
+		<![CDATA[ FROM com.ff.domain.business.LoadMovementVendorDO  ccDO where ccDO.vendorId =:vendorId]]>
+	</query>
+	
+	<query name="getVendorPartyNameByLoggedInCityId">
+		<![CDATA[
+		select distinct vendor
+		 FROM com.ff.domain.business.LoadMovementVendorDO  vendor
+		 inner join vendor.vendorTypeDO as vendorType
+	where 
+	
+	vendorType.vendorTypeCode=:vendorTypeCode 
+	and  vendor.vendorId IN
+	(select vendorRegion.vendorDO.vendorId from com.ff.domain.business.VendorRegionMapDO vendorRegion 
+	where 	vendorRegion.vendorRegionMappingId in
+			(select venderOffice.vendorOfficeRegionId from com.ff.domain.business.VendorOfficeMapDO
+			 venderOffice  where venderOffice.officeDO.officeId in
+	 	(select office.officeId from com.ff.domain.organization.OfficeDO office
+	 										 where 
+	 		office.cityId=:loggdCityId)))
+	 
+	 ]]>
+	</query>
+	
+	<query name="getAllVendorsForOfficeMapping">
+		<![CDATA[
+		SELECT concat(businessName,'~',vendorCode) FROM com.ff.domain.business.LoadMovementVendorDO
+	 ]]>
+	</query>
+	
+	<query name="getVendorListByTransportMode">
+		<![CDATA[ 
+			select		vendor
+			from		com.ff.domain.business.LoadMovementVendorDO vendor,
+						com.ff.domain.routeserviced.BcunServicedByDO sb,
+						com.ff.domain.routeserviced.ServiceByTypeDO sbt,
+						com.ff.domain.business.BcunVendorTypeDO vt,
+						com.ff.domain.transport.TransportModeDO tm						
+			where 		vendor.vendorId = sb.loadMovementVendorDO.vendorId
+			and 		vendor.vendorTypeDO.vendorTypeId = vt.vendorTypeId
+			and 		sbt.serviceByTypeId = sb.serviceByTypeDO.serviceByTypeId
+			and 		tm.transportModeId = sbt.transportModeDO.transportModeId
+			and			sb.serviceByTypeDO.serviceByTypeId in (1, 4, 7)
+			and 		sbt.transportModeDO.transportModeId = :transportMode
+			and 		vendor.vendorTypeDO.vendorTypeId = 4
+			and 		vt.vendorTypeCode = 'C'
+			order by	vendor.businessName
+		]]>
+	</query>
+	
+</hibernate-mapping>

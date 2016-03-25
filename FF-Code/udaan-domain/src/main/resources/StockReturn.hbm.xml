@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<class name="com.ff.domain.stockmanagement.operations.stockreturn.StockReturnDO" table="ff_f_stock_return">
+		<id name="stockReturnId" type="java.lang.Long">
+			<column name="STOCK_RETURN_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name = "issueNumber" column = "ISSUE_NUMBER" />
+		<property name = "returnNumber" column = "RETURN_NUMBER" />
+		<property name = "acknowledgementNumber" column = "ACKNOWLEDGEMENT_NUMBER" />
+		<property name = "issuedDate" column = "ISSUED_DATE" />
+		<property name = "returnDate" column = "RETURN_DATE" />
+		
+		<!--  common attributes  START -->
+		
+		<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+		<!-- <property name="centralInboudStatus" column="DT_CENTRAL_INBOUND" />
+		<property name="centralOutboudStatus" column="DT_CENTRAL_OUTBOUND" /> -->
+		<!-- <property name="nodeId" column="TRANS_NODE_ID" /> -->
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="createdBy" column="CREATED_BY_USER" />
+		<property name="updatedBy" column="UPDATED_BY_USER" />
+		
+		<!--  common attributes  END-->
+	
+		<!-- One -to- Many relationships START -->
+			<set  name="returnItemDtls" lazy="false" cascade="all-delete-orphan" inverse="true" fetch="join">
+	            <key column="STOCK_RETURN_ID"/>
+	            <one-to-many class="com.ff.domain.stockmanagement.operations.stockreturn.StockReturnItemDtlsDO"/>
+	        </set> 
+		<!-- One -to- Many relationships END -->
+	
+	<!-- Many -to- one relationships START -->
+			
+			<many-to-one name="returningOfficeDO"
+				class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+				<column name="RETURNING_OFFICE_ID" />
+			</many-to-one>
+	
+					
+			<many-to-one name="issuedOfficeDO"
+				class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+				<column name="ISSUED_OFFICE_ID" />
+			</many-to-one>
+		
+		<!-- Many -to- one relationships END -->
+		
+		<!-- Many -to- one relationships (Common attributes) START-->
+		<!-- <many-to-one name="createdByUserDO"
+			class="com.ff.domain.umc.UserDO" lazy="false" fetch="join">
+			<column name="CREATED_BY_USER" />
+		</many-to-one>
+		<many-to-one name="updatedByUserDO"
+			class="com.ff.domain.umc.UserDO" lazy="false" fetch="join">
+			<column name="UPDATED_BY_USER" />
+		</many-to-one> -->
+		<!-- Many -to- one relationships (Common attributes) END-->
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		
+		<!-- <property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		
+		<property name="dtToOpsman">
+			<column name="DT_TO_OPSMAN" />
+		</property>
+		
+ -->		
+	</class>
+
+
+<query name="getMaxStockReturnNumber">
+	<![CDATA[
+		select 	max(return.returnNumber)from com.ff.domain.stockmanagement.operations.stockreturn.StockReturnDO return 
+		where  	return.transactionStatus =:transactionStatus
+		AND length(return.returnNumber)=:numberLength
+		AND 	return.returnNumber like :prefix
+		AND 	return.returningOfficeDO.officeId = :officeId
+	 ]]>
+</query>
+
+<query name="findReturnDtlsByReturnNumber">
+	<![CDATA[
+		FROM	com.ff.domain.stockmanagement.operations.stockreturn.StockReturnDO stockReturn 
+		WHERE 	stockReturn.returnNumber = :returnNumber
+	 ]]>
+</query>
+
+<query name="getStockReturnDtlsFromCSD">
+	<![CDATA[ 
+		FROM	com.ff.domain.stockmanagement.operations.stockreturn.StockReturnDO stockReturn 
+		WHERE	stockReturn.sapStatus=:sapStatus
+	]]>
+</query>
+
+<query name="getStockReturnCount">
+	<![CDATA[ 
+		SELECT 	COUNT(*)
+		FROM	com.ff.domain.stockmanagement.operations.stockreturn.StockReturnDO stockReturn 
+		WHERE	stockReturn.sapStatus=:sapStatus
+	]]>
+</query>
+
+<query name="updateStockReturnDtlsOfCSD">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.stockmanagement.operations.stockreturn.StockReturnDO stockReturn 
+		SET		stockReturn.sapStatus=:sapStatus,stockReturn.sapTimestamp=:sapTimestamp
+		WHERE	stockReturn.returnNumber=:returnNumber
+	]]>
+</query>
+
+<!-- Query For Data Sync  Started -->
+	
+<!-- 	<query name="getUnsyncInboundStockReturn">
+		<![CDATA[ com.ff.domain.stockmanagement.operations.stockreturn.StockReturnDO stockReturn   where stockReturn.dtToCentral='N' or stockReturn.dtToCentral is null ]]>
+	</query>
+	
+	 -->
+	<!-- <query name="getstockReturnId">
+		<![CDATA[SELECT stockReturn.stockReturnId From com.ff.domain.stockmanagement.operations.stockreturn.StockReturnDO stockReturn  where  stockReturn.returnNumber = :returnNumber ]]>
+	</query> -->
+	
+<!-- Query For Data Sync  End -->	
+
+</hibernate-mapping>

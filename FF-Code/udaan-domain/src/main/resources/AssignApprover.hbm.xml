@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.umc.AssignApproverDO" table="ff_d_approver_assign">
+		<id name="assignApproverId" type="java.lang.Integer">
+			<column name="APPROVERASSIGN_ID" />
+			<generator class="native" />
+		</id>
+		<property name="user" type="java.lang.Integer">
+			<column name="USER_ID" />
+		</property>
+		<property name="screen" type="java.lang.Integer">
+			<column name="SCREEN" />
+		</property>
+		<property name="active">
+			<column name="ACTIVE" />
+		</property>
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>	
+	</class>
+	
+	
+	<query name="updateAssignApprover">
+		<![CDATA[
+			update com.ff.domain.umc.AssignApproverDO assAppDO set assAppDO.active=:active,assAppDO.dtToBranch='N' where assAppDO.user=:userId and assAppDO.screen=:screenId
+		]]>
+	
+	</query>
+</hibernate-mapping>
+	

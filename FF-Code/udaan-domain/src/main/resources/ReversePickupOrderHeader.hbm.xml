@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.ReversePickupOrderHeaderDO" table="ff_f_rev_pickup_order_request_header">
+		<id name="requestHeaderID" type="java.lang.Integer">
+			<column name="REQUEST_HEADER_ID" />
+			<generator class="native" />
+		</id>
+		<property name="requestDate" type="java.util.Date">
+			<column name="REQUEST_DATE" />
+		</property>
+		
+		<property name="originatingOffice" type="java.lang.Integer">
+			<column name="REQUEST_ORIGIN_OFFICE" />
+		</property>
+		
+		<property name="deliveryOffice" type="java.lang.Integer">
+			<column name="DELIVERY_OFFICE" />
+		</property>
+		
+		<property name="customer" type="java.lang.Integer">
+			<column name="CUSTOMER_ID" />
+		</property>
+		<property name="numOfOrders" type="java.lang.Integer">
+			<column name="NO_OF_ORDERS" />
+		</property>
+		
+		<property name="createdBy" column ="CREATED_BY" />
+		<property name="transactionCreateDate" update="false">
+			<column name="CREATION_DATE" />
+		</property>
+		
+		<property name="updatedBy" column ="UPDATE_BY" />
+		<property name="transactionModifiedDate" type="java.util.Date">
+			<column name="UPDATE_DATE" />
+		</property>
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		
+		 <property name="dtUpdateToCentral">
+			<column name="DT_UPDATE_TO_CENTRAL" />
+		</property>
+		
+		<set  name="detailsDO" lazy="false" fetch="join" cascade="all-delete-orphan" inverse="true" >
+            <key column="REQUEST_HEADER_ID"/>
+            <one-to-many class="com.ff.domain.pickup.ReversePickupOrderDetailDO"/>
+        </set> 
+
+		</class>
+		
+	
+	
+	
+	
+              
+ </hibernate-mapping>               
+
+	
+		
+		
+		
+		

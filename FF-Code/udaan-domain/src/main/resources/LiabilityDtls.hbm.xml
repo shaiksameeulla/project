@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.LiabilityDetailsDO" table="ff_f_liability_entries">
+		<id name="liabilityDetailId" type="java.lang.Integer">
+			<column name="LIABILITY_ENTRY_ID" />
+			<generator class="native" />
+		</id>
+		<property name="bookingDate" column="BOOKING_DATE" />
+		<property name="codLcAmt" column="COD_LC_AMT" />
+		<property name="collectedAmt" column="COLLECTED_AMT" />
+		<property name="paidAmt" column="PAID_AMT" />
+		<property name="position" column="POSITION" />
+		<property name="transactionBalanceAmount" column="BALANCE_AMOUNT" />
+		
+		<!--  common attributes  START-->
+		<property name="createdBy" column="CREATED_BY" update="false" />
+		<property name="createdDate" column="CREATED_DATE" update="false" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<!--  common attributes  END-->
+	
+		<!-- Many -to- one relationships START -->
+		
+		<many-to-one name="liabilityId"	
+			class="com.ff.domain.mec.LiabilityDO" lazy="false" fetch="join">
+			<column name="LIABILITY_ID" />
+		</many-to-one>
+		
+		<many-to-one name="consgId"
+			class="com.ff.domain.consignment.ConsignmentDO" lazy="false" fetch="join">
+			<column name="CONSIGNMENT_ID" />
+		</many-to-one>
+		<!-- Many -to- one relationships END -->
+	</class>
+	
+	<!-- <query name="getLiabilityEntriesDtlsForInterface">
+	<![CDATA[
+	 	FROM	com.ff.domain.mec.LiabilityDetailsDO liabilityEntries
+	 	WHERE	liabilityEntries.sapStatus=:sapStatus
+	]]>
+</query> -->
+
+ <query name="getTotalPaidLiabilityByConsg">
+	<![CDATA[
+	 	select sum(liabilityEntries.paidAmt) FROM	com.ff.domain.mec.LiabilityDetailsDO liabilityEntries
+	 	WHERE	liabilityEntries.consgId.consgId=:consgId
+	]]>
+</query> 
+
+</hibernate-mapping>

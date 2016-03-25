@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.business.CSDSAPVendorRegionMapDO" table="ff_d_vendor_region_map">
+		<id name="vendorRegionMappingId" column="VENDOR_REGION_MAP_ID" type="java.lang.Integer" >
+			<generator class="native" />
+		</id>
+		<property name="regionId" column="REGION_MAPPED_TO" />
+		<property name="status" column="STATUS" />
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATED_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATED_DATE" />
+		<!-- <property name="vendorId" column="VENDOR_ID" /> -->
+		<many-to-one name="vendorDO"
+			class="com.ff.domain.business.CSDSAPLoadMovementVendorDO" lazy="false" fetch="join">
+			<column name="VENDOR_ID" />
+		</many-to-one>
+		
+	</class>
+
+	<query name="getVendorRegionMapping">
+		<![CDATA[ 
+			FROM	com.ff.domain.business.CSDSAPVendorRegionMapDO  vendorMapDO
+			WHERE 	vendorMapDO.regionId=:regionId
+			AND		vendorMapDO.vendorDO.vendorId=:vendorId
+		]]>
+	</query>
+	
+</hibernate-mapping>

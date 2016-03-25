@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.stockreturn.StockReturnItemDtlsDO" table="ff_f_stock_return_item_dtls">
+		<id name="stockReturnItemDtlsId" type="java.lang.Long">
+			<column name="STOCK_RETURN_ITEM_DTLS_ID" />
+			<generator class="native" />
+		</id>
+		<property name="rowNumber" column="ROW_NUMBER" />
+		<property name="description" column="DESCRIPTION" />
+		<property name="uom" column="UOM" />
+		<property name="approvedQuantity" column="APPROVED_QUANTITY" />
+		<property name = "issuedQuantity" column = "ISSUED_QUANTITY" />
+		<property name="receivedQuantity" column="RECEIVED_QUANTITY" />
+		<property name="returningQuantity" column="RETURNING_QUANTITY" />
+		<property name="remarks" column="REMARKS" />
+		
+		<property name="officeProductCodeInSeries" column="OFFICE_PRODUCT_CODE_IN_SERIES" />
+		<property name="startLeaf" column="START_LEAF" />
+		<property name="endLeaf" column="END_LEAF" />
+		<property name="startSerialNumber" column="START_SI_NUMBER" />
+		<property name="endSerialNumber" column="END_SI_NUMBER" />
+
+
+<!--  common attributes  START-->
+	<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+	<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+	<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+	<!-- <property name="centralInboudStatus" column="DT_CENTRAL_INBOUND" />
+	<property name="centralOutboudStatus" column="DT_CENTRAL_OUTBOUND" /> -->
+	<!-- <property name="nodeId" column="TRANS_NODE_ID" /> -->
+	<!-- <property name="sapStatus" column="DT_SAP" /> -->
+	
+	<!--  common attributes  END-->
+	
+	<!-- Many -to- one relationships START -->
+		<many-to-one name="itemTypeDO"
+			class="com.ff.domain.stockmanagement.masters.ItemTypeDO" lazy="false" fetch="join">
+			<column name="ITEM_TYPE_ID" />
+		</many-to-one>
+		
+		<many-to-one name="itemDO"
+			class="com.ff.domain.stockmanagement.masters.ItemDO" lazy="false" fetch="join">
+			<column name="ITEM_ID" />
+		</many-to-one>
+		
+		<many-to-one name="returnDo"
+			class="com.ff.domain.stockmanagement.operations.stockreturn.StockReturnDO" lazy="false" fetch="join">
+			<column name="STOCK_RETURN_ID" />
+		</many-to-one>
+		
+		<!-- Many -to- one relationships END -->
+		
+		<!-- Many -to- one relationships (Common attributes) START-->
+		<!-- <many-to-one name="createdByUser"
+			class="com.ff.domain.umc.UserDO" lazy="false" fetch="join">
+			<column name="CREATED_BY_USER" />
+		</many-to-one>
+		<many-to-one name="updatedByUser"
+			class="com.ff.domain.umc.UserDO" lazy="false" fetch="join">
+			<column name="UPDATED_BY_USER" />
+		</many-to-one> -->
+		<!-- Many -to- one relationships (Common attributes) END-->
+		
+	</class>
+<query name="getStockReturnTODate">
+		<![CDATA[ select returnDo.transactionModifiedDate
+ 			FROM com.ff.domain.stockmanagement.operations.stockreturn.StockReturnItemDtlsDO as return
+ 			
+ 			left outer join return.returnDo as returnDo
+ 			WHERE 
+ 			returnDo.issuedOfficeDO.officeId=:partyTypeId
+ 			AND 
+ 			return.itemDO.itemId=:itemId
+ 			AND
+ 			return.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			return.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between return.startLeaf and return.endLeaf
+ 				   
+ 			order by return.transactionModifiedDate desc
+ 	
+		
+ 			
+		]]>
+	</query>
+	<query name="getStockReturnFromDate">
+		<![CDATA[ select returnDo.transactionModifiedDate
+ 			FROM com.ff.domain.stockmanagement.operations.stockreturn.StockReturnItemDtlsDO as return
+ 			
+ 			left outer join return.returnDo as returnDo
+ 			WHERE 
+ 			returnDo.returningOfficeDO.officeId=:partyTypeId
+ 			AND 
+ 			return.itemDO.itemId=:itemId
+ 			AND
+ 			return.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			return.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between return.startLeaf and return.endLeaf
+ 			order by return.transactionModifiedDate desc
+ 	
+		
+ 			
+		]]>
+	</query>
+	<query name="getLatestReturnDateByLeaf">
+		<![CDATA[ select returnDo.transactionModifiedDate
+ 			FROM com.ff.domain.stockmanagement.operations.stockreturn.StockReturnItemDtlsDO as return
+ 			
+ 			left outer join return.returnDo as returnDo
+ 			WHERE 
+ 			return.itemDO.itemId=:itemId
+ 			AND
+ 			return.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			return.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between return.startLeaf and return.endLeaf
+ 			order by return.transactionModifiedDate desc
+ 	
+		
+ 			
+		]]>
+	</query>
+	<!-- <query name="isSeriesReturnFromPlant">
+		<![CDATA[ select return.stockReturnItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.stockreturn.StockReturnItemDtlsDO as return
+ 			
+ 			left outer join return.returnDo as returnDo
+ 			WHERE 
+ 			returnDo.returningOfficeDO.officeId=:partyTypeId
+ 			AND 
+ 			return.itemDO.itemId=:itemId
+ 			AND
+ 			return.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			return.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between return.startLeaf and return.endLeaf
+ 				    
+ 			AND return.transactionModifiedDate IN (
+ 			select max(return1.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.stockreturn.StockReturnItemDtlsDO as return1
+ 			WHERE
+ 			return1.itemDO.itemId=:itemId
+ 			AND
+ 			return1.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			:leaf between return1.startLeaf and return1.endLeaf
+ 			    AND 
+ 			  return1.transactionStatus = :transactionStatus
+ 			
+ 			)
+ 	
+		
+ 			
+		]]>
+	</query> -->
+	
+	<sql-query name="isSeriesReturnFromPlant">
+		<return-scalar column="col_0_0_" type="long"/>
+		<![CDATA[ 
+		select
+        stockretur0_.STOCK_RETURN_ITEM_DTLS_ID as col_0_0_ 
+    from
+        ff_f_stock_return_item_dtls stockretur0_ 
+    left outer join
+        ff_f_stock_return stockretur1_ 
+            on stockretur0_.STOCK_RETURN_ID=stockretur1_.STOCK_RETURN_ID 
+    where
+        stockretur1_.RETURNING_OFFICE_ID =:partyTypeId
+        and stockretur0_.ITEM_ID =:itemId 
+        and stockretur0_.OFFICE_PRODUCT_CODE_IN_SERIES =:officeCode
+        and stockretur0_.TRANS_ACTIVE_STATUS=:transactionStatus
+        and (
+            :leaf between stockretur0_.START_LEAF and stockretur0_.END_LEAF
+        ) 
+        and (
+            stockretur0_.TRANS_MODIFIED_DATE_TIME in (
+                select
+                    max(stockretur2_.TRANS_MODIFIED_DATE_TIME) 
+                from
+                    ff_f_stock_return_item_dtls stockretur2_ 
+                where
+                    stockretur2_.ITEM_ID=:itemId
+                    and stockretur2_.OFFICE_PRODUCT_CODE_IN_SERIES=:officeCode 
+                    and (
+                        :leaf between stockretur2_.START_LEAF and stockretur2_.END_LEAF
+                    ) 
+                    and stockretur2_.TRANS_ACTIVE_STATUS=:transactionStatus
+            )
+        )
+ 
+      	]]>
+	</sql-query>
+	<query name="isSeriesReturnTOPlant">
+		<![CDATA[ select return.stockReturnItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.stockreturn.StockReturnItemDtlsDO as return
+ 			
+ 			left outer join return.returnDo as returnDo
+ 			WHERE 
+ 			returnDo.issuedOfficeDO.officeId=:partyTypeId
+ 			AND 
+ 			return.itemDO.itemId=:itemId
+ 			AND
+ 			return.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			return.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between return.startLeaf and return.endLeaf
+ 				    
+ 			AND return.transactionModifiedDate IN (
+ 			select max(return1.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.stockreturn.StockReturnItemDtlsDO as return1
+ 			WHERE 
+ 			return1.itemDO.itemId=:itemId
+ 			AND
+ 			return1.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			:leaf between return1.startLeaf and return1.endLeaf
+ 			    AND 
+ 			  return1.transactionStatus = :transactionStatus
+ 			
+ 			)
+ 	
+		
+ 			
+		]]>
+	</query>
+	<query name="getLatestReturnedDateBySerialNumber">
+		<![CDATA[
+ 			select returnDtls.transactionModifiedDate FROM com.ff.domain.stockmanagement.operations.stockreturn.StockReturnItemDtlsDO  returnDtls 
+ 		 		WHERE :startSerialNumber between returnDtls.startSerialNumber and returnDtls.endSerialNumber
+ 			AND length(returnDtls.startSerialNumber) = length(:startSerialNumber)
+       		AND returnDtls.transactionStatus = :transactionStatus
+       		ORDER BY returnDtls.transactionModifiedDate DESC
+		]]>
+	</query>
+	
+	<query name="getStockHolderFromStockReturn">
+		<![CDATA[ 
+			select new com.ff.domain.stockmanagement.wrapper.StockHolderWrapperDO(returnDO.issuedOfficeDO.officeId,returnDtls.transactionModifiedDate)	 FROM com.ff.domain.stockmanagement.operations.stockreturn.StockReturnItemDtlsDO as returnDtls 
+			inner join returnDtls.returnDo as returnDO
+ 		 		WHERE 
+ 		 		returnDtls.itemDO.itemId=:itemId
+ 		 		and
+ 		 		:startSerialNumber between returnDtls.startSerialNumber and returnDtls.endSerialNumber
+ 			AND length(returnDtls.startSerialNumber) = length(:startSerialNumber)
+       		AND returnDtls.transactionStatus = :transactionStatus
+       		ORDER BY returnDtls.transactionModifiedDate DESC
+		]]>
+	</query>
+	
+	<!-- Query For Data Sync  start -->	
+<!-- 	<query name="getstockReturnItemDtlsId">
+		<![CDATA[SELECT stockReturnDtls.stockReturnItemDtlsId 
+		From com.ff.domain.stockmanagement.operations.stockreturn.StockReturnItemDtlsDO stockReturnDtls  
+		where  stockReturnDtls.rowNumber = :rowNumber 
+		and stockReturnDtls.returnDo = :returnDo ]]>
+	</query> -->
+	
+<!-- Query For Data Sync  End -->	
+
+</hibernate-mapping>

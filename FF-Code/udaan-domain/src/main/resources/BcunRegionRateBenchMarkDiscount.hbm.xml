@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.rateBenchmarkDiscount.BcunRegionRateBenchMarkDiscountDO" table="ff_d_region_rate_bench_mark_discount">
+		<id name="regionRateBenchMarkDiscountId" type="java.lang.Integer">
+			<column name="REGION_RATE_BENCH_MARK_DISCOUNT_ID" />
+			<generator class="assigned" />
+		</id>
+		
+		<property name="discountPercentage" type="java.lang.Double">
+			<column name="DISCOUNT_PERCENTAGE" />
+		</property>
+		
+		<property name="industryCategory" type="java.lang.Integer">
+			<column name="RATE_INDUSTRY_CATEGORY" />
+		</property>
+		
+		<property name="discountApproved" type="java.lang.String">
+			<column name="REG_DISCOUNT_APPROVED" />
+		</property>
+		<property name="region" type="java.lang.Integer">
+			<column name="REGION" />
+		</property>
+		
+		<property name="employeeId" column="APPROVER"/>
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+	</class>
+</hibernate-mapping>

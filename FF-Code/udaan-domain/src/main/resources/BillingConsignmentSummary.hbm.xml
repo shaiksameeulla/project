@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.billing.BillingConsignmentSummaryDO"
+		table="ff_f_billing_consignment_summary">
+		<id column="SUMMARY_ID" name="billingConsignmentSummaryId" type="java.lang.Integer">
+			<generator class="native" />
+		</id>
+		<property column="TRANSACTION_IDENTIFIER" generated="never"
+			lazy="false" name="transactionIdentifier" />
+		<property column="SALES_ORDER" generated="never" lazy="false"
+			name="salesOrder" />
+		<property column="TRANSFER_STATUS" generated="never" lazy="false"
+			name="transferStatus" />
+		<property column="BOOKING_DATE" generated="never" lazy="false"
+			name="bookingDate" type="java.util.Date" />
+		<property column="CREATED_DATE" generated="never" lazy="false"
+			name="createdDate" type="java.util.Date" />
+		<property column="UPDATE_DATE" generated="never" lazy="false"
+			name="updatedDate" type="java.util.Date" />
+		<property column="CREATED_BY" generated="never" lazy="false"
+			name="createdBy" type="java.lang.Integer" />
+		<property column="UPDATE_BY" generated="never" lazy="false"
+			name="updatedBy" type="java.lang.Integer" />
+		<property column="SAP_TIMESTAMP" generated="never" lazy="false"
+			name="sapTimestamp" />
+		<many-to-one class="com.ff.domain.organization.OfficeDO"
+			lazy="false" fetch="join" name="pickupOfficeDO">
+			<column name="PICKUP_OFFICE_ID" />
+		</many-to-one>
+		<!-- <many-to-one name="productDO" class="com.ff.domain.serviceOffering.ProductDO" 
+			lazy="false"> <column name="PRODUCT_ID"/> </many-to-one> <many-to-one name="contractPaymentBillingLocationDO" 
+			class="com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO" 
+			lazy="false"> <column name="CONTRACT_PAYMENT_BILLING_LOCATION"/> </many-to-one> -->
+		<property column="SHIP_TO_CODE " generated="never" lazy="false"
+			name="shipToCode" />
+		<property column="UNIT_OF_MEASUREMENT" generated="never"
+			lazy="false" name="unitOfMeasurement" type="java.lang.Double" />
+		<property column="SUMMARY_TYPE " generated="never" lazy="false"
+			name="summaryType" />
+		<property column="DISTRIBUTION_CHANNEL " generated="never"
+			lazy="false" name="distributionChannel" />
+		<property column="NO_OF_PICKUPS" generated="never" lazy="false"
+			name="noOfPickups" type="java.lang.Integer" />
+		<!-- <many-to-one class="com.ff.domain.billing.BillDO" lazy="false" fetch="join"
+			name="billDO">
+			<column name="INVOICE" />
+		</many-to-one> -->
+		<property name="invoiceId" column="INVOICE"></property>
+		<!-- <many-to-one name="consignmentTypeDO" class="com.ff.domain.serviceOffering.ConsignmentTypeDO" 
+			lazy="false"> <column name="CONSIGNMENT_TYPE_ID"/> </many-to-one> <many-to-one 
+			name="destinationRegionDO" class="com.ff.domain.geography.RegionDO" lazy="false"> 
+			<column name="DESTINATION_REGION_ID"/> </many-to-one> -->
+		<set fetch="join" lazy="false" name="billingConsignmentDOs" sort="unsorted"
+			table="ff_f_billing_consignment">
+			<key>
+				<column name="SUMMARY" />
+			</key>
+			<one-to-many class="com.ff.domain.billing.BillingConsignmentDO" />
+		</set>
+		<property column="PRODUCT_CODE" generated="never" lazy="false"
+			name="productCode" type="java.lang.String" />
+		<property column="SUMMARY_CATEGORY" generated="never" lazy="false"
+			name="summaryCategory" type="java.lang.String" />
+		<property column="DESTINATION_OFFICE" generated="never" lazy="false"
+			name="destinationOffice" type="java.lang.String" />
+		<property column="VERSION" generated="never" lazy="false"
+			name="version" type="java.lang.Integer" />
+	</class>
+	<!-- bcsDO.transferStatus=:sapStatus, -->
+	<query name="updateBCSDetailsForSAP"> UPDATE
+		com.ff.domain.billing.BillingConsignmentSummaryDO bcsDO SET
+		bcsDO.transferStatus=:transferStatus,bcsDO.sapTimestamp=:sapTimestamp
+		WHERE bcsDO.billingConsignmentSummaryId=:billingConsignmentSummaryId
+	</query>
+	<query name="getBCSDtls"> FROM
+		com.ff.domain.billing.BillingConsignmentSummaryDO bcsDO WHERE
+		bcsDO.billingConsignmentSummaryId=:billingConsignmentSummaryId
+	</query>
+	<query name="updateSONumber"> UPDATE
+		com.ff.domain.billing.BillingConsignmentSummaryDO bcsDO SET
+		bcsDO.salesOrder=:salesOrder WHERE
+		bcsDO.billingConsignmentSummaryId=:billingConsignmentSummaryId
+	</query>
+</hibernate-mapping>

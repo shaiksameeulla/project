@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.RunsheetAssignmentHeaderDO"
+		table="ff_f_pickup_assignment_header">
+
+		<id name="assignmentHeaderId" type="java.lang.Integer">
+			<column name="PICKUP_ASSIGNMENT_HEADER_ID" />
+			<generator class="native" />
+		</id>
+
+		<many-to-one 
+			name="assignmentCreatedAtOfficeType" 
+			column="PICKUP_ASSIGNMENT_CREATED_AT"
+			unique="true"
+			lazy="false"
+			fetch="join" />
+		
+		<many-to-one 
+			name="assignmentCreatedForOfficeType" 
+			column="PICKUP_ASSIGNMENT_CREATED_FOR"
+			unique="true"
+			lazy="false"
+			fetch="join" />
+		
+		<property name="createdAtOfficeId" type="java.lang.Integer">
+			<column name="OFFICE_CREATED_AT" />
+		</property>
+
+		<property name="createdForOfficeId" type="java.lang.Integer">
+			<column name="OFFICE_CREATED_FOR" />
+		</property>
+
+		<property name="employeeFieldStaffId" type="java.lang.Integer">
+			<column name="EMPLOYEE_FIELD_STAFF" />
+		</property>
+
+		<many-to-one 
+			name="pickupAssignmentType" 
+			column="PICK_UP_ASSIGNMENT_TYPE"
+			unique="true"
+			lazy="false"
+			fetch="join" />
+			
+		<property name="runsheetAssignmentStatus" type="java.lang.String">
+			<column name="RUNSHEET_ASSIGNMENT_STATUS" />
+		</property>
+
+		<!-- <property name="dataTransferStatus" type="java.lang.String">
+			<column name="DATA_TRANSFER_STATUS" />
+		</property> -->
+
+		<property name="createdBy" type="java.lang.Integer">
+			<column name="CREATED_BY" />
+		</property>
+
+		<property name="createdDate" type="java.util.Date" update="false">
+			<column name="CREATION_DATE" />
+		</property>
+
+		<property name="updatedBy" type="java.lang.Integer">
+			<column name="UPDATE_BY" />
+		</property>
+
+		<property name="updatedDate" type="java.util.Date">
+			<column name="UPDATE_DATE" />
+		</property>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		<property name="dtUpdateToCentral">
+			<column name="DT_UPDATE_TO_CENTRAL" />
+		</property>
+		<set name="assignmentDetails" 
+			fetch="join" 
+			lazy="false"
+			inverse="true" 
+			cascade="all-delete-orphan">
+				<key column="PICKUP_ASSIGNMENT_HEADER_ID" not-null="true" />
+				<one-to-many class="com.ff.domain.pickup.RunsheetAssignmentDetailDO" />
+		</set>
+
+	</class>
+	<query name="getBranchesUnderHub">
+	<![CDATA[SELECT office.officeId,office.officeCode,office.officeName FROM com.ff.domain.organization.OfficeDO office 
+				WHERE office.reportingHUB =:loginOfficeId ]]>
+	</query>
+	
+	<query name="getRunsheetAssignmentHeader">
+	<![CDATA[FROM com.ff.domain.pickup.RunsheetAssignmentHeaderDO runsheetAssignmentHeader
+				WHERE runsheetAssignmentHeader.assignmentHeaderId=:assignmentHeaderId]]>
+	</query>
+	
+	<!--Start.....................Generate Pickup run sheet ...................-->
+	<query name="getPickupEmployeeUnderHub">
+	<![CDATA[
+	SELECT emp FROM com.ff.domain.organization.EmployeeDO emp
+		WHERE ((emp.officeId IN (:branchList)))
+		AND emp.empStatus = 'A'
+		AND emp.employeeId in (SELECT hdr.employeeFieldStaffId 
+								FROM com.ff.domain.pickup.RunsheetAssignmentHeaderDO hdr,
+								      com.ff.domain.pickup.RunsheetAssignmentDetailDO dtl
+								WHERE hdr.assignmentHeaderId = dtl.runsheetAssignmentHeaderDO.assignmentHeaderId
+								AND hdr.createdAtOfficeId = :createdAtOfficeId 
+								AND hdr.createdForOfficeId IN (:branchList)
+								AND (hdr.pickupAssignmentType.assignmentTypeId = (SELECT pkpAssgnType.assignmentTypeId 
+																			FROM com.ff.domain.pickup.PickupAssignmentTypeDO pkpAssgnType
+																			WHERE pkpAssgnType.assignmentTypeCode = 'P')
+								OR
+								((hdr.pickupAssignmentType.assignmentTypeId = (Select pkpAssgnType.assignmentTypeId 
+																			FROM com.ff.domain.pickup.PickupAssignmentTypeDO pkpAssgnType
+																			WHERE pkpAssgnType.assignmentTypeCode = 'T')))
+								AND DATE_FORMAT(hdr.createdDate, GET_FORMAT(DATE,'USA')) = DATE_FORMAT(current_date, GET_FORMAT(DATE,'USA'))))
+		ORDER BY emp.firstName
+	]]>
+	</query>
+    <query name="getAssignedPickupRunsheets">
+       <![CDATA[FROM com.ff.domain.pickup.RunsheetAssignmentHeaderDO runsheetAssignmentHeader
+                           WHERE runsheetAssignmentHeader.createdAtOfficeId=:createdAtOffice 
+                           AND runsheetAssignmentHeader.createdForOfficeId IN (:branchList)
+                           AND ((runsheetAssignmentHeader.pickupAssignmentType.assignmentTypeCode = 'T' 
+                           AND DATE_FORMAT(runsheetAssignmentHeader.createdDate, GET_FORMAT(DATE,'USA')) = DATE_FORMAT(current_date, GET_FORMAT(DATE,'USA')))                     
+                           OR (runsheetAssignmentHeader.pickupAssignmentType.assignmentTypeCode = 'P'))
+                           AND (((:emplist = 'S') and (runsheetAssignmentHeader.employeeFieldStaffId IN (:employeeId))) OR (:emplist = 'A'))
+                           AND 0 <> (SELECT COUNT (detail.assignmentDetailId) 
+                                                FROM com.ff.domain.pickup.RunsheetAssignmentDetailDO detail
+                                                WHERE detail.mappedStatus = 'Y'
+                                                AND detail.runsheetAssignmentHeaderDO.assignmentHeaderId = runsheetAssignmentHeader.assignmentHeaderId)]]>
+    </query>
+	<!--End.....................Generate Pickup run sheet .....................-->
+</hibernate-mapping>

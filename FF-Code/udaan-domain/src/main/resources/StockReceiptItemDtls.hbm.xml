@@ -1,0 +1,873 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO" table="ff_f_stock_receipt_item_dtls">
+		<id name="stockReceiptItemDtlsId" type="java.lang.Long">
+			<column name="STOCK_RECEIPT_ITEM_DTLS_ID" />
+			<generator class="native" />
+		</id>
+		<property name="rowNumber" column="ROW_NUMBER" />
+		<property name="description" column="DESCRIPTION" />
+		<property name="uom" column="UOM" />
+		<property name="requestedQuantity" column="REQUESTED_QUANTITY" />
+		<property name="issuedQuantity" column="ISSUED_QUANTITY" />
+		<property name="approvedQuantity" column="APPROVED_QUANTITY" />
+		<property name="receivedQuantity" column="RECEIVED_QUANTITY" />
+		<property name="officeProductCodeInSeries" column="OFFICE_PRODUCT_CODE_IN_SERIES" />
+		<property name="startLeaf" column="START_LEAF" />
+		<property name="endLeaf" column="END_LEAF" />
+		<property name="startSerialNumber" column="START_SI_NUMBER" />
+		<property name="endSerialNumber" column="END_SI_NUMBER" />
+		<property name="remarks" column="REMARKS" />
+		<property name="requisitionCreatedOfficeId" column="REQUISITION_CREATED_OFFICE_ID" /> 
+		<property name="balanceReturnQuantity" column="BALANCE_RETURN_QUANTITY" /> 
+		
+		
+		
+		<!--  common attributes  START-->
+		<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+		<!-- <property name="centralInboudStatus" column="DT_CENTRAL_INBOUND" />
+		<property name="centralOutboudStatus" column="DT_CENTRAL_OUTBOUND" /> -->
+		<!-- <property name="nodeId" column="TRANS_NODE_ID" /> -->
+		<!-- <property name="sapStatus" column="DT_SAP" /> -->
+		<!--  common attributes  END-->
+	
+		<!-- Many -to- one relationships START -->
+		<many-to-one name="itemTypeDO"
+			class="com.ff.domain.stockmanagement.masters.ItemTypeDO" lazy="false" fetch="join" >
+			<column name="ITEM_TYPE_ID" />
+		</many-to-one>
+		
+		<many-to-one name="itemDO"
+			class="com.ff.domain.stockmanagement.masters.ItemDO" lazy="false" fetch="join" >
+			<column name="ITEM_ID" />
+		</many-to-one>
+		
+		<many-to-one name="stockReceiptDO"
+			class="com.ff.domain.stockmanagement.operations.receipt.StockReceiptDO" lazy="false" fetch="join">
+			<column name="STOCK_RECEIPT_ID" />
+		</many-to-one>
+		
+		<!-- Many -to- one relationships END -->
+	</class>
+	<query name="isSeriesAlreadyReceivedWithReqNumber">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			
+ 			receiptDo.requisitionNumber = :transactionNumber
+ 			AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 (:leaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 				
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesAlreadyReceivedWithReqNumberWithRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			
+ 			receiptDo.requisitionNumber = :transactionNumber
+ 			AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			  ((:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 OR
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			  OR
+ 			  (receiptDtls.startLeaf between :startLeaf and :endLeaf)
+ 			  OR
+ 			  (receiptDtls.endLeaf between :startLeaf and :endLeaf))
+ 				
+ 			
+		]]>
+	</query>
+	<query name="isSeriesAlreadyReceivedWithReqNumberUnderItemType">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			inner join receiptDtls.itemDO as itemDo
+ 			inner join  itemDo.itemTypeDO as itemTypeDo
+ 			WHERE 
+ 			
+ 			receiptDo.requisitionNumber = :transactionNumber
+ 			AND
+ 			itemTypeDo.itemTypeId IN ( select item.itemTypeDO.itemTypeId FROM com.ff.domain.stockmanagement.masters.ItemDO as item where itemId= :itemId)
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 (:leaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 				
+ 			
+		]]>
+	</query>
+	<query name="isSeriesAlreadyReceivedWithReqNumberUnderItemTypeWithRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			inner join receiptDtls.itemDO as itemDo
+ 			inner join  itemDo.itemTypeDO as itemTypeDo
+ 			WHERE 
+ 			
+ 			receiptDo.requisitionNumber = :transactionNumber
+ 			AND
+ 			itemTypeDo.itemTypeId IN ( select item.itemTypeDO.itemTypeId FROM com.ff.domain.stockmanagement.masters.ItemDO as item where itemId= :itemId)
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 ((:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 OR
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			  OR
+ 			  (receiptDtls.startLeaf between :startLeaf and :endLeaf)
+ 			  OR
+ 			  (receiptDtls.endLeaf between :startLeaf and :endLeaf))
+ 				
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesAlreadyReceivedWithReqNumberExcludeId">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			
+ 			receiptDo.requisitionNumber = :transactionNumber
+ 			AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			    receiptDtls.stockReceiptItemDtlsId != :receiptItemDtlsId
+ 			    AND
+ 			 (:leaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 				
+ 			
+		]]>
+	</query>
+	<query name="isSeriesAlreadyReceivedWithReqNumberExcludeIdWithRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			
+ 			receiptDo.requisitionNumber = :transactionNumber
+ 			AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			    receiptDtls.stockReceiptItemDtlsId != :receiptItemDtlsId
+ 			    AND
+ 			  ((:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 OR
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			  OR
+ 			  (receiptDtls.startLeaf between :startLeaf and :endLeaf)
+ 			  OR
+ 			  (receiptDtls.endLeaf between :startLeaf and :endLeaf))
+ 				
+ 			
+		]]>
+	</query>
+	<query name="isSeriesAlreadyReceivedWithReqNumberUnderItemTypeExcludeId">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			inner join receiptDtls.itemDO as itemDo
+ 			inner join  itemDo.itemTypeDO as itemTypeDo
+ 			WHERE 
+ 			receiptDo.requisitionNumber = :transactionNumber
+ 			AND
+ 			receiptDtls.stockReceiptItemDtlsId != :receiptItemDtlsId
+ 			AND
+ 			itemTypeDo.itemTypeId IN ( select item.itemTypeDO.itemTypeId FROM com.ff.domain.stockmanagement.masters.ItemDO as item where itemId= :itemId)
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 (:leaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 				
+ 			
+		]]>
+	</query>
+	<query name="isSeriesAlreadyReceivedWithReqNumberUnderItemTypeExcludeIdWithRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			inner join receiptDtls.itemDO as itemDo
+ 			inner join  itemDo.itemTypeDO as itemTypeDo
+ 			WHERE 
+ 			receiptDo.requisitionNumber = :transactionNumber
+ 			AND
+ 			receiptDtls.stockReceiptItemDtlsId != :receiptItemDtlsId
+ 			AND
+ 			itemTypeDo.itemTypeId IN ( select item.itemTypeDO.itemTypeId FROM com.ff.domain.stockmanagement.masters.ItemDO as item where itemId= :itemId)
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			( (:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 OR
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			  OR
+ 			  (receiptDtls.startLeaf between :startLeaf and :endLeaf)
+ 			  OR
+ 			  (receiptDtls.endLeaf between :startLeaf and :endLeaf))
+ 				
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesAlreadyReceivedWithOtherReqNumber">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			receiptDo.requisitionNumber is not null
+ 			AND 
+ 			receiptDo.requisitionNumber != :transactionNumber
+ 			AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 (:leaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 				
+ 			
+		]]>
+	</query>
+	<query name="isSeriesAlreadyReceivedWithOtherReqNumberWithRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			receiptDo.requisitionNumber is not null
+ 			AND 
+ 			receiptDo.requisitionNumber != :transactionNumber
+ 			AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 ((:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 OR
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			  OR
+ 			  (receiptDtls.startLeaf between :startLeaf and :endLeaf)
+ 			  OR
+ 			  (receiptDtls.endLeaf between :startLeaf and :endLeaf))
+ 				
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesAlreadyReceivedWithOtherReqNumberUnderItemType">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			inner join receiptDtls.itemDO as itemDo
+ 			inner join  itemDo.itemTypeDO as itemTypeDo
+ 			WHERE 
+ 			receiptDo.requisitionNumber is not null
+ 			AND 
+ 			receiptDo.requisitionNumber != :transactionNumber
+ 			AND
+ 			itemTypeDo.itemTypeId IN ( select item.itemTypeDO.itemTypeId FROM com.ff.domain.stockmanagement.masters.ItemDO as item where itemId= :itemId)
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 (:leaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 				
+ 			
+		]]>
+	</query>
+	<query name="isSeriesAlreadyReceivedWithOtherReqNumberUnderItemTypeWithRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			inner join receiptDtls.itemDO as itemDo
+ 			inner join  itemDo.itemTypeDO as itemTypeDo
+ 			WHERE 
+ 			receiptDo.requisitionNumber is not null
+ 			AND 
+ 			receiptDo.requisitionNumber != :transactionNumber
+ 			AND
+ 			itemTypeDo.itemTypeId IN ( select item.itemTypeDO.itemTypeId FROM com.ff.domain.stockmanagement.masters.ItemDO as item where itemId= :itemId)
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 ((:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 OR
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			  OR
+ 			  (receiptDtls.startLeaf between :startLeaf and :endLeaf)
+ 			  OR
+ 			  (receiptDtls.endLeaf between :startLeaf and :endLeaf))
+ 				
+ 			
+		]]>
+	</query>
+	<query name="isSeriesAlreadyReceivedWithOtherReqNumberExcludeId">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			    receiptDtls.stockReceiptItemDtlsId != :receiptItemDtlsId
+ 			    AND
+ 			 receiptDo.requisitionNumber != :transactionNumber
+ 			 AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between receiptDtls.startLeaf and receiptDtls.endLeaf
+ 				
+ 			
+		]]>
+	</query>
+	<query name="isSeriesAlreadyReceivedWithOtherReqNumberExcludeIdWithRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			    receiptDtls.stockReceiptItemDtlsId != :receiptItemDtlsId
+ 			    AND
+ 			 receiptDo.requisitionNumber != :transactionNumber
+ 			 AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			( (:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 OR
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			  OR
+ 			  (receiptDtls.startLeaf between :startLeaf and :endLeaf)
+ 			  OR
+ 			  (receiptDtls.endLeaf between :startLeaf and :endLeaf))
+ 				
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesAlreadyReceivedWithOtherReqNumberUnderItemTypeExcludeId">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			inner join receiptDtls.itemDO as itemDo
+ 			inner join  itemDo.itemTypeDO as itemTypeDo
+ 			WHERE 
+ 			    receiptDtls.stockReceiptItemDtlsId != :receiptItemDtlsId
+ 			    AND
+ 			 receiptDo.requisitionNumber != :transactionNumber
+ 			 AND
+ 			itemTypeDo.itemTypeId IN ( select item.itemTypeDO.itemTypeId FROM com.ff.domain.stockmanagement.masters.ItemDO as item where itemId= :itemId)
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between receiptDtls.startLeaf and receiptDtls.endLeaf
+ 				
+ 			
+		]]>
+	</query>
+	<query name="isSeriesAlreadyReceivedWithOtherReqNumberUnderItemTypeExcludeIdWithRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			inner join receiptDtls.itemDO as itemDo
+ 			inner join  itemDo.itemTypeDO as itemTypeDo
+ 			WHERE 
+ 			    receiptDtls.stockReceiptItemDtlsId != :receiptItemDtlsId
+ 			    AND
+ 			 receiptDo.requisitionNumber != :transactionNumber
+ 			 AND
+ 			itemTypeDo.itemTypeId IN ( select item.itemTypeDO.itemTypeId FROM com.ff.domain.stockmanagement.masters.ItemDO as item where itemId= :itemId)
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			  ((:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 OR
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			  OR
+ 			  (receiptDtls.startLeaf between :startLeaf and :endLeaf)
+ 			  OR
+ 			  (receiptDtls.endLeaf between :startLeaf and :endLeaf))
+ 				
+ 			
+		]]>
+	</query>
+	
+	
+	<query name="isSeriesAlreadyReceivedWithIssueNumber">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			 receiptDo.issueNumber = :transactionNumber
+ 			 AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between receiptDtls.startLeaf and receiptDtls.endLeaf
+ 				
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesAlreadyReceivedWithIssueNumberWithRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			 receiptDo.issueNumber = :transactionNumber
+ 			 AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			( (:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 OR
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			  OR
+ 			  (receiptDtls.startLeaf between :startLeaf and :endLeaf)
+ 			  OR
+ 			  (receiptDtls.endLeaf between :startLeaf and :endLeaf))
+ 				
+ 			
+		]]>
+	</query>
+	<query name="isSeriesAlreadyReceivedWithIssueNumberExcludeId">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			 receiptDo.issueNumber = :transactionNumber
+ 			 AND
+ 			  receiptDtls.stockReceiptItemDtlsId != :receiptItemDtlsId
+ 			  AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between receiptDtls.startLeaf and receiptDtls.endLeaf
+ 				
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesAlreadyReceivedWithIssueNumberExcludeIdWithRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			 receiptDo.issueNumber = :transactionNumber
+ 			 AND
+ 			  receiptDtls.stockReceiptItemDtlsId != :receiptItemDtlsId
+ 			  AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			( (:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 OR
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			  OR
+ 			  (receiptDtls.startLeaf between :startLeaf and :endLeaf)
+ 			  OR
+ 			  (receiptDtls.endLeaf between :startLeaf and :endLeaf))
+ 				
+ 			
+		]]>
+	</query>
+	
+	<!-- <query name="isSeriesExistInOffice">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDo.receiptOfficeId.officeId=:partyTypeId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between receiptDtls.startLeaf and receiptDtls.endLeaf
+ 				AND
+		receiptDtls.transactionModifiedDate IN(
+				 SELECT max(receiptDtls1.transactionModifiedDate)
+ 				FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls1
+ 				WHERE 
+ 				receiptDtls1.itemDO.itemId=:itemId
+ 				AND
+ 				receiptDtls1.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 				receiptDtls1.transactionStatus = :transactionStatus
+ 			    AND  
+ 			(  	:leaf between receiptDtls1.startLeaf and receiptDtls1.endLeaf	)	)
+ 			
+ 			
+		]]>
+	</query> -->
+	
+	<sql-query name="isSeriesExistInOffice">
+		<return-scalar column="col_0_0_" type="long"/>
+		<![CDATA[ 
+		       
+        select
+        stockrecei0_.STOCK_RECEIPT_ITEM_DTLS_ID as col_0_0_ 
+    from
+        ff_f_stock_receipt_item_dtls stockrecei0_ 
+    inner join
+        ff_f_stock_receipt stockrecei1_ 
+            on stockrecei0_.STOCK_RECEIPT_ID=stockrecei1_.STOCK_RECEIPT_ID 
+    where
+        stockrecei0_.ITEM_ID=:itemId 
+        and stockrecei1_.RECEIPT_OFFICE_ID=:partyTypeId
+        and stockrecei0_.OFFICE_PRODUCT_CODE_IN_SERIES=:officeCode
+        and stockrecei0_.TRANS_ACTIVE_STATUS=:transactionStatus 
+        and (
+            :leaf between stockrecei0_.START_LEAF and stockrecei0_.END_LEAF
+        ) 
+        and (
+            stockrecei0_.TRANS_MODIFIED_DATE_TIME in (
+                select
+                    max(stockrecei2_.TRANS_MODIFIED_DATE_TIME) 
+                from
+                    ff_f_stock_receipt_item_dtls stockrecei2_ 
+                where
+                    stockrecei2_.ITEM_ID=:itemId 
+                    and stockrecei2_.OFFICE_PRODUCT_CODE_IN_SERIES=:officeCode
+                    and stockrecei2_.TRANS_ACTIVE_STATUS=:transactionStatus 
+                    and (
+                        :leaf between stockrecei2_.START_LEAF and stockrecei2_.END_LEAF
+                    )
+            )
+        )
+      	]]>
+	</sql-query>
+	
+	<query name="latestSeriesDateForReceipt">
+		<![CDATA[ select receiptDo.transactionModifiedDate
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDo.receiptOfficeId.officeId=:partyTypeId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between receiptDtls.startLeaf and receiptDtls.endLeaf
+ 				order by receiptDtls.transactionModifiedDate desc
+ 			
+ 			
+		]]>
+	</query>
+	
+	<query name="latestSeriesDateForReceiptWithoutOffice">
+		<![CDATA[ select receiptDo.transactionModifiedDate
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between receiptDtls.startLeaf and receiptDtls.endLeaf
+ 				order by receiptDtls.transactionModifiedDate desc
+ 			
+ 			
+		]]>
+	</query>
+	<query name="receivedQntyForIssueNumberForReturn">
+		<![CDATA[ SELECT SUM(receiptDtls.receivedQuantity)
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDo.issueNumber = :issueNumber
+ 			AND
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			AND  
+ 			receiptDo.acknowledgementNumber is not null
+		]]>
+	</query>
+	<query name="isSeriesIssuedToOfficeForStockIntegration">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDo.receiptOfficeId.officeId=:partyTypeId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between receiptDtls.startLeaf and receiptDtls.endLeaf
+ 				AND
+		receiptDtls.transactionModifiedDate IN(
+				 SELECT max(receiptDtls1.transactionModifiedDate)
+ 				FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls1
+ 				WHERE 
+ 				receiptDtls1.itemDO.itemId=:itemId
+ 				AND
+ 				receiptDtls1.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 				receiptDtls1.transactionStatus = :transactionStatus
+ 			    AND  
+ 			(  	:leaf between receiptDtls1.startLeaf and receiptDtls1.endLeaf	)	)
+ 			
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesIssuedToRegionForStockIntegration">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDo.receiptOfficeId.officeId IN (select loffice.reportingRHO FROM com.ff.domain.organization.OfficeDO loffice where loffice.officeId =:partyTypeId)
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between receiptDtls.startLeaf and receiptDtls.endLeaf
+ 				AND
+		receiptDtls.transactionModifiedDate IN(
+				 SELECT max(receiptDtls1.transactionModifiedDate)
+ 				FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls1
+ 				WHERE 
+ 				receiptDtls1.itemDO.itemId=:itemId
+ 				AND
+ 				receiptDtls1.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 				receiptDtls1.transactionStatus = :transactionStatus
+ 			    AND  
+ 			(  	:leaf between receiptDtls1.startLeaf and receiptDtls1.endLeaf	)	)
+ 			
+ 			
+		]]>
+	</query>
+	
+	<query name="getItemDoForStockReceiptBySerialNumber">
+		<![CDATA[
+ 			SELECT  receiptDtls.itemDO from com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls  
+ 			WHERE :startSerialNumber between receiptDtls.startSerialNumber and receiptDtls.endSerialNumber
+ 			AND length(receiptDtls.startSerialNumber) = length(:startSerialNumber)
+       		AND receiptDtls.transactionStatus = :transactionStatus
+		]]>
+	</query>
+	<query name="getLatestReceiptDateBySerialNumber">
+		<![CDATA[
+ 			SELECT  receiptDtls.transactionModifiedDate from com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls  
+ 			WHERE :startSerialNumber between receiptDtls.startSerialNumber and receiptDtls.endSerialNumber
+ 			AND length(receiptDtls.startSerialNumber) = length(:startSerialNumber)
+       		AND receiptDtls.transactionStatus = :transactionStatus
+       		ORDER BY receiptDtls.transactionModifiedDate DESC
+		]]>
+	</query>
+	
+	<query name="isSeriesReceivedWithReceiptNumberByRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			
+ 			receiptDo.acknowledgementNumber = :transactionNumber
+ 			AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			  (:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 AND
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesReceivedWithLatestReceiptNumberByRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			
+ 			receiptDo.acknowledgementNumber = :transactionNumber
+ 			AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			  (:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 AND
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			  and
+ 			  receiptDtls.transactionModifiedDate IN(
+				 SELECT max(receiptDtls1.transactionModifiedDate)
+ 				FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls1
+ 				WHERE 
+ 				receiptDtls1.itemDO.itemId=:itemId
+ 				AND
+ 				receiptDtls1.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 				receiptDtls1.transactionStatus = :transactionStatus
+ 			    AND  
+ 			(:startLeaf between receiptDtls1.startLeaf and receiptDtls1.endLeaf
+ 			 OR
+ 			  :endLeaf between receiptDtls1.startLeaf and receiptDtls1.endLeaf
+ 			))
+ 			
+		]]>
+	</query>
+	<query name="isSeriesReceivedWithReceiptNumberWithSameRowByRange">
+		<![CDATA[ select receiptDtls.stockReceiptItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls
+ 			
+ 			inner join receiptDtls.stockReceiptDO as receiptDo
+ 			WHERE 
+ 			
+ 			receiptDtls.stockReceiptItemDtlsId =:receiptItemDtlsId
+ 			AND
+ 			receiptDo.acknowledgementNumber = :transactionNumber
+ 			AND
+ 			receiptDtls.itemDO.itemId=:itemId
+ 			AND
+ 			receiptDtls.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			receiptDtls.transactionStatus = :transactionStatus
+ 			    AND  
+ 			  (:startLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 AND
+ 			  (:endLeaf between receiptDtls.startLeaf and receiptDtls.endLeaf)
+ 			 
+ 			
+		]]>
+	</query>
+	<query name="getBalanceReturnedQntyForReturn">
+		<![CDATA[
+ 			SELECT receiptDtls.balanceReturnQuantity from com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls  
+ 			WHERE receiptDtls.stockReceiptItemDtlsId=:stockItemDtlsId
+		]]>
+	</query>
+	<query name="updateBalanceReceiptQntyWithReturnQntyForReturnAgainstReceipt">
+		<![CDATA[
+ 			UPDATE com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls 
+ 			SET receiptDtls.balanceReturnQuantity = receiptDtls.receivedQuantity - :receivedQuantity 
+ 			WHERE receiptDtls.stockReceiptItemDtlsId=:stockItemDtlsId
+		]]>
+	</query>
+	<query name="updateBalanceReceiptQntyWithBalanceRetQntyForReturnAgainstReceipt">
+		<![CDATA[
+ 			UPDATE com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO receiptDtls 
+ 			SET receiptDtls.balanceReturnQuantity = receiptDtls.balanceReturnQuantity - :receivedQuantity 
+ 			WHERE receiptDtls.stockReceiptItemDtlsId=:stockItemDtlsId
+		]]>
+	</query>
+	<query name="getStockHolderFromStockReceipt">
+		<![CDATA[ 
+			select new com.ff.domain.stockmanagement.wrapper.StockHolderWrapperDO(receiptDO.receiptOfficeId.officeId,receiptDtls.transactionModifiedDate)	 FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO as receiptDtls 
+			inner join receiptDtls.stockReceiptDO as receiptDO
+ 		 		WHERE
+ 		 		receiptDtls.itemDO.itemId=:itemId
+ 		 		and
+:startSerialNumber between receiptDtls.startSerialNumber and receiptDtls.endSerialNumber
+ 			AND length(receiptDtls.startSerialNumber) = length(:startSerialNumber)
+       		AND receiptDtls.transactionStatus = :transactionStatus
+       		ORDER BY receiptDtls.transactionModifiedDate DESC
+		]]>
+	</query>
+</hibernate-mapping>

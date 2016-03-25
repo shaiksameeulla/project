@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.manifest.ComailManifestDO" table="ff_f_comail_manifested">
+		<id name="coMailManifestId" type="java.lang.Integer">
+			<column name="COMAIL_MANIFESTED_ID" />
+			<generator class="native" />
+		</id>
+
+		<many-to-one name="comailDO" class="com.ff.domain.manifest.ComailDO"
+			lazy="false" unique="true" cascade="all"  fetch="join">
+			<column name="COMAIL_ID" />
+		</many-to-one>
+
+		<property name="manifestId" type="java.lang.Integer">
+			<column name="MANIFEST_ID" />
+		</property>
+
+	</class>
+
+
+	<query name="deleteComail">
+		<![CDATA[
+			DELETE FROM com.ff.domain.manifest.ComailManifestDO comailManifest
+			WHERE comailManifest.comailDO.coMailId IN( :comailId )
+		]]>
+	</query>
+
+	<!-- Starting Data sync querys -->
+
+	<query name="getUpdateCoMailManifest"> 
+	<![CDATA[ From com.ff.domain.manifest.ComailManifestDO comail where  comail.coMailManifestId IN (:coMailManifestId) ]]>
+	</query>
+
+	<!-- Ending Data sync querys -->
+
+	 <query name="isComailNumberUsed">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ComailDO comail,
+								 com.ff.domain.manifest.ComailManifestDO comailManifested,
+								 com.ff.domain.manifest.ManifestDO manifest
+			WHERE 	 comailManifested.manifestId= manifest.manifestId
+			AND		 comailManifested.manifestId NOT IN (:manifestId)
+			and		 comailManifested.comailDO.coMailId=comail.coMailId
+			and  	 manifest.manifestType='O'
+			and 	 comail.coMailNo=:comailNo 
+		]]>
+	</query> 
+	
+	<!-- using in Print functionality where comail is required. -->
+	<query name="getComailCountByManifestNo">
+		<![CDATA[ SELECT COUNT(*) FROM  com.ff.domain.manifest.ComailManifestDO comail,
+		com.ff.domain.manifest.ManifestDO manifest
+		where comail.manifestId=manifest.manifestId
+		and manifest.manifestNo=:manifestNo		
+		and manifest.manifestProcessCode IN (:manifestProcessCode) ]]>
+	</query>
+	
+	<query name="getComailCountByManifestId">
+		<![CDATA[ SELECT COUNT(*) FROM  com.ff.domain.manifest.ComailManifestDO comail,
+					com.ff.domain.manifest.ManifestDO manifest
+					where comail.manifestId=manifest.manifestId
+					and manifest.manifestId=:manifestIds
+		]]>
+	</query>
+	
+	<!-- Ami aded this for outbound comail on 21 08 -->
+		<query name="getManifestIdFromComailId">
+		<![CDATA[ select comail.manifestId
+			      from com.ff.domain.manifest.ComailManifestDO comail where comail.comailDO.coMailId=:coMailId]]>
+	</query> 
+	
+	<query name="deleteFromComailManifest">
+		<![CDATA[ DELETE FROM com.ff.domain.manifest.ComailManifestDO comailManifest
+			WHERE comailManifest.coMailManifestId IN( :comailmanifstIds )]]>
+	</query> 
+	
+			
+	<query name="isComailNumManifested">
+		<![CDATA[
+			SELECT COUNT(*) FROM com.ff.domain.manifest.ComailManifestDO comailManifest 
+			WHERE comailManifest.comailDO.coMailNo =:coMailNo
+          	AND comailManifest.manifestId In(
+	          	Select manifest.manifestId from
+	          	com.ff.domain.manifest.ManifestDO manifest
+	          	WHERE manifest.operatingOffice IN(:operatingOffice)
+	          	AND manifest.manifestProcessCode IN(:processCode) 
+	          	AND manifest.updatingProcess.processCode IN(:updateProcessCode)
+	          	AND manifest.manifestType=:manifestType
+          	)
+		]]>
+	</query>
+	
+</hibernate-mapping>

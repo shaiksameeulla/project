@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.billing.SAPBillingConsignmentSummaryDO" table="ff_f_sap_billing_consignment_summary">
+		<id name="Id" type="java.lang.Long" column="ID">
+			<generator class="increment" />
+		</id>
+        <property name="bookingDate" column="BOOKING_DATE"/>
+	 	<property name="bookingOffice" column="BOOKING_OFFICE"/>
+	 	<property name="custSoldTo" column="CUSTOMER_SOLD_TO"/>
+	 	<property name="custShipTo" column="CUSTOMER_SHIP_TO"/>
+	 	<property name="distributionChannel" column="DISTRIBUTION_CHANNEL"/>
+	 	<property name="transactionNumber" column="TRANSACTION_NUMBER"/>
+	 	<property name="destinationBranch" column="DESTINATION_BRANCH"/>
+	 	<property name="productCode" column="PRODUCT_CODE"/>
+	 	<property name="bookingType" column="BOOKING_TYPE"/>
+	 	<property name="quantity" column="QUANTITY"/>
+	 	<property name="consgStatus" column="CONSG_STATUS"/>
+	 	<property name="weight" column="WEIGHT"/>
+	 	<property name="freight" column="FREIGHT"/>
+	 	<property name="fuelSurcharge" column="FUEL_SURCHARGE"/>
+	 	<property name="riskSurcharge" column="RISK_SURCHARGE"/>
+	 	<property name="parcelHandlingCharges" column="PARCEL_HANDLING_CHARGES"/>
+	 	<property name="airportHandlingCharges" column="AIRPORT_HANDLING_CHARGES"/>
+	 	<property name="documentHandlingCharges" column="DOCUMENT_HANDLING_CHARGES"/>
+	 	<property name="valueOfMaterial" column="VALUE_OF_MATERIAL"/>
+	 	<property name="codCharges" column="COD_CHARGES"/>
+	 	<property name="toPayCharges" column="TO_PAY_CHARGES"/>
+	 	<property name="lcCharges" column="LC_CHARGES"/>
+	 	<property name="codAmt" column="COD_AMOUNT"/>
+	 	<property name="lcAmt" column="LC_AMOUNT"/>
+	 	<property name="specialCharges" column="SPECIAL_CHARGES"/>
+	 	<property name="others" column="OTHERS"/>
+	 	<property name="serviceTax" column="SERVICE_TAX"/>
+	 	<property name="educationCess" column="EDUCATION_CESS"/>
+	 	<property name="secHighEduCess" column="SEC_HIGH_EDU_CESS"/>
+	 	<property name="stateTax" column="STATE_TAX"/>
+	 	<property name="surchargeOnStateTax" column="SURCHARGE_ON_STATE_TAX"/>
+	 	<property name="summaryCategory" column="SUMMARY_CATEGORY"/>
+	 	<property name="destinationOfc" column="DESTINATION_OFFICE"/>
+	 	<property name="grandTotal" column="GRAND_TOTAL"/>
+	 	<property name="sapStatus" column="DT_SAP_OUTBOUND"/>
+	 	<property name="sapTimestamp" column="SAP_TIMESTAMP"/>
+	 	<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<property name="exception" column="EXCEPTION" />
+	</class>
+	
+<query name="getBCSFromStaging">
+	<![CDATA[
+		 FROM	com.ff.domain.billing.SAPBillingConsignmentSummaryDO sapBCSDO
+		 WHERE	sapBCSDO.sapStatus=:sapStatus and ( sapBCSDO.exception IS NULL or LENGTH(sapBCSDO.exception ) < 1)
+	]]>
+</query>
+
+<query name="getBCSCountFromStaging">
+	<![CDATA[
+	     SELECT COUNT(*)
+		 FROM	com.ff.domain.billing.SAPBillingConsignmentSummaryDO sapBCSDO
+		 WHERE	sapBCSDO.sapStatus=:sapStatus and ( sapBCSDO.exception IS NULL or LENGTH(sapBCSDO.exception ) < 1)
+	]]>
+</query>
+
+<query name="updateBCSInStaging">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.billing.SAPBillingConsignmentSummaryDO sapBCSDO
+		SET		sapBCSDO.sapStatus=:sapStatus,sapBCSDO.sapTimestamp=:sapTimestamp,sapBCSDO.exception=:exception
+		WHERE 	sapBCSDO.Id=:Id
+	]]>
+</query>
+	
+</hibernate-mapping>

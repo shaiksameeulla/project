@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.routeserviced.BcunServicedByDO" table="ff_f_serviced_by">
+		<id name="servicedById" type="java.lang.Integer" column="SERVICED_BY_ID">
+			<generator class="assigned" />
+		</id>
+		
+        <property name="servicedByType" type="java.lang.String" column="SERVICED_BY" />
+		
+		<many-to-one name="loadMovementVendorDO" class="com.ff.domain.business.LoadMovementVendorDO" lazy="false" fetch="join">
+			<column name="LOAD_MOVEMENT_VENDOR" />
+		</many-to-one>
+		
+		<many-to-one name="employeeDO" class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join">
+			<column name="EMPLOYEE" />
+		</many-to-one>
+		
+		<many-to-one name="serviceByTypeDO" class="com.ff.domain.routeserviced.ServiceByTypeDO" lazy="false" fetch="join">
+			<column name="SERVICE_BY_TYPE" />
+		</many-to-one>
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+	</class>
+	<query name="getServiceByDetailsByVendor">
+		<![CDATA[
+ 			FROM com.ff.domain.routeserviced.BcunServicedByDO servicedBy
+ 			WHERE servicedBy.serviceByTypeDO.serviceByTypeId=:serviceByTypeId
+ 			AND servicedBy.loadMovementVendorDO.vendorId=:vendorId
+		]]>
+	</query>
+		
+	<query name="getServiceByDetailsByEmployee">
+		<![CDATA[
+ 			FROM com.ff.domain.routeserviced.BcunServicedByDO servicedBy
+ 			WHERE servicedBy.serviceByTypeDO.serviceByTypeId=:serviceByTypeId
+ 			AND servicedBy.employeeDO.employeeId=:employeeId
+		]]>
+	</query>
+</hibernate-mapping>

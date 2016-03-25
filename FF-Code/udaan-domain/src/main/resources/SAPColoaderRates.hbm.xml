@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.ff.domain.coloading.SAPColoaderRatesDO" table="ff_f_sap_coloader_rates">
+        <id name="id" type="java.lang.Long">
+            <column name="ID" />
+            <generator class="native" />
+        </id>
+       	 <property name="transactionNumber" column="TRANSACTION_NUMBER" />
+       	 <property name="dispatchDate" column = "DISPATCH_DATE" />
+       	 <property name="vendorName" column="VENDOR_NAME" />
+       	 <property name="subRateType" column = "SUB_RATE_TYPE" />
+       	 <property name="awbCDRRNumber" column=" AWB_CD_RR_Number" />
+       	 <property name="transportRefNumber" column = "TRANSPORT_REF_NO" />
+       	 <property name="destinationCity" column=" DESTINATION_CITY" />
+       	 <property name="basic" column = "BASIC" />
+       	 <property name="grossTotal" column="GROSS_TOTAL" />
+       	 <property name="serviceType" column = " SERVICE_TYPE" />
+       	 <property name="uom" column=" UOM" />
+       	 <property name="qty" column = "QUANTITY" />
+       	 <property name="offCode" column="OFFICE_CODE" />
+       	 <property name="tripShitNumber" column="TRIP_SHEET_NUMBER" />
+       	 <property name="otherCharges" column = "OTHER_CHARGES" />
+       	 <property name="total" column="TOTAL" />
+       	 <property name="sapStatus" column="DT_SAP_OUTBOUND" />
+       	 <property name="sapTimestamp" column = "SAP_TIMESTAMP" />
+       	 <property name="exception" column = "EXCEPTION" />
+    </class>
+    
+    <query name="getColoaderDtlsFromStaging">
+		<![CDATA[
+			 FROM	com.ff.domain.coloading.SAPColoaderRatesDO sapcoloaderDO
+			 WHERE	sapcoloaderDO.sapStatus=:sapStatus and ( sapcoloaderDO.exception IS NULL or LENGTH(sapcoloaderDO.exception ) < 1)
+		]]>
+	</query>
+
+	<query name="updateColoaderDtlsSAPFlag">
+		<![CDATA[ 
+			UPDATE	com.ff.domain.coloading.SAPColoaderRatesDO sapcoloaderDO
+			SET		sapcoloaderDO.sapStatus=:sapStatus,sapcoloaderDO.sapTimestamp=:sapTimestamp,sapcoloaderDO.exception=:exception
+			WHERE 	sapcoloaderDO.id=:id
+		]]>
+	</query> 
+	
+</hibernate-mapping>

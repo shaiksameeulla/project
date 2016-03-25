@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.tracking.ProcessMapDO" table="ff_f_tracking_process">
+		<id name="rowId" column="ROW_ID" type="java.lang.Integer"></id>
+		<property name="artifactType" column="ARTIFACT_TYPE" type="java.lang.String" />
+		<property name="consgNumber" column="CONSG_NO" type="java.lang.String" />
+		<property name="manifestNumber" column="MANIFEST_NO" type="java.lang.String" />
+		<property name="processNumber" column="PROCESS_NO" type="java.lang.String" />
+		<property name="processOrder" column="PROCESS_ORDER" type="java.lang.Integer" />
+		<!-- Added by Narasimha to set the process date as system date -->
+	    <property name="processDate" column="PROCESS_DATE"	type="java.util.Date"/>
+		<property name="value1" column="VALUE_1" type="java.lang.String" />
+		<property name="value2" column="VALUE_2" type="java.lang.String" />
+		<property name="value3" column="VALUE_3" type="java.lang.String" />
+		<property name="value4" column="VALUE_4" type="java.lang.String" />
+		<property name="value5" column="VALUE_5" type="java.lang.String" />
+		<property name="value6" column="VALUE_6" type="java.lang.String" />
+		<property name="value7" column="VALUE_7" type="java.lang.String" />
+		<property name="value8" column="VALUE_8" type="java.lang.String" />
+		<property name="value9" column="VALUE_9" type="java.lang.String" />
+		<property name="value10" column="VALUE_10" type="java.lang.String" />
+		<property name="value11" column="VALUE_11" type="java.lang.String" />
+		<property name="value12" column="VALUE_12" type="java.lang.String" />
+        <property name="value13" column="VALUE_13" type="java.lang.String" />
+        <property name="value14" column="VALUE_14" type="java.lang.String" />
+		<property name="key1" column="KEY_1" type="java.lang.String" />
+		<property name="key2" column="KEY_2" type="java.lang.String" />
+		<property name="key3" column="KEY_3" type="java.lang.String" />
+		<property name="key4" column="KEY_4" type="java.lang.String" />
+		<property name="key5" column="KEY_5" type="java.lang.String" />
+		<property name="key6" column="KEY_6" type="java.lang.String" />
+		<property name="key7" column="KEY_7" type="java.lang.String" />
+		<property name="key8" column="KEY_8" type="java.lang.String" />
+		<property name="key9" column="KEY_9" type="java.lang.String" />
+		<property name="key10" column="KEY_10" type="java.lang.String" />
+		<property name="key11" column="KEY_11" type="java.lang.String" />
+		<property name="key12" column="KEY_12" type="java.lang.String" />
+		<property name="key13" column="KEY_13" type="java.lang.String" />
+		<property name="key14" column="KEY_14" type="java.lang.String" />
+	</class>
+    
+   <sql-query name="getProcessMapDetails">
+	    <return alias="process" class="com.ff.domain.tracking.ProcessMapDO"/>
+	    <![CDATA[CALL sp_track_consignment(:consgNum)]]>
+    </sql-query>
+    
+    <sql-query name="getManifestProcessMapDetails">
+	    <return alias="manifestProcess" class="com.ff.domain.tracking.ProcessMapDO"/>
+	    <![CDATA[CALL sp_track_manifest(:manifestNum)]]>
+    </sql-query>
+    	
+</hibernate-mapping>

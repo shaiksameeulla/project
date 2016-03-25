@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+	
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.GLMasterDO" table="ff_d_gl_master">
+		<id name="glId" type="java.lang.Integer">
+			<column name="GL_ID" />
+			<generator class="native" />
+		</id>
+		<property name="glCode" column="GL_CODE" />
+		<property name="glDesc" column="GL_DESC" />
+		<property name="nature" column="NATURE" />
+		<property name="isEmpGL" column="IS_EMP_GL" />
+		<property name="isCoLoaderGL" column="IS_CO_LOADER_GL" />
+		<property name="isOctroiGL" column="IS_OCTROI_GL" />
+		<property name="isBankGL" column="IS_BANK_GL" />
+	
+		<!-- Many -to- One relationships START -->
+        <many-to-one name="paymentModeDO"
+			class="com.ff.domain.serviceOffering.PaymentModeDO" lazy="false" fetch="join">
+			<column name="PAYMENT_ID" />
+		</many-to-one>
+		<!-- Many -to- One relationships END -->
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+	</class>
+	
+<query name="getGLDtlsByRegionId">
+	<![CDATA[
+		FROM com.ff.domain.mec.GLMasterDO gl 
+		WHERE gl.glId IN 
+			(SELECT region.glMasterDO.glId FROM com.ff.domain.mec.GLRegionDO region 
+			WHERE region.regionDO.regionId=:regionId) 
+	]]>
+</query>
+
+<!-- <query name="getPaymentIdByGLId">
+	<![CDATA[
+		SELECT gl.paymentModeDO.paymentId FROM com.ff.domain.mec.GLMasterDO gl 
+		WHERE gl.glId=:glId
+	]]>
+</query> -->
+
+<query name="getGLDetailsByGLId">
+	<![CDATA[
+		FROM com.ff.domain.mec.GLMasterDO gl WHERE gl.glId=:glId
+	]]>
+</query>
+
+<query name="getAllBankGLDtls">
+	<![CDATA[
+		FROM com.ff.domain.mec.GLMasterDO gl
+		WHERE gl.isBankGL=:isBankGL
+	]]>
+</query>
+
+<query name="getAllBankGLDtlsByRegion">
+	<![CDATA[
+		FROM com.ff.domain.mec.GLMasterDO gl 
+		WHERE gl.glId IN 
+			(SELECT region.glMasterDO.glId FROM com.ff.domain.mec.GLRegionDO region 
+			WHERE region.regionDO.regionId=:regionId)
+		AND gl.isBankGL=:isBankGL
+	]]>
+</query>
+
+<query name="getAllGLDesc">
+	<![CDATA[
+		SELECT DISTINCT(gl.glDesc) FROM com.ff.domain.mec.GLMasterDO gl
+	]]>
+</query>
+
+</hibernate-mapping>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.organization.BcunEmployeeDO" table="ff_d_employee">
+		<id name="employeeId" type="java.lang.Integer">
+			<column name="EMPLOYEE_ID" />
+			<generator class="assigned" />
+		</id>
+		<property name="empCode" type="java.lang.String">
+			<column name="EMP_CODE" length="25" />
+		</property>
+		<property name="firstName" type="java.lang.String">
+			<column name="FIRST_NAME" length="50" />
+		</property>
+		<property name="lastName" type="java.lang.String">
+			<column name="LAST_NAME" length="50" />
+		</property>
+
+		<property name="empPhone" type="java.lang.String">
+			<column name="PHONE" length="25" />
+		</property>
+
+		<property name="designation" type="java.lang.String">
+			<column name="DESIGNATION" length="50" />
+		</property>
+
+		<property name="empType" type="java.lang.String">
+			<column name="EMP_TYPE" length="50" />
+		</property>
+		<!-- <property name="managerCode" type="java.lang.String"> <column name="MANAGER" 
+			length="25" /> </property> -->
+		<property name="departmentId" type="java.lang.Integer">
+			<column name="DEPARTMENT" length="25" />
+		</property>
+	
+		<property name="city" type="java.lang.String">
+			<column name="CITY" />
+		</property>
+		<property name="officeId" type="java.lang.Integer">
+			<column name="OFFICE" />
+		</property>
+		<property name="emailId" type="java.lang.String">
+			<column name="EMAIL_ID" length="50" />
+		</property>
+		<property name="empVirtual" type="java.lang.String">
+			<column name="EMPLOYEE_VIRTUAL" length="1" />
+		</property>
+		 <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+
+	</class>
+</hibernate-mapping>

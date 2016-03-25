@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.routeserviced.TripServicedByDO" table="ff_f_trip_serviced_by">
+		<id name="tripServicedById" type="java.lang.Integer" column="TRIP_SERVICED_BY_ID">
+			<generator class="native" />
+		</id>
+		
+		<property name= "operationDays" column = "OPERATION_DAYS" />
+        <property name= "allDays" column = "ALL_DAYS" />
+        <property name = "effectiveFrom" column = "EFFECTIVE_FROM" />
+        <property name = "effectiveTo" column = "EFFECTIVE_TO" />
+        <property name = "active" type="java.lang.String" column = "ACTIVE" />
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		
+		<many-to-one name="servicedByDO" class="com.ff.domain.routeserviced.ServicedByDO" lazy="false" fetch="join">
+			<column name="SERVICED_BY" />
+		</many-to-one>
+		
+		<many-to-one name="tripDO" class="com.ff.domain.routeserviced.TripDO" lazy="false" fetch="join">
+			<column name="TRIP" />
+		</many-to-one>
+		
+		<many-to-one name="transportModeDO" class="com.ff.domain.transport.TransportModeDO" lazy="false" fetch="join">
+			<column name="TRANSPORT_MODE" />
+		</many-to-one>
+	</class>
+		
+	<query name="getTripServicedByListByRouteIdModeIdServiceByTypeIdVendorId">
+	<![CDATA[ 	FROM com.ff.domain.routeserviced.TripServicedByDO tripServicedBy where 
+				tripServicedBy.tripDO.routeDO.routeId=:routeId and 
+				tripServicedBy.transportModeDO.transportModeId=:transportModeId and
+				tripServicedBy.servicedByDO.serviceByTypeDO.serviceByTypeId=:serviceByTypeId
+				AND tripServicedBy.servicedByDO.loadMovementVendorDO.vendorId=:vendorId
+				AND effectiveFrom <= CURDATE()
+				AND effectiveTo >= CURDATE()
+			]]>
+	</query>	
+	
+	<query name="getTripServicedByListByRouteIdTransportModeIdServiceByTypeId">
+	<![CDATA[ 	FROM com.ff.domain.routeserviced.TripServicedByDO tripServicedBy where 
+				tripServicedBy.tripDO.routeDO.routeId=:routeId and 
+				tripServicedBy.transportModeDO.transportModeId=:transportModeId and
+				tripServicedBy.servicedByDO.serviceByTypeDO.serviceByTypeId=:serviceByTypeId
+				AND effectiveFrom <= CURDATE()
+				AND effectiveTo >= CURDATE()
+			]]>
+	</query>	
+	
+	<query name="getTripServicedByListByTransportModeIdServiceByTypeId">
+	<![CDATA[ 	FROM com.ff.domain.routeserviced.TripServicedByDO tripServicedBy where 
+				tripServicedBy.transportModeDO.transportModeId=:transportModeId and
+				tripServicedBy.servicedByDO.serviceByTypeDO.serviceByTypeId=:serviceByTypeId
+				AND effectiveFrom <= CURDATE()
+				AND effectiveTo >= CURDATE()
+			]]>
+	</query>
+	
+	<query name="inActiveTripServicedByDetails">
+		<![CDATA[
+ 			update com.ff.domain.routeserviced.TripServicedByDO tripServicedBy
+ 			set tripServicedBy.active =:active
+ 			where tripServicedBy.tripServicedById in (:tripServicedById)
+		]]>
+	</query>
+		
+	<!-- Data Sync For Dispatch and Receive Module Started-->
+	<query name="getTripServicedById4Flight">
+		<![CDATA[ Select tripServicedBy.tripServicedById 
+				FROM com.ff.domain.routeserviced.TripServicedByDO tripServicedBy 
+				where tripServicedBy.tripDO.routeDO.routeId=:routeId
+				AND tripServicedBy.transportModeDO.transportModeId=:transportModeId
+				AND tripServicedBy.servicedByDO.serviceByTypeDO.serviceByTypeId=:serviceByTypeId
+				AND tripServicedBy.tripDO.transportDO.flightDO.flightId=:flightId
+				AND (tripServicedBy.active='Y' or tripServicedBy.active is NULL)
+			]]>
+	</query>
+	<query name="getTripServicedById4Train">
+		<![CDATA[ Select tripServicedBy.tripServicedById 
+				FROM com.ff.domain.routeserviced.TripServicedByDO tripServicedBy 
+				where tripServicedBy.tripDO.routeDO.routeId=:routeId
+				AND tripServicedBy.transportModeDO.transportModeId=:transportModeId
+				AND tripServicedBy.servicedByDO.serviceByTypeDO.serviceByTypeId=:serviceByTypeId
+				AND tripServicedBy.tripDO.transportDO.trainDO.trainId=:trainId
+				AND (tripServicedBy.active='Y' or tripServicedBy.active is NULL)
+			]]>
+	</query>
+	<query name="getTripServicedById4Vehicle">
+		<![CDATA[ Select tripServicedBy.tripServicedById 
+				FROM com.ff.domain.routeserviced.TripServicedByDO tripServicedBy 
+				where tripServicedBy.tripDO.routeDO.routeId=:routeId
+				AND tripServicedBy.transportModeDO.transportModeId=:transportModeId
+				AND tripServicedBy.servicedByDO.serviceByTypeDO.serviceByTypeId=:serviceByTypeId
+				AND tripServicedBy.tripDO.transportDO.vehicleDO.vehicleId=:vehicleId
+				AND (tripServicedBy.active='Y' or tripServicedBy.active is NULL)
+			]]>
+	</query>
+	
+	<!-- Data Sync For Dispatch and Receive Module Ended-->
+	<query name="getTripServicedByDOListByTripServicedByForVehicle">
+	<![CDATA[ 	FROM com.ff.domain.routeserviced.TripServicedByDO tripServicedBy where 
+				tripServicedBy.tripDO.routeDO.routeId=:routeId
+				AND tripServicedBy.transportModeDO.transportModeId=:transportModeId 
+				AND tripServicedBy.servicedByDO.serviceByTypeDO.serviceByTypeId=:serviceByTypeId
+				AND tripServicedBy.tripDO.transportDO.transportId IN 
+	 		  	(SELECT transport.transportId from com.ff.domain.transport.TransportDO transport where
+	 		  	 transport.transportModeDO.transportModeId=:transportModeId
+	 		  	 AND transport.vehicleDO.regionalOfficeDO.officeId IN (select office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeTypeDO.offcTypeCode=:officeTypeCode and  office.mappedRegionDO.regionId=:regionId))
+				AND effectiveFrom <=:effectiveFrom
+				AND effectiveTo >=:effectiveTo
+				ORDER BY tripServicedBy.tripServicedById asc
+			]]>
+	</query>
+	
+	<query name="getTripServicedByDOListByTripServicedByForAirColoading">
+		<![CDATA[ 	FROM com.ff.domain.routeserviced.TripServicedByDO tripServicedBy 
+		            where tripServicedBy.tripDO.routeDO.routeId=:routeId 
+					AND tripServicedBy.transportModeDO.transportModeId=:transportModeId		
+					AND tripServicedBy.transportModeDO.transportModeCode=:transportModeCode			 
+					AND :effectiveFrom between tripServicedBy.effectiveFrom and tripServicedBy.effectiveTo	
+					AND tripServicedBy.active='Y'
+					ORDER BY tripServicedBy.tripServicedById asc
+		]]>
+	</query>
+	
+</hibernate-mapping>

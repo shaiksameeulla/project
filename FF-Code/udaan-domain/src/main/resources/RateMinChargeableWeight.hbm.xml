@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.ratemanagement.masters.RateMinChargeableWeightDO" table="ff_d_rate_min_chargeable_weight">
+		<id name="rateMinChargeableWeightId" type="java.lang.Integer" column="RATE_MIN_CHARGEABLE_WEIGHT_ID">
+			<generator class="native" />
+		</id>
+				
+        <property name="minChargeableWeight" type="java.lang.Double" >
+        <column name="MIN_CHARGEABLE_WEIGHT" />
+        </property>
+        <many-to-one name="rateCustomerProductCatMapDO" class="com.ff.domain.ratemanagement.masters.RateCustomerProductCatMapDO"  lazy="false"  fetch="join">
+        <column name="RATE_CUSTOMER_PRODUCT_CAT_MAP" ></column>
+        </many-to-one>
+        <property name="dtToBranch" column="DT_TO_BRANCH"/>
+    </class>
+
+
+<query name="getRateMinChrgWts">
+		<![CDATA[
+ 				FROM com.ff.domain.ratemanagement.masters.RateMinChargeableWeightDO minChrg where 
+				minChrg.rateCustomerProductCatMapDO.rateCustomerCategoryDO.rateCustomerCategoryCode =:rateCustomerCategoryCode 
+				AND minChrg.rateCustomerProductCatMapDO.rateProductCategoryDO.rateProductCategoryType =:rateProductCategoryType
+				ORDER BY minChrg.rateCustomerProductCatMapDO.rateProductCategoryDO.rateProductCategoryId, minChrg.minChargeableWeight 
+				]]>
+	</query>
+</hibernate-mapping>

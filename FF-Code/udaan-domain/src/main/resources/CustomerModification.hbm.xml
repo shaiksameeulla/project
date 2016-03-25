@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.billing.CustModificationDO" table="ff_f_customer_Modification">
+		<id name="custModificationId" column="CUST_MODIFICATION_ID" type="java.lang.Integer">
+			<generator class="native" />
+		</id>
+		<property name="consgId" column="CONSG_ID" type="java.lang.Integer" />
+		<property name="oldCustId" column="OLD_CUST_ID" type="java.lang.Integer" />
+		<property name="newCustId" column="NEW_CUST_ID" type="java.lang.Integer" />
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date" />
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer" />
+
+	</class>
+
+	<!-- <sql-query name="getCustomerModificationDetails">
+		<return alias="customer" class="" />
+		select
+		case
+		when cn.CONSG_NO is null
+		then 'N'
+		else 'Y'
+		end as cnDetails,
+
+		case
+		when bk.CONSG_NUMBER is null
+		then 'N'
+		else 'Y'
+		end as bookDetails,
+		case
+		when rate.CONSIGNMENT_ID is null
+		then 'N'
+		else 'Y'
+		end as rateDetails,
+
+		case
+		when cust.CUSTOMER_ID is null
+		then 'N'
+		else 'Y'
+		end as custCheck,
+
+		case
+		when bc.CONSG_NO is not null
+		then 'N'
+		else 'Y'
+		end as billCheck,
+		case
+		when expense.DT_SAP_OUTBOUND='C' then
+		'N'
+		else 'Y'
+		end as expenseCheck ,
+
+		case
+		when collection.DT_SAP_OUTBOUND='C' then
+		'N'
+		else 'Y'
+		end as collectionCheck ,
+
+		case
+		when liapayment.DT_SAP_OUTBOUND='C' then
+		'N'
+		else 'Y'
+		end as liabilityCheck
+
+		from ff_f_consignment cn
+		left join ff_f_booking bk on bk.CONSG_NUMBER=cn.CONSG_NO
+		left join ff_f_consignment_rate rate on (rate.CONSIGNMENT_ID = cn.CONSG_ID
+		and rate.RATE_CALCULATED_FOR='B')
+		left join ff_d_customer cust on cust.CUSTOMER_ID = cn.CUSTOMER
+		left join ff_f_billing_consignment bc on bc.CONSG_NO=cn.CONSG_NO
+		left join ff_f_expense_entries exentry on exentry.CONSG_ID = cn.CONSG_ID
+		left join ff_f_expense expense on expense.EXPENSE_ID =
+		exentry.EXPENSE_ID
+		left join ff_f_collection_entries collentry on
+		collentry.CONSIGNMENT_ID=cn.CONSG_ID
+		left join ff_f_collection collection on
+		collection.COLLECTION_ID=collentry.COLLECTION_ID
+		left join ff_f_liability_entries liaentry on liaentry.CONSIGNMENT_ID =
+		cn.CONSG_ID
+		left join ff_f_liability_payment liapayment on
+		liapayment.LIABILITY_ID=liaentry.LIABILITY_ID
+		where cn.CONSG_NO =:consgNo
+	</sql-query> -->
+	
+	
+	<!-- <sql-query name="getCustomerModificationDetails">
+	<return alias="custModifCheck" class="com.ff.domain.billing.CustModificationAliasDO" />
+	SELECT
+	CASE WHEN cn.CONSG_NO IS NULL THEN 'N' ELSE 'Y' END AS cnDetails,
+	CASE WHEN bk.CONSG_NUMBER IS NULL THEN 'N' ELSE 'Y' END AS bookDetails,
+	CASE WHEN rate.CONSIGNMENT_ID IS NULL THEN 'N' ELSE 'Y' END AS
+	rateDetails,
+	CASE WHEN cust.CUSTOMER_ID IS NULL THEN 'N' ELSE 'Y' END AS custCheck,
+	CASE WHEN bc.CONSG_NO IS NULL THEN 'Y' ELSE 'N' END AS billCheck,
+	CASE
+	WHEN (SELECT
+	count( expense.EXPENSE_ID)
+	FROM
+	ff_f_expense expense
+	JOIN ff_f_expense_entries exentry
+	ON exentry.EXPENSE_ID = expense.EXPENSE_ID
+	WHERE
+	expense.DT_SAP_OUTBOUND = 'C' AND
+	exentry.CONSG_ID =:consgId) > 0
+	THEN
+	'N'
+	ELSE
+	'Y'
+	END
+	AS expenseCheck,
+
+	CASE
+	WHEN (SELECT
+	count( collection.COLLECTION_ID)
+	FROM
+	ff_f_collection collection
+	JOIN ff_f_collection_entries collentry
+	ON collection.COLLECTION_ID = collentry.COLLECTION_ID
+	WHERE
+	collection.DT_SAP_OUTBOUND = 'C' AND
+	collentry.CONSIGNMENT_ID =:consgId) > 0
+	THEN
+	'N'
+	ELSE
+	'Y'
+	END
+	AS collectionCheck,
+
+	CASE
+	WHEN ( select
+	count(liaPay.LIABILITY_ID)
+	FROM ff_f_liability_payment liaPay
+	JOIN ff_f_liability_entries liaEntry
+	ON liaPay.LIABILITY_ID=liaEntry.LIABILITY_ID
+	WHERE
+	liaPay.DT_SAP_OUTBOUND='C' AND
+	liaEntry.CONSIGNMENT_ID=:consgId)> 0
+	THEN
+	'N'
+	ELSE
+	'Y'
+	END
+	AS liabilityCheck
+
+
+
+
+	FROM
+	ff_f_consignment cn
+	LEFT JOIN ff_f_booking bk ON bk.CONSG_NUMBER = cn.CONSG_NO
+	LEFT JOIN ff_f_consignment_rate rate
+	ON (rate.CONSIGNMENT_ID = cn.CONSG_ID AND
+	rate.RATE_CALCULATED_FOR = 'B')
+	LEFT JOIN ff_d_customer cust ON cust.CUSTOMER_ID = cn.CUSTOMER
+	LEFT JOIN ff_f_billing_consignment bc ON bc.CONSG_NO = cn.CONSG_NO
+	WHERE
+	cn.CONSG_ID =:consgId
+	order by bc.BILLING_CONSIGNMENT_ID asc limit 1
+
+</sql-query>
+ -->
+</hibernate-mapping>

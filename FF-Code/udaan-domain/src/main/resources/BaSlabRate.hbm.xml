@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.ba.BaSlabRateDO" table="ff_f_rate_ba_slab_rate">
+		<id name="baSlabRateId">
+			<column name="BA_SLAB_RATE_ID" />
+			<generator class="native" />
+		</id>
+		<property name="baProductHeaderId">
+            <column name="BA_RATE_PRODUCT_HEADER" />
+        </property>
+        
+        <many-to-one name="weightSlab" class="com.ff.domain.ratemanagement.operations.ba.BaRateCalculationWeightSlabDO" lazy="false">
+           <column name="BA_WEIGHT_SLAB"/>
+        </many-to-one>
+        <property name="originSector">
+            <column name="ORIGIN_SECTOR" />
+         </property>
+         <property name="destinationSector">
+            <column name="DEST_SECTOR" />
+         </property>
+		<property name="rate">
+			<column name="SLAB_RATE" />
+		</property>
+		<property name="servicedOn">
+			<column name="SERVICED_ON" />
+		</property>
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+	</class>
+<!-- 	<query name="getBaNormalSlab">
+		<![CDATA[ 
+			FROM 	com.ff.domain.ratemanagement.operations.ba.BaSlabRateDO slabRate 
+			WHERE	slabRate.baProductHeaderId=:baRateHeaderId 
+			AND		(slabRate.originSector=:originSector OR slabRate.originSector = null)
+			AND		slabRate.destinationSector=:destinationSector
+			AND	  	slabRate.servicedOn =:servicedOn
+		]]>
+	</query> -->
+	
+</hibernate-mapping>
+	

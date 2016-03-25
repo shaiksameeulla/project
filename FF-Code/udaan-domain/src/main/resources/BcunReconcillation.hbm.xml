@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.bcun.reconcillation.BcunReconcillationDO"
+		table="ff_d_bcun_reconcillation">
+		<id name="dataReconcillationId" type="java.lang.Long">
+			<column name="DATA_RECONCILLATION_ID" />
+			<generator class="native" />
+		</id>
+		<property name="transactionOfficeId" column="TRANSACTION_OFFICE" />
+		<property name="transactionDate" column="TRANSACTION_DATE" />
+		<property name="processName" column="PROCESS_NAME" />
+		<property name="branchCNCount" column="BRANCH_CN_COUNT" />
+		<property name="centralCNCount" column="CENTRAL_CN_COUNT" />
+		<property name="centralLastProcessedDate" column="CR_LAST_PROCESSED_DATE" />
+		<property name="branchLastRequestInDate" column="BR_LAST_REQUEST_IN_DATE" />
+		<property name="isCountMatched" column="IS_COUNT_MATCHED" />
+	</class>
+	 <query name="getReconcillationDetailsByProcess">
+	<![CDATA[ FROM com.ff.domain.bcun.reconcillation.BcunReconcillationDO bcunReconcillationDo where bcunReconcillationDo.transactionOfficeId =:transoffice and bcunReconcillationDo.transactionDate= date(:transDate) and bcunReconcillationDo.processName =:processName
+		]]>
+	</query>
+	 
+	 <!-- <sql-query name="getBookingReconcillationData">
+		<![CDATA[ SELECT date(bk.BOOKING_DATE) as transactionDate, bk.BOOKING_OFF as transactionOfficeId ,COUNT(1) as centralCNCount, 'B' as processName FROM ff_f_booking bk WHERE date(bk.BOOKING_DATE) >= :transactionDate GROUP BY date(bk.BOOKING_DATE),bk.BOOKING_OFF
+		]]>
+	</sql-query> 
+	
+	 <sql-query name="getDeliveryReconcillationData">
+		<![CDATA[ SELECT date(ffd.DRS_DATE) as transactionDate, ffd.CREATED_OFFICE_ID as transactionOfficeId ,COUNT(1) as centralCNCount, 'D' as processName FROM ff_f_delivery ffd WHERE date(ffd.DRS_DATE) >= :transactionDate GROUP BY date(ffd.DRS_DATE),ffd.CREATED_OFFICE_ID
+		]]>
+	</sql-query> -->
+	<query name="getMismatchedReconcillationDataByProcess">
+	<![CDATA[ FROM com.ff.domain.bcun.reconcillation.BcunReconcillationDO bcunReconcillationDo where bcunReconcillationDo.isCountMatched ='N' and bcunReconcillationDo.branchCNCount >0 and bcunReconcillationDo.processName =:processName
+		]]>
+	</query>
+	<query name="getBookingReconcillationDataForBlob">
+	<![CDATA[select booking.bookingOfficeId as transactionOfficeId,date(booking.bookingDate) as transactionDate,'B' as processName ,booking.consgNumber as transactionNumber FROM com.ff.domain.booking.BookingDO booking 
+	where booking.bookingOfficeId =:transactionOfficeId and date(booking.bookingDate) =:transactionDate ]]>
+	</query>
+	<query name="getDeliveryReconcillationDataForBlob">
+	<![CDATA[select drs.createdOfficeDO.officeId as transactionOfficeId,date(drs.drsDate) as transactionDate,'D' as processName ,drs.drsNumber as transactionNumber , size(drs.deliveryDtlsDO) as noOfElements,drs.drsStatus as transactionStatus FROM com.ff.domain.delivery.DeliveryDO drs 
+	where drs.createdOfficeDO.officeId =:transactionOfficeId and date(drs.drsDate) =:transactionDate ]]>
+	</query>
+	<query name="updateBookingdtToCentralFlag">  
+		<![CDATA[
+			 UPDATE com.ff.domain.booking.BookingDO booking set booking.dtToCentral='N' where booking.bookingType <> NULL AND booking.consgNumber in(:businesskey)]]>
+	</query>
+	<query name="updateDeliverydtToCentralFlag">    
+		<![CDATA[
+			 UPDATE com.ff.domain.delivery.DeliveryDO drs set drs.dtToCentral='N' where drs.drsNumber in(:businesskey)]]>
+	</query>
+	<sql-query name="getBookingReconcillationDataAtBranch">
+		<![CDATA[ SELECT date(bk.BOOKING_DATE) as transactionDate, bk.BOOKING_OFF as transactionOfficeId ,COUNT(1) as branchCNCount, 'B' as processName FROM ff_f_booking bk WHERE date(bk.BOOKING_DATE) >= :transactionDate and date(bk.BOOKING_DATE) < current_date() GROUP BY date(bk.BOOKING_DATE),bk.BOOKING_OFF
+		]]>
+	</sql-query>
+	<sql-query name="getDeliveryReconcillationDataAtBranch">
+		<![CDATA[ SELECT date(ffd.DRS_DATE) as transactionDate, ffd.CREATED_OFFICE_ID as transactionOfficeId ,COUNT(1) as branchCNCount, 'D' as processName FROM ff_f_delivery ffd WHERE date(ffd.DRS_DATE) >= :transactionDate and date(ffd.DRS_DATE) < current_date() and ffd.IS_DRS_DISCARDED='N' GROUP BY date(ffd.DRS_DATE),ffd.CREATED_OFFICE_ID
+		]]>
+	</sql-query>
+	
+	<sql-query name="getBookingCountForReconcillationAtCentral">
+		<![CDATA[ SELECT COUNT(1) as centralCNCount FROM ff_f_booking bk WHERE date(bk.BOOKING_DATE) = date(:transactionDate) and bk.BOOKING_OFF = :transactionOfficeId 
+		]]>
+	</sql-query>
+	
+	<sql-query name="getDrsCountForReconcillationAtCentral">
+		<![CDATA[ SELECT COUNT(1) as centralCNCount FROM ff_f_delivery ffd WHERE date(ffd.DRS_DATE) = date(:transactionDate) and ffd.CREATED_OFFICE_ID =:transactionOfficeId and ffd.DRS_STATUS ='CLOSED' and ffd.IS_DRS_DISCARDED='N'
+		]]>
+	</sql-query>
+
+</hibernate-mapping>
+	

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.billing.BillDO" table="ff_f_bill">
+		<id name="invoiceId" type="java.lang.Integer" column="INVOICE_ID">
+			<generator class="native" />
+		</id>
+
+		<property name="invoiceNumber" column="INVOICE_NUMBER" />
+
+		<many-to-one name="productDO"
+			class="com.ff.domain.serviceOffering.ProductDO" lazy="false" fetch="join">
+			<column name="PRODUCT_ID" />
+		</many-to-one>
+
+		<!-- BILLING_OFFICE_ID mapping is disabled as it is no more required -->
+		<!-- <many-to-one name="pickupOfficeDO" class="com.ff.domain.organization.OfficeDO"
+			lazy="false" fetch="join">
+			<column name="BILLING_OFFICE_ID" />
+		</many-to-one> -->
+
+		<property name="fromDate" column="FROM_DATE" type="java.util.Date" />
+
+		<property name="toDate" column="TO_DATE" type="java.util.Date" />
+
+		<property name="noOfPickups" column="NO_OF_PICKUPS" type="java.lang.Integer" />
+
+		<property name="freight" column="FREIGHT" type="java.lang.Double" />
+
+		<property name="riskSurcharge" column="RISK_SURCHARGE" type="java.lang.Double" />
+
+		<property name="docHandlingCharge" column="DOC_HANDLING_CHARGE"
+			type="java.lang.Double" />
+
+		<property name="parcelHandlingCharge" column="PARCAL_HANDLING_CHARGE"
+			type="java.lang.Double" />
+
+		<property name="airportHandlingCharge" column="AIRPORT_HANDLING_CHARGE"
+			type="java.lang.Double" />
+
+		<property name="otherCharges" column="OTHER_CHARGES" type="java.lang.Double" />
+
+		<property name="total" column="TOTAL" type="java.lang.Double" />
+
+		<property name="fuelSurcharge" column="FUEL_SURCHARGE" type="java.lang.Double" />
+
+		<property name="serviceTax" column="SERVICE_TAX" type="java.lang.Double" />
+
+		<property name="educationCess" column="EDUCATION_CESS" type="java.lang.Double" />
+
+		<property name="higherEducationCess" column="HIGHER_EDUCATION_CESS"
+			type="java.lang.Double" />
+
+		<property name="stateTax" column="STATE_TAX" type="java.lang.Double" />
+
+		<property name="surchargeOnStateTax" column="SURCHARGE_ON_STATE_TAX"
+			type="java.lang.Double" />
+
+		<property name="grandTotal" column="GRAND_TOTAL" type="java.lang.Double" />
+
+		<property name="grandTotalRoundedOff" column="GRAND_TOTAL_ROUNDED_OFF"
+			type="java.lang.Double" />
+
+		<property name="billGenerated" column="BILL_GENERATED" />
+		<!-- <property name="transferStatus" column="TRANSFER_STATUS"/> -->
+
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer" />
+
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date" />
+
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer" />
+
+		<property name="updatedDate" column="UPDATE_DATE" type="java.util.Date" />
+
+		<property name="billStatus" column="BILL_STATUS" type="java.lang.String" />
+
+		<property name="shipToCode" column="SHIP_TO_CODE" />
+		
+		<many-to-one name="customer"
+			class="com.ff.domain.business.CustomerDO" lazy="false" fetch="join">
+			<column name="CUSTOMER" />
+		</many-to-one>
+		
+		<!-- <many-to-one name="contractPaymentBillingLocationDO" class="com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO" 
+			lazy="false"> <column name="CONTRACT_PAYMENT_BILLING_LOCATION"/> </many-to-one> -->
+
+		<!-- <set name="billingConsignmentSummaryDOs" table="ff_f_billing_consignment_summary"
+			lazy="false" fetch="join">
+			<key>
+				<column name="INVOICE" />
+			</key>
+			<one-to-many class="com.ff.domain.billing.BillingConsignmentSummaryDO" />
+		</set> -->
+
+		<!-- <set name="billingConsignmentDOs" table="ff_f_billing_consignment"
+			lazy="false" fetch="join">
+			<key>
+				<column name="INVOICE" />
+			</key>
+			<one-to-many class="com.ff.domain.billing.BillingConsignmentDO" />
+		</set> -->
+
+       <many-to-one name="financialProductDO"
+			class="com.ff.domain.billing.FinancialProductDO" lazy="false" fetch="join">
+			<column name="FINANCIAL_PRODUCT_ID" />
+		</many-to-one>
+		 
+	   <property name="fuelSurchargePercentage" column="FUEL_SURCHARGE_PERCENTAGE"
+			type="java.lang.Double" />
+			
+		<property name="fuelSurchargePercentageFormaula" column="FUEL_SURCHARGE_PERCENTAGE_FORMULA"/>
+			
+		<property name="billGenerationDate" column="BILL_GENERATION_DATE"/>
+		
+		<property name="lcAmount" column="LC_AMOUNT"
+			type="java.lang.Double" />
+			
+		<property name="lcCharge" column="LC_CHARGE"
+			type="java.lang.Double" />
+			
+	    <property name="codAmount" column="COD_AMOUNT"
+			type="java.lang.Double" />
+		
+	    <property name="codCharge" column="COD_CHARGE"
+			type="java.lang.Double" />
+			
+	    <property name="rtoCharge" column="RTO_CHARGE"
+			type="java.lang.Double" />	
+
+        <property name="billType" column="BILL_TYPE"
+			type="java.lang.String" />	
+	</class>
+
+	<!-- <query name="getBillsByCustomerId"> <![CDATA[ FROM com.ff.domain.billing.BillDO 
+		bill where bill.contractPaymentBillingLocationDO.locationOperationType='B' 
+		AND bill.contractPaymentBillingLocationDO.rateContractDO.rateContractId IN 
+		( Select rateContract.rateContractId from com.ff.domain.ratemanagement.masters.RateContractDO 
+		rateContract where rateContract.customerId=:customerId ) ]]> </query> -->
+
+
+	<!-- <query name="getBillsByCustomerId">
+		<![CDATA[	SELECT bill FROM
+			        com.ff.domain.billing.BillDO AS bill,
+					com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO AS cpbl,
+					com.ff.domain.ratemanagement.masters.RateContractDO AS rateContract
+					where 
+					 bill.shipToCode=cpbl.shippedToCode
+					 AND rateContract.rateContractId=cpbl.rateContractDO.rateContractId
+					 AND rateContract.customerId=:customerId
+					 AND cpbl.locationOperationType='B'
+				]]>
+	</query> -->
+
+	<query name="getBillsByCustomerId">
+		<![CDATA[	
+			SELECT 
+				bill 
+			FROM
+	        	com.ff.domain.billing.BillDO AS bill
+			WHERE 
+				bill.customer.customerId=:customerId
+		]]>
+	</query>
+
+	<query name="getBillsByInvoiceNos">
+		<![CDATA[	FROM com.ff.domain.billing.BillDO bill
+					where bill.invoiceNumber IN (:invoiceNumbers)
+				]]>
+	</query>
+
+	<!-- <query name="getBillsByShippedToCodeAndStartEndDate"> <![CDATA[ FROM 
+		com.ff.domain.billing.BillDO bill where bill.contractPaymentBillingLocationDO.shippedToCode=:shippedToCode 
+		AND bill.createdDate BETWEEN :startDate and :endDate ]]> </query> -->
+
+	<query name="getBillsByShippedToCodeAndStartEndDate">
+		<![CDATA[ 	FROM com.ff.domain.billing.BillDO bill
+					where bill.shipToCode=:shippedToCode
+					AND bill.createdDate BETWEEN :startDate and :endDate
+				]]>
+	</query>
+
+	<!-- <query name="getBillsByCustomerIdsAndStartEndDate"> <![CDATA[ FROM 
+		com.ff.domain.billing.BillDO bill where bill.contractPaymentBillingLocationDO.rateContractDO.rateContractId 
+		IN ( Select rateContract.rateContractId from com.ff.domain.ratemanagement.masters.RateContractDO 
+		rateContract where rateContract.customerId IN (:customerIds) ) AND bill.productDO.productId=:productId 
+		AND bill.createdDate BETWEEN :startDate and :endDate ]]> </query> -->
+
+   <!-- This query nor required only billprinting screen was using earlier (for uat defect it is changed now) -->
+   <!-- 	<query name="getBillsByCustomerIdsAndStartEndDate">
+		<![CDATA[ 
+			SELECT 
+				bill 
+			FROM
+	        	com.ff.domain.billing.BillDO AS bill
+			WHERE 
+				bill.customer.customerId=:customerId
+			AND bill.productDO.productId=:productId
+			AND bill.createdDate BETWEEN :startDate and :endDate
+		]]>
+	</query> -->
+
+	<sql-query name="updateBillSalesorderDtls" callable="true">
+	    <![CDATA[CALL sp_sap_bill_sales_order()]]>
+	</sql-query>
+	
+	<query name="updateInvoiceStatusInBill">
+		<![CDATA[
+			 UPDATE	com.ff.domain.billing.BillDO billDO
+			 SET 	billDO.billStatus=:billStatus
+			 WHERE	billDO.invoiceNumber=:invoiceNumber
+		]]>
+	</query>
+	
+	<query name="getPaymentBillsByCustomerId">
+		<![CDATA[	
+			SELECT DISTINCT(bill) FROM
+		        com.ff.domain.billing.BillDO AS bill,
+		        com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO AS cpbl,
+				com.ff.domain.pickup.PickupDeliveryLocationDO AS pdl,
+				com.ff.domain.pickup.PickupDeliveryContractDO AS pdc
+			WHERE
+				pdc.customer.customerId=:customerId AND
+				pdc.office.officeId=:officeId AND
+				pdl.pickupDlvContract.contractId=pdc.contractId AND
+				cpbl.pickupDeliveryLocation.pickupDlvLocId=pdl.pickupDlvLocId AND
+				cpbl.locationOperationType IN (:locationOperationType) AND
+				cpbl.shippedToCode=bill.shipToCode AND
+				bill.billStatus NOT IN ('C') AND 
+				bill.invoiceNumber NOT IN (
+		   			SELECT DISTINCT(collDtls.billNo) FROM com.ff.domain.mec.collection.CollectionDtlsDO collDtls 
+		   			WHERE collDtls.collectionAgainst='B' AND collDtls.billNo IS NOT NULL
+		   		)
+		]]>
+	</query>
+	
+	<query name="getSAPBillsByCustomerId">
+		<![CDATA[	
+			SELECT DISTINCT(bill) FROM com.ff.domain.billing.BillDO AS bill
+			WHERE bill.shipToCode IN (
+				SELECT DISTINCT(customer.customerCode) FROM 
+					com.ff.domain.business.CustomerDO customer 
+				WHERE 
+					customer.officeMappedDO.officeId=:officeId AND
+					customer.customerId=:customerId AND
+	      			customer.contractNo IS NULL AND
+	      			customer.status='A'
+		   	) 
+		   	AND bill.billStatus NOT IN ('C')
+		   	AND bill.invoiceNumber NOT IN (
+		   		SELECT DISTINCT(collDtls.billNo) FROM com.ff.domain.mec.collection.CollectionDtlsDO collDtls 
+		   		WHERE collDtls.collectionAgainst='B' AND collDtls.billNo IS NOT NULL
+		   	)
+		]]>
+	</query>
+	
+	<query name="getBillsByCustomerAndStartEndDate">
+		<![CDATA[ 
+			SELECT 
+				bill 
+			FROM
+	        	com.ff.domain.billing.BillDO AS bill
+			WHERE 
+				bill.customer.customerId=:customerId
+			    AND bill.billGenerationDate BETWEEN :startDate and :endDate
+		]]>
+	</query>
+	
+</hibernate-mapping>

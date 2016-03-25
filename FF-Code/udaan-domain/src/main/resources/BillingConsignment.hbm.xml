@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.billing.BillingConsignmentDO" table="ff_f_billing_consignment">
+		<id name="billingConsignmentId" type="java.lang.Integer" column="BILLING_CONSIGNMENT_ID">
+			<generator class="native" />
+		</id>
+
+		<property name="consgId" column="CONSG_ID" type="java.lang.Integer" />
+		<property name="originOfficeId" column="ORIGIN_OFFICE" type="java.lang.Integer" />
+		<property name="noOfPcs" column="NO_OF_PCS" type="java.lang.Integer" />
+		<property name="consignmentCopy" column="CONSIGNMENT_COPY"
+			type="java.lang.Integer" />
+		<property name="operatingLevel" column="OPERATING_LEVEL"
+			type="java.lang.Integer" />
+
+		<property name="consgNo" column="CONSG_NO" />
+		<property name="mobileNo" column="MOBILE_NO" />
+		<property name="insurancePolicyNo" column="INSURANCE_POLICY_NO" />
+		<property name="refNo" column="REF_NO" />
+
+		<property name="receivedDate" column="RECEIVED_DATE" type="java.util.Date" />
+		<property name="dlvDateTime" column="DLV_DATE_TIME" type="java.util.Date" />
+
+		<property name="price" column="PRICE" type="java.lang.Double" />
+		<property name="actualWeight" column="ACTUAL_WEIGHT" type="java.lang.Double" />
+		<property name="volWeight" column="VOL_WEIGHT" type="java.lang.Double" />
+		<property name="finalWeight" column="FINAL_WEIGHT" type="java.lang.Double" />
+		<property name="height" column="HEIGHT" type="java.lang.Double" />
+		<property name="length" column="LENGTH" type="java.lang.Double" />
+		<property name="breadth" column="BREADTH" type="java.lang.Double" />
+		<property name="declaredValue" column="DECLARED_VALUE" type="java.lang.Double" />
+
+		<property name="recvNameOrCompSeal" column="RECV_NAME_OR_COMP_SEAL" />
+		<property name="receivedStatus" column="RECEIVED_STATUS" />
+		<property name="consgStatus" column="CONSG_STATUS" />
+		<property name="scope" column="SCOPE" />
+
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date" />
+		<property name="updatedDate" column="UPDATE_DATE" type="java.util.Date" />
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer" />
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer" />
+
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		<property name="dtToCentral" column="DT_TO_CENTRAL" />
+		<property name="dtFromOpsman" column="DT_FROM_OPSMAN" />
+		<property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL" />
+		<property name="dtToOpsman" column="DT_TO_OPSMAN" />
+		<property name="version" column="VERSION" />
+
+		<many-to-one name="productDO"
+			class="com.ff.domain.serviceOffering.ProductDO" lazy="false" fetch="join">
+			<column name="PRODUCT" />
+		</many-to-one>
+
+		<many-to-one name="destPincodeDO" class="com.ff.domain.geography.PincodeDO"
+			lazy="false" fetch="join">
+			<column name="DEST_PINCODE" />
+		</many-to-one>
+
+		<many-to-one name="consignmentTypeDO"
+			class="com.ff.domain.serviceOffering.ConsignmentTypeDO" lazy="false" fetch="join">
+			<column name="CONSG_TYPE" />
+		</many-to-one>
+
+		<many-to-one name="updatedProcessDO" class="com.ff.domain.tracking.ProcessDO"
+			lazy="false" fetch="join">
+			<column name="UPDATED_PROCESS_FROM" />
+		</many-to-one>
+
+		<many-to-one name="cnContentDO"
+			class="com.ff.domain.serviceOffering.CNContentDO" lazy="false" fetch="join">
+			<column name="CONTENT" />
+		</many-to-one>
+
+		<many-to-one name="cnPaperWorksDO"
+			class="com.ff.domain.serviceOffering.CNPaperWorksDO" lazy="false" fetch="join">
+			<column name="PAPER_WORK" />
+		</many-to-one>
+
+		<many-to-one name="insuredByDO"
+			class="com.ff.domain.serviceOffering.InsuredByDO" lazy="false" fetch="join">
+			<column name="INSURED_BY" />
+		</many-to-one>
+
+		<many-to-one name="consignor"
+			class="com.ff.domain.business.ConsigneeConsignorDO" lazy="false" fetch="join">
+			<column name="CONSIGNOR" />
+		</many-to-one>
+
+		<many-to-one name="consignee"
+			class="com.ff.domain.business.ConsigneeConsignorDO" lazy="false" fetch="join">
+			<column name="CONSIGNEE" />
+		</many-to-one>
+
+		<many-to-one name="billingConsignmentSummaryDO"
+			class="com.ff.domain.billing.BillingConsignmentSummaryDO" lazy="false" fetch="join">
+			<column name="SUMMARY" />
+		</many-to-one>
+
+		<!-- <many-to-one name="billDO" class="com.ff.domain.billing.BillDO"
+			lazy="false" fetch="join">
+			<column name="INVOICE" />
+		</many-to-one> -->
+		<property name="invoiceId" column="INVOICE"></property>
+
+		<set name="billingConsignmentRateDOs" table="ff_f_billing_consignment_rate"
+			lazy="false" fetch="join">
+			<key>
+				<column name="BILLING_CONSIGNMENT" />
+			</key>
+			<one-to-many class="com.ff.domain.billing.BillingConsignmentRateDO" />
+		</set>
+
+	</class>
+
+	<query name="getBillingConsgDtls">
+		<![CDATA[
+			FROM	com.ff.domain.billing.BillingConsignmentDO billConsgDO
+			WHERE	billConsgDO.billingConsignmentSummaryDO.billingConsignmentSummaryId=:billingConsignmentSummaryId
+		]]>
+	</query>
+
+</hibernate-mapping>

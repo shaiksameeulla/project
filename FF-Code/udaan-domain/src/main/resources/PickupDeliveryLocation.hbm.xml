@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.PickupDeliveryLocationDO" table="ff_d_pickup_delivery_location">
+		<id name="pickupDlvLocId" column="LOCATION_ID" type="java.lang.Integer" >
+			<generator class="native" />
+		</id>		
+		<property name="pickupDlvLocCode" type="java.lang.String">
+			<column name="LOCATION_CODE" />
+		</property>
+		 <property name="dtToBranch" column="DT_TO_BRANCH" />
+		<many-to-one name="pickupDlvContract"
+			class="com.ff.domain.pickup.PickupDeliveryContractDO" column="CONTRACT_ID" cascade="all" lazy="false"	fetch="join"/>
+		
+		<many-to-one name="address"	
+			class="com.ff.domain.pickup.AddressDO" column="ADDRESS"	cascade="all" lazy="false" fetch="join"/>
+	</class>
+	
+	<query name="getPickupDlvLocation">
+		<![CDATA[FROM com.ff.domain.pickup.PickupDeliveryLocationDO pickLoc where  pickLoc.pickupDlvContract.customer.customerId = :customerId AND 
+			pickLoc.pickupDlvContract.office.officeId=:officeId AND address.status='A']]>
+	</query>
+
+	<query name="getPickupDlvLocationByContractId">
+		<![CDATA[
+			FROM	com.ff.domain.pickup.PickupDeliveryLocationDO pickupLoc
+			WHERE 	pickupLoc.pickupDlvContract.contractId=:contractId
+		]]>	
+	</query>
+	
+</hibernate-mapping>

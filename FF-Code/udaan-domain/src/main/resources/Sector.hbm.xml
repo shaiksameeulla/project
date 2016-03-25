@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.ratemanagement.masters.SectorDO" table="ff_d_sector">
+		<id name="sectorId" type="java.lang.Integer" column="SECTOR_ID">
+			<generator class="native" />
+		</id>
+				
+        <property name="sectorName">
+        <column name="SECTOR_NAME" />
+        </property>
+        
+        <property name="sectorType"  >
+        <column name="SECTOR_TYPE" />
+        </property>
+        
+        <property name="calculationOrder" >
+        <column name="CALCULATION_ORDER" />
+        </property>
+        
+        <property name="representSectorCode">
+        <column name="REPRESENT_BY_SECTOR" />
+        </property>
+        
+        <property name="sectorCode">
+        <column name="SECTOR_CODE" />
+        </property>
+        <property name="dtToBranch" column="DT_TO_BRANCH"/>
+    </class>
+    <query name="getSectorByCityCode">
+		<![CDATA[
+			select sector from com.ff.domain.ratemanagement.masters.SectorDO sector where sector.sectorName= 
+			(
+				select z.zoneCode from com.ff.domain.geography.ZoneDO z where z.zoneId=
+				(
+					select region.zone from com.ff.domain.geography.RegionDO region where region.regionId=
+					(
+						select city.region from com.ff.domain.geography.CityDO city where city.cityId=
+						(
+							select city.cityId from com.ff.domain.geography.CityDO city where city.cityCode=:cityCode
+						)
+					)
+				)
+			)
+		]]>
+	</query> 
+	<query name="getOriginSectorByRegionId">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.masters.SectorDO sector 
+			WHERE sector.sectorCode IN 
+				(SELECT zone.zoneCode FROM com.ff.domain.geography.ZoneDO zone 
+				WHERE zone.zoneId IN 
+					(SELECT region.zone FROM com.ff.domain.geography.RegionDO region
+					WHERE region.regionId=:regionId) 
+				)
+		]]>
+	</query> 
+	<!-- 
+	<query name="getIntracityByOriginNDestinationPincode">
+		<![CDATA[
+			 from com.ff.domain.ratemanagement.masters.SectorDO sector where sector.sectorName='intracity' and 
+			 (
+			 	select origin.cityId from com.ff.domain.geography.PincodeDO origin where origin.pincode=:originPincode
+			 ) = 
+			 (
+			 	select destination.cityId from com.ff.domain.geography.PincodeDO destination where destination.pincode=:destinationPincode
+			 )
+		]]>
+	</query>  -->
+	<sql-query name="getSectorBySourceAndDestPincode">
+	<return alias="sectorDO" class="com.ff.domain.ratemanagement.masters.SectorDO" />
+		<![CDATA[
+		SELECT sec.*
+ 		FROM    ff_d_sector sec
+        JOIN
+          (SELECT CASE
+                     WHEN sCity = dCity
+                     THEN
+                        1
+                     WHEN sState = dState
+                     THEN
+                        2
+                     WHEN sZone = dZone
+                     THEN
+                        3
+                     ELSE
+                        CASE
+                           WHEN dZone = 'NORTH' THEN 4
+                           WHEN dZone = 'EAST' THEN 5
+                           WHEN dZone = 'WEST' THEN 6
+                           WHEN dZone = 'SOUTH' THEN 7
+                           WHEN dZone = 'NORTH EAST' THEN 9
+                        END
+                  END
+                     AS 'SECTOR_ID'
+             FROM (SELECT 1 AS id,
+                          c.CITY_NAME AS 'sCity',
+                          s.STATE_NAME AS 'sState',
+                          z.ZONE_CODE AS 'sZone'
+                     FROM ff_d_city c
+                          JOIN ff_d_state s
+                             ON c.STATE = s.STATE_ID
+                          JOIN ff_d_zone z
+                             ON z.ZONE_ID = s.ZONE_ID
+                    WHERE c.CITY_ID =:originCity) a,
+                  (SELECT 1 AS id,
+                          c.CITY_NAME AS 'dCity',
+                          s.STATE_NAME AS 'dState',
+                          z.ZONE_CODE AS 'dZone'
+                     FROM ff_d_pincode p
+                          JOIN ff_d_city c
+                             ON c.CITY_ID = p.CITY_ID
+                          JOIN ff_d_state s
+                             ON c.STATE = s.STATE_ID
+                          JOIN ff_d_zone z
+                             ON z.ZONE_ID = s.ZONE_ID
+                    WHERE p.PINCODE =:destPincode) b
+            WHERE a.id = b.id) c
+       ON sec.SECTOR_ID = c.SECTOR_ID
+		]]>
+	</sql-query> 
+	
+	<sql-query name="getDestinationSectorByOriginAndDestPincode">
+	<return alias="sectorDO" class="com.ff.domain.ratemanagement.masters.SectorDO" />
+		<![CDATA[
+		  SELECT sec.*
+		  FROM    ff_d_sector sec
+		       JOIN
+		          (SELECT CASE
+		                     WHEN dZone = 'NORTH' THEN 4
+		                     WHEN dZone = 'EAST' THEN 5
+		                     WHEN dZone = 'WEST' THEN 6
+		                     WHEN dZone = 'SOUTH' THEN 7
+		                     WHEN dZone = 'NORTH EAST' THEN 9
+		                  END
+		                     AS 'SECTOR_ID'
+		             FROM (SELECT 1 AS id,
+		                          c.CITY_NAME AS 'sCity',
+		                          s.STATE_NAME AS 'sState',
+		                          z.ZONE_CODE AS 'sZone'
+		                     FROM ff_d_city c
+		                          JOIN ff_d_state s
+		                             ON c.STATE = s.STATE_ID
+		                          JOIN ff_d_zone z
+		                             ON z.ZONE_ID = s.ZONE_ID
+		                    WHERE c.CITY_ID=:originCity) a,
+		                  (SELECT 1 AS id,
+		                          c.CITY_NAME AS 'dCity',
+		                          s.STATE_NAME AS 'dState',
+		                          z.ZONE_CODE AS 'dZone'
+		                     FROM ff_d_pincode p
+		                          JOIN ff_d_city c
+		                             ON c.CITY_ID = p.CITY_ID
+		                          JOIN ff_d_state s
+		                             ON c.STATE = s.STATE_ID
+		                          JOIN ff_d_zone z
+		                             ON z.ZONE_ID = s.ZONE_ID
+		                    WHERE p.PINCODE =:destPincode) b
+		            WHERE a.id = b.id) c
+		       ON sec.SECTOR_ID = c.SECTOR_ID
+		]]>
+	</sql-query> 
+	
+	<query name="getAllSectors">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.masters.SectorDO sector
+		]]>
+	</query> 
+</hibernate-mapping>

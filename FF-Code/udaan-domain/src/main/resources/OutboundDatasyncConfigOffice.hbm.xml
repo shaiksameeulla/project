@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.bcun.OutboundDatasyncConfigOfficeDO" table="ff_d_outbound_datasync_office">
+		<id name="datasyncId" type="java.lang.Integer">
+			<column name="DATASYNC_ID" />
+			<generator class="native" />
+		</id>
+		 <many-to-one name="outboundOffice" class="com.ff.domain.organization.OfficeDO"  lazy="false" fetch="join">
+        <column name="OUTBOUND_OFFICE_ID" not-null="true" unique="true"></column>
+        </many-to-one>
+		<property name="officeLavel">
+			<column name="OUTBOUND_OFFICE_LEVEL" />
+		</property>
+		<property name="scheduleTime">
+			<column name="SCHEDULE_TIME" />
+		</property>
+		<property name="recordStatus" type="java.lang.String">
+			<column name="RECORD_STATUS" />
+		</property>
+		<property name="isActiveForOpsman" column="IS_ACTIVE_FOR_OPSMAN" type="string"/>
+		<property name="outboundOfficeCategory" column="OUTBOUND_OFFICE_CATEGORY"/>
+		
+	</class>
+	<query name="getAllActiveDatasyncOffice">
+		<![CDATA[ FROM OutboundDatasyncConfigOfficeDO configOffice where configOffice.recordStatus='A' order by configOffice.outboundOfficeCategory desc ]]>
+	</query>
+	<query name="getAllActiveDatasyncOfficeByCategory">
+		<![CDATA[ FROM OutboundDatasyncConfigOfficeDO configOffice where configOffice.outboundOfficeCategory=:outboundOfficeCategory AND configOffice.recordStatus='A' order by configOffice.officeLavel]]>
+	</query>
+	
+	<query name="getAllLiveOfficeList">
+		<![CDATA[ select distinct(office.officeId) from com.ff.domain.organization.OfficeDO as office,com.ff.domain.bcun.OutboundDatasyncConfigOfficeDO as liveOffice
+		 
+		 inner join liveOffice.outboundOffice as outboundOff
+		 where (office.reportingRHO IN(outboundOff.officeId)
+		or office.officeId IN (outboundOff.officeId)
+		OR office.reportingHUB IN (outboundOff.officeId)
+		OR office.cityId IN (outboundOff.cityId)
+		)
+	]]>
+	</query>
+	
+	<query name="getActiveBranchesForDataPublishing">
+		<![CDATA[
+					SELECT office.outboundOffice.officeId 
+					FROM com.ff.domain.bcun.OutboundDatasyncConfigOfficeDO office
+					WHERE  office.isActiveForOpsman = 'Y'
+				]]>
+	</query>
+	
+	<query name="getAllActiveDatasyncOfficeIDList">
+		<![CDATA[ select distinct(configOffice.outboundOffice.officeId) FROM com.ff.domain.bcun.OutboundDatasyncConfigOfficeDO configOffice
+		 where configOffice.recordStatus='A' order by configOffice.officeLavel]]>
+	</query>
+	
+</hibernate-mapping>

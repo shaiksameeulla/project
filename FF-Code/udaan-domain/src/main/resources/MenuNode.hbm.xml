@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.umc.MenuNodeDO" table="ff_d_app_menu">
+	<cache usage="read-only" region="eternalCache"/>
+		<id name="menuId" type="java.lang.Integer" column="MENU_ID">
+			<generator class="assigned" />
+		</id>
+		
+		<discriminator column="MENU_TYPE" />
+		<property name="position" type="java.lang.Integer" column="POSITION" />
+		<property name="embeddedInMenu" type="java.lang.Integer"
+			column="EMBEDDED_IN_MENU" />
+		<!-- <property name="menuType" column="MENU_TYPE"/> -->
+		<property name="menuLabel" column="MENU_LABEL" />
+		<property name="appName" column="APP_NAME" />
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		<property name="status" column="STATUS" />
+		
+
+		<many-to-one name="applScreenDO" class="com.ff.domain.umc.ApplScreenDO"
+			lazy="false">
+			<column name="APP_SCREEN" />
+		</many-to-one>
+
+		
+		
+		<subclass name="com.ff.domain.umc.MenuLeafNodeDO"
+			discriminator-value="A">
+			<many-to-one name="menuNodeDO" class="com.ff.domain.umc.MenuNodeDO"
+				lazy="false" insert="false" update="false">
+				<column name="EMBEDDED_IN_MENU" />
+			</many-to-one>
+		</subclass>
+
+		<subclass name="com.ff.domain.umc.MenuCompositeNodeDO"
+			discriminator-value="L">
+			<many-to-one name="menuNodeDO" class="com.ff.domain.umc.MenuNodeDO"
+				lazy="false" insert="false" update="false">
+				<column name="EMBEDDED_IN_MENU" />
+			</many-to-one>
+			<set name="menuNodeDOs" table="ff_d_app_menu" lazy="false" fetch="subselect"
+				order-by="POSITION" where="STATUS = 'A'" >
+				<key>
+					<column name="EMBEDDED_IN_MENU" />
+				</key>
+				<one-to-many class="com.ff.domain.umc.MenuNodeDO" />
+			</set>
+		</subclass>
+	</class>
+
+	<query name="getMenuNodes">
+		<![CDATA[	FROM com.ff.domain.umc.MenuLeafNodeDO menuNode
+					where menuNode.status = 'A' and menuNode.applScreenDO.screenId IN (:screenIds) and menuNode.appName = :appName
+					order by menuNode.embeddedInMenu,menuNode.position asc					
+				]]>
+	</query>
+
+</hibernate-mapping>

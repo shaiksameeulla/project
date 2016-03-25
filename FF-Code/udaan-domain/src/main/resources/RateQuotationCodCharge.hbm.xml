@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+
+	<class name="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCODChargeDO" table="ff_f_rate_quotation_cod_charge">
+		<id name="rateQuotationCODChargeId" type="java.lang.Integer" column="RATE_QUOTATION_COD_CHARGE_ID">
+			<generator class="native" />
+		</id>
+		
+		
+		<many-to-one name="rateQuotationDO" class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO"  lazy="false"  fetch="join">
+		<column name="RATE_QUOTATION" />
+		</many-to-one>
+		
+		<property name="considerHigherFixedOrPercent" >
+        	<column name="CONSIDER_HIGHER_FIXED_OR_PERC"/>
+		</property>
+		
+		<many-to-one name="codChargeDO" class="com.ff.domain.ratemanagement.masters.CodChargeDO"  lazy="false"  fetch="join">
+		<column name="COD_CHARGE" />
+		</many-to-one>
+		
+		<property name="considerFixed" >
+        	<column name="CONSIDER_FIXED"/>
+		</property>
+				
+		<property name="percentileValue" type="java.lang.Double"  >
+        	<column name="PERCENTILE_VALUE"/>
+		</property>
+		
+		<property name="fixedChargeValue">
+        	<column name="FIXED_VALUE"/>
+		</property>
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+		<property name="createdDate" column="CREATED_DATE" />
+ 		<property name="createdBy" column="CREATED_BY" />
+        <property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE"/>   
+    </class>
+    <query name="getCalculatedCODCharge">
+		<![CDATA[
+				SELECT rateQuotationCODChargeDO
+				FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCODChargeDO rateQuotationCODChargeDO
+				INNER JOIN rateQuotationCODChargeDO.codChargeDO codChargeDO
+				INNER JOIN rateQuotationCODChargeDO.rateQuotationDO rateQuotationDO
+			    WHERE rateQuotationDO.rateQuotationId=:rateQuotation
+				AND ((:codChargeSlab BETWEEN codChargeDO.minimumDeclaredValue AND codChargeDO.maximumDeclaredValue) 
+						OR (:codChargeSlab >= codChargeDO.minimumDeclaredValue AND 
+						     (codChargeDO.maximumDeclaredValue IS NULL OR codChargeDO.maximumDeclaredValue = 0)))
+		]]>
+	</query>
+	
+	 <query name="deleteCODCharges">
+		<![CDATA[
+			DELETE 	FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCODChargeDO rateQuotationCODChargeDO
+			   WHERE rateQuotationCODChargeDO.rateQuotationDO.rateQuotationId =:rateQuotationId
+		]]>
+	</query>
+	
+	 <query name="getRateCodCharges">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCODChargeDO rateQuotationCODChargeDO
+			   WHERE rateQuotationCODChargeDO.rateQuotationDO.rateQuotationId =:quotationId
+		]]>
+	</query>
+	
+	
+	
+</hibernate-mapping>

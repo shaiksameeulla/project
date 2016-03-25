@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.serviceOffering.BookingTypeProductMapDO" table="ff_d_booking_type_product_map">
+		<id name="bookingTypeProductMapId" type="java.lang.Integer">
+			<column name="BOOKING_TYPE_PRODUCT_MAP_ID" />
+			<generator class="assigned" />
+		</id>
+		
+		<property name="status" column="STATUS" type="java.lang.String"/>		
+		
+		<many-to-one name="bookingType"
+			class="com.ff.domain.booking.BookingTypeDO" lazy="false" fetch="join" >
+			<column name="BOOKING_TYPE_ID" />
+		</many-to-one>
+		
+		<many-to-one name="product"
+			class="com.ff.domain.serviceOffering.ProductDO" lazy="false" fetch="join" >
+			<column name="PRODUCT_ID" />
+		</many-to-one>
+	<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+	</class>
+	
+	<query name="getBookingProductMap">
+	<![CDATA[ 
+		FROM com.ff.domain.serviceOffering.BookingTypeProductMapDO as bookingProductMap 	
+		where bookingProductMap.bookingType.bookingType = :bookingType	
+	 
+	 ]]>
+	</query>
+	
+	<query name="isProductServicedByBooking">
+	<![CDATA[ 
+		SELECT count(*) FROM com.ff.domain.serviceOffering.BookingTypeProductMapDO as bookingProductMap 	
+		where bookingProductMap.bookingType.bookingType = :bookingType	AND bookingProductMap.product.consgSeries = :consgSeries	 
+	 ]]>
+	</query>
+	
+	<query name="isNormalProductServicedByBooking">
+	<![CDATA[ 
+		SELECT count(*) FROM com.ff.domain.serviceOffering.BookingTypeProductMapDO as bookingProductMap 	
+		where bookingProductMap.bookingType.bookingType = :bookingType	AND bookingProductMap.product.productCode = :productCode	 
+	 ]]>
+	</query>
+	
+	
+	
+</hibernate-mapping>

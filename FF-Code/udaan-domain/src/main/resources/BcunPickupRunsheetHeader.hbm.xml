@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.BcunPickupRunsheetHeaderDO" table="ff_f_pickup_runsheet_header">
+		<id name="runsheetHeaderId" type="java.lang.Integer">
+			<column name="RUNSHEET_HEADER_ID" />
+			<generator class="native" />
+		</id>
+		<property name="runsheetNo" type="java.lang.String">
+			<column name="RUNSHEET_NO" />
+		</property>
+		<property name="runsheetDate" type="java.util.Date">
+			<column name="RUNSHEET_DATE" />
+		</property>
+		<property name="runsheetStatus" type="java.lang.String">
+			<column name="RUNSHEET_STATUS" />
+		</property>
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer"/>
+         <property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/>
+		<property name="transactionCreateDate" type="java.util.Date">
+			<column name="CREATION_DATE" />
+		</property>
+		<property name="transactionModifiedDate" type="java.util.Date">
+			<column name="UPDATE_DATE" />
+		</property>
+		<property name="dtToBranch"><column name="DT_TO_BRANCH" /></property>
+		<property name="dtToCentral"><column name="DT_TO_CENTRAL" /></property>
+		<property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL" />
+		<!-- Start of Changes by <48206> for opsman on 20/09/2013  -->
+		<property  name="dtToOpsman" type="java.lang.String">
+			<column name="DT_TO_OPSMAN"/>
+		</property>
+		
+		<property  name="dtFromOpsman" 	type="java.lang.String">
+			<column name="DT_FROM_OPSMAN"/>
+		</property>
+		<!-- End of Changes by <48206> for opsman on 20/09/2013  -->
+		<many-to-one name="pickupAssignmentHeader" class="com.ff.domain.pickup.BcunRunsheetAssignmentHeaderDO" lazy="false" fetch="join" >
+			<column name="PICKUP_ASSIGNMENT_HEADER_ID" />
+		</many-to-one>
+		<set name="runsheetDetails" table="ff_f_pickup_runsheet_detail" cascade="all" lazy="false" fetch="join">
+			<key>
+				<column name="RUNSHEET_HEADER_ID"/>
+			</key>
+			<one-to-many class="com.ff.domain.pickup.BcunPickupRunsheetDetailDO" />
+		</set>
+	</class>
+	<!-- Start Queries For Data Sync -->
+	<query name="getUnsyncInboundDataForPickupRunsheet">
+		<![CDATA[FROM com.ff.domain.pickup.BcunPickupRunsheetHeaderDO pkupRunsheetHeader 
+					WHERE pkupRunsheetHeader.dtToCentral='N' AND runsheetStatus='C']]>
+	</query>
+	<query name="getRunsheetHeader">
+        <![CDATA[FROM com.ff.domain.pickup.BcunPickupRunsheetHeaderDO runsheetHeader 
+                    WHERE runsheetHeader.runsheetNo=:runsheetNo]]>
+    </query>
+	<!-- End Queries For Data Sync -->
+	<!-- Query For BCUN OutBound Data Sync  Started-->
+		<query name="getUnsyncOutboundRunsheet">
+		<![CDATA[ From com.ff.domain.pickup.BcunPickupRunsheetHeaderDO runsheetHeader   
+					where runsheetHeader.dtToBranch='N'
+		]]>
+	</query>
+	<!-- Query For BCUN OutBound  Data Sync  End-->
+	
+</hibernate-mapping>

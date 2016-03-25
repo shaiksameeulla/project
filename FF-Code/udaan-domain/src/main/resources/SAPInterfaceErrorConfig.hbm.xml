@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.sap.error.conf.SAPInterfaceErrorConfigDO" table="ff_d_sap_interface_error_config">
+		<id name="Id" type="java.lang.Long">
+			<column name="INTERFACE_ID"/>
+			<generator class="native"/>
+		</id>
+		
+		<property name="interfaceName" column="INTERFACE_NAME"/>
+		<property name="interfaceType" column="INTERFACE_TYPE"/>
+		<property name="tableName" column="TABLE_NAME"/>
+		<property name="statusColumnName" column="STATUS_COLUMN_NAME"/>
+		<property name="createdDate" column="CREATED_DATE" update="false"/>
+		<property name="updatedDate" column="UPDATED_DATE"/>
+		<property name="successStatus" column="SUCCESS_STATUS"/>
+		<property name="failureStatus" column="FAILURE_STATUS"/>
+	</class>
+
+	<query name="getSAPInterfaceErrorConfigData">
+		 <![CDATA[ 
+		 		FROM com.ff.domain.sap.error.conf.SAPInterfaceErrorConfigDO InterfaceErrorConfig 
+				WHERE InterfaceErrorConfig.interfaceType = :interfaceType
+		 ]]>
+	</query>	
+		
+</hibernate-mapping>

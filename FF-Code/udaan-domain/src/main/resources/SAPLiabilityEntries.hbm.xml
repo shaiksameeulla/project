@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.SAPLiabilityEntriesDO" table="ff_f_sap_liability_entries">
+		<id name="Id" type="java.lang.Long">
+			<column name="ID" />
+			<generator class="native" />
+		</id>
+		 <property name="bookingDate" column="BOOKING_DATE" />
+		 <property name="bookingOfcRHOCode" column="BOOKING_OFFICE_RHO_CODE" />
+		 <property name="consgNo" column="CONSIGNMENT_NO" />
+		 <property name="consgId" column="CONSG_ID" />
+		 <property name="creationDate" column="CREATION_DATE" />
+		 <property name="codValue" column="COD_VALUE" /> 
+		 <property name="lcValue" column="LC_VALUE" />
+		 <property name="destRHO" column="DESTINATION_RHO" />
+		 <property name="statusFlag" column="STATUS_FLAG" />
+		 <property name="custNo" column="CUSTOMER_CODE" />
+		 <property name="consgDelivered" column="CONSIGNMENT_DELIVERED" />
+		 <property name="rtoDate" column="RTO_DATE" />
+		 <property name="rtoDrsDate" column="RTO_DRS_DATE" />
+		 <property name="consigneeDate" column="CONSIGNEE_DATE" />
+		 <property name="baAmount" column="BA_AMOUNT" />
+		 <property name="isConsumed" column="IS_CONSUMED" />
+		 <!-- Common Attributes Starts-->
+		 <property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		 <property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		 <property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<property name="exception" column="EXCEPTION" />
+		 <!-- Common Attributes Ends -->
+	</class>
+	
+<query name="getCODLCFromStaging">
+	<![CDATA[
+		 FROM	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		 WHERE	codlcDO.sapStatus=:sapStatus and ( codlcDO.exception IS NULL or LENGTH(codlcDO.exception ) < 1)
+	]]>
+</query>
+
+<query name="getCODLCStagingCount">
+	<![CDATA[
+		 SELECT COUNT(*)
+		 FROM	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		 WHERE	codlcDO.sapStatus=:sapStatus
+	]]>
+</query>
+
+<query name="getCODLCDeliveredStagingCount">
+	<![CDATA[
+		 SELECT COUNT(*)
+		 FROM	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		 WHERE	codlcDO.sapStatus=:sapStatus
+		 AND	codlcDO.statusFlag=:statusFlag
+	]]>
+</query>
+
+<query name="getCODLCDeliveredStaging">
+	<![CDATA[
+		 FROM	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		 WHERE	codlcDO.sapStatus=:sapStatus
+		 AND	codlcDO.statusFlag=:statusFlag
+	]]>
+</query>
+
+<query name="updateCODLCStatusFlag">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		SET		codlcDO.sapStatus=:sapStatus,codlcDO.sapTimestamp=:sapTimestamp,codlcDO.exception=:exception
+		WHERE 	codlcDO.Id=:Id
+	]]>
+</query>
+
+<!-- Add Remaining Restrictions below query RTO,RTODRS Date is null -->
+<query name="getConsgStatusFromStaging">
+	<![CDATA[
+		 FROM	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		 WHERE	codlcDO.sapStatus=:sapStatus
+		 AND	codlcDO.consgDelivered IS NULL
+		 AND	codlcDO.rtoDate IS NULL
+		 AND 	codlcDO.rtoDrsDate IS NULL
+	]]>
+</query>
+
+<query name="updateConsgDeliveredStatusInStaging">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		SET		codlcDO.consgDelivered=:consgDelivered,codlcDO.updatedDate=:updatedDate,codlcDO.updatedBy=:updatedBy
+		WHERE 	codlcDO.consgNo=:consgNo
+	]]>
+</query>
+
+<query name="updateConsgRTOStatusInStaging">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		SET		codlcDO.rtoDate=:rtoDate,codlcDO.sapStatus=:sapStatus,codlcDO.updatedDate=:updatedDate,codlcDO.updatedBy=:updatedBy
+		WHERE 	codlcDO.consgNo=:consgNo
+	]]>
+</query>
+
+<query name="getStagingConsgForRTODRS">
+	<![CDATA[ 
+		 FROM	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		 WHERE	codlcDO.sapStatus=:sapStatus
+		 AND	codlcDO.consgDelivered IS NULL
+		 AND	codlcDO.rtoDate IS NOT NULL
+		 AND 	codlcDO.rtoDrsDate IS NULL
+	]]>
+</query>
+
+<query name="updateConsgRTODRSStatusInStaging">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		SET		codlcDO.rtoDrsDate=:rtoDrsDate,codlcDO.sapStatus=:sapStatus,codlcDO.updatedDate=:updatedDate,codlcDO.updatedBy=:updatedBy
+		WHERE 	codlcDO.consgNo=:consgNo
+	]]>
+</query>
+
+<query name="getCODLCDtlsByConsgNo">
+	<![CDATA[ 
+		 FROM	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		 WHERE	codlcDO.consgNo=:consgNo
+	]]>
+</query>
+
+<query name="updateConsigneeDate">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		SET		codlcDO.consigneeDate=:consigneeDate,codlcDO.sapStatus=:sapStatus,codlcDO.updatedDate=:updatedDate,codlcDO.updatedBy=:updatedBy
+		WHERE 	codlcDO.consgNo=:consgNo
+	]]>
+</query>
+
+<query name="updateCODLCConsgStagingStatus">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		SET		codlcDO.isConsumed='Y'
+		WHERE 	( codlcDO.bookingDate BETWEEN :bookingStartDate AND :bookingEndDate )
+	]]>
+</query>
+<query name="getLiabilityEntryByConsigNoForSAPLiabilityScheduler">
+	<![CDATA[ 
+		FROM	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		WHERE 	codlcDO.consgNo=:consgNo AND codlcDO.statusFlag != 'M'
+	]]>
+</query>
+	
+<query name="updateCustModificationflagForBilling">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.mec.SAPLiabilityEntriesDO codlcDO
+		SET		codlcDO.sapStatus='N',codlcDO.custNo=:custCode,codlcDO.updatedDate=:updatedDate,codlcDO.updatedBy=:updatedBy
+		WHERE 	codlcDO.consgId=:consgId AND codlcDO.statusFlag='B'
+	]]>
+</query>	
+	
+</hibernate-mapping>

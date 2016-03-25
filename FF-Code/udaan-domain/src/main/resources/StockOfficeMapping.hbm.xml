@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.masters.StockOfficeMappingDO" table="ff_d_office_stock_mapping">
+		<id name="stockId" type="java.lang.Integer">
+			<column name="STOCK_ID" />
+			<generator class="native" />
+		</id>
+		<property name="quantity" column="STOCK_QUANTITY" />
+		<property name="reorderLevelQuantity" column="REORDER_LEVEL_QUANTITY" />
+		<property name="reorderReqQuantity" column="REORDER_REQ_QUANTITY" />
+		<property name="transactionStatus" column="CUR_STATUS" />
+		
+		<!-- <property name="itemId" column="ITEM_ID" />
+		<property name="officeId" column="OFFICE_ID" /> -->
+		<property name="isAutoRequisitonRequired" column="IS_AUTO_REQUISITION_REQUIRED" />
+
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> 
+		<many-to-one name="itemDO"
+			class="com.ff.domain.stockmanagement.masters.ItemDO" lazy="false" fetch ="join">
+			<column name="ITEM_ID" />
+		</many-to-one> 
+	<many-to-one name="officeDO" 
+			class="com.ff.domain.organization.OfficeDO" lazy="false" fetch ="join">
+			<column name="OFFICE_ID" />
+		</many-to-one> 
+	</class>
+	<query name="stockDecreaseForOffice">
+		<![CDATA[
+ 			update com.ff.domain.stockmanagement.masters.StockOfficeMappingDO stoffice
+ 			set stoffice.quantity = stoffice.quantity- :quantity
+ 			where stoffice.itemDO.itemId= :itemId
+ 			AND
+ 			stoffice.officeDO.officeId=:partyTypeId
+		]]>
+	</query>
+	
+	<query name="stockIncreaseForOffice">
+		<![CDATA[
+ 			update com.ff.domain.stockmanagement.masters.StockOfficeMappingDO stoffice
+ 			set stoffice.quantity = stoffice.quantity + :quantity,
+ 					stoffice.isAutoRequisitonRequired = 
+ 								case 
+ 								when isAutoRequisitonRequired='Y'
+ 								 	then 'Y'
+ 								when isAutoRequisitonRequired='N' AND stoffice.quantity > stoffice.reorderLevelQuantity 
+ 									then 'Y' 
+ 								else 'N' 
+ 								END
+ 			where stoffice.itemDO.itemId= :itemId
+ 			AND
+ 			stoffice.officeDO.officeId=:partyTypeId
+		]]>
+	</query>
+	
+	<query name="getStockDtlsForAutoReq">
+		<![CDATA[ SELECT stoffice
+ 			FROM com.ff.domain.stockmanagement.masters.StockOfficeMappingDO stoffice
+ 			
+ 			WHERE stoffice.officeDO.officeId = :officeId
+ 			AND
+ 			stoffice.quantity <= stoffice.reorderLevelQuantity
+ 			AND   stoffice.transactionStatus =:transactionStatus
+ 			AND   stoffice.isAutoRequisitonRequired = :isAutoRequisitonRequired
+ 			AND  stoffice.reorderReqQuantity > 0
+ 			AND stoffice.itemDO.itemId is not null
+		]]>
+	</query>
+	<query name="updateStatusForAutoReq">
+		<![CDATA[
+ 			update com.ff.domain.stockmanagement.masters.StockOfficeMappingDO stoffice
+ 			set stoffice.isAutoRequisitonRequired = :autoReqStatus
+ 			where stoffice.stockId IN (:stockId)
+		]]>
+	</query>
+	
+	<!--using SubQuery style   -->
+	<!-- <query name="getOfficeDtlsForAutoReq">
+		<![CDATA[ SELECT stock.officeDO.officeId
+ 				FROM com.ff.domain.stockmanagement.masters.StockOfficeMappingDO as stock
+ 				
+ 				WHERE 	stock.quantity <= stock.reorderLevelQuantity
+ 				AND   stock.transactionStatus =:transactionStatus
+ 				AND   stock.isAutoRequisitonRequired = :isAutoRequisitonRequired
+ 				AND  stock.reorderReqQuantity > 0
+ 				AND stock.itemDO.itemId is not null
+ 				AND stock.officeDO.officeId in(
+ 				 				select  office.officeId from com.ff.domain.organization.OfficeDO office
+ 				 				WHERE   office.officeTypeDO.offcTypeId IN(
+ 					SELECT officeTypeDo.offcTypeId FROM com.ff.domain.organization.OfficeTypeDO officeTypeDo 
+ 						where officeTypeDo.offcTypeCode =:offTypeCode
+ 				
+ 				))
+		]]>
+	</query> -->
+	<!--using Join style   -->
+	<query name="getOfficeDtlsForAutoReq">
+		<![CDATA[ SELECT office.officeId
+ 				FROM com.ff.domain.stockmanagement.masters.StockOfficeMappingDO as stock
+ 				left outer join stock.officeDO as office
+ 				left outer join office.officeTypeDO as officeType
+ 				WHERE 	stock.quantity <= stock.reorderLevelQuantity
+ 				AND   stock.transactionStatus =:transactionStatus
+ 				AND   stock.isAutoRequisitonRequired = :isAutoRequisitonRequired
+ 				AND  stock.reorderReqQuantity > 0
+ 				AND stock.itemDO.itemId is not null
+ 				AND officeType.offcTypeCode = :offTypeCode
+		]]>
+	</query> 
+	
+</hibernate-mapping>

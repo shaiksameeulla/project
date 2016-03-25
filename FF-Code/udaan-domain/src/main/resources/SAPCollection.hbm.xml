@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.collection.SAPCollectionDO" table="ff_f_sap_collection">
+		<id name="Id" type="java.lang.Long">
+			<column name="ID" />
+			<generator class="native" />
+		</id>
+		<property name="custCode" column="CUSTOMER_CODE" />
+		<property name="txNumber" column="TRANSACTION_NO" />
+		<property name="CollectionDate" column="COLLECTION_DATE" />
+		<property name="modeOfPayment" column="PAYMENT_MODE" />
+		<property name="bankGLCode" column="BANK_GL" />
+		<property name="chequeDate" column="CHEQUE_DATE" />
+		<property name="chequeNo" column="CHEQUE_NO" />
+		<property name="bankName" column="BANK_NAME" />
+		<property name="consgNo" column="CONSG_NO" />
+		<property name="collectionAgainst" column="COLLECTION_AGAINST" />
+		<property name="billNo" column="BILL_NO" />
+		<property name="receivedAmt" column="RECEIVED_AMOUNT" />
+		<property name="tdsAmt" column="TDS_AMOUNT" />
+		<property name="billedAmt" column="BILL_AMOUNT" />
+		<property name="remarks" column="REMARKS" />
+		<property name="deduction" column="DEDUCTION" />
+		<property name="officeCode" column="OFFICE_CODE" />
+		<property name="reasonCode" column="REASON_CODE" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<property name="exception" column="EXCEPTION" />
+	</class>
+	
+<query name="getCollectionDtlsFromSAPCollnStaging">
+	<![CDATA[
+		 FROM	com.ff.domain.mec.collection.SAPCollectionDO sapCollnDO
+		 WHERE	sapCollnDO.sapStatus=:sapStatus and ( sapCollnDO.exception IS NULL or LENGTH(sapCollnDO.exception ) < 1)
+	]]>
+</query>
+
+<query name="updateCollectionDtlsSAPFlag">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.mec.collection.SAPCollectionDO sapCollnDO
+		SET		sapCollnDO.sapStatus=:sapStatus,sapCollnDO.sapTimestamp=:sapTimestamp,sapCollnDO.exception=:exception
+		WHERE 	sapCollnDO.Id=:Id
+	]]>
+</query>	
+	
+</hibernate-mapping>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.jobservice.JobServicesDO" table="ff_d_job_services">
+		<id name="jobId" type="java.lang.Integer" column="JOB_ID">
+			<generator class="native" />
+		</id>
+				
+        <property name="jobNumber" column="JOB_NUMBER" />
+        <property name="processCode" column="PROCESS_CODE" />
+        <property name="officeId" column="OFFICE_ID" />
+       	<property name="fileSubmissionDate" column="JOB_SUBMISSION_DATE" />
+        <property name="priority" column="PRIORITY" />
+        <property name="jobStatus" column="JOB_STATUS" />
+        <property name="remarks" column="REMARKS" />
+                
+        
+        <property name="creatdBy"  column="CREATED_BY" />
+        <property name="createdDate"  column="CREATED_DATE" />
+        <property name="updateBy" column="UPDATED_BY"/>
+        <property name="updateDate"  column="UPDATED_DATE" />
+        <property name="percentageCompleted"  column="PERCENTAGE_COMPLETED" />
+        <property name="failureFile" column="ERROR_FILE"/>
+        <property name="successFile" column="SUCCESS_FILE"/>
+         <property name="fileNameSuccess" column="SUCCESS_FILE_NAME"/>
+        <property name="fileNameFailure" column="FAILURE_FILE_NAME"/>
+      
+    </class>
+    
+  	<query name="getJobserviceByJobNumber">
+  	<![CDATA[
+  			FROM com.ff.domain.jobservice.JobServicesDO jobService 
+  			WHERE jobService.jobNumber =:jobNumber
+  	]]>
+  	
+  	</query>
+
+</hibernate-mapping>

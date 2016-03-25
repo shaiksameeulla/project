@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.umc.UserRightsDO" table="ff_d_user_rights">
+		<id name="userRightsId" type="java.lang.Integer">
+			<column name="USER_RIGHTS_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name="userId" type="java.lang.Integer">
+            <column name="CREATED_BY" />
+         </property>
+          <property name="updatedBy" type="java.lang.Integer">
+            <column name="UPDATE_BY" />
+         </property>
+         
+          <property name="transactionCreateDate" type="java.util.Date">
+            <column name="CREATION_DATE" />
+         </property>
+         <property name="transactionModifiedDate" type="java.util.Date">
+            <column name="UPDATE_DATE" />
+         </property>
+         
+          <property name="status" type="java.lang.String">
+            <column name="STATUS" />
+         </property>
+          <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+         
+         
+       
+	
+		
+		<many-to-one name="userDO" class="com.ff.domain.umc.UserDO" lazy="false" fetch="join">
+			<column name="USER_ID" />
+		</many-to-one>
+		
+		<many-to-one name="roleDO" class="com.ff.domain.umc.UserRolesDO" lazy="false" fetch="join">
+			<column name="ROLE_ID" />
+		</many-to-one>
+		
+	
+		
+	</class>
+	
+	<query name="getUserRoles">
+		<![CDATA[
+			From com.ff.domain.umc.UserRightsDO userRights where userRights.userDO.userId in (:userId) and userRights.status=:status]]>
+	</query>
+	
+	<query name="isRoleAssigned">
+		<![CDATA[
+			SELECT userRights.userDO from com.ff.domain.umc.UserRightsDO userRights where userRights.roleDO.roleId = :roleId and userRights.status = 'A' ]]>
+	</query>
+	
+	<query name="getUserRightsId">
+		<![CDATA[
+			SELECT userRights.userRightsId from com.ff.domain.umc.UserRightsDO userRights where userRights.roleDO.roleId = :roleId  and userRights.userDO.userId =:userId) ]]>
+	</query>
+	
+	<query name="deleteUserRights">
+		<![CDATA[
+			UPDATE com.ff.domain.umc.UserRightsDO userRights  set  userRights.status = 'I' where  userRights.userDO.userId =:userId) ]]>
+	</query>
+	
+	
+	
+	<query name="getUnsyncOutboundUserRights">
+		<![CDATA[select userRight from com.ff.domain.umc.UserRightsDO userRight, com.ff.domain.umc.EmployeeUserDO userEmp 
+						 where userRight.userDO.userId=userEmp.userId  and  userEmp.empDO.officeId=:branchId 
+						 and (userRight.dtToBranch='N')]]>
+	</query>
+	
+	
+</hibernate-mapping>
+	

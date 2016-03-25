@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.business.CustomerTypeDO" table="ff_d_customer_type">
+		<id name="customerTypeId" type="java.lang.Integer" column="CUSTOMER_TYPE_ID">
+			<generator class="native" />
+		</id>
+		
+        <property name="customerTypeCode" column="CUSTOMER_TYPE_CODE"/>
+        <property name="customerTypeDesc" column="CUSTOMER_TYPE_DESC"  />
+	</class>
+	
+	<query name="getCustTypeByCode">
+		<![CDATA[
+			FROM	com.ff.domain.business.CustomerTypeDO custType 
+			WHERE	custType.customerTypeCode=:customerTypeCode
+		]]>
+	</query>
+	
+	<query name="getBATypeList">
+		<![CDATA[
+ 				FROM	com.ff.domain.business.CustomerTypeDO customerTypeDO 
+				WHERE   customerTypeDO.customerTypeCode IN (SELECT 	accountGroup.customerGroup 
+															FROM	com.ff.domain.ratemanagement.masters.AccountGroupSapDO accountGroup
+															WHERE	accountGroup.rateCustomerCategoryId.rateCustomerCategoryId = 
+																	(	SELECT rateCustomerCategoryDO.rateCustomerCategoryId 
+																		FROM com.ff.domain.ratemanagement.masters.RateCustomerCategoryDO rateCustomerCategoryDO
+																		WHERE  rateCustomerCategoryDO.rateCustomerCategoryCode =:customerCode
+																	) 
+															)
+				
+				]]>
+	</query>
+	
+	<query name="getCustTypeNameByCustTypeId">
+		<![CDATA[
+			FROM	com.ff.domain.business.CustomerTypeDO custType 
+			where	custType.customerTypeId=:custTypeId 
+		 ]]>
+	</query>
+	
+</hibernate-mapping>

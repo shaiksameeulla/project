@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+	
+<hibernate-mapping>
+	<class name="com.ff.domain.complaints.ServiceRelatedDetailsDO" table="ff_f_service_related_detail">
+		<id name="serviceRelatedId" column="SERVICE_RELATED_DETAIL_ID" type="java.lang.Integer" >
+			<generator class="identity" />
+		</id>
+		
+		<property name="weight" column="WEIGHT" type="java.lang.Double"/>
+		
+		<property name="empPhone" column="PHONE" />
+		<property name="empEmail" column="EMAIL" />
+		
+		<many-to-one name="productDO"  class="com.ff.domain.serviceOffering.ProductDO" lazy="false" fetch="join">
+			<column name="PRODUCT" />
+		</many-to-one>
+		<many-to-one name="consgTypeDO"  class="com.ff.domain.serviceOffering.ConsignmentTypeDO" lazy="false" fetch="join">
+			<column name="CONSG_TYPE_ID" />
+		</many-to-one>
+		
+		<many-to-one name="paperworkDO"  class="com.ff.domain.serviceOffering.CNPaperWorksDO" lazy="false" fetch="join">
+			<column name="PAPERWORK_ID" />
+		</many-to-one>
+		
+		<many-to-one name="cityDO"  class="com.ff.domain.geography.CityDO" lazy="false" fetch="join">
+			<column name="ORIGIN_CITY_ID" />
+		</many-to-one>
+				
+		<many-to-one name="pincodeDO"  class="com.ff.domain.geography.PincodeDO" lazy="false" fetch="join">
+			<column name="PINCODE" />
+		</many-to-one>
+		
+	</class>
+									
+</hibernate-mapping>	
+
+		

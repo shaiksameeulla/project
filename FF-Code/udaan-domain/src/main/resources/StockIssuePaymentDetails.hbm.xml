@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class
+		name="com.ff.domain.stockmanagement.operations.issue.StockIssuePaymentDetailsDO"
+		table="ff_f_stock_payment_detls">
+		<id name="stockPaymentId" type="java.lang.Long">
+			<column name="STOCK_PAYMENT_ID" />
+			<generator class="native" />
+		</id>
+		<property name="issueNumber" column="ISSUE_NUMBER" />
+		<property name="issuedDate" column="ISSUED_DATE" />
+		<property name="paymentMode" column="PAYMENT_MODE" />
+		<property name="amountReceived" column="AMOUNT_RECEIVED" />
+		<property name="bankName" column="BANK_NAME" />
+		<property name="paymentDate" column="PAYMENT_DATE" />
+		<property name="branch" column="BRANCH_NAME" />
+		<property name="chequeNumber" column="CHEQUE_DD_NUMBER" />
+		<property name="isProcessed" column="IS_POSTED" />
+
+
+		<!-- TAX attributes START -->
+		
+		 <property name="serviceTax" column="SERVICE_TAX" />
+		<property name="eduCessTax" column="EDU_CESS" />
+		<property name="heduCessTax" column="HEDU_CESS" />
+
+		<property name="serviceTaxAmount" column="SERVICE_TAX_AMNT" />
+		<property name="eduCessTaxAmount" column="EDU_CESS_AMNT" />
+		<property name="heduCessTaxAmount" column="HEDU_CESS_AMNT" />
+
+		<property name="stateTax" column="STATE_TAX" />
+		<property name="surChrgeStateTax" column="SUR_CHRG_ON_ST_TAX" />
+
+		<property name="stateTaxAmount" column="STATE_TAX_AMNT" />
+		<property name="surChrgeStateTaxAmount" column="SUR_CHRG_ON_ST_TAX_AMNT" />
+		<property name="totalToPayAmount" column="TOTAL_TO_PAY_AMOUNT" />
+		<!-- Tax attributes END -->
+		<!-- common attributes START -->
+		<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+
+		<!-- <property name="nodeId" column="TRANS_NODE_ID" /> -->
+
+		<!-- common attributes END -->
+
+		<property name="createdBy" column="CREATED_BY_USER" />
+		<property name="updatedBy" column="UPDATED_BY_USER" />
+		<!-- Many -to- one relationships START -->
+
+		<many-to-one name="stockIssueDO"
+			class="com.ff.domain.stockmanagement.operations.issue.StockIssueDO"
+			column="STOCK_ISSUE_ID" unique="true" fetch="join" lazy="false">
+		</many-to-one>
+
+	</class>
+
+	<query name="getPaymentDtlsForMiscExp">
+<![CDATA[
+ 
+ 	 from com.ff.domain.stockmanagement.operations.issue.StockIssuePaymentDetailsDO as payment WHERE payment.isProcessed=:isProcessed
+ 	 and payment.stockIssueDO is not null
+ 	
+ 
+ ]]>
+	</query>
+
+	<query name="updatePaymentDtlsForMiscExp">
+<![CDATA[
+ 	 UPDATE com.ff.domain.stockmanagement.operations.issue.StockIssuePaymentDetailsDO as payment 
+ 	 SET payment.isProcessed=:isProcessed 
+ 	 WHERE payment.stockPaymentId =:stockPaymentId
+ 	
+ ]]>
+	</query>
+
+
+
+
+
+</hibernate-mapping>

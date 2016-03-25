@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.ratemanagement.operations.ratebenchmark.BcunRateBenchMarkProductDO" table="ff_d_rate_bench_mark_product">
+		<id name="rateBenchMarkProductId" type="java.lang.Integer" column="RATE_BENCH_MARK_PRODUCT_ID">
+			<generator class="assigned" />
+		</id>
+		
+		<!-- <property name="rateBenchMarkHeaderId" column="RATE_BENCH_MARK_HEADER"/>
+		
+		<property name="rateProductCategoryId" column="RATE_PRODUCT_CATEGORY"/> -->
+		
+		 <many-to-one name="rateBenchMarkHeaderDO" class="com.ff.domain.ratemanagement.operations.ratebenchmark.BcunRateBenchMarkHeaderDO" cascade="all" fetch="join" lazy="false">
+        <column name="RATE_BENCH_MARK_HEADER" ></column>
+        </many-to-one>
+        <many-to-one name="rateProductCategoryDO" class="com.ff.domain.ratemanagement.masters.BcunRateProductCategoryDO" cascade="all" lazy="false"  fetch="join">
+        <column name="RATE_PRODUCT_CATEGORY" ></column>
+        </many-to-one>
+       
+       
+        <set name="rateBenchMarkMatrixHeaderDO" table = "ff_d_rate_bench_mark_matrix_header" lazy="false" cascade="all"  fetch="join">
+		<key column="RATE_BENCH_MARK_PRODUCT" />
+		<one-to-many class="com.ff.domain.ratemanagement.operations.ratebenchmark.BcunRateBenchMarkMatrixHeaderDO" />
+		</set>
+		
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+		
+    </class>
+
+</hibernate-mapping>

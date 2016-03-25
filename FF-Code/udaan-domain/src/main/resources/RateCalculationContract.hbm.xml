@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.masters.RateCalculationContractDO"
+		table="ff_d_rate_contract">
+		<id name="rateContractId" type="java.lang.Integer" column="RATE_CONTRACT_ID">
+			<generator class="native" />
+		</id>
+		<property name="rateContractNo" column="RATE_CONTRACT_NUMBER" />
+		<property name="octraiBourneBy" column="OCTRAI_BOURNE_BY" />
+		<property name="contractFor" column="CONTRACT_FOR" />
+		<property name="validFromDate" column="VALID_FROM_DATE" type="java.util.Date" />
+		<property name="validToDate" column="VALID_TO_DATE" type="java.util.Date" />
+		<property name="rateContractType" column="RATE_CONTRACT_TYPE" />
+		<property name="contractStatus" column="CONTRACT_STATUS" />
+		<property name="customerId" column="CUSTOMER" type="java.lang.Integer" />
+		<property name="isRenewed" column="CONTRACT_RENEWED" type="java.lang.String" />
+		<property name="rateQuotationId" column="RATE_QUOTATION" />
+		<property name="createdDate" column="CREATED_DATE"/>
+	</class>
+</hibernate-mapping>

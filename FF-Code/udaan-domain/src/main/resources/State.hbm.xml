@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.geography.StateDO" table="ff_d_state">
+		<id name="stateId" type="java.lang.Integer">
+			<column name="STATE_ID" />
+			<generator class="native" />
+		</id>
+		<property name="stateName" type="java.lang.String">
+			<column name="STATE_NAME" />
+		</property>
+				
+		<property name="stateCode" type="java.lang.String">
+			<column name="STATE_CODE" />
+		</property>
+		
+		<many-to-one name="zone"  class="com.ff.domain.geography.ZoneDO" lazy="false" fetch="join">
+			<column name="ZONE_ID"/>
+		</many-to-one>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>							
+	</class>
+		 <query name="getState">
+	<![CDATA[ FROM com.ff.domain.geography.StateDO state 
+			  where state.stateId=:stateId]]>
+	</query> 
+	
+	<!-- Query has been changed because it was displaying wrong states  -->
+	<query name="getStateByRegionId">
+	<![CDATA[ SELECT stateDo FROM com.ff.domain.geography.StateDO  stateDo
+	where stateDo.stateId IN (select  distinct cityDo.state from com.ff.domain.geography.CityDO  cityDo where  cityDo.region=:regionId)
+	ORDER BY stateDo.stateName
+	 ]]>
+	</query>
+	
+	<!-- <query name="getStateByRegionId">
+	<![CDATA[ SELECT stateDo FROM com.ff.domain.geography.StateDO  stateDo ,
+    com.ff.domain.geography.RegionDO  regionDO ,
+	com.ff.domain.geography.ZoneDO  ZoneDO
+	where regionDO.zone=ZoneDO.zoneId
+	AND ZoneDO.zoneId=stateDo.zone
+	AND regionDO.regionId IN (:regionId)
+	ORDER BY stateDo.stateName
+	 ]]>
+	</query> -->
+	
+	<query name="getAllStates">
+	<![CDATA[ FROM com.ff.domain.geography.StateDO state ORDER BY state.stateName
+	 ]]>
+	</query> 	
+		
+</hibernate-mapping>

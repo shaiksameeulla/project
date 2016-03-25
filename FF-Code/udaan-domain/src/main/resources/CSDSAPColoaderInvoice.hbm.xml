@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.coloading.CSDSAPColoaderInvoiceDO" table="ff_f_sap_coloader_invoice">
+		<id name="id" type="java.lang.Integer" column="ID">
+				<generator class="native" />
+		</id>
+		<property name="transactionNo" column="TRANSACTION_NO" />
+		<property name="invoiceNo" column="INVOICE_NO" />
+		<property name="sapStatus" column="DT_SAP_INBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+	</class>
+	
+	 <query name="getStagingColoaderDtls">
+		<![CDATA[
+			 FROM	com.ff.domain.coloading.CSDSAPColoaderInvoiceDO sapcoloaderDO
+			 WHERE	sapcoloaderDO.id=:id
+		]]>
+	</query>
+	
+	<query name="getStagingColoaderInvoiceDtls">
+		<![CDATA[
+			 FROM	com.ff.domain.coloading.CSDSAPColoaderInvoiceDO sapcoloaderDO
+			 WHERE	sapcoloaderDO.sapStatus=:sapStatus
+		]]>
+	</query>
+	
+	<query name="updateInvoiceStagingStatus">
+		<![CDATA[
+			 UPDATE	com.ff.domain.coloading.CSDSAPColoaderInvoiceDO sapcoloaderDO
+			 SET	sapcoloaderDO.sapStatus=:sapStatus
+			 WHERE	sapcoloaderDO.id=:id
+		]]>
+	</query>
+	
+</hibernate-mapping>

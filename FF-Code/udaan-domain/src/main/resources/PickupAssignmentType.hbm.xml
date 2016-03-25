@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.PickupAssignmentTypeDO" table="ff_d_pickup_assignment_type">
+
+		<id name="assignmentTypeId" type="java.lang.Integer">
+			<column name="PICKUP_ASSIGNMENT_TYPE_ID" />
+			<generator class="assigned" />
+		</id>
+
+		<property name="assignmentTypeCode" type="java.lang.String">
+			<column name="PICKUP_ASSIGNMENT_TYPE_CODE" />
+		</property>
+
+		<property name="assignmentTypeDescription" type="java.lang.String">
+			<column name="PICKUP_ASSIGNMENT_TYPE_DESC" />
+		</property>
+
+		<property name="createdBy" type="java.lang.String">
+			<column name="CREATED_BY" />
+		</property>
+
+		<property name="createdDate" type="java.util.Date">
+			<column name="CREATION_DATE" />
+		</property>
+
+		<property name="updatedBy" type="java.lang.String">
+			<column name="UPDATE_BY" />
+		</property>
+
+		<property name="updatedDate" type="java.util.Date">
+			<column name="UPDATE_DATE" />
+		</property> 
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> 
+
+	</class>
+		<query name="getPickupRunsheetType">
+			<![CDATA[from com.ff.domain.pickup.PickupAssignmentTypeDO]]>
+		</query>
+	<query name="getAssignmentTypeById">
+		<![CDATA[ SELECT assignmentType.assignmentTypeDescription FROM com.ff.domain.pickup.PickupAssignmentTypeDO assignmentType 
+					WHERE assignmentType.assignmentTypeId= :assignmentTypeId]]>
+	</query>
+</hibernate-mapping>		

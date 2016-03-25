@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<class name="com.ff.domain.stockmanagement.operations.stockreturn.BcunStockReturnDO" table="ff_f_stock_return" dynamic-update="true">
+		<id name="stockReturnId" type="java.lang.Long">
+			<column name="STOCK_RETURN_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name = "issueNumber" column = "ISSUE_NUMBER" />
+		<property name = "returnNumber" column = "RETURN_NUMBER" />
+		<property name = "acknowledgementNumber" column = "ACKNOWLEDGEMENT_NUMBER" />
+		<property name = "issuedDate" column = "ISSUED_DATE" />
+		<property name = "returnDate" column = "RETURN_DATE" />
+		
+		<!--  common attributes  START -->
+		
+		<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+		
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		
+		<!--  common attributes  END-->
+	
+		<!-- One -to- Many relationships START -->
+			<set  name="returnItemDtls" lazy="false" cascade="all-delete-orphan"  fetch="join">
+	            <key column="STOCK_RETURN_ID"/>
+	            <one-to-many class="com.ff.domain.stockmanagement.operations.stockreturn.BcunStockReturnItemDtlsDO"/>
+	        </set> 
+		<!-- One -to- Many relationships END -->
+		
+		<property name="returningOfficeId" column="RETURNING_OFFICE_ID" type="java.lang.Integer" />	
+			
+		<property name="issuedOfficeId" column="ISSUED_OFFICE_ID" type="java.lang.Integer" />	
+					
+		<property name="createdBy" column="CREATED_BY_USER" />
+		<property name="updatedBy" column="UPDATED_BY_USER" />	
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		
+	</class>
+
+
+<!-- Query For Data Sync  Started -->
+	
+	
+	
+	
+	<query name="getstockReturnId">
+		<![CDATA[SELECT stockReturn.stockReturnId From com.ff.domain.stockmanagement.operations.stockreturn.BcunStockReturnDO stockReturn  where  stockReturn.returnNumber = :returnNumber ]]>
+	</query>
+	
+	<!-- Query For BCUN OutBound Data Sync  Started  -->
+		<query name="getUnsyncOutboundStockReturn">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.stockreturn.BcunStockReturnDO stockReturn
+					where stockReturn.dtToBranch='N' and (stockReturn.returningOfficeId=:branchId or stockReturn.issuedOfficeId=:branchId) 
+					
+		]]>
+	</query>
+	
+	
+	<query name="getStockReturnDtlsByNumber">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.stockreturn.BcunStockReturnDO stockReturn
+					where stockReturn.returnNumber = :returnNumber 
+		]]>
+	</query>
+	
+<!-- Query For Data Sync  End -->	
+
+</hibernate-mapping>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.transport.VehicleDO" table="ff_d_vehicle">
+		<id name="vehicleId" type="java.lang.Integer" column="VEHICLE_ID">
+			<generator class="native" />
+		</id>
+		
+        <!-- <property name="vehicleCode" type="java.lang.String"  >
+        	<column name="VEHICLE_CODE"/>
+		</property>
+        <property name="vehicleName" type="java.lang.String"  >
+        	<column name="VEHICLE_NAME"/>
+		</property>
+        <property name="vehicleDesc" type="java.lang.String"  >
+        	<column name="VEHICLE_DESC"/>
+		</property> -->
+        <property name="vehicleType" type="java.lang.String"  >
+        	<column name="VEHICLE_TYPE"/>
+		</property>
+        <property name="regNumber" type="java.lang.String"  >
+        	<column name="REG_NUMBER"/>
+		</property>
+		 <property name="isGpsEnabled" type="java.lang.Boolean"  >
+        	<column name="GPS_ENABLED"/>
+		</property>
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> 
+		
+        <property name="updatedBy" type="int">
+            <column name="UPDATE_BY" not-null="true" />
+        </property>
+
+        <property name="updatedDate" type="timestamp">
+            <column name="UPDATE_DATE" length="19" not-null="true" />
+        </property>		
+
+		<many-to-one name="regionalOfficeDO" class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="REGIONAL_OFFICE" />
+		</many-to-one>
+	</class>
+	
+	<query name="getVehicleDetailsByRegionAndRHOOfc">
+	<![CDATA[ FROM com.ff.domain.transport.VehicleDO vehicle
+	 		  WHERE vehicle.regNumber=:regNumber
+	 		  AND vehicle.regionalOfficeDO.officeId IN (select office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeTypeDO.offcTypeCode=:officeTypeCode and  office.mappedRegionDO.regionId=:regionId)]]>
+	</query>
+	
+	<query name="getAllVehicleDetailsByRegionAndRHOOfc">
+	<![CDATA[ FROM com.ff.domain.transport.VehicleDO vehicle
+	 		  WHERE vehicle.regionalOfficeDO.officeId IN (select office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeTypeDO.offcTypeCode=:officeTypeCode and  office.mappedRegionDO.regionId=:regionId)]]>
+	</query>	
+	
+	<query name="getVehicleAvailability">
+		<![CDATA[ FROM com.ff.domain.transport.VehicleDO vehicle
+		WHERE vehicle.regNumber in (:regNumbers))]]>
+	</query>	
+	
+</hibernate-mapping>

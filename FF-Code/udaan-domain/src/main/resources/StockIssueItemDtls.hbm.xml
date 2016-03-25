@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO" table="ff_f_stock_issue_item_dtls">
+		<id name="stockIssueItemDtlsId" type="java.lang.Long">
+			<column name="STOCK_ISSUE_ITEM_DTLS_ID" />
+			<generator class="native" />
+		</id>
+		<property name="rowNumber" column="ROW_NUMBER" not-null="true"/>
+		<property name="uom" column="UOM" />
+		<property name="remarks" column="REMARKS" />
+		<property name="requestedQuantity" column="REQUESTED_QUANTITY" />
+		<property name="approvedQuantity" column="APPROVED_QUANTITY" />
+		<property name="issuedQuantity" column="ISSUED_QUANTITY" not-null="true"/>
+		<property name="balanceReceiptQnty" column="BALANCE_RECEIPT_QUANTITY" />
+		<property name="description" column="DESCRIPTION" />
+		<property name="officeProductCodeInSeries" column="OFFICE_PRODUCT_CODE_IN_SERIES" />
+		<property name="startLeaf" column="START_LEAF" />
+		<property name="endLeaf" column="END_LEAF" />
+		<property name="startSerialNumber" column="START_SI_NUMBER" />
+		<property name="endSerialNumber" column="END_SI_NUMBER" />
+		 <property name="ratePerUnitQuantity" column="RATE_PER_UNIT_QUANTITY" /> 
+		<!-- <property name="itemPrice" formula="RATE_PER_UNIT_QUANTITY * ISSUED_QUANTITY"/>  -->
+		 <property name="itemPrice" column="ITEM_PRICE" />
+	<!--  common attributes  START-->
+	
+	<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+	<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+	<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+	<property name="sapStatus" column="DT_SAP" />
+	<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+	<!--  common attributes  END-->
+	
+	<!-- Many -to- one relationships START -->
+		<many-to-one name="itemTypeDO"
+			class="com.ff.domain.stockmanagement.masters.ItemTypeDO" lazy="false" fetch="join">
+			<column name="ITEM_TYPE_ID" />
+		</many-to-one>
+		
+		<many-to-one name="itemDO"
+			class="com.ff.domain.stockmanagement.masters.ItemDO" lazy="false" fetch="join">
+			<column name="ITEM_ID" />
+		</many-to-one>
+		
+		<many-to-one name="stockIssueDO"
+			class="com.ff.domain.stockmanagement.operations.issue.StockIssueDO" lazy="false" fetch="join">
+			<column name="STOCK_ISSUE_ID" />
+		</many-to-one>
+		
+		<!-- Many -to- one relationships END -->
+		
+	</class>
+	
+	<!-- Query For Global validations START-->
+	<query name="isSeriesIssuedToFR">
+		<![CDATA[ select issueFr.stockIssueItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueFr
+ 			
+ 			inner join issueFr.stockIssueDO as issueDo
+ 			WHERE 
+ 			issueDo.issuedToFranchisee.customerId=:partyTypeId
+ 			AND 
+ 			issueFr.itemDO.itemId=:itemId
+ 			AND
+ 			issueFr.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			issueFr.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between issueFr.startLeaf and issueFr.endLeaf
+ 				    
+		AND
+		issueFr.transactionModifiedDate IN(
+				 SELECT max(issueFr1.transactionModifiedDate)
+ 				FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issueFr1
+ 				WHERE issueFr1.itemDO.itemId=:itemId
+ 				AND
+ 				issueFr1.officeProductCodeInSeries =:officeCode
+ 			    				AND 
+ 				issueFr1.transactionStatus = :transactionStatus
+ 			    AND  
+ 				:leaf between issueFr1.startLeaf and issueFr1.endLeaf
+ 							)
+ 			
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesIssuedToEmp">
+		<![CDATA[ select issueEmp.stockIssueItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueEmp
+ 			
+ 			inner join issueEmp.stockIssueDO as issueDo
+ 			WHERE 
+ 			issueDo.issuedToPickupBoy.employeeId=:partyTypeId
+ 			AND 
+ 			issueEmp.itemDO.itemId=:itemId
+ 			AND
+ 			issueEmp.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			issueEmp.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between issueEmp.startLeaf and issueEmp.endLeaf
+ 				    
+		AND
+		issueEmp.transactionModifiedDate IN(
+				 SELECT max(issueEmp1.transactionModifiedDate)
+ 				FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issueEmp1
+ 				WHERE issueEmp1.itemDO.itemId=:itemId
+ 				AND
+ 				issueEmp1.officeProductCodeInSeries =:officeCode
+ 			    				AND 
+ 				issueEmp1.transactionStatus = :transactionStatus
+ 			    AND  
+ 			  			:leaf between issueEmp1.startLeaf and issueEmp1.endLeaf
+ 				    			
+ 											)
+ 			
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesIssuedToCustomer">
+		<![CDATA[ select issueCustomer.stockIssueItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueCustomer
+ 			
+ 			inner join issueCustomer.stockIssueDO as issueDo
+ 			WHERE 
+ 			issueDo.issuedToCustomer.customerId=:partyTypeId
+ 			AND 
+ 			issueCustomer.itemDO.itemId=:itemId
+ 			AND
+ 			issueCustomer.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			issueCustomer.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between issueCustomer.startLeaf and issueCustomer.endLeaf
+ 				   
+		AND
+		issueCustomer.transactionModifiedDate IN(
+				 SELECT max(issueCustomer1.transactionModifiedDate)
+ 				FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issueCustomer1
+ 				WHERE issueCustomer1.itemDO.itemId=:itemId
+ 				AND
+ 				issueCustomer1.officeProductCodeInSeries =:officeCode
+ 			    				AND 
+ 				issueCustomer1.transactionStatus = :transactionStatus
+ 			    AND  
+ 			  			:leaf between issueCustomer1.startLeaf and issueCustomer1.endLeaf
+ 				    			
+ 											)
+ 			
+ 			
+		]]>
+	</query>
+	<query name="isSeriesIssuedToOffice">
+		<![CDATA[ select issueBranch.stockIssueItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueBranch
+ 			
+ 			inner join issueBranch.stockIssueDO as issueDo
+ 			WHERE 
+ 			issueDo.issuedToOffice.officeId=:partyTypeId
+ 			AND 
+ 			issueBranch.itemDO.itemId=:itemId
+ 			AND
+ 			issueBranch.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			issueBranch.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between issueBranch.startLeaf and issueBranch.endLeaf
+ 				   
+		AND
+		issueBranch.transactionModifiedDate IN(
+				 SELECT max(issueBranch1.transactionModifiedDate)
+ 				FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issueBranch1
+ 				WHERE 
+ 				issueBranch1.itemDO.itemId=:itemId
+ 				AND
+ 				issueBranch1.officeProductCodeInSeries =:officeCode
+ 			    				AND 
+ 				issueBranch1.transactionStatus = :transactionStatus
+ 			    AND  
+ 						:leaf between issueBranch1.startLeaf and issueBranch1.endLeaf	
+ 											)
+ 			
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesIssuedToBA">
+		<![CDATA[ select issueBa.stockIssueItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueBa
+ 			
+ 			inner join issueBa.stockIssueDO as issueDo
+ 			WHERE 
+ 			issueDo.issuedToBA.customerId=:partyTypeId
+ 			AND 
+ 			issueBa.itemDO.itemId=:itemId
+ 			AND
+ 			issueBa.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			issueBa.transactionStatus = :transactionStatus
+ 			    AND
+ 			:leaf between issueBa.startLeaf and issueBa.endLeaf
+ 			
+		AND
+		issueBa.transactionModifiedDate IN(
+				 SELECT max(issueBa1.transactionModifiedDate)
+ 				FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issueBa1
+ 				WHERE issueBa1.itemDO.itemId=:itemId
+ 				AND
+ 				issueBa1.officeProductCodeInSeries =:officeCode
+ 			    				AND 
+ 				issueBa1.transactionStatus = :transactionStatus
+ 			    AND  
+ 						:leaf between issueBa1.startLeaf and issueBa1.endLeaf	
+ 								)
+ 			
+ 			
+		]]>
+	</query>
+	
+	<!-- <query name="isSeriesAlreadyIssued">
+		<![CDATA[ select issueBranch.stockIssueItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueBranch
+ 			
+ 			inner join issueBranch.stockIssueDO as issueDo
+ 			WHERE 
+ 			issueDo.issueOfficeDO.officeId=:partyTypeId
+ 			AND 
+ 			issueBranch.itemDO.itemId=:itemId
+ 			AND
+ 			issueBranch.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			issueBranch.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between issueBranch.startLeaf and issueBranch.endLeaf
+ 				   AND
+ 			issueBranch.transactionModifiedDate IN(
+				 SELECT max(issueBranch1.transactionModifiedDate)
+ 				FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issueBranch1
+ 				WHERE issueBranch1.itemDO.itemId=:itemId
+ 				AND
+ 				issueBranch1.officeProductCodeInSeries =:officeCode
+ 			    				AND 
+ 				issueBranch1.transactionStatus = :transactionStatus
+ 			    AND  
+ 						:leaf between issueBranch1.startLeaf and issueBranch1.endLeaf
+ 						
+ 											)
+ 			
+		
+ 			
+ 			
+		]]>
+	</query> -->	
+	
+	<sql-query name="isSeriesAlreadyIssued">
+		<return-scalar column="col_0_0_" type="long"/>
+		<![CDATA[ 
+		select
+        stockissue0_.STOCK_ISSUE_ITEM_DTLS_ID as col_0_0_ 
+    from
+        ff_f_stock_issue_item_dtls stockissue0_ 
+    inner join
+        ff_f_stock_issue stockissue1_ 
+            on stockissue0_.STOCK_ISSUE_ID=stockissue1_.STOCK_ISSUE_ID 
+    where
+        stockissue1_.ISSUE_OFFICE_ID=:partyTypeId
+        and stockissue0_.ITEM_ID=:itemId
+        and stockissue0_.OFFICE_PRODUCT_CODE_IN_SERIES=:officeCode
+        and stockissue0_.TRANS_ACTIVE_STATUS=:transactionStatus
+        and (
+            :leaf between stockissue0_.START_LEAF and stockissue0_.END_LEAF
+        ) 
+        and (
+            stockissue0_.TRANS_MODIFIED_DATE_TIME in (
+                select
+                    max(stockissue2_.TRANS_MODIFIED_DATE_TIME) 
+                from
+                    ff_f_stock_issue_item_dtls stockissue2_ 
+                where
+                    stockissue2_.ITEM_ID=:itemId
+                    and stockissue2_.OFFICE_PRODUCT_CODE_IN_SERIES=:officeCode
+                    and stockissue2_.TRANS_ACTIVE_STATUS=:transactionStatus
+                    and (
+                        :leaf  between stockissue2_.START_LEAF and stockissue2_.END_LEAF
+                    )
+            )
+        )
+      	]]>
+	</sql-query>
+	
+	<query name="isSeriesAlreadyIssuedExcludeRowId">
+		<![CDATA[ select issueBranch.stockIssueItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueBranch
+ 			
+ 			inner join issueBranch.stockIssueDO as issueDo
+ 			WHERE 
+ 			issueDo.issueOfficeDO.officeId=:partyTypeId
+ 			AND 
+ 			issueBranch.itemDO.itemId=:itemId
+ 			AND
+ 			issueBranch.stockIssueItemDtlsId !=:itemDetailsId
+ 			AND
+ 			issueBranch.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			issueBranch.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between issueBranch.startLeaf and issueBranch.endLeaf
+ 				AND    
+ 			issueBranch.transactionModifiedDate IN(
+				 SELECT max(issueBranch1.transactionModifiedDate)
+ 				FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issueBranch1
+ 				WHERE 
+ 				issueBranch1.itemDO.itemId=:itemId
+ 				AND
+ 				issueBranch1.officeProductCodeInSeries =:officeCode
+ 			    				AND 
+ 				issueBranch1.transactionStatus = :transactionStatus
+ 				AND
+ 				issueBranch1.stockIssueItemDtlsId !=:itemDetailsId
+ 			    AND  
+ 					:leaf between issueBranch1.startLeaf and issueBranch1.endLeaf
+ 				    	
+ 											)
+		
+ 			
+ 			
+		]]>
+	</query>	
+	<query name="getStockIssueType">
+		<![CDATA[ select issueDo.issuedToType
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueType
+ 			
+ 			inner join issueType.stockIssueDO as issueDo
+ 			WHERE 
+ 			issueType.itemDO.itemId=:itemId
+ 			AND
+ 			issueType.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			issueType.transactionStatus = :transactionStatus
+ 			    AND  
+ 			( :startLeaf between issueType.startLeaf and issueType.endLeaf
+ 				    AND
+ 			:endLeaf between issueType.startLeaf and issueType.endLeaf
+ 			)
+		AND
+		issueType.transactionModifiedDate IN(
+				 SELECT max(issueType1.transactionModifiedDate)
+ 				FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issueType1
+ 				WHERE issueType1.itemDO.itemId=:itemId
+ 				AND
+ 				issueType1.officeProductCodeInSeries =:officeCode
+ 			    				AND 
+ 				issueType1.transactionStatus = :transactionStatus
+ 			    AND  
+ 			(  			:startLeaf between issueType1.startLeaf and issueType1.endLeaf
+ 				    			OR 
+ 						:endLeaf between issueType1.startLeaf and issueType1.endLeaf	
+ 						
+ 							)
+ 											)
+ 			
+ 			
+		]]>
+	</query>
+	
+	<query name="getStockLatestIssueDate">
+		<![CDATA[ select issueDo.transactionModifiedDate
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueType
+ 			
+ 			inner join issueType.stockIssueDO as issueDo
+ 			WHERE 
+ 			
+ 			issueType.itemDO.itemId=:itemId
+ 			AND
+ 			issueType.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			issueType.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between issueType.startLeaf and issueType.endLeaf
+ 				order by issueType.transactionModifiedDate desc
+ 			
+		]]>
+	</query>
+	
+	<query name="isSeriesIssuedWithIssueNumber">
+		<![CDATA[ select issueBranch.stockIssueItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueBranch
+ 			
+ 			inner join issueBranch.stockIssueDO as issueDo
+ 			WHERE 
+ 			issueBranch.itemDO.itemId=:itemId
+ 			AND
+ 			issueDo.stockIssueNumber = :transactionNumber
+ 			AND
+ 			issueBranch.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			issueBranch.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 (:startLeaf between issueBranch.startLeaf and issueBranch.endLeaf
+ 			 AND 
+ 			  :endLeaf between issueBranch.startLeaf and issueBranch.endLeaf)
+		]]>
+	</query>
+	<query name="isSeriesIssuedWithIssueNumberAndItemDetailsId">
+		<![CDATA[ select issueBranch.stockIssueItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueBranch
+ 			
+ 			inner join issueBranch.stockIssueDO as issueDo
+ 			WHERE 
+ 			issueDo.stockIssueNumber = :transactionNumber
+ 			AND
+ 			issueBranch.itemDO.itemId=:itemId
+ 			AND
+ 			issueBranch.stockIssueItemDtlsId =:itemDetailsId
+ 			AND
+ 			issueBranch.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			issueBranch.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 (:startLeaf between issueBranch.startLeaf and issueBranch.endLeaf
+ 			 AND 
+ 			  :endLeaf between issueBranch.startLeaf and issueBranch.endLeaf)
+		]]>
+	</query>
+	<query name="getIssuedBalanceQntyForReceipt">
+		<![CDATA[
+ 			SELECT issDtls.balanceReceiptQnty from com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issDtls  
+ 			WHERE issDtls.stockIssueItemDtlsId=:stockItemDtlsId
+		]]>
+	</query>
+	<query name="updateBalanceQntyWithIssueQntyForSIReceipt">
+		<![CDATA[
+ 			UPDATE com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issDtls 
+ 			SET issDtls.balanceReceiptQnty = issDtls.issuedQuantity - :receivedQuantity 
+ 			WHERE issDtls.stockIssueItemDtlsId=:stockItemDtlsId
+		]]>
+	</query>
+	<query name="updateBalanceQntyWithReceiptQntyForSIReceipt">
+		<![CDATA[
+ 			UPDATE com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issDtls 
+ 			SET issDtls.balanceReceiptQnty = issDtls.balanceReceiptQnty - :receivedQuantity 
+ 			WHERE issDtls.stockIssueItemDtlsId=:stockItemDtlsId
+		]]>
+	</query>
+	
+	<query name="getItemIdAndIssueNo">
+		<![CDATA[
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issueDetails 
+ 		 	WHERE issueDetails.startSerialNumber=:startSerialNumber
+ 		 	
+		]]><!-- AND issueDetails.issueOfficeDO.officeId=:officeId -->
+	</query>
+	<query name="getItemDoForStockIssueBySerialNumber">
+		<![CDATA[
+ 			SELECT  issDtls.itemDO from com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issDtls  
+ 			WHERE :startSerialNumber between issDtls.startSerialNumber and issDtls.endSerialNumber
+ 			AND length(issDtls.startSerialNumber) = length(:startSerialNumber)
+       		AND issDtls.transactionStatus = :transactionStatus
+		]]>
+	</query>
+	<query name="getIssueItemDtlIdWithIssueNumberForReceipt">
+		<![CDATA[
+ 			select issueBranch.stockIssueItemDtlsId
+ 			FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueBranch
+ 			
+ 			inner join issueBranch.stockIssueDO as issueDo
+ 			WHERE 
+ 			issueDo.stockIssueNumber = :transactionNumber
+ 			AND
+ 			issueBranch.itemDO.itemId=:itemId
+ 			AND
+ 			issueBranch.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			issueBranch.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between issueBranch.startLeaf and issueBranch.endLeaf
+ 		 	
+		]]><!-- AND issueDetails.issueOfficeDO.officeId=:officeId -->
+	</query>
+	
+	<query name="getLatestIssueDateBySerialNumber">
+		<![CDATA[
+ 			select issueDtls.transactionModifiedDate FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO  issueDtls 
+ 		 		WHERE :startSerialNumber between issueDtls.startSerialNumber and issueDtls.endSerialNumber
+ 			AND length(issueDtls.startSerialNumber) = length(:startSerialNumber)
+       		AND issueDtls.transactionStatus = :transactionStatus
+       		ORDER BY issueDtls.transactionModifiedDate DESC
+		]]>
+	</query>
+	
+	<query name="getStockIssueDetailsForSAP">
+		<![CDATA[ 
+		FROM	com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issueDtlsDO
+		WHERE	( (  issueDtlsDO.sapStatus=:sapStatus 
+					 AND issueDtlsDO.stockIssueDO.issuedToType IN ('BA','BR'))
+				OR (issueDtlsDO.sapStatus=:sapStatus 
+					AND issueDtlsDO.stockIssueDO.issuedToType = 'FR'
+					AND issueDtlsDO.itemTypeDO.itemHasSeries = 'N')
+			)
+		]]>
+	</query>
+	
+	<query name="getCountOfIssueDtlsForSAP">
+		<![CDATA[ 
+		Select	count(*)
+		FROM	com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issueDtlsDO
+		WHERE	( (  issueDtlsDO.sapStatus=:sapStatus 
+					 AND issueDtlsDO.stockIssueDO.issuedToType IN ('BA','BR'))
+				OR (issueDtlsDO.sapStatus=:sapStatus 
+					AND issueDtlsDO.stockIssueDO.issuedToType = 'FR'
+					AND issueDtlsDO.itemTypeDO.itemHasSeries = 'N')
+			)
+		]]>
+	</query>
+	
+	<query name="updateStockIssueDetailsForSAP">
+		<![CDATA[ 
+			UPDATE	com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO issueDtlsDO
+			SET		issueDtlsDO.sapStatus=:sapStatus,issueDtlsDO.sapTimestamp=:sapTimestamp
+			WHERE	issueDtlsDO.stockIssueItemDtlsId=:stockIssueItemDtlsId
+		]]>
+	</query>
+	
+	<query name="getStockHolderFromStockIssue">
+		<![CDATA[ 
+			select new com.ff.domain.stockmanagement.wrapper.StockHolderWrapperDO(stockDO.issuedToOffice.officeId,stockDO.issuedToPickupBoy.employeeId,stockDO.issuedToFranchisee.customerId,stockDO.issuedToCustomer.customerId,stockDO.issuedToBA.customerId,issueDtls.transactionModifiedDate)	 FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO as issueDtls 
+			inner join issueDtls.stockIssueDO as stockDO
+ 		 		WHERE issueDtls.itemDO.itemId=:itemId
+ 		 		and
+ 		 		 :startSerialNumber between issueDtls.startSerialNumber and issueDtls.endSerialNumber
+ 			AND length(issueDtls.startSerialNumber) = length(:startSerialNumber)
+       		AND issueDtls.transactionStatus = :transactionStatus
+       		ORDER BY issueDtls.transactionModifiedDate DESC
+		]]>
+	</query>
+	
+	<sql-query name="getLatestStockByLeafForIssue" callable="true">
+	    <![CDATA[ CALL sp_get_latest_stock_by_leaf_for_issue(:leaf,:officeCode,:itemId)]]>
+    </sql-query>
+    <sql-query name="getLatestStockByLeafForIssue1" callable="true">
+	    <![CDATA[ CALL sp_stock_issue_validation_1(:startLeaf,:endLeaf,:officeCode,:itemId,:partyTypeId)]]>
+    </sql-query>
+	
+	
+	
+	<!-- Query For Global validations END-->
+	
+	<!-- 	<query name="getstockIssueItemDtlsId">
+		<![CDATA[SELECT stockItemDO.stockIssueItemDtlsId From com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO stockItemDO where  stockItemDO.rowNumber = :rowNumber and  stockItemDO.stockIssueDO= :stockIssueId ]]>
+	</query> -->
+	
+<!-- Query For Data Sync  End -->	
+	
+	
+</hibernate-mapping>

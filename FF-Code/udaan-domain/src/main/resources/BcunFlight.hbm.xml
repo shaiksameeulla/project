@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.transport.BcunFlightDO" table="ff_d_flight">
+		<id name="flightId" type="java.lang.Integer" column="FLIGHT_ID">
+			<generator class="assigned" />
+		</id>
+
+        <property name="flightNumber" column="FLIGHT_NUMBER" type="java.lang.String"/>
+        <property name="airlineCode" column="AIRLINE_CODE" type="java.lang.String"/>
+         <property name="airlineName" column="AIRLINE_NAME" type="java.lang.String"/>
+        <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+	</class>
+</hibernate-mapping>

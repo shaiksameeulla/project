@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.transfer.StockTransferDO" table="ff_f_stock_transfer">
+		<id name="stockTransferId" type="java.lang.Long">
+			<column name="STOCK_TRANSFER_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name="stockTransferNumber" column="TRANSFER_NUMBER" unique="true" not-null="true"/>
+		<property name="stockIssueNumber" column="ISSUE_NUMBER" />
+		<property name="transferFromType" column="TRANSFER_FROM_TYPE" not-null="true"/>
+		<property name="transferTOType" column="TRANSFER_TO_TYPE" not-null="true"/>
+		<property name="transferDate" column="TRANSFER_DATE" />
+		
+		<property name="transferQuantity" column="QUANTITY" not-null="true"/>
+		<property name="officeProductCodeInSeries" column="OFFICE_PRODUCT_CODE_IN_SERIES" not-null="true"/>
+		<property name="startLeaf" column="START_LEAF" not-null="true"/>
+		<property name="endLeaf" column="END_LEAF" not-null="true"/>
+		<property name="startSerialNumber" column="START_SI_NUMBER" not-null="true"/>
+		<property name="endSerialNumber" column="END_SI_NUMBER" not-null="true"/>
+		<property name="fromShippedToCode" formula="(SELECT issue.SHIPPED_TO_CODE from ff_f_stock_issue as issue where issue.ISSUED_TO_CUSTOMER=FROM_CUSTOMER_ID limit 1)" />
+		<property name="shippedToCode" column="SHIPPED_TO_CODE" />
+
+	<!--  common attributes  START-->
+	
+	<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+	<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+	<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+	<!-- <property name="centralInboudStatus" column="DT_CENTRAL_INBOUND" />
+	<property name="centralOutboudStatus" column="DT_CENTRAL_OUTBOUND" /> -->
+	<!-- <property name="nodeId" column="TRANS_NODE_ID" /> -->
+	 <property name="sapStatus" column="DT_SAP" /> 
+	<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+	<property name="createdBy" column="CREATED_BY_USER" />
+	<property name="updatedBy" column="UPDATED_BY_USER" />
+	
+	<!--  common attributes  END-->
+	
+	<!-- Many -to- one relationships START -->
+		
+		
+		<many-to-one name="itemDO"
+			class="com.ff.domain.stockmanagement.masters.ItemDO" lazy="false" fetch="join">
+			<column name="ITEM_ID" />
+		</many-to-one>
+		
+   	 <many-to-one name="createdOfficeDO"
+			class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="CREATED_BY_OFFICE" />
+		</many-to-one>
+		<many-to-one name="transferFromBaDO"
+			class="com.ff.domain.business.CustomerDO" lazy="false" fetch="join">
+			<column name="FROM_BA_ID" />
+		</many-to-one> 
+		
+		<many-to-one name="transferFromEmpDO"
+			class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join">
+			<column name="FROM_EMPLOYEE_ID" />
+		</many-to-one>
+		<many-to-one name="transferFromCustomerDO"
+			class="com.ff.domain.business.CustomerDO" lazy="false" fetch="join">
+			<column name="FROM_CUSTOMER_ID" />
+		</many-to-one>
+		
+		 <many-to-one name="transferTOOfficeDO"
+			class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="TO_BRANCH_ID" />
+		</many-to-one>
+		<many-to-one name="transferTOBaDO"
+			class="com.ff.domain.business.CustomerDO" lazy="false" fetch="join">
+			<column name="TO_BA_ID" />
+		</many-to-one> 
+		
+		<many-to-one name="transferTOEmpDO"
+			class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join">
+			<column name="TO_EMPLOYEE_ID" />
+		</many-to-one>
+		<many-to-one name="transferTOCustomerDO"
+			class="com.ff.domain.business.CustomerDO" lazy="false" fetch="join">
+			<column name="TO_CUSTOMER_ID" />
+		</many-to-one>
+		
+			<!-- Many-to-one relationships (Common attributes) START -->
+			<!-- <many-to-one name="createdByUser"
+				class="com.ff.domain.umc.UserDO" lazy="false" update="false">
+				<column name="CREATED_BY_USER" />
+			</many-to-one>
+			<many-to-one name="updatedByUser"
+				class="com.ff.domain.umc.UserDO" lazy="false">
+				<column name="UPDATED_BY_USER" />
+			</many-to-one>		 -->
+		<!-- Many -to- one relationships END -->
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		
+		<!-- <property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		
+		<property name="dtToOpsman">
+			<column name="DT_TO_OPSMAN" />
+		</property> -->
+	
+	</class>
+	
+	
+	
+	 <query name="isSeriesTransferredTOOffice">
+		<![CDATA[ select transOffice.stockTransferId
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transOffice
+ 			
+ 			WHERE 
+ 			transOffice.transferTOOfficeDO.officeId=:partyTypeId
+ 			AND 
+ 			transOffice.itemDO.itemId=:itemId
+ 			AND
+ 			transOffice.transactionStatus=:transactionStatus
+ 			AND 
+ 			transOffice.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			 :leaf between transOffice.startLeaf AND transOffice.endLeaf
+ 			AND
+ 			transOffice.transactionModifiedDate IN (
+ 			select max(transOffice1.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transOffice1
+ 			
+ 			WHERE 
+ 			transOffice1.itemDO.itemId=:itemId
+ 			AND
+ 			transOffice1.transactionStatus=:transactionStatus
+ 			AND 
+ 			transOffice1.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			  :leaf between transOffice1.startLeaf AND transOffice1.endLeaf
+ 			
+ 			)
+		]]>
+	</query> 
+	<query name="isSeriesTransferredTOBa">
+		<![CDATA[ select transferToBa.stockTransferId
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferToBa
+ 			
+ 			WHERE 
+ 			transferToBa.transferTOBaDO.customerId=:partyTypeId
+ 			AND 
+ 			transferToBa.itemDO.itemId=:itemId
+ 			AND
+ 			transferToBa.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferToBa.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			 :leaf between transferToBa.startLeaf AND transferToBa.endLeaf
+ 			AND
+ 			transferToBa.transactionModifiedDate IN (
+ 			select max(transferToBa1.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferToBa1
+ 			
+ 			WHERE 
+ 			transferToBa1.itemDO.itemId=:itemId
+ 			AND
+ 			transferToBa1.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferToBa1.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			  :leaf between transferToBa1.startLeaf AND transferToBa1.endLeaf
+ 			
+ 			)
+		]]>
+	</query> 
+	
+	
+	<query name="isSeriesTransferredTOCust">
+		<![CDATA[ select transferToCust.stockTransferId
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferToCust
+ 			
+ 			WHERE 
+ 			transferToCust.transferTOCustomerDO.customerId=:partyTypeId
+ 			AND 
+ 			transferToCust.itemDO.itemId=:itemId
+ 			AND
+ 			transferToCust.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferToCust.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			 :leaf between transferToCust.startLeaf AND transferToCust.endLeaf
+ 			AND
+ 			transferToCust.transactionModifiedDate IN (
+ 			select max(transferToCust1.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferToCust1
+ 			
+ 			WHERE 
+ 			transferToCust1.itemDO.itemId=:itemId
+ 			AND
+ 			transferToCust1.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferToCust1.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			  (:leaf between transferToCust1.startLeaf AND transferToCust1.endLeaf)
+ 			)
+		]]>
+	</query> 
+	
+	<query name="isSeriesTransferredFromBa">
+		<![CDATA[ select transferFromBa.stockTransferId
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferFromBa
+ 			WHERE 
+ 			transferFromBa.transferFromBaDO.customerId=:partyTypeId
+ 			AND 
+ 			transferFromBa.itemDO.itemId=:itemId
+ 			AND
+ 			transferFromBa.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferFromBa.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			( :leaf between transferFromBa.startLeaf AND transferFromBa.endLeaf )
+ 			AND
+ 			 transferFromBa.transactionModifiedDate IN (
+ 			select max(transferFromBa1.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferFromBa1
+ 			
+ 			WHERE 
+ 			transferFromBa1.itemDO.itemId=:itemId
+ 			AND 
+ 			transferFromBa1.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferFromBa1.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			  (:leaf between transferFromBa1.startLeaf AND transferFromBa1.endLeaf)
+ 			
+ 			
+ 			)
+ 			
+		]]>
+	</query> 
+	
+	<query name="isSeriesExistAtTransferredFromBa">
+		<![CDATA[ select transferFromBa.stockTransferId
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferFromBa
+ 			WHERE 
+ 			transferFromBa.transferFromBaDO.customerId=:partyTypeId
+ 			AND 
+ 			transferFromBa.itemDO.itemId=:itemId
+ 			AND
+ 			transferFromBa.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferFromBa.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			( :leaf between transferFromBa.startLeaf AND transferFromBa.endLeaf)
+ 			AND
+ 			transferFromBa.transactionModifiedDate IN (
+ 			select max(transferFromBa1.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferFromBa1
+ 			
+ 			WHERE 
+ 			transferFromBa1.itemDO.itemId=:itemId
+ 			AND 
+ 			transferFromBa1.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferFromBa1.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			  (:leaf between transferFromBa1.startLeaf AND transferFromBa1.endLeaf)
+ 			
+ 			
+ 			
+ 			)
+ 			
+		]]>
+	</query> 
+	
+	<query name="isSeriesTransferredFromCust">
+		<![CDATA[ select transferFromCust.stockTransferId
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferFromCust
+ 			
+ 			WHERE 
+ 			transferFromCust.transferFromCustomerDO.customerId=:partyTypeId
+ 			AND 
+ 			transferFromCust.itemDO.itemId=:itemId
+ 			AND
+ 			transferFromCust.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferFromCust.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			 :leaf between transferFromCust.startLeaf AND transferFromCust.endLeaf
+ 			AND 
+ 			 transferFromCust.transactionModifiedDate IN (
+ 			select max(transferFromCust1.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferFromCust1
+ 			
+ 			WHERE 
+ 			transferFromCust1.itemDO.itemId=:itemId
+ 			AND 
+ 			transferFromCust1.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferFromCust1.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			  (:leaf between transferFromCust1.startLeaf AND transferFromCust1.endLeaf)
+ 			
+ 			
+ 			)
+		]]>
+	</query> 
+	
+	<query name="isSeriesExistAtTransferredFromCust">
+		<![CDATA[ select transferFromCust.stockTransferId
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferFromCust
+ 			
+ 			WHERE 
+ 			transferFromCust.transferFromCustomerDO.customerId=:partyTypeId
+ 			AND 
+ 			transferFromCust.itemDO.itemId=:itemId
+ 			AND
+ 			transferFromCust.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferFromCust.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			 :leaf between transferFromCust.startLeaf AND transferFromCust.endLeaf
+ 			 AND
+ 			 transferFromCust.transactionModifiedDate IN (
+ 			select max(transferFromCust1.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferFromCust1
+ 			
+ 			WHERE 
+ 			transferFromCust1.itemDO.itemId=:itemId
+ 			AND 
+ 			transferFromCust1.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferFromCust1.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			  (:leaf between transferFromCust1.startLeaf AND transferFromCust1.endLeaf)
+ 			
+ 			
+ 			)
+ 			 
+		]]>
+	</query> 
+	<query name="isSeriesTransferredFromEmp">
+		<![CDATA[ select transferFromEmp.stockTransferId
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferFromEmp
+ 			
+ 			WHERE 
+ 			transferFromEmp.transferFromEmpDO.employeeId=:partyTypeId
+ 			AND 
+ 			transferFromEmp.itemDO.itemId=:itemId
+ 			AND
+ 			transferFromEmp.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferFromEmp.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			 :leaf between transferFromEmp.startLeaf AND transferFromEmp.endLeaf
+ 			 AND 
+ 			 transferFromEmp.transactionModifiedDate IN (
+ 			select max(transferFromEmp1.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferFromEmp1
+ 			
+ 			WHERE 
+ 			transferFromEmp1.itemDO.itemId=:itemId
+ 			AND 
+ 			transferFromEmp1.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferFromEmp1.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			  (:leaf between transferFromEmp1.startLeaf AND transferFromEmp1.endLeaf)
+ 			
+ 			
+ 			)
+		]]>
+	</query> 
+	
+	<query name="isSeriesExistAtTransferredFromEmp">
+		<![CDATA[ select transferFromEmp.stockTransferId
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferFromEmp
+ 			
+ 			WHERE 
+ 			transferFromEmp.transferFromEmpDO.employeeId=:partyTypeId
+ 			AND 
+ 			transferFromEmp.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferFromEmp.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			transferFromEmp.itemDO.itemId=:itemId
+ 			
+ 			AND
+ 			( :leaf between transferFromEmp.startLeaf AND transferFromEmp.endLeaf)
+ 			 AND 			 
+ 			 transferFromEmp.transactionModifiedDate IN (
+ 			select max(transferFromEmp1.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferFromEmp1
+ 			
+ 			WHERE 
+ 			transferFromEmp1.itemDO.itemId=:itemId
+ 			AND 
+ 			transferFromEmp1.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferFromEmp1.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			  (:leaf between transferFromEmp1.startLeaf AND transferFromEmp1.endLeaf)
+ 			
+ 			)
+		]]>
+	</query> 
+	<query name="isSeriesTransferredTOEmp">
+		<![CDATA[ select transferToEmp.stockTransferId
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferToEmp
+ 			
+ 			WHERE 
+ 			transferToEmp.transferTOEmpDO.employeeId=:partyTypeId
+ 			AND 
+ 			transferToEmp.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferToEmp.itemDO.itemId=:itemId
+ 			AND
+ 			transferToEmp.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			 :leaf between transferToEmp.startLeaf AND transferToEmp.endLeaf
+ 			AND
+ 			transferToEmp.transactionModifiedDate IN (
+ 			select max(transferToEmp1.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferToEmp1
+ 			
+ 			WHERE 
+ 			transferToEmp1.itemDO.itemId=:itemId
+ 			AND 
+ 			transferToEmp1.transactionStatus=:transactionStatus
+ 			AND 
+ 			transferToEmp1.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			  (:leaf between transferToEmp1.startLeaf AND transferToEmp1.endLeaf)
+ 			
+ 			
+ 			
+ 			)
+		]]>
+	</query> 
+	
+	
+
+	
+	<query name="getStockLatestTransferTOOfficeDate">
+		<![CDATA[ select transfer.transferDate
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transfer
+ 			
+ 			WHERE 
+ 			transfer.transferTOOfficeDO.officeId=:partyTypeId
+ 			AND
+ 			transfer.itemDO.itemId=:itemId
+ 			AND
+ 			transfer.officeProductCodeInSeries =:officeCode
+ 			    AND 
+ 			transfer.transactionStatus = :transactionStatus
+ 			    AND  
+ 			 :leaf between transfer.startLeaf and transfer.endLeaf
+ 				order by transfer.transactionModifiedDate desc
+ 			
+		]]>
+	</query>
+	
+	<query name="findTransferDtlsByTransferNumber">
+		<![CDATA[ 
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transfer
+ 			WHERE 
+ 			transfer.createdOfficeDO.officeId=:officeId
+ 			AND transfer.transactionStatus=:transactionStatus
+ 		 	AND transfer.stockTransferNumber=:stockTransferNumber
+ 			
+		]]>
+	</query>
+	<query name="getMaxTransferNumber">
+		<![CDATA[
+ 			select max(transfer.stockTransferNumber)FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO  transfer 
+ 		 		WHERE 
+ 		 		transfer.createdOfficeDO.officeId=:officeId
+ 		 	AND 
+			transfer.transactionStatus =:transactionStatus
+ 		 	AND  length(transfer.stockTransferNumber) = :numberLength
+ 		 	AND transfer.stockTransferNumber like :prefix
+		]]>
+	</query>
+	<query name="getLatestTransferDateBySerialNumber">
+		<![CDATA[
+ 			select customer.transactionModifiedDate FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO  customer 
+ 		 		WHERE :startSerialNumber between customer.startSerialNumber and customer.endSerialNumber
+ 			AND length(customer.startSerialNumber) = length(:startSerialNumber)
+       		AND customer.transactionStatus = :transactionStatus
+       		ORDER BY customer.transactionModifiedDate DESC
+		]]>
+	</query>
+	
+	<query name="getLatestTransferDetailsBySerialNumber">
+		<![CDATA[
+ 			select customer.transactionModifiedDate FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO  customer 
+ 		 		WHERE :startSerialNumber between customer.startSerialNumber and customer.endSerialNumber
+ 			AND length(customer.startSerialNumber) = length(:startSerialNumber)
+       		AND customer.transactionStatus = :transactionStatus
+       		ORDER BY customer.transactionModifiedDate DESC
+		]]>
+	</query>
+	
+ 			 			
+	<query name="getStockTransferDtlsForSAP">
+		<![CDATA[
+			FROM	com.ff.domain.stockmanagement.operations.transfer.StockTransferDO stkTransferDO
+ 			WHERE	((stkTransferDO.transferFromType='BA'
+ 						AND stkTransferDO.transferFromBaDO.customerId IS NOT NULL)
+ 					 OR (stkTransferDO.transferFromType='CUSTOMER'
+ 					 	AND stkTransferDO.transferFromCustomerDO.customerId IS NOT NULL
+ 					 	AND stkTransferDO.itemDO.itemId IN (SELECT 	itemDO.itemId
+ 					 										FROM	com.ff.domain.stockmanagement.masters.ItemDO itemDO 
+ 					 										WHERE 	itemDO.itemTypeDO.itemTypeId IN (SELECT itemTypeDO.itemTypeId
+ 					 																  				FROM	com.ff.domain.stockmanagement.masters.ItemTypeDO itemTypeDO
+ 					 																  				WHERE	itemTypeDO.itemHasSeries= 'N')
+											  				) 
+ 					 	AND	stkTransferDO.transferFromCustomerDO.customerId IN (select	custDo.customerId
+ 					 															FROM	com.ff.domain.business.CustomerDO custDo
+ 					 															WHERE 	 custDo.customerType IN ( SELECT custTypeDO.customerTypeCode
+ 					 																							  FROM com.ff.domain.business.CustomerTypeDO custTypeDO	
+ 					 																							  WHERE custTypeDO.customerTypeCode='FR')
+ 					 															)
+ 					 	)
+ 					 )
+ 			AND		stkTransferDO.sapStatus=:sapStatus	
+		]]>
+	</query>
+	
+	<query name="updateStockTransferForCSD">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.stockmanagement.operations.transfer.StockTransferDO stkTransferDO
+		SET		stkTransferDO.sapStatus=:sapStatus,stkTransferDO.sapTimestamp=:sapTimestamp
+		WHERE	stkTransferDO.stockTransferNumber=:stockTransferNumber
+	]]>
+</query>
+
+<query name="getStockLatestTransferDate">
+		<![CDATA[ 
+		
+		select max(transfer.transactionModifiedDate)
+ 			FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transfer
+ 			
+ 			WHERE 
+ 			transfer.itemDO.itemId=:itemId
+ 			AND 
+ 			transfer.transactionStatus=:transactionStatus
+ 			AND 
+ 			transfer.officeProductCodeInSeries =:officeCode
+ 			AND
+ 			  (:leaf between transfer.startLeaf AND transfer.endLeaf)
+ 			  order by transfer.transactionModifiedDate desc
+ 			
+		]]>
+	</query>
+	
+	<query name="getStockTransferCount">
+		<![CDATA[
+		SELECT COUNT(*)
+			FROM	com.ff.domain.stockmanagement.operations.transfer.StockTransferDO stkTransferDO
+ 			WHERE	((stkTransferDO.transferFromType='BA'
+ 						AND stkTransferDO.transferFromBaDO.customerId IS NOT NULL)
+ 					 OR (stkTransferDO.transferFromType='CUSTOMER'
+ 					 	AND stkTransferDO.transferFromCustomerDO.customerId IS NOT NULL
+ 					 	AND stkTransferDO.itemDO.itemId IN (SELECT 	itemDO.itemId
+ 					 										FROM	com.ff.domain.stockmanagement.masters.ItemDO itemDO 
+ 					 										WHERE 	itemDO.itemTypeDO.itemTypeId IN (SELECT itemTypeDO.itemTypeId
+ 					 																  				FROM	com.ff.domain.stockmanagement.masters.ItemTypeDO itemTypeDO
+ 					 																  				WHERE	itemTypeDO.itemHasSeries= 'N')
+											  				) 
+ 					 	AND	stkTransferDO.transferFromCustomerDO.customerId IN (select	custDo.customerId
+ 					 															FROM	com.ff.domain.business.CustomerDO custDo
+ 					 															WHERE 	 custDo.customerType IN ( SELECT custTypeDO.customerTypeCode
+ 					 																							  FROM com.ff.domain.business.CustomerTypeDO custTypeDO	
+ 					 																							  WHERE custTypeDO.customerTypeCode='FR')
+ 					 															)
+ 					 	)
+ 					 )
+ 			AND		stkTransferDO.sapStatus=:sapStatus	
+		]]>
+	</query>
+	
+	<query name="getStockHolderFromStockTransfer">
+		<![CDATA[ 
+			select new com.ff.domain.stockmanagement.wrapper.StockHolderWrapperDO(transferDtls.transferTOOfficeDO.officeId,transferDtls.transferTOEmpDO.employeeId,transferDtls.transferTOCustomerDO.customerId,
+			transferDtls.transferTOBaDO.customerId,transferDtls.transactionModifiedDate)	 FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO as transferDtls 
+ 		 		WHERE 
+ 		 		transferDtls.itemDO.itemId=:itemId
+ 		 		and
+ 		 		:startSerialNumber between transferDtls.startSerialNumber and transferDtls.endSerialNumber
+ 			AND length(transferDtls.startSerialNumber) = length(:startSerialNumber)
+       		AND transferDtls.transactionStatus = :transactionStatus
+       		ORDER BY transferDtls.transactionModifiedDate DESC
+		]]>
+	</query>
+	
+	
+	<!-- Query For Data Sync  Started -->
+	
+<!-- 	<query name="getUnsyncInboundStockTransfer">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO  transferDO   where transferDO.dtToCentral='N' or transferDO.dtToCentral is null ]]>
+	</query>
+	
+	
+	<query name="getstockTransferId">
+		<![CDATA[SELECT transferDO.stockTransferId From com.ff.domain.stockmanagement.operations.transfer.StockTransferDO  transferDO where  transferDO.stockTransferNumber = :stockTransferNumber ]]>
+	</query> -->
+	
+<!-- Query For Data Sync  End -->	
+</hibernate-mapping>

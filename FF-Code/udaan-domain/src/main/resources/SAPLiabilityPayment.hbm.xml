@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.SAPLiabilityPaymentDO" table="ff_f_sap_liability_payment">
+		<id name="Id" type="java.lang.Integer">
+			<column name="ID" />
+			<generator class="native" />
+		</id>
+		 <property name="custCode" column="CUSTOMER_CODE" />
+		 <property name="txNumber" column="TRANSACTION_NO" />
+		 <property name="creationDate" column="CREATION_DATE" />
+		 <property name="chequeDate" column="CHEQUE_DATE" />
+		 <property name="chequeNo" column="CHEQUE_NO" /> 
+		 <property name="chequeBankName" column="CHEQUE_BANK_NAME" />
+		 <property name="bankGLCode" column="BANK_GL_CODE" />
+		 <property name="amount" column="AMOUNT" />
+		 <property name="regionCode" column="REGION_CODE" />
+		 <property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		 <property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		  <property name="exception" column="EXCEPTION" />
+		 <property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+	</class>
+	
+<query name="getLiabilityDtlsFromStaging">
+	<![CDATA[
+		 FROM	com.ff.domain.mec.SAPLiabilityPaymentDO sapLiabPayDO
+		 WHERE	sapLiabPayDO.sapStatus=:sapStatus and ( sapLiabPayDO.exception IS NULL or LENGTH(sapLiabPayDO.exception ) < 1)
+	]]>
+</query>
+
+<query name="updateLiabilityPaymentSAPFlag">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.mec.SAPLiabilityPaymentDO sapLiabPayDO
+		SET		sapLiabPayDO.sapStatus=:sapStatus,sapLiabPayDO.sapTimestamp=:sapTimestamp,sapLiabPayDO.exception=:exception
+		WHERE 	sapLiabPayDO.Id=:Id
+	]]>
+</query>	
+	
+</hibernate-mapping>

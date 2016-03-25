@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkMatrixHeaderDO" table="ff_d_rate_bench_mark_matrix_header">
+		<id name="rateBenchMarkMatrixHeaderId" type="java.lang.Integer" column="RATE_BENCH_MARK_MATRIX_HEADER_ID">
+			<generator class="native" />
+		</id>
+		
+		<!-- <many-to-one name="vobSlabDO" class="com.ff.domain.ratebenchmark.VobSlabDO"  lazy="false">
+        <column name="VOB_SLAB" ></column>
+        </many-to-one>
+        <many-to-one name="rateMinChargeableWeightDO" class="com.ff.domain.ratebenchmark.RateMinChargeableWeightDO"  lazy="false">
+        <column name="RATE_MIN_CHARGEABLE_WEIGHT" ></column>
+        </many-to-one> -->
+        
+           
+        <property name="vobSlab" type="java.lang.Integer" >
+        <column name="VOB_SLAB" />
+        </property>
+        <property name="rateMinChargeableWeight" type="java.lang.Integer" >
+        <column name="RATE_MIN_CHARGEABLE_WEIGHT" />
+        </property>
+        			
+        <many-to-one name="rateBenchMarkProductDO" class="com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkProductDO"  lazy="false"  fetch="join">
+        <column name="RATE_BENCH_MARK_PRODUCT" ></column>
+        </many-to-one>
+        
+        <set name="rateBenchMarkMatrixDO" table = "ff_d_rate_bench_mark_matrix" cascade="all" inverse="true" lazy="false" fetch="join" >
+		 
+		<key column="RATE_BENCH_MARK_MATRIX_HEADER" />
+		<one-to-many class="com.ff.domain.ratemanagement.operations.ratebenchmark.RateBenchMarkMatrixDO" />
+		</set>
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+    </class>
+
+</hibernate-mapping>

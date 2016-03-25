@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.manifest.OpsmanConsignmentReturnDO" table="ff_f_consignment_return">
+		<id name="consignmentReturnId" type="java.lang.Integer" column="CONSIGNMENT_RETURN_ID">
+			<generator class="native" />
+		</id>
+		
+        <property name="isEmailValidated" column="IS_EMAIL_VALIDATED"/>
+        <property name="returnType" column="RETURN_TYPE"/>
+        <property name="contactNumber" column="CONTACT_NUMBER"/>
+        <property name="processNumber" column="PROCESS_NUMBER"/>
+      
+		<property name="drsDateTime" column="DRS_DATE_TIME" type="java.util.Date"/>
+		<property name="officeId" column="OFFICE"/>
+		<property name="processId" column="UPDATED_PROCESS_FROM"/>
+		
+        <property name="dtToBranch" column="DT_TO_BRANCH"/>
+        <property name="dtToCentral" column="DT_TO_CENTRAL"/>
+        <property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL"/>
+		
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date" update="false"/>
+		<property name="updatedDate" column="UPDATE_DATE"  type="java.util.Date"/>    
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer" update="false"/>
+		<property name="updatedBy" column="UPDATE_BY"  type="java.lang.Integer"/>
+		
+		<property name="dtToOpsman" column="DT_TO_OPSMAN"/>
+		<property name="dtFromOpsman" column="DT_FROM_OPSMAN"/>
+		
+		<many-to-one name="consignmentDO" class="com.ff.domain.consignment.OpsmanConsignmentDO" lazy="false" fetch="join" cascade="all">
+			<column name="CONSIGNMENT" />
+		</many-to-one>
+		
+		 <set name="consignmentReturnReasonDOs" table="ff_f_consignment_return_reason" cascade="all" lazy="false" fetch="subselect">
+            <key>
+                <column name="CONSIGNMENT_RETURN"/>
+            </key>
+            <one-to-many class="com.ff.domain.manifest.BcunConsignmentReturnReasonDO"/>
+        </set>
+							
+	</class>
+
+	<!-- Start of Changes by <48206> for opsman on 20/09/2013  -->
+	<query name="getOpsmanInboundRthRtoConsgReturn">
+		<![CDATA[FROM com.ff.domain.manifest.OpsmanConsignmentReturnDO consignmentReturn 
+				 WHERE consignmentReturn.createdDate >= '2014-06-23' AND
+				 	   consignmentReturn.dtToOpsman!='Y' AND
+					   consignmentReturn.dtFromOpsman!='Y' AND
+					   consignmentReturn.officeId IN (:officeIds)]]>
+	</query>
+	<!-- AND consignmentReturn.returnType = 'H' -->
+	<!-- End of Changes by <48206> for opsman on 20/09/2013  -->	
+</hibernate-mapping>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.BcunReversePickupOrderDetailDO" table="ff_f_rev_pickup_order_request_detail">
+		<id name="detailId" type="java.lang.Integer">
+			<column name="REQUEST_DETAIL_ID" />
+			<generator class="native" />
+		</id>
+		<property name="orderNumber" type="java.lang.String">
+			<column name="ORDER_NO" />
+		</property>		
+		<property name="consignnorName" type="java.lang.String">
+			<column name="CONSIGNOR_NAME" />
+		</property>
+		<property name="address" type="java.lang.String">
+			<column name="ADDRESS" />
+		</property>
+		<property name="city" type="java.lang.Integer">
+			<column name="CITY" />
+		</property>
+		<property name="pincode" type="java.lang.Integer">
+			<column name="PINCODE" />
+		</property>
+		<property name="telephone" type="java.lang.String">
+			<column name="TELEPHONE" />
+		</property>		
+		<property name="mobile" type="java.lang.String">
+			<column name="MOBILE" />
+		</property>		
+		<property name="assignedBranch" type="java.lang.Integer">
+			<column name="BRANCH_ORDER_ASSIGNED_TO" />
+		</property>
+		<property name="email" type="java.lang.String">
+			<column name="EMAIL_ID" />
+		</property>
+		<property name="consignmentType" type="java.lang.Integer">
+			<column name="CONSIGNMENT_TYPE" />
+		</property>		
+		<property name="materialDesc" type="java.lang.String">
+			<column name="MATERIAL_DESC" />
+		</property>
+		<property name="insuaranceRefNum" type="java.lang.String">
+			<column name="INSURANCE_REF_NO" />
+		</property>
+		 <property name="remarks" type="java.lang.String">
+			<column name="REMARKS" />
+		</property> 
+		<property name="orderRequestStatus" type="java.lang.String">
+			<column name="ORDER_REQUEST_STATUS" />
+		</property>
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer"/>
+         <property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/>
+         <property name="transactionCreateDate">
+			<column name="CREATION_DATE" />
+		</property>
+		<property name="transactionModifiedDate" type="java.util.Date">
+			<column name="UPDATE_DATE" />
+		</property>
+		 <many-to-one name="headerId" class="com.ff.domain.pickup.BcunReversePickupOrderHeaderDO" fetch="join" lazy="false" cascade="all">
+            <column name="REQUEST_HEADER_ID" />
+        </many-to-one>  
+        
+    </class>
+    <!-- Start Queries For Data Sync -->
+	<query name="getRevPickupRequestDetailId">
+		<![CDATA[SELECT revDetail.detailId FROM com.ff.domain.pickup.BcunReversePickupOrderDetailDO revDetail 
+					WHERE revDetail.orderNumber=:orderNumber]]>
+	</query>
+	<query name="getRevPickupRequestDetailByOrderNo">
+		<![CDATA[FROM com.ff.domain.pickup.BcunReversePickupOrderDetailDO revDetail 
+					WHERE revDetail.orderNumber=:orderNumber]]>
+	</query>
+	<!-- End Queries For Data Sync -->
+</hibernate-mapping>

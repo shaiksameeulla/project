@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+      
+	<class
+	name="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationDO"
+	table="ff_f_rate_quotation">
+	<id name="rateQuotationId" type="java.lang.Integer" column="RATE_QUOTATION_ID">
+		<generator class="assigned" />
+	</id>
+
+	<many-to-one name="customer" class="com.ff.domain.business.BcunCustomerDO"
+		lazy="false" fetch="join" cascade="all">
+		<column name="RATE_CUSTOMER" />
+	</many-to-one>
+
+	<set name="rateFixedChargeDO" table="ff_f_rate_quotation_fixed_charges"
+		lazy="false" cascade="all-delete-orphan" fetch="join">
+
+		<key column="RATE_QUOTATION" />
+		<one-to-many
+			class="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationFixedChargesDO" />
+
+	</set>
+
+	<set name="codChargeDO" table="ff_f_rate_quotation_cod_charge"
+		lazy="false" cascade="all-delete-orphan" fetch="join">
+
+		<key column="RATE_QUOTATION" />
+		<one-to-many
+			class="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationCODChargeDO" />
+
+	</set>
+
+
+	<set name="rateQuotationProductCategoryHeaderDO" table="ff_f_rate_quotation_product_category_header"
+		lazy="false" cascade="all" fetch="join">
+
+		<key column="RATE_QUOTATION" />
+		<one-to-many
+			class="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationProductCategoryHeaderDO" />
+
+	</set>
+
+	<!-- <set name="rateQuotationRTOChargesDO" table="ff_f_rate_quotation_rto_charges" 
+		lazy="false" cascade="all" fetch="join"> <key column="RATE_QUOTATION" /> 
+		<one-to-many class="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationRTOChargesDO" 
+		/> </set> -->
+
+	<one-to-one name="rateQuotationRTOChargesDO"
+		class="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationRTOChargesDO"
+		property-ref="rateQuotationId" cascade="all-delete-orphan" fetch="join" />
+
+	<set name="rateQuotationFixedChargesConfigDO" table="ff_f_rate_quotation_fixed_charges_config"
+		lazy="false" cascade="all-delete-orphan" fetch="join">
+
+		<key column="QUOTATION" />
+		<one-to-many
+			class="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationFixedChargesConfigDO" />
+
+	</set>
+
+	<property name="ratequotationOriginatedFrom" column="RATE_QUOTATION_ORIGINATED_FROM" />
+	<property name="quotationCreatedDate" column="CREATED_DATE" />
+
+	<property name="quotationCreatedBy" column="CREATED_BY" />
+	<property name="approversRemarks" column="APPROVERS_REMARKS" />
+	<property name="excecutiveRemarks" column="EXECUTIVES_REMARKS" />
+	<property name="RateQuotationNo" column="RATE_QUOTATION_NUMBER" />
+	<property name="status" column="STATUS" />
+	<property name="rateQuotationType" column="RATE_QUOTATION_TYPE" />
+	<property name="rateQuotationOriginatedfromType" column="RATE_QUOTATION_ORIGINATED_FROM_TYPE" />
+	<property name="quotationUsedFor" column="QUOTATION_USED_FOR" />
+	<property name="approvalRequired" column="APPROVAL_REQUIRED" />
+	<property name="approvedAt" column="APPROVED_AT" />
+	<property name="dtToBranch" column="DT_TO_BRANCH" />
+	<property name="updatedBy" column="UPDATE_BY" />
+	<property name="updatedDate" column="UPDATE_DATE" />
+	<property name="quotationCreatedFrom" column="RATE_QUOTATION_CREATED_FROM" />
+</class>
+</hibernate-mapping>
+

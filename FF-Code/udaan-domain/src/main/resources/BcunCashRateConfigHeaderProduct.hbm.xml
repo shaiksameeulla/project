@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.cash.BcunCashRateConfigHeaderProductDO" 
+		table="ff_f_rate_cash_product_map">
+		<id name="headerProductMapId">
+			<column name="RATE_CASH_PRODUCT_MAP_ID" />
+			<generator class="assigned" />
+		</id>
+		<property name="headerDO" column="RATE_CASH_HEADER" />
+        <property name="dtToBranch" column="DT_TO_BRANCH" />
+        <property name="minChargeableWeight" column="MINIMUM_CHARGEABLE_WEIGHT" />
+        <property name="rateProductDO" column="RATE_PRODUCT_CATEGORY" />
+        <!-- one-to-many relation START -->
+        <set name="cashRateSlabRateDOs" table="ff_f_rate_cash_slab_rate"
+			lazy="false" cascade="all-delete-orphan" inverse="false"  fetch="join">
+			<key column="RATE_CASH_PRODUCT_MAP" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.cash.BcunCashRateSlabRateDO" />
+		</set>
+		<set name="cashRateSplDestDOs" table="ff_f_rate_cash_special_destination" 
+			lazy="false" cascade="all-delete-orphan" inverse="false"  fetch="join">
+			<key column="RATE_CASH_PRODUCT_MAP" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.cash.BcunCashRateSpecialDestinationDO" />
+		</set>
+		<!-- one-to-many relation END -->
+	</class>
+</hibernate-mapping>
+	

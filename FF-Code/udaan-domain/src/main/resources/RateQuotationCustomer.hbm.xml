@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationCustomerDO" table="ff_f_rate_quoted_customer">
+		<id name="customerId" type="java.lang.Integer">
+			<column name="CUSTOMER_ID" />
+			<generator class="native" />
+		</id>
+
+		<property name="mobile">
+			<column name="MOBILE" />
+		</property>
+		<property name="phone">
+			<column name="PHONE" />
+		</property>
+		<property name="email">
+			<column name="EMAIL" />
+		</property>
+		<property name="status">
+			<column name="CUR_STATUS" />
+		</property>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="createdDate" column="CREATED_DATE"/>
+		
+		<property name="legacyCustomerCode" column="LEGACY_CUSTOMER_CODE"/>
+		
+
+
+
+		<!-- Changes ffrom Customer new -->
+
+		<many-to-one name="officeMappedDO" class="com.ff.domain.organization.OfficeDO"
+			lazy="false"  fetch="join">
+			<column name="OFFICE_MAPPED_TO" />
+		</many-to-one>
+
+		<many-to-one name="salesOfficeDO" class="com.ff.domain.organization.OfficeDO"
+			lazy="false"  fetch="join">
+			<column name="SALES_OFFICE" />
+		</many-to-one>
+
+
+		<many-to-one name="primaryContactDO"
+			class="com.ff.domain.ratemanagement.masters.ContactDO" cascade="all"
+			lazy="false"  fetch="join">
+			<column name="PRIMARY_CONTACT" />
+		</many-to-one>
+
+		<many-to-one name="secondaryContactDO"
+			class="com.ff.domain.ratemanagement.masters.ContactDO" cascade="all"
+			lazy="false"  fetch="join">
+			<column name="SECONDARY_CONTACT" />
+		</many-to-one>
+
+
+		<!-- <many-to-one name="billingCycle" class="com.ff.domain.stockmanagement.masters.StockStandardTypeDO" 
+			lazy="false" fetch="join"> <column name="BILLING_CYCLE" /> </many-to-one> 
+			<many-to-one name="paymentTerm" class="com.ff.domain.stockmanagement.masters.StockStandardTypeDO" 
+			lazy="false" fetch="join"> <column name="PAYEMENT_TERM" /> </many-to-one> -->
+		<many-to-one name="industryCategoryDO"
+			class="com.ff.domain.ratemanagement.masters.RateIndustryCategoryDO"
+			lazy="false"  fetch="join">
+			<column name="INDUSTRY_CATEGORY" />
+		</many-to-one>
+
+		<many-to-one name="industryTypeDO"
+			class="com.ff.domain.ratemanagement.masters.RateIndustryTypeDO" lazy="false"  fetch="join">
+			<column name="INDUSTRY_TYPE" />
+		</many-to-one>
+		<many-to-one name="customerCategoryDO"
+			class="com.ff.domain.ratemanagement.masters.RateCustomerCategoryDO"
+			lazy="false"  fetch="join">
+			<column name="CUSTOMER_CATEGORY" />
+		</many-to-one>
+		<many-to-one name="salesPersonDO" class="com.ff.domain.organization.EmployeeDO"
+			lazy="false"  fetch="join">
+			<column name="SALES_PERSON" />
+		</many-to-one>
+		<many-to-one name="addressDO" class="com.ff.domain.pickup.AddressDO"
+			cascade="all" lazy="false"  fetch="join">
+			<column name="ADDRESS" />
+		</many-to-one>
+
+		<many-to-one name="customerType"
+			class="com.ff.domain.business.CustomerTypeDO" lazy="false" fetch="join">
+			<column name="CUSTOMER_TYPE" />
+		</many-to-one>
+
+		<many-to-one name="groupKeyDO"
+			class="com.ff.domain.ratemanagement.masters.CustomerGroupDO" lazy="false"  fetch="join">
+			<column name="GROUP_KEY" />
+		</many-to-one>
+		<property name="paymentTerm" column="PAYEMENT_TERM" />
+		<property name="billingCycle" column="BILLING_CYCLE" />
+		<property name="contractNo" column="CONTRACT_NO" />
+		<property name="customerCode" column="CUSTOMER_CODE" />
+		<property name="businessName" column="BUSINESS_NAME" />
+		<property name="tanNo" column="TAN_NO" />
+		<property name="distributionChannels" column="DISTRIBUTION_CHANNELS" />
+		<property name="panNo" column="PAN_NO" />
+		<property name="businessType" column="BUSINESS_TYPE" />
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="createdBy" column="CREATED_BY" />
+ 		<property name="updatedBy" column="UPDATED_BY" />
+		<property name="updatedDate" column="UPDATED_DATE"/>
+		<!-- common attributes START -->
+		<!-- <property name="sapStatus" column="SAP_STATUS" /> <property name="sapTimestamp" 
+			column="SAP_TIMESTAMP" /> -->
+		<!-- common attributes END -->
+		<!-- Ends here -->
+	</class>
+
+
+	
+	
+</hibernate-mapping>

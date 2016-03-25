@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.booking.BookingDO" table="ff_f_booking">
+		<id name="bookingId" column="BOOKING_ID" type="java.lang.Integer">
+			<generator class="native" />
+		</id>
+
+		<property name="consgNumber" column="CONSG_NUMBER" type="java.lang.String" />
+		<property name="cnStatus" column="TRANS_STATUS" type="java.lang.String" />
+		<property name="status" column="STATUS" type="java.lang.String" />
+		<property name="bookingDate" column="BOOKING_DATE" type="java.util.Date" />
+		<property name="orderDate" column="ORDER_DATE" type="java.util.Date" />
+		<property name="noOfPieces" column="NO_OF_PIECES" type="java.lang.Integer" />
+		<property name="actualWeight" column="ACTUAL_WEIGHT" type="java.lang.Double" />
+		<property name="fianlWeight" column="FINAL_WEIGHT" type="java.lang.Double" />
+		<property name="volWeight" column="VOL_WEIGHT" />
+		<property name="price" column="PRICE" />
+		<property name="height" column="HEIGHT" type="java.lang.Double" />
+		<property name="length" column="LENGTH" type="java.lang.Double" />
+		<property name="breath" column="BREATH" type="java.lang.Double" />
+		<property name="pickRunsheetNo" column="PICKUP_RUNSHEET_NO"
+			type="java.lang.String" />
+		<property name="deliveryDate" column="DLV_DATE_TIME" type="java.util.Date" />
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer" />
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer" />
+		<property name="shippedToCode" column="SHIPPED_TO_CODE" type="java.lang.String" />
+		<property name="declaredValue" type="java.lang.Double">
+			<column name="DECLARED_VALUE" />
+		</property>
+
+		<!-- <property name="declaredValue" column="DECLARED_VALUE" type="java.lang.Double"/> -->
+		<property name="trnaspmentChg" column="TRANSPMENT_CHG" type="java.lang.Double" />
+
+		<property name="weightCapturedMode" column="WEIGHT_CAPTURED_MODE"
+			type="java.lang.String" />
+
+		<property name="otherCNContent" column="OTHERS_CN_CONTENT"
+			type="java.lang.String" />
+		<property name="paperWorkRefNo" column="PAPER_WORK_REF_NO"
+			type="java.lang.String" />
+		<!-- <property name="businessAssociateId" column="BA" type="java.lang.Integer"/> -->
+		<!-- <property name="customerId" column="CUSTOMER" type="java.lang.Integer"/> -->
+		<many-to-one name="customerId" class="com.ff.domain.business.CustomerDO"
+			lazy="false" fetch="join" >
+			<column name="CUSTOMER" />
+		</many-to-one>
+		<property name="insurencePolicyNo" column="INSURANCE_POLICY_NO"
+			type="java.lang.String" />
+		<property name="insurenceAmt" column="INSURANCE_AMT" type="java.lang.Double" />
+		<property name="refNo" column="CUST_REF_NO" type="java.lang.String" />
+
+		<many-to-one name="bookingType" class="com.ff.domain.booking.BookingTypeDO"
+			lazy="false" fetch="join" >
+			<column name="BOOKING_TYPE" />
+		</many-to-one>
+
+		<property name="bookingOfficeId" column="BOOKING_OFF" type="java.lang.Integer" />
+		<property name="approvedBy" column="APPROVED_BY" type="java.lang.Integer" />
+		<property name="pincodeDlvTimeMapId" column="PINCODE_DLV_TIME_MAP_ID"
+			type="java.lang.Integer" />
+		<property name="processNumber" column="PROCESS_NO" type="java.lang.String" />
+		<!-- <property name="consideredForPettyCash" column="CONSIDERED_FOR_PETTY_CASH" type="java.lang.String" /> -->
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date" update="false"/>
+		<property name="updatedDate" column="UPDATE_DATE" type="java.util.Date" />
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+
+		<property name="blkBookingType" column="BLK_BOOKING_TYPE"
+			type="java.lang.String" />
+
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		<property name="dtToOpsman">
+			<column name="DT_TO_OPSMAN" />
+		</property>
+		<property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL" />
+		<!-- <many-to-one name="bookingOfficeId" class="com.ff.domain.organization.OfficeDO" 
+			lazy="false"> <column name="BOOKING_OFF" /> </many-to-one> -->
+		<many-to-one name="pincodeId" class="com.ff.domain.geography.PincodeDO"
+			lazy="false" fetch="join" >
+			<column name="DEST_PINCODE" />
+		</many-to-one>
+		<many-to-one name="consgTypeId"
+			class="com.ff.domain.serviceOffering.ConsignmentTypeDO" lazy="false" fetch="join" >
+			<column name="CONSG_TYPE" />
+		</many-to-one>
+		<!-- <many-to-one name="consigneeId" class="com.ff.domain.business.ConsigneeConsignorDO" 
+			lazy="false" cascade="all" unique="true"> <column name="CONSIGNEE" /> </many-to-one> 
+			<many-to-one name="consignorId" class="com.ff.domain.business.ConsigneeConsignorDO" 
+			lazy="false" cascade="all" unique="true"> <column name="CONSIGNOR" /> </many-to-one> -->
+		<many-to-one name="cnContentId"
+			class="com.ff.domain.serviceOffering.CNContentDO" lazy="false" fetch="join" >
+			<column name="CONTENT" />
+		</many-to-one>
+
+		<many-to-one name="cnPaperWorkId"
+			class="com.ff.domain.serviceOffering.CNPaperWorksDO" lazy="false" fetch="join" >
+			<column name="PAPER_WORK" />
+		</many-to-one>
+
+		<many-to-one name="bookingPayment" class="com.ff.domain.booking.BookingPaymentDO"
+			lazy="false" fetch="join"  cascade="all" unique="true">
+			<column name="BOOKING_PAYMENT_ID" />
+		</many-to-one>
+
+		<many-to-one name="insuredBy"
+			class="com.ff.domain.serviceOffering.InsuredByDO" lazy="false" fetch="join" 
+			unique="true" >
+			<column name="INSURED_BY" />
+		</many-to-one>
+
+		<many-to-one name="updatedProcess" class="com.ff.domain.tracking.ProcessDO"
+			lazy="false" fetch="join"  unique="true">
+			<column name="UPDTAED_PROCESS_FROM" />
+		</many-to-one>
+		<!-- <set name="childCNs" table="FF_F_BOOKING_CHILD_CNS" cascade="all" 
+			lazy="false"> <key> <column name="BOOKING_ID" /> </key> <one-to-many class="com.ff.domain.booking.ChildConsignmentDO" 
+			/> </set> -->
+
+		<set name="bokingPrefs" table="ff_f_booking_preference_mapping"
+			cascade="all" lazy="false"  >
+			<key>
+				<column name="BOOKING_ID" />
+			</key>
+			<one-to-many class="com.ff.domain.booking.BookingPreferenceMappingDO" />
+		</set>
+
+		<many-to-one name="bulkBookingVendorDtls"
+			class="com.ff.domain.booking.BulkBookingVendorDtlsDO" lazy="false" fetch="join"
+			cascade="all" unique="true">
+			<column name="BULK_BOOKING_VENDOR_ID" />
+		</many-to-one>
+
+	</class>
+	<query name="isConsgBooked">
+		<![CDATA[
+			SELECT count(*) from com.ff.domain.booking.BookingDO booking where booking.consgNumber IN( :consgNumber ) and booking.cnStatus='A']]>
+	</query>
+
+	<query name="isConsgBookedForStock">
+		<![CDATA[
+			SELECT count(*) from com.ff.domain.booking.BookingDO booking where  booking.cnStatus='A' and length(booking.consgNumber) =length(:startLeaf)
+			and booking.consgNumber between :startLeaf and :endLeaf ]]>
+	</query>
+	<query name="getEBBookings">
+		<![CDATA[
+			 from com.ff.domain.booking.BookingDO booking where booking.bookingType.bookingType=:bookingType
+			 and  booking.deliveryDate=:bookingDate]]>
+	</query>
+
+	<query name="getBookingByProcess">
+		<![CDATA[
+			 from com.ff.domain.booking.BookingDO booking where booking.consgNumber =:consgNumber and updatedProcess.processCode =:processCode]]>
+	</query>
+
+	<query name="updateBookingStatus">
+		<![CDATA[
+			 UPDATE com.ff.domain.booking.BookingDO booking set booking.status=:status where booking.bookingId = :bookingId]]>
+	</query>
+
+	<query name="updateBookingCNStatus">
+		<![CDATA[
+			 UPDATE com.ff.domain.booking.BookingDO booking set booking.cnStatus=:cnStatus where booking.consgNumber IN( :consgNumber )]]>
+	</query>
+
+	<query name="getPickupBookingDtls">
+		<![CDATA[
+			SELECT booking.bookingId,booking.pickRunsheetNo,booking.updatedProcess.processCode  from com.ff.domain.booking.BookingDO booking where booking.consgNumber =:consgNumber and 
+			booking.cnStatus='A']]>
+	</query>
+	<query name="getPickupBookingDtlsByStatus">
+		<![CDATA[
+			SELECT booking.bookingId,booking.pickRunsheetNo  from com.ff.domain.booking.BookingDO booking where booking.consgNumber =:consgNumber ]]>
+	</query>
+	<query name="deletePickedupBookingCNs">
+	<![CDATA[
+		DELETE com.ff.domain.booking.BookingDO booking WHERE booking.consgNumber IN( :consgNumber )]]>
+	</query>
+	<!-- Query For Data Sync -->
+
+
+
+
+	<!-- <query name="getBookingId"> <![CDATA[SELECT booking.bookingId From 
+		com.ff.domain.booking.BookingDO booking where booking.consgNumber = :consgNumber 
+		and booking.cnStatus='A']]> </query> -->
+
+	<!-- <query name="getConsignorConsigneeIds"> <![CDATA[SELECT booking.consigneeId,booking.consignorId 
+		From com.ff.domain.booking.BookingDO booking where booking.consgNumber = 
+		:consgNumber and booking.cnStatus='A']]> </query> -->
+
+	<query name="getBookingTypeByConsgNumber">
+		<![CDATA[SELECT booking.bookingType.bookingType From com.ff.domain.booking.BookingDO booking where  booking.consgNumber = :consgNumber and booking.cnStatus='A']]>
+	</query>
+
+
+
+	<query name="getDiscountBookings">
+		<![CDATA[From com.ff.domain.booking.BookingDO booking where  booking.cnStatus='A' and booking.bookingDate between
+			:fromDate AND :toDate and booking.consgNumber in (
+				SELECT cn.consgNo FROM com.ff.domain.consignment.ConsignmentDO cn WHERE cn.discount != 0
+				)
+			)
+		]]>
+	</query>
+
+	<query name="getBookingDtlsForUdaanOpsmanIntg">
+		<![CDATA[From com.ff.domain.booking.BookingDO booking where booking.dtToOpsman='N'  and booking.cnStatus='A']]>
+	</query>
+
+	<query name="getRefNoDetails">
+		<![CDATA[
+			 From com.ff.domain.booking.BookingDO booking where booking.refNo IN( :refNo )]]>
+	</query>
+
+	<query name="getPincodeAgainstConsgNo">
+		<![CDATA[
+			 FROM	com.ff.domain.booking.BookingDO booking 
+			 WHERE	booking.consgNumber=:consgNumber
+		 ]]>
+	</query>
+
+
+	<query name="getBookingDtlsByConsgNo">
+		<![CDATA[
+			 FROM	com.ff.domain.booking.BookingDO booking 
+			 WHERE	booking.consgNumber=:consgNumber
+		 ]]>
+	</query>
+
+
+	<!-- START queries used for manifest -->
+	<query name="getBookingConsignment">
+		<![CDATA[
+			 FROM	com.ff.domain.booking.BookingDO booking 
+			 WHERE	booking.consgNumber IN (:consgNos)
+		 ]]>
+	</query>
+
+	<query name="getAllBookingOfficesOfCurrDate">
+		<![CDATA[ 
+			SELECT	distinct booking.bookingOfficeId 
+			FROM	com.ff.domain.booking.BookingDO booking 
+			where  booking.bookingOfficeId is not null
+			
+		]]>
+	</query>
+
+	<query name="updateCashBookingRecords">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.booking.BookingDO bookingDO
+		SET		bookingDO.sapStatus=:sapStatus
+		WHERE 	bookingDO.bookingOfficeId=:bookingOfficeId
+		AND		bookingDO.bookingDate between :bookingStartDate  and :bookingEndDate
+	]]>
+	</query>
+
+	<query name="getBookingOfficeId">
+		<![CDATA[
+			 SELECT booking.bookingOfficeId from com.ff.domain.booking.BookingDO booking 
+			 where booking.consgNumber=:consgNumber
+			 ]]>
+	</query>
+
+	<query name="getBookingBookingType">
+		<![CDATA[
+			 SELECT booking.bookingType from com.ff.domain.booking.BookingDO booking
+			 where booking.consgNumber=:consgNumber
+			 ]]>
+	</query>
+	
+	<!-- END queries used for manifest -->
+
+	<query name="updateBookForCustModification">
+		<![CDATA[ 
+		 
+			UPDATE com.ff.domain.booking.BookingDO bookingDO 
+			SET bookingDO.customerId=:custDO,bookingDO.actualWeight=:actualWeight,bookingDO.fianlWeight=:finalWeight,bookingDO.updatedDate=:updatedDate,bookingDO.updatedBy=:updatedBy,bookingDO.shippedToCode=:shippedToCode 
+				WHERE bookingDO.consgNumber=:consgNo
+		]]>
+	</query>
+
+	<!-- START queries for Email for FOC booking -->
+
+	<query name="getFocBookingDetailsByDate">
+		<![CDATA[FROM com.ff.domain.booking.BookingDO booking 
+		WHERE booking.bookingType = 6
+		AND date(booking.createdDate) BETWEEN STR_TO_DATE(:startDate,'%Y-%m-%d %H:%i:%s') AND STR_TO_DATE(:endDate,'%Y-%m-%d %H:%i:%s')	ORDER BY booking.approvedBy
+		]]>
+	</query>
+
+	<!-- END queries for Email of FOC booking -->
+
+	<query name="getBookingDtlsByConsgNoWithDateFilter">
+		<![CDATA[
+			 FROM	com.ff.domain.booking.BookingDO booking 
+			 WHERE	booking.consgNumber=:consgNumber
+			 AND 	booking.bookingDate >= '2015-04-01'
+		 ]]>
+	</query>
+	
+	<query name="getBookingDateByConsgNo">
+		<![CDATA[  select booking.bookingDate FROM com.ff.domain.booking.BookingDO booking 
+					WHERE booking.consgNumber=:consgNumber
+		]]>
+	</query>
+	
+     <query name="updateBookingOpsmanStatus">
+		<![CDATA[ 
+			UPDATE com.ff.domain.booking.BookingDO bookingDO 
+			SET bookingDO.dtFromOpsman=:dtFromOpsman
+			WHERE bookingDO.consgNumber=:consgNo
+		]]>
+	</query>
+	
+	 <sql-query name="getOfficeIdAndBookingDateForPettyCash">
+		<![CDATA[ 
+			select bo.BOOKING_OFF,min(bo.BOOKING_DATE) from ff_f_booking bo
+			inner join ff_f_booking_payment bp ON bo.BOOKING_PAYMENT_ID = bp.BOOKING_PAYMENT_ID
+			where 
+			bo.CONSIDERED_FOR_PETTY_CASH = 'N'
+			and bp.PAYMENT_MODE = (select pm.PAYMENT_ID from ff_d_payment_mode pm where pm.PAYMENT_CODE = 'CA')
+			and bo.BOOKING_DATE between :maximumAllowableDate and :currentDateTime
+			group by bo.BOOKING_OFF
+		]]>
+	</sql-query>
+	
+	<sql-query name="updateConsgsConsideredForPettyCash">
+		<![CDATA[ 
+			UPDATE ff_f_booking SET CONSIDERED_FOR_PETTY_CASH = :updatedStatus
+			WHERE CONSG_NUMBER IN (:consgNumberList)
+		]]>
+	</sql-query> 
+
+</hibernate-mapping>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.cash.CashRateSlabRateDO" table="ff_f_rate_cash_slab_rate">
+		<id name="slabRateId">
+			<column name="CASH_SLAB_RATE_ID" />
+			<generator class="native" />
+		</id>
+		<!-- <property name="rateProductMapId">
+            <column name="RATE_CASH_PRODUCT_MAP" />
+        </property> -->
+        <many-to-one name="rateHeaderProductDO" 
+        	class="com.ff.domain.ratemanagement.operations.cash.CashRateConfigHeaderProductDO" 
+        	lazy="false"  fetch="join">
+			<column name="RATE_CASH_PRODUCT_MAP" />
+		</many-to-one>
+		<property name="originSectorId">
+            <column name="ORIGIN_SECTOR" />
+        </property>
+		<property name="destinationSectorId">
+			<column name="DEST_SECTOR" />
+		</property>
+        <property name="slabRate">
+			<column name="SLAB_RATE" />
+		</property>
+		<property name="servicedOn">
+			<column name="SERVICED_ON" />
+		</property>
+		<many-to-one name="weightSlabDO" class="com.ff.domain.ratemanagement.masters.WeightSlabDO" lazy="false"  fetch="join">
+           <column name="CASH_WEIGHT_SLAB"/>
+        </many-to-one> 
+        <property name="dtToBranch" column="DT_TO_BRANCH" />
+	</class>
+</hibernate-mapping>

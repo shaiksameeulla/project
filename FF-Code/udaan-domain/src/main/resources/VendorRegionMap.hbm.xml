@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.business.VendorRegionMapDO" table="ff_d_vendor_region_map">
+		<id name="vendorRegionMappingId" column="VENDOR_REGION_MAP_ID" type="java.lang.Integer" >
+			<generator class="assigned" />
+		</id>
+		<property name="regionId" column="REGION_MAPPED_TO" />
+		<!-- <property name="vendorId" column="VENDOR_ID" /> -->
+		<many-to-one name="vendorDO"
+			class="com.ff.domain.business.LoadMovementVendorDO" lazy="false" >
+			<column name="VENDOR_ID" />
+		</many-to-one>
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		<property name="status" column="STATUS" />
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATED_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATED_DATE" />
+	</class>
+
+	<query name="getVendorsListByServiceTypeAndCity">
+		<![CDATA[ 
+		SELECT vendorRegDO.vendorDO FROM com.ff.domain.business.VendorRegionMapDO  vendorRegDO 
+		WHERE vendorRegDO.vendorDO.vendorTypeDO.vendorTypeCode =:vendorTypeCode
+		 AND vendorRegDO.regionId = (SELECT city.region FROM com.ff.domain.geography.CityDO city WHERE city.cityId =:cityId) 
+		]]>
+	</query>
+	
+</hibernate-mapping>

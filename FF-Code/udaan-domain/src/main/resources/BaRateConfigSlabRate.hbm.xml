@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.ba.BaRateConfigSlabRateDO" table="ff_f_rate_ba_slab_rate">
+		<id name="baSlabRateId">
+			<column name="BA_SLAB_RATE_ID" />
+			<generator class="native" />
+		</id>
+        
+        <many-to-one name="baRateProductDO" class="com.ff.domain.ratemanagement.operations.ba.BaRateConfigProductHeaderDO" lazy="false">
+           <column name="BA_RATE_PRODUCT_HEADER"/>
+        </many-to-one>
+        <!-- <many-to-one name="weightSlab" class="com.ff.domain.ratemanagement.masters.WeightSlabDO" lazy="false">
+           <column name="BA_WEIGHT_SLAB"/>
+        </many-to-one> -->
+        <many-to-one name="baRateWeightSlabDO" class="com.ff.domain.ratemanagement.operations.ba.BaRateWeightSlabDO" lazy="false">
+           <column name="BA_WEIGHT_SLAB"/>
+        </many-to-one>
+        <property name="originSector">
+            <column name="ORIGIN_SECTOR" />
+        </property>
+        <property name="destinationSector">
+            <column name="DEST_SECTOR" />
+        </property>
+		<property name="rate">
+			<column name="SLAB_RATE" />
+		</property>
+		<property name="servicedOn">
+			<column name="SERVICED_ON" />
+		</property>
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+	</class>
+</hibernate-mapping>
+	

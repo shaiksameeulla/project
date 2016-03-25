@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.receipt.StockReceiptDO" table="ff_f_stock_receipt">
+		<id name="stockReceiptId" type="java.lang.Long">
+			<column name="STOCK_RECEIPT_ID" />
+			<generator class="native" />
+		</id>
+		<property name="requisitionNumber" column="REQUISITION_NUMBER" />
+		<property name="issueNumber" column="ISSUE_NUMBER" />
+		<property name="acknowledgementNumber" column="ACKNOWLEDGEMENT_NUMBER" />
+		<property name="issuedDate" column="ISSUED_DATE" />
+		<property name="receivedDate" column="RECEIVED_DATE" />
+		
+		<!-- common attributes START -->
+		<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+		<!-- <property name="centralInboudStatus" column="DT_CENTRAL_INBOUND" />
+		<property name="centralOutboudStatus" column="DT_CENTRAL_OUTBOUND" /> -->
+		<!-- <property name="nodeId" column="TRANS_NODE_ID" /> -->
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapStatusInBound" column="DT_SAP_INBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="createdBy" column="CREATED_BY_USER" />
+		<property name="updatedBy" column="UPDATED_BY_USER" />
+		<!-- common attributes END -->
+		
+		<!-- One-to- Many relationships START -->
+		<set name="stockReceiptItemDtls" lazy="false" cascade="all-delete-orphan" inverse="true" order-by="ROW_NUMBER asc" fetch="join">
+            <key column="STOCK_RECEIPT_ID"/>
+            <one-to-many class="com.ff.domain.stockmanagement.operations.receipt.StockReceiptItemDtlsDO"/>
+    	</set> 
+		<!-- One-to-Many relationships END -->	
+		
+		<!-- Many -to- one relationships START  -->
+			<many-to-one name="receiptOfficeId"
+				class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+				<column name="RECEIPT_OFFICE_ID" />
+			</many-to-one>
+			<many-to-one name="issuedOfficeId"
+				class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+				<column name="ISSUED_OFFICE_ID" />
+			</many-to-one>
+			
+			<!-- Many-to-one relationships (Common attributes) START -->
+				<!-- <many-to-one name="createdByUser"
+					class="com.ff.domain.umc.UserDO" lazy="false" fetch="join">
+					<column name="CREATED_BY_USER" />
+				</many-to-one>
+				<many-to-one name="updatedByUser"
+					class="com.ff.domain.umc.UserDO" lazy="false" fetch="join">
+					<column name="UPDATED_BY_USER" />
+				</many-to-one> -->
+			<!-- Many -to- one relationships (Common attributes) END -->
+		
+		<!-- Many -to- one relationships END  -->	
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+	</class>
+<query name="getMaxReceiptNumber">
+	<![CDATA[
+		SELECT max(rec.acknowledgementNumber) FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptDO rec 
+	 	WHERE rec.transactionStatus=:transactionStatus
+	 	AND	rec.receiptOfficeId.officeId=:officeId
+	 	AND length(rec.acknowledgementNumber)=:numberLength
+	 	AND rec.acknowledgementNumber like :prefix
+	]]>
+</query>
+<query name="findReceiptDtlsByAckNumber">
+	<![CDATA[
+		FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptDO rec 
+	 	WHERE rec.acknowledgementNumber=:acknowledgementNumber
+	 	AND	rec.transactionStatus=:transactionStatus
+	 	AND	rec.receiptOfficeId.officeId=:officeId
+	]]>
+</query>
+
+
+<query name="isIssueNumberReceived">
+	<![CDATA[ select received.stockReceiptId
+		FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptDO received 
+	 	WHERE received.issueNumber = :issueNumber
+	 	AND	received.transactionStatus=:transactionStatus
+	 	AND	received.receiptOfficeId.officeId=:officeId
+	]]>
+</query>
+<query name="findReturnDtlsByAckNumber">
+	<![CDATA[
+		FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptDO receipt 
+		WHERE receipt.acknowledgementNumber=:acknowledgementNumber
+	]]>
+</query>
+
+<query name="getStockReceiptDetailsForSAP">
+		<![CDATA[ 
+			FROM com.ff.domain.stockmanagement.operations.receipt.StockReceiptDO receipt 
+			WHERE receipt.sapStatus=:sapStatus
+		]]>
+</query>
+
+<query name="getCountOfStockReceiptForSAP">
+		<![CDATA[ 
+			SELECT	count(*)
+			FROM	com.ff.domain.stockmanagement.operations.receipt.StockReceiptDO receipt
+			WHERE 	receipt.sapStatus=:sapStatus
+		]]>
+</query>
+
+
+<query name="updateStockReceiptDetailsForSAP">
+		<![CDATA[ 
+		UPDATE com.ff.domain.stockmanagement.operations.receipt.StockReceiptDO receipt 
+ 			SET receipt.sapStatus=:sapStatus,receipt.sapTimestamp=:sapTimestamp
+ 			WHERE receipt.acknowledgementNumber=:acknowledgementNumber
+		]]>
+</query>
+
+
+</hibernate-mapping>

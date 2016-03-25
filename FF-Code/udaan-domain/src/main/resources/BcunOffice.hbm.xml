@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.organization.BcunOfficeDO" table="ff_d_office">
+		<id name="officeId" type="java.lang.Integer">
+			<column name="OFFICE_ID" />
+			<generator class="assigned"/>
+		</id>
+		<property name="officeCode" type="java.lang.String">
+			<column name="OFFICE_CODE" />
+		</property>
+		<property name="officeName" type="java.lang.String">
+			<column name="OFFICE_NAME" />
+		</property>
+
+		<property name="address1" type="java.lang.String">
+			<column name="ADDRESS_1" />
+		</property>
+		<property name="address2" type="java.lang.String">
+			<column name="ADDRESS_2" />
+		</property>
+		<property name="address3" type="java.lang.String">
+			<column name="ADDRESS_3" />
+		</property>
+
+		<!-- <property name="buildingName" type="java.lang.String">
+			<column name="BUILDING_NAME" />
+		</property>
+
+		<property name="buildingBlock" type="java.lang.String">
+			<column name="BUILDING_BLOCK" />
+		</property>
+
+		<property name="inChargeName" type="java.lang.String">
+			<column name="INCHARGE_NAME" />
+		</property> -->
+
+		<property name="phone" type="java.lang.String">
+			<column name="PHONE" />
+		</property>
+
+		<property name="email" type="java.lang.String">
+			<column name="EMAIL" />
+		</property>
+
+		<!-- <property name="fax" type="java.lang.String">
+			<column name="FAX" />
+		</property> -->
+
+		<property name="reportingRHO" type="java.lang.Integer">
+			<column name="REPORTING_RHO" />
+		</property>
+
+		<property name="reportingHUB" type="java.lang.Integer">
+			<column name="REPORTING_HUB" />
+		</property>
+
+		<!-- <property name="officeOpeningTime" type="java.lang.String">
+			<column name="OFFICE_OPENING_TIME" />
+		</property> -->
+
+		<property name="officeClosingTime" type="java.lang.String">
+			<column name="OFFICE_CLOSING_TIME" />
+		</property>
+
+		<property name="weeklyHoliday" type="java.lang.String">
+			<column name="WEEKLY_HOLIDAY" />
+		</property>
+
+		<property name="cityId" type="java.lang.Integer">
+			<column name="CITY_ID" />
+		</property>
+		
+		 <property name="pincodeId" type="java.lang.Integer">
+			<column name="PINCODE_ID" />
+		</property> 
+
+		<!-- <property name="areaId" type="java.lang.Integer">
+			<column name="AREA_ID" />
+		</property> -->
+		
+		<property name="pincode" type="java.lang.String">
+			<column name="PINCODE" />
+		</property>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> 
+		
+		<property name="mobileNo" column="MOBILE_NO" />
+		
+		 <many-to-one name="officeTypeDO" class="com.ff.domain.organization.OfficeTypeDO"  lazy="false" fetch="join">
+        <column name="OFFICE_TYPE_ID" not-null="false" unique="true"></column>
+        </many-to-one>
+        <many-to-one name="mappedRegionDO" class="com.ff.domain.geography.RegionDO"  lazy="false" fetch="join">
+        <column name="MAPPED_TO_REGION" ></column>
+        </many-to-one>
+		<!-- <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> -->
+	</class>
+	
+	
+	
+
+	
+</hibernate-mapping>

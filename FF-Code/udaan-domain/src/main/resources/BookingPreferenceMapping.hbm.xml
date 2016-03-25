@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.booking.BookingPreferenceMappingDO" table="ff_f_booking_preference_mapping">
+		<id name="bookingPreId" column="BOOKING_PRE_ID" type="java.lang.Integer" >
+			<generator class="native" />
+		</id>
+		
+		<many-to-one name="bookingId"   class="com.ff.domain.booking.BookingDO" lazy="false" fetch="join" >
+		<column name="BOOKING_ID" />
+        </many-to-one> 
+		
+		<many-to-one name="referenceId"  class="com.ff.domain.booking.BookingPreferenceDetailsDO" lazy="false" fetch="join" >
+		<column name="PREFERENCE_ID" />
+         </many-to-one>
+		
+		<property  name="splInstructions" 	type="java.lang.String" >
+		<column name="SPL_INSTRUCTIONS" />
+         </property>
+		
+			<property  name="otherPref" type="java.lang.String" >
+		<column name="OTHER_PREF" />
+         </property>
+		
+		
+		
+	</class>
+	
+<!--  	 <query name="getBookingPrefMappingId">
+		<![CDATA[
+			SELECT booking.bookingPreId from com.ff.domain.booking.BookingPreferenceMappingDO booking where booking.bookingId.bookingId = :bookingIds ]]>
+	</query>  -->
+	 
+
+</hibernate-mapping>

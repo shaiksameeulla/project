@@ -1,0 +1,720 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.business.CustomerDO" table="ff_d_customer">
+		<id name="customerId" type="java.lang.Integer">
+			<column name="CUSTOMER_ID" />
+			<generator class="native" />
+		</id>
+
+		<property name="mobile">
+			<column name="MOBILE" />
+		</property>
+		<property name="phone">
+			<column name="PHONE" />
+		</property>
+		<property name="email">
+			<column name="EMAIL" />
+		</property>
+		<property name="status">
+			<column name="CUR_STATUS" />
+		</property>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="createdDate" column="CREATED_DATE" />
+
+		<property name="legacyCustomerCode" column="LEGACY_CUSTOMER_CODE" />
+
+
+
+
+		<!-- Changes ffrom Customer new -->
+
+		<many-to-one name="officeMappedDO" class="com.ff.domain.organization.OfficeDO"
+			lazy="false" fetch="join">
+			<column name="OFFICE_MAPPED_TO" />
+		</many-to-one>
+
+		<many-to-one name="salesOfficeDO" class="com.ff.domain.organization.OfficeDO"
+			lazy="false" fetch="join">
+			<column name="SALES_OFFICE" />
+		</many-to-one>
+
+
+		<many-to-one name="primaryContactDO"
+			class="com.ff.domain.ratemanagement.masters.ContactDO" cascade="all"
+			lazy="false" fetch="join">
+			<column name="PRIMARY_CONTACT" />
+		</many-to-one>
+
+		<many-to-one name="secondaryContactDO"
+			class="com.ff.domain.ratemanagement.masters.ContactDO" cascade="all"
+			lazy="false" fetch="join">
+			<column name="SECONDARY_CONTACT" />
+		</many-to-one>
+
+
+		<!-- <many-to-one name="billingCycle" class="com.ff.domain.stockmanagement.masters.StockStandardTypeDO" 
+			lazy="false" fetch="join"> <column name="BILLING_CYCLE" /> </many-to-one> 
+			<many-to-one name="paymentTerm" class="com.ff.domain.stockmanagement.masters.StockStandardTypeDO" 
+			lazy="false" fetch="join"> <column name="PAYEMENT_TERM" /> </many-to-one> -->
+		<many-to-one name="industryCategoryDO"
+			class="com.ff.domain.ratemanagement.masters.RateIndustryCategoryDO"
+			lazy="false" fetch="join">
+			<column name="INDUSTRY_CATEGORY" />
+		</many-to-one>
+
+		<many-to-one name="industryTypeDO"
+			class="com.ff.domain.ratemanagement.masters.RateIndustryTypeDO" lazy="false"
+			fetch="join">
+			<column name="INDUSTRY_TYPE" />
+		</many-to-one>
+		<many-to-one name="customerCategoryDO"
+			class="com.ff.domain.ratemanagement.masters.RateCustomerCategoryDO"
+			lazy="false" fetch="join">
+			<column name="CUSTOMER_CATEGORY" />
+		</many-to-one>
+		<many-to-one name="salesPersonDO" class="com.ff.domain.organization.EmployeeDO"
+			lazy="false" fetch="join">
+			<column name="SALES_PERSON" />
+		</many-to-one>
+		<many-to-one name="addressDO" class="com.ff.domain.pickup.AddressDO"
+			cascade="all" lazy="false" fetch="join">
+			<column name="ADDRESS" />
+		</many-to-one>
+
+		<many-to-one name="customerType" class="com.ff.domain.business.CustomerTypeDO"
+			lazy="false" fetch="join">
+			<column name="CUSTOMER_TYPE" />
+		</many-to-one>
+
+		<many-to-one name="groupKeyDO"
+			class="com.ff.domain.ratemanagement.masters.CustomerGroupDO" lazy="false"
+			fetch="join">
+			<column name="GROUP_KEY" />
+		</many-to-one>
+		<property name="paymentTerm" column="PAYEMENT_TERM" />
+		<property name="billingCycle" column="BILLING_CYCLE" />
+		<property name="contractNo" column="CONTRACT_NO" />
+		<property name="customerCode" column="CUSTOMER_CODE" />
+		<property name="businessName" column="BUSINESS_NAME" />
+		<property name="tanNo" column="TAN_NO" />
+		<property name="distributionChannels" column="DISTRIBUTION_CHANNELS" />
+		<property name="panNo" column="PAN_NO" />
+		<property name="businessType" column="BUSINESS_TYPE" />
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATED_BY" />
+		<property name="updatedDate" column="UPDATED_DATE" />
+		<!-- common attributes START -->
+		<!-- <property name="sapStatus" column="SAP_STATUS" /> <property name="sapTimestamp" 
+			column="SAP_TIMESTAMP" /> -->
+		<!-- common attributes END -->
+		<!-- Ends here -->
+	</class>
+
+
+	<query name="getMasterCustomers">
+		<![CDATA[ 
+			select		customer
+			from		com.ff.domain.business.CustomerDO customer,
+						com.ff.domain.pickup.PickupContractDO pickupContract,
+						com.ff.domain.organization.OfficeDO office
+			where		customer.customerId = pickupContract.customer.customerId
+			and			pickupContract.office.officeId = office.officeId
+			and			office.officeId = :employeeOfficeId
+			and			customer.status = 'A'
+			and			pickupContract.status = 'A'
+		]]>
+	</query>
+
+	<query name="getCustDOByCustName">
+	<![CDATA[ FROM com.ff.domain.business.CustomerDO customer where customer.customerCode=:custCode]]>
+	</query>
+	<query name="getCustomer">
+	<![CDATA[ FROM com.ff.domain.business.CustomerDO customer WHERE customer.customerId=:customerId]]>
+	</query>
+
+	<query name="getAllCustomers">
+	<![CDATA[ FROM com.ff.domain.business.CustomerDO]]>
+	</query>
+
+	<!-- <query name="getLiabilityCustomers"> <![CDATA[ FROM com.ff.domain.business.CustomerDO 
+		customer WHERE customer.customerId IN (SELECT DISTINCT(customerDO.customerId) 
+		FROM com.ff.domain.mec.collection.CollectionDO collectionDO) AND customer.officeMappedDO.officeId 
+		IN ( SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office 
+		WHERE office.mappedRegionDO.regionId=:regionId ) ]]> </query> -->
+
+	<query name="getLiabilityCustomers">
+		<![CDATA[ 
+			SELECT 
+				DISTINCT(contract.customer) 
+			FROM 		
+				com.ff.domain.pickup.PickupDeliveryContractDO contract,
+				com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO billingLoc,
+				com.ff.domain.pickup.PickupDeliveryLocationDO pickupLoc
+			WHERE		
+				contract.office.mappedRegionDO.regionId = :regionId
+				AND	contract.contractId = pickupLoc.pickupDlvContract.contractId
+				AND	pickupLoc.pickupDlvLocId = billingLoc.pickupDeliveryLocation.pickupDlvLocId
+				AND	billingLoc.locationOperationType IN ('P','BP')
+				AND contract.customer.customerType.customerTypeCode IN (:customerType)
+		 ]]>
+	</query>
+	
+	<query name="getLiabilityCustomersForLiabilityByRegion">
+		<![CDATA[ 
+			select distinct new com.ff.domain.stockmanagement.wrapper.StockCustomerWrapperDO(customerDO.customerId,customerDO.customerCode,customerDO.businessName)
+			from com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO as billingLocation  
+			inner join billingLocation.pickupDeliveryLocation as location
+			inner join location.pickupDlvContract as pickupContract
+			inner join pickupContract.office as office
+			inner join pickupContract.customer as customerDO
+			
+			inner join customerDO.customerType as customerType
+			where 
+			billingLocation.locationOperationType IN ('P','BP')
+			AND customerType.customerTypeCode IN (:customerType)
+			AND office.mappedRegionDO.regionId = :regionId
+			AND customerDO.status =:transactionStatus
+		 ]]>
+	</query>
+	<query name="getAllLiabilityCustomersForLiability">
+		<![CDATA[ 
+			select distinct new com.ff.domain.stockmanagement.wrapper.StockCustomerWrapperDO(customerDO.customerId,customerDO.customerCode,customerDO.businessName)
+			from com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO as billingLocation  
+			inner join billingLocation.pickupDeliveryLocation as location
+			inner join location.pickupDlvContract as pickupContract
+			inner join pickupContract.customer as customerDO
+			inner join customerDO.customerType as customerType
+			where 
+			billingLocation.locationOperationType IN ('P','BP')
+			AND customerType.customerTypeCode IN (:customerType)
+			AND customerDO.status =:transactionStatus
+		 ]]>
+	</query>
+
+	<query name="getAllLiabilityCustomers">
+		<![CDATA[ 
+			SELECT contract.customer 
+			FROM 		com.ff.domain.pickup.PickupDeliveryContractDO contract,
+						com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO billingLoc,
+						com.ff.domain.pickup.PickupDeliveryLocationDO pickupLoc
+			WHERE		contract.contractId = pickupLoc.pickupDlvContract.contractId
+			AND			pickupLoc.pickupDlvLocId = billingLoc.pickupDeliveryLocation.pickupDlvLocId
+			AND			billingLoc.locationOperationType IN ('P','BP')
+			AND			contract.customer.customerType.customerTypeCode IN (:customerType)
+		 ]]>
+	</query>
+
+	<query name="getCustomerByOffice">
+        <![CDATA[ FROM com.ff.domain.business.CustomerDO customer
+        			WHERE customer.officeMappedDO.officeId IN (:mappedOffice) 
+         ]]>
+	</query>
+
+
+	<query name="updateEmailbyCustId">
+	<![CDATA[ UPDATE  com.ff.domain.business.CustomerDO customer  set customer.email =:emailId  where customer.customerId =:customerId ]]>
+	</query>
+
+
+	<query name="getCustomerIdByCode"> 
+	<![CDATA[ select customer.customerId  from com.ff.domain.business.CustomerDO customer where customer.customerCode =:customerCode ]]>
+
+	</query>
+
+
+	<!-- <query name="getBACodeByBAId"> <![CDATA[ FROM com.ff.domain.business.BusinessAssociateDO 
+		businAssociates where businAssociates.baId =:baId ]]> </query> -->
+
+	<query name="getCustomersByOfficeId">
+		<![CDATA[  FROM com.ff.domain.business.CustomerDO customer where customer.officeMappedDO.officeId in(:officeId ) ]]>
+	</query>
+
+	<query name="getCustomersByOffIds">
+		<![CDATA[  
+			FROM com.ff.domain.business.CustomerDO customer 
+			WHERE customer.salesOfficeDO.officeId IN (:officeIds)
+			ORDER BY customer.businessName
+		]]>
+	</query>
+
+	<query name="getCustomersByCityIdForUMC">
+		<![CDATA[  
+			SELECT concat(customer.businessName,'~',customer.customerCode) FROM com.ff.domain.business.CustomerDO customer 
+		    INNER JOIN customer.salesOfficeDO AS salesOffice
+			WHERE salesOffice.cityId=:cityId
+		 	AND customer.status='A'
+		 ]]>
+	</query>
+
+	<query name="getCustomersByRegionId">
+		<![CDATA[  
+			FROM com.ff.domain.business.CustomerDO customer 
+			WHERE customer.salesOfficeDO.mappedRegionDO.regionId=:regionId
+			ORDER BY customer.businessName
+		]]>
+	</query>
+
+	<query name="blockOrUnblockCustomer">
+		<![CDATA[
+			UPDATE com.ff.domain.business.CustomerDO custNew 
+			SET custNew.status=:status 
+			WHERE custNew.customerId=:customerId
+		]]>
+	</query>
+	<query name="updateCustPanNo">
+		<![CDATA[
+			UPDATE com.ff.domain.business.CustomerDO custNew 
+			SET custNew.panNo=:panNo
+			WHERE custNew.customerId=:customerId
+		]]>
+	</query>
+	<query name="updateCustTanNo">
+		<![CDATA[
+			UPDATE com.ff.domain.business.CustomerDO  custNew 
+			SET custNew.tanNo=:tanNo 
+			WHERE custNew.customerId=:customerId
+		]]>
+	</query>
+	<query name="getOfficeIdByCustomerId">
+		<![CDATA[ select customer.officeMappedDO.officeId FROM com.ff.domain.business.CustomerDO customer where  customer.customerId=:customerId ]]>
+	</query>
+
+	<query name="getOfficeIdByCustomerIdForContract">
+		<![CDATA[ select customer.office.officeId  from com.ff.domain.pickup.PickupDeliveryContractDO customer where  customer.customer.customerId=:customerId ]]>
+	</query>
+
+
+	<query name="updateContractNo">
+		<![CDATA[ UPDATE com.ff.domain.business.CustomerDO cust
+					SET cust.contractNo=:contractNo
+					WHERE 
+		          	cust.customerId =:customerId
+	]]>
+	</query>
+
+	<query name="getCustomerByTypes">
+		<![CDATA[ FROM com.ff.domain.business.CustomerDO  customer where customer.customerType.customerTypeCode in (:customerTypeCodes) ]]>
+	</query>
+
+	<query name="rateCustomersByCustomerName">
+	<![CDATA[ SELECT  new com.ff.domain.business.CustomerWrapperDO(
+			 cust.createdDate ,
+			 cust.contractNo, 
+			 (SELECT office.officeName FROM com.ff.domain.organization.OfficeDO office WHERE 
+			 	office.officeId = (SELECT office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where 
+			 		office1.officeId = cust.salesOfficeDO.officeId)) ,
+			 (SELECT city.cityName FROM com.ff.domain.geography.CityDO city WHERE city.cityId = (SELECT office1.cityId FROM com.ff.domain.organization.OfficeDO office1 WHERE office1.officeId = cust.salesOfficeDO.officeId)),
+			 cust.businessName,
+			 (SELECT offc.officeName FROM com.ff.domain.organization.OfficeDO offc where offc.officeId = (select customer.salesOfficeDO from com.ff.domain.business.CustomerDO customer where customer.customerId = cust.customerId))  ,
+			 (SELECT emp.firstName FROM com.ff.domain.organization.EmployeeDO emp where emp.employeeId = (select customer.salesPersonDO.employeeId from com.ff.domain.business.CustomerDO customer where customer.customerId = cust.customerId))  ,
+			 (select group.customerGroupName from com.ff.domain.ratemanagement.masters.CustomerGroupDO group where group.customerGroupId = cust.groupKeyDO),
+			 cust.status
+			)
+			FROM 
+			 com.ff.domain.business.CustomerDO cust
+			 WHERE 
+			 cust.businessName like :custName 
+		]]>
+	</query>
+
+	<query name="updateCustomerCodeBycustomerId">
+	<![CDATA[
+		update com.ff.domain.business.CustomerDO cust set cust.customerCode =:customerCode
+		WHERE cust.customerId =:customerId
+	]]>
+	</query>
+
+	<query name="getCustomersByOffice">
+        <![CDATA[ FROM com.ff.domain.business.CustomerDO customer
+        			WHERE customer.officeMappedDO.officeId IN (:officeList) 
+         ]]>
+	</query>
+
+	<query name="updateCustomerBillDtls">
+        <![CDATA[ 
+        	UPDATE com.ff.domain.business.CustomerDO customer
+        	SET 
+        		customer.panNo=:panNo,
+        		customer.tanNo=:tanNo,
+        		customer.billingCycle=:billingCycle, 
+        		customer.paymentTerm=:paymentTerm,
+        		customer.customerCode=:customerCode,
+        		customer.customerType.customerTypeId=:customerTypeId,
+        		dtToBranch ='N',
+        		sapStatus=:sapStatus
+        	WHERE customer.customerId=:customerId
+        ]]>
+	</query>
+
+	<query name="getCustomerCodeAndRateCustomerCategoryByCustomerId">
+        <![CDATA[ 
+        	SELECT 	new com.ff.domain.ratemanagement.masters.CustomerCustomerRateTypeDO(cust.customerCode, ratecust.rateCustomerCategoryCode)
+        	FROM	com.ff.domain.business.RateCalculationCustomerDO cust
+        	INNER JOIN cust.customerCategoryDO ratecust
+        	WHERE	cust.customerId =:customerId
+        ]]>
+	</query>
+
+	<query name="updateContractNoAndDistributionChannel">
+		<![CDATA[ UPDATE com.ff.domain.business.CustomerDO cust
+					SET cust.contractNo=:contractNo,
+						cust.distributionChannels=:distributionChannels,
+						cust.sapStatus=:sapStatus,
+						cust.dtToBranch =:dtToBranch,
+						cust.status=:status
+					WHERE 
+		          	cust.customerId =:customerId
+	]]>
+	</query>
+
+	<!-- <query name="getCustomersByBillingBranch"> <![CDATA[ SELECT contractPaymentBillingLocation.pickupDeliveryLocation.pickupDlvContract.customer 
+		FROM com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO 
+		contractPaymentBillingLocation, com.ff.domain.ratemanagement.masters.RateContractDO 
+		rateContract WHERE contractPaymentBillingLocation.rateContractDO.rateContractId 
+		= rateContract.rateContractId AND contractPaymentBillingLocation.pickupDeliveryLocation.pickupDlvContract.office.officeId 
+		IN (:billingOffice) AND ( (contractPaymentBillingLocation.locationOperationType 
+		in ('B', 'BP') AND contractPaymentBillingLocation.pickupDeliveryLocation.pickupDlvContract.customer.customerType.customerTypeCode 
+		in ('CR','CC','LC','CD','GV') AND rateContract.typeOfBilling = 'CBCP') OR 
+		(contractPaymentBillingLocation.locationOperationType in ('P', 'BP') AND 
+		contractPaymentBillingLocation.pickupDeliveryLocation.pickupDlvContract.customer.customerType.customerTypeCode 
+		in ('CR','CC','LC','CD','GV') AND rateContract.typeOfBilling in ('DBDP', 
+		'DBCP')) OR (contractPaymentBillingLocation.locationOperationType = 'P' AND 
+		contractPaymentBillingLocation.pickupDeliveryLocation.pickupDlvContract.customer.customerType.customerTypeCode 
+		= 'FR') OR (contractPaymentBillingLocation.locationOperationType = 'BP' AND 
+		contractPaymentBillingLocation.pickupDeliveryLocation.pickupDlvContract.customer.customerType.customerTypeCode 
+		= 'RL') ) GROUP BY contractPaymentBillingLocation.pickupDeliveryLocation.pickupDlvContract.office.officeId, 
+		contractPaymentBillingLocation.pickupDeliveryLocation.pickupDlvContract.customer.customerId, 
+		contractPaymentBillingLocation.shippedToCode UNION SELECT customer FROM com.ff.domain.business.CustomerDO 
+		customer WHERE customer.officeMappedDO.officeId IN (:billingOffice) AND customer.customerType.customerTypeCode 
+		in ('BA', 'BV', 'AC') ]]> </query> -->
+
+	<!-- <sql-query name="getCustomersByBillingBranch"> <return alias="customer" 
+		class="com.ff.domain.business.CustomerDO" /> select fdc.CUSTOMER_ID as {customer.customerId}, 
+		fdc.BUSINESS_NAME as {customer.businessName} from ff_d_office fdo join ff_d_pickup_delivery_contract 
+		fdpdc on fdo.OFFICE_ID = fdpdc.OFFICE_ID join ff_d_pickup_delivery_location 
+		fdpdl on fdpdc.CONTRACT_ID = fdpdl.CONTRACT_ID join ff_d_contract_payment_billing_location 
+		fdcpbl on fdcpbl.PICKUP_DELIVERY_LOCATION = fdpdl.LOCATION_ID join ff_d_rate_contract 
+		fdrc on fdrc.RATE_CONTRACT_ID = fdcpbl.RATE_CONTRACT join ff_d_customer fdc 
+		on fdc.CUSTOMER_ID = fdpdc.CUSTOMER_ID join ff_d_customer_type fdct on fdct.CUSTOMER_TYPE_ID 
+		= fdc.CUSTOMER_TYPE where fdo.OFFICE_ID in (:billingOffice) and ((fdcpbl.LOCATION_OPERATION_TYPE 
+		in ('B', 'BP') and fdct.CUSTOMER_TYPE_CODE in ('CR','CC','LC','CD','GV') 
+		and fdrc.TYPE_OF_BILLING = 'CBCP') OR (fdcpbl.LOCATION_OPERATION_TYPE in 
+		('P', 'BP') and fdct.CUSTOMER_TYPE_CODE in ('CR','CC','LC','CD','GV') and 
+		fdrc.TYPE_OF_BILLING in ('DBDP', 'DBCP')) OR (fdcpbl.LOCATION_OPERATION_TYPE 
+		in ('P') and fdct.CUSTOMER_TYPE_CODE = 'FR') OR (fdcpbl.LOCATION_OPERATION_TYPE 
+		= 'BP' and fdct.CUSTOMER_TYPE_CODE = 'RL')) group by fdo.OFFICE_ID, fdpdc.CUSTOMER_ID, 
+		fdcpbl.SHIPPED_TO_CODE union select fdc1.CUSTOMER_ID as {customer.customerId} 
+		, fdc1.BUSINESS_NAME as {customer.businessName} from ff_d_office fdo1 join 
+		ff_d_customer fdc1 on fdc1.OFFICE_MAPPED_TO = fdo1.OFFICE_ID join ff_d_customer_type 
+		fdct1 on fdct1.CUSTOMER_TYPE_ID = fdc1.CUSTOMER_TYPE where fdct1.CUSTOMER_TYPE_CODE 
+		in ('BA', 'BV', 'AC') and fdo1.OFFICE_ID in (:billingOffice) </sql-query> -->
+
+	<sql-query name="getCustomersByBillingBranch">
+		<return alias="customer" class="com.ff.domain.business.CustomerDO" />
+		select
+		<!-- fdc.CUSTOMER_ID as {customer.customerId}, fdc.BUSINESS_NAME as {customer.businessName} -->
+		fdc.*
+		from ff_d_office fdo
+		join ff_d_pickup_delivery_contract fdpdc on
+		fdo.OFFICE_ID = fdpdc.OFFICE_ID
+		join ff_d_pickup_delivery_location
+		fdpdl on fdpdc.CONTRACT_ID = fdpdl.CONTRACT_ID
+		join
+		ff_d_contract_payment_billing_location fdcpbl on
+		fdcpbl.PICKUP_DELIVERY_LOCATION = fdpdl.LOCATION_ID
+		join
+		ff_d_rate_contract fdrc on fdrc.RATE_CONTRACT_ID =
+		fdcpbl.RATE_CONTRACT
+		join ff_d_customer fdc on fdc.CUSTOMER_ID =
+		fdpdc.CUSTOMER_ID
+		join ff_d_customer_type fdct on fdct.CUSTOMER_TYPE_ID
+		= fdc.CUSTOMER_TYPE
+		where fdo.OFFICE_ID in (:billingOffice)
+		and
+		((fdcpbl.LOCATION_OPERATION_TYPE in ('B', 'BP')
+		and fdct.CUSTOMER_TYPE_CODE in ('CR','CC','LC','CD','GV','FR')
+		and fdrc.TYPE_OF_BILLING = 'CBCP')
+		OR
+		(fdcpbl.LOCATION_OPERATION_TYPE in ('P', 'BP')
+		and fdct.CUSTOMER_TYPE_CODE in ('CR','CC','LC','CD','GV','FR')
+		and fdrc.TYPE_OF_BILLING in ('DBDP', 'DBCP'))
+		OR
+		(fdcpbl.LOCATION_OPERATION_TYPE = 'BP'
+		and fdct.CUSTOMER_TYPE_CODE = 'RL'))
+		group by fdo.OFFICE_ID,
+		fdpdc.CUSTOMER_ID, fdcpbl.SHIPPED_TO_CODE
+		<!-- union select fdc1.CUSTOMER_ID as {customer.customerId} , fdc1.BUSINESS_NAME 
+			as {customer.businessName} from ff_d_office fdo1 join ff_d_customer fdc1 
+			on fdc1.OFFICE_MAPPED_TO = fdo1.OFFICE_ID join ff_d_customer_type fdct1 on 
+			fdct1.CUSTOMER_TYPE_ID = fdc1.CUSTOMER_TYPE where fdct1.CUSTOMER_TYPE_CODE 
+			in ('BA', 'BV', 'AC') and fdo1.OFFICE_ID in (:billingOffice) -->
+
+	</sql-query>
+
+
+	<sql-query name="getCustomersByBillingBranchUnion">
+		<return alias="customer" class="com.ff.domain.business.CustomerDO" />
+		select
+		<!-- fdc1.CUSTOMER_ID as {customer.customerId} , fdc1.BUSINESS_NAME as 
+			{customer.businessName} -->
+		fdc1.*,
+		from ff_d_office fdo1
+		join ff_d_customer fdc1 on
+		fdc1.OFFICE_MAPPED_TO = fdo1.OFFICE_ID
+		join ff_d_customer_type fdct1 on
+		fdct1.CUSTOMER_TYPE_ID = fdc1.CUSTOMER_TYPE
+		where
+		fdct1.CUSTOMER_TYPE_CODE in ('BA', 'BV', 'AC')
+		and fdo1.OFFICE_ID in (:billingOffice)
+	</sql-query>
+	<query name="getCustomersForBillCollection">
+        <![CDATA[ 
+        	FROM com.ff.domain.business.CustomerDO customer WHERE 
+        	customer.officeMappedDO.officeId=:officeId AND
+        	customer.contractNo IS NULL AND
+        	customer.status='A'
+        ]]>
+	</query>
+
+	<!-- For Billing Module -->
+	<sql-query name="getNonContractedCustomersByBillingBranch">
+		<return alias="customer" class="com.ff.domain.business.CustomerDO" />
+		select
+		fdc1.*
+		from
+		ff_d_office fdo1
+		join ff_d_customer fdc1 on fdc1.OFFICE_MAPPED_TO = fdo1.OFFICE_ID
+		join ff_d_customer_type fdct1 on fdct1.CUSTOMER_TYPE_ID =
+		fdc1.CUSTOMER_TYPE
+		join ff_d_product_customer_type_map fdpctm1
+		on fdpctm1.CUSTOMER_TYPE_ID = fdct1.CUSTOMER_TYPE_ID
+		join ff_d_product fdp1 on fdp1.PRODUCT_ID = fdpctm1.PRODUCT_ID
+		join ff_d_financial_product_series_customer_type_map fdfpsctm1
+		on (fdfpsctm1.PRODUCT = fdp1.PRODUCT_ID and
+		fdfpsctm1.CUSTOMER_TYPE = fdct1.CUSTOMER_TYPE_ID)
+		join ff_d_financial_product fffp1
+		on fffp1.FINANCIAL_PRODUCT_ID = fdfpsctm1.FINANCIAL_PRODUCT
+		where
+		fdo1.OFFICE_ID in (:billingOfficeId) and
+		fffp1.FINANCIAL_PRODUCT_ID = :financialProductId and
+		fdct1.CUSTOMER_TYPE_CODE in ('BA',
+		'BV',
+		'AC') and fffp1.STATUS='A' and fdfpsctm1.STATUS='A'
+
+	</sql-query>
+
+	<sql-query name="getContractedCustomersByBillingBranch">
+		<return alias="customer" class="com.ff.domain.business.CustomerDO" />
+		select
+		fdc.*
+		from
+		ff_d_office fdo
+		join ff_d_pickup_delivery_contract fdpdc on fdo.OFFICE_ID =
+		fdpdc.OFFICE_ID
+		join ff_d_pickup_delivery_location fdpdl
+		on fdpdc.CONTRACT_ID = fdpdl.CONTRACT_ID
+		join ff_d_contract_payment_billing_location fdcpbl
+		on fdcpbl.PICKUP_DELIVERY_LOCATION = fdpdl.LOCATION_ID
+		join ff_d_rate_contract fdrc on fdrc.RATE_CONTRACT_ID =
+		fdcpbl.RATE_CONTRACT
+		join ff_d_customer fdc on fdc.CUSTOMER_ID = fdpdc.CUSTOMER_ID
+		join ff_d_customer_type fdct on fdct.CUSTOMER_TYPE_ID = fdc.CUSTOMER_TYPE
+		join ff_d_product_customer_type_map fdpctm
+		on fdpctm.CUSTOMER_TYPE_ID = fdct.CUSTOMER_TYPE_ID
+		join ff_d_product fdp on fdp.PRODUCT_ID = fdpctm.PRODUCT_ID
+		join ff_d_financial_product_series_customer_type_map fdfpsctm
+		on (fdfpsctm.PRODUCT = fdp.PRODUCT_ID and
+		fdfpsctm.CUSTOMER_TYPE = fdct.CUSTOMER_TYPE_ID)
+		join ff_d_financial_product fffp
+		on fffp.FINANCIAL_PRODUCT_ID = fdfpsctm.FINANCIAL_PRODUCT
+		where
+		fdo.OFFICE_ID in (:billingOfficeId) and
+		fffp.FINANCIAL_PRODUCT_ID = :financialProductId and fffp.STATUS='A' and fdfpsctm.STATUS='A' and
+		((fdcpbl.LOCATION_OPERATION_TYPE in ('B',
+		'BP') and
+		fdct.CUSTOMER_TYPE_CODE in ('CR',
+		'CC',
+		'LC',
+		'CD',
+		'GV',
+		'FR') and
+		fdrc.TYPE_OF_BILLING = 'CBCP') OR
+		(fdcpbl.LOCATION_OPERATION_TYPE in ('B',
+		'BP') and
+		fdct.CUSTOMER_TYPE_CODE in ('CR',
+		'CC',
+		'LC',
+		'CD',
+		'GV',
+		'FR') and
+		fdrc.TYPE_OF_BILLING in ('DBDP',
+		'DBCP')) OR
+		(fdcpbl.LOCATION_OPERATION_TYPE = 'BP' and
+		fdct.CUSTOMER_TYPE_CODE = 'RL'))
+		group by
+		fdo.OFFICE_ID,
+		fdpdc.CUSTOMER_ID,
+		fdcpbl.SHIPPED_TO_CODE
+
+	</sql-query>
+
+
+	<query name="getCustomerByBranchAndRateProductCategory">
+        <![CDATA[ 
+        		SELECT  customer.customerId,customer.customerCode, customer.businessName
+        		FROM 	com.ff.domain.business.CustomerDO customer
+        		INNER JOIN customer.customerCategoryDO  rateCustomerCat
+        		LEFT JOIN customer.officeMappedDO officeMappedTo
+        		INNER JOIN customer.salesOfficeDO salesOffice
+        		WHERE 	((officeMappedTo.officeId IN (:officeId)) OR (salesOffice.officeId IN (:officeId)))
+        		AND		rateCustomerCat.rateCustomerCategoryId IN (SELECt rcc.rateCustomerCategoryId
+        															FROM  com.ff.domain.ratemanagement.masters.RateCustomerProductCatMapDO  cpcm 
+        															INNER JOIN cpcm.rateCustomerCategoryDO rcc
+        															INNER JOIN cpcm.rateProductCategoryDO rpcd
+        															WHERE rpcd.rateProductCategoryId IN (:rateProductCategory)
+        														  )
+        		AND		customer.status = 'A'
+        		ORDER BY customer.businessName
+        ]]>
+	</query>
+
+	<query name="getCustomerByStationAndProduct">
+        <![CDATA[ 
+        		SELECT  customer.customerId,customer.customerCode, customer.businessName
+        		FROM 	com.ff.domain.business.CustomerDO customer
+        		LEFT JOIN customer.customerCategoryDO  rateCustomerCat
+        		LEFT JOIN customer.officeMappedDO officeMappedTo
+        		LEFT JOIN customer.salesOfficeDO salesOffice
+        		WHERE 	((officeMappedTo.cityId IN (:cityId)) 
+        					OR (customer.salesOfficeDO.cityId IN (:cityId))
+        					OR  (customer.customerId IN ( SELECT customer1.customerId  
+        												  FROM com.ff.domain.pickup.PickupDeliveryContractDO  picDelcontract,
+        													   com.ff.domain.business.CustomerDO customer1,
+        				                                       com.ff.domain.ratemanagement.masters.RateContractDO rateContract
+        												  WHERE 	customer1.customerId = rateContract.customerId
+        												  AND		customer1.customerId = picDelcontract.customer.customerId
+        												  AND 		picDelcontract.office.cityId IN (:cityId))
+        						)
+        				)
+        		AND	   rateCustomerCat.rateCustomerCategoryId IN (SELECt rcc.rateCustomerCategoryId
+        															FROM  com.ff.domain.ratemanagement.masters.RateCustomerProductCatMapDO  cpcm 
+        															INNER JOIN cpcm.rateCustomerCategoryDO rcc
+        															INNER JOIN cpcm.rateProductCategoryDO rpcd
+        															WHERE rpcd.rateProductCategoryId IN (SELECT   ppcm.rateProductCategoryId
+        																								 FROM com.ff.domain.ratemanagement.masters.RateProductProductCategoryMapDO ppcm 
+        																								 WHERE ppcm.productId IN (:productId))
+        														  )
+        		AND		customer.status = 'A'
+        		ORDER BY customer.businessName
+        ]]>
+	</query>
+
+	<!-- <query name="getCustomerByStation"> <![CDATA[ SELECT customer.customerId,customer.customerCode, 
+		customer.businessName FROM com.ff.domain.business.CustomerDO customer INNER 
+		JOIN customer.customerCategoryDO rateCustomerCat INNER JOIN customer.officeMappedDO 
+		officeMappedTo INNER JOIN customer.salesOfficeDO salesOffice WHERE ((customer.customerId 
+		IN ( SELECT customer1.customerId FROM com.ff.domain.pickup.PickupDeliveryContractDO 
+		picDelcontract, com.ff.domain.business.CustomerDO customer1, com.ff.domain.ratemanagement.masters.RateContractDO 
+		rateContract WHERE customer1.customerId = rateContract.customerId AND customer1.customerId 
+		= picDelcontract.customer.customerId AND picDelcontract.office.cityId IN 
+		(:cityId)) ) OR (customer.salesOfficeDO.cityId IN (:cityId)) ) AND customer.status 
+		= 'A' ORDER BY customer.businessName ]]> </query> -->
+
+	 <sql-query name="getCustomerByStation">
+	 <!-- <return alias="customer" class="com.ff.domain.business.RateRevisionDO" />  -->
+		select cu.CUSTOMER_ID as customerId, cu.CUSTOMER_CODE as customerCode, cu.BUSINESS_NAME as businessName
+		from ff_d_customer cu inner join ff_d_pickup_delivery_contract dc
+		on dc.CUSTOMER_ID = cu.CUSTOMER_ID inner join ff_d_rate_contract rc
+		on cu.customer_id = rc.customer inner join ff_d_office o1
+		on dc.OFFICE_ID = o1.OFFICE_ID inner join ff_d_office o2
+		on cu.SALES_OFFICE = o2.OFFICE_ID
+		where
+		o2.CITY_ID in (:cityId) OR
+		o1.CITY_ID in (:cityId) AND cu.CUR_STATUS = 'A'
+		ORDER BY cu.BUSINESS_NAME;
+
+
+	</sql-query>
+ 
+
+	<sql-query name="getCustomersByContractBranches">
+		<return alias="customer" class="com.ff.domain.business.CustomerDO" />
+		SELECT
+		finalResult.*
+		FROM
+		(
+		/* contracted customers */
+		SELECT
+		fdc.*
+		FROM
+		ff_d_office fdo
+		JOIN ff_d_pickup_delivery_contract fdpdc ON fdo.OFFICE_ID =
+		fdpdc.OFFICE_ID
+		JOIN ff_d_pickup_delivery_location fdpdl
+		ON fdpdc.CONTRACT_ID = fdpdl.CONTRACT_ID
+		JOIN ff_d_contract_payment_billing_location fdcpbl
+		ON fdcpbl.PICKUP_DELIVERY_LOCATION = fdpdl.LOCATION_ID
+		JOIN ff_d_rate_contract fdrc ON fdrc.RATE_CONTRACT_ID =
+		fdcpbl.RATE_CONTRACT
+		JOIN ff_d_customer fdc ON fdc.CUSTOMER_ID = fdpdc.CUSTOMER_ID
+		JOIN ff_d_customer_type fdct ON fdct.CUSTOMER_TYPE_ID = fdc.CUSTOMER_TYPE
+		WHERE
+		fdo.OFFICE_ID IN (:officeIds) AND
+		fdct.CUSTOMER_TYPE_CODE IN ('CR'
+		,'CC'
+		,'LC'
+		,'CD'
+		,'GV'
+		,'FR') AND
+		fdc.CUR_STATUS = 'A'
+		GROUP BY
+		fdo.OFFICE_ID
+		,fdpdc.CUSTOMER_ID
+		,fdcpbl.SHIPPED_TO_CODE
+		UNION
+		/* non contracted customers AC */
+		SELECT
+		fdc.*
+		FROM
+		ff_d_office fdo
+		JOIN ff_d_customer fdc ON fdc.OFFICE_MAPPED_TO = fdo.OFFICE_ID
+		JOIN ff_d_customer_type fdct ON fdct.CUSTOMER_TYPE_ID = fdc.CUSTOMER_TYPE
+		JOIN ff_d_product_customer_type_map fdpctm1
+		ON fdpctm1.CUSTOMER_TYPE_ID = fdct.CUSTOMER_TYPE_ID
+		WHERE
+		fdo.OFFICE_ID IN (:officeIds) AND
+		fdct.CUSTOMER_TYPE_CODE IN ('AC') AND
+		fdc.CUR_STATUS = 'A'
+		UNION
+		/* non contracted customers BA, BV */
+		SELECT
+		fdc.*
+		FROM
+		ff_d_office fdo
+		JOIN ff_d_customer fdc ON fdc.OFFICE_MAPPED_TO = fdo.OFFICE_ID
+		JOIN ff_d_customer_type fdct ON fdct.CUSTOMER_TYPE_ID = fdc.CUSTOMER_TYPE
+		JOIN ff_d_city fdcity ON fdcity.CITY_ID = fdo.CITY_ID
+		WHERE
+		fdcity.CITY_ID IN (:cityId) AND
+		fdct.CUSTOMER_TYPE_CODE IN ('BA'
+		,'BV') AND
+		fdc.CUR_STATUS = 'A'
+		UNION
+		/* reverse logistics customer */
+		SELECT
+		fdc.*
+		FROM
+		ff_d_customer fdc
+		JOIN ff_d_customer_type fdct ON fdct.CUSTOMER_TYPE_ID = fdc.CUSTOMER_TYPE
+		WHERE
+		fdct.CUSTOMER_TYPE_CODE = 'RL' AND
+		fdc.CUR_STATUS = 'A') as finalResult ORDER BY finalResult.BUSINESS_NAME
+	</sql-query>
+
+</hibernate-mapping>

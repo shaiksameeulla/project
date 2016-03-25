@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.umc.ApplScreenDO" table="ff_d_app_scrn">
+	<cache usage="read-only" region="eternalCache"/>
+		<id name="screenId" type="java.lang.Integer">
+			<column name="SCREEN_ID" />
+			<generator class="assigned" />
+		</id>
+		<property name="screenCode" type="java.lang.String">
+			<column name="SCREEN_CODE" />
+		</property>
+		<property name="screenName" type="java.lang.String">
+			<column name="SCREEN_NAME" />
+		</property>
+		<property name="screenDescription" type="java.lang.String">
+			<column name="SCREEN_DESCRIPTION" />
+		</property>
+		
+		<property name="moduleName" type="java.lang.String">
+			<column name="MODULE_NAME" />
+		</property>
+		<property name="moduleDescription" type="java.lang.String">
+			<column name="MODULE_DESCRIPTION" />
+		</property>
+		
+		<property name="imgPath" type="java.lang.String">
+			<column name="IMAGE_PATH_NAME" />
+		</property>
+		<property name="urlName" type="java.lang.String">
+			<column name="URL_NAME" />
+		</property>
+		<property name="paramName" type="java.lang.String">
+			<column name="URL_PARAMS" />
+		</property>
+		<property name="appName" type="java.lang.String">
+			<column name="APP_NAME" />
+		</property>
+		<property name="accessibleTO" type="java.lang.String">
+			<column name="SRC_ACCESSIBLE_TO" />
+		</property>
+		<property name="scrAssign" type="java.lang.String">
+			<column name="IS_SRC_ASSIGN" />
+		</property>
+		
+		<!-- <property name="level" type="java.lang.Integer">
+			<column name="LEVEL_ID" />
+		</property>
+		
+		<property name="displaySequence" type="java.lang.Integer">
+			<column name="DISPLAY_SEQUENCE" />
+		</property>
+		<property name="parentName" type="java.lang.String">
+			<column name="PARENT_NAME" />
+		</property> -->
+		 <property name="dtToBranch" column="DT_TO_BRANCH"/>
+		 
+		 <property name="status" column="STATUS" />
+		
+	</class>
+	
+	<query name="getAllScreens">
+		<![CDATA[
+			From com.ff.domain.umc.ApplScreenDO screen where screen.status = 'A'
+		]]>
+	
+	</query>
+	
+	<query name="getAccessibleApplscreens">
+		<![CDATA[
+			 From com.ff.domain.umc.ApplScreenDO screen where screen.accessibleTO in(:accessible) and screen.appName != 'centralized' and screen.status = 'A'  order by screen.screenName 
+		]]>
+	
+	</query>
+	
+	<query name="getAllAssignApplScreens">
+		<![CDATA[
+			 From com.ff.domain.umc.ApplScreenDO screen where screen.scrAssign =:scrAssign and screen.status = 'A' order by screen.screenName
+		]]>
+	
+	</query>
+	
+	<query name="getCenralizedScreensForScreen">
+		<![CDATA[
+			 select screen From com.ff.domain.umc.ApplScreenDO screen where screen.screenName=(
+			 	select screen1.screenName From com.ff.domain.umc.ApplScreenDO screen1 where screen1.screenId=:screenId
+			 )
+			  and screen.appName = 'centralized' and screen.status = 'A'
+		]]>
+	
+	</query>
+</hibernate-mapping>
+	

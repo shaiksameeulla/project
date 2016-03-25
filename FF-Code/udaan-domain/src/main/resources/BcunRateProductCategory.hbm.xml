@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.ratemanagement.masters.BcunRateProductCategoryDO" table="ff_d_rate_product_category">
+		<id name="rateProductCategoryId" type="java.lang.Integer" column="RATE_PRODUCT_CATEGORY_ID">
+			<generator class="assigned" />
+		</id>
+		
+		<property name="rateProductCategoryCode" type="java.lang.String" >
+        <column name="PRODUCT_CATEGORY_CODE" />
+        </property>
+        		
+        <property name="rateProductCategoryName" type="java.lang.String" >
+        <column name="PRODUCT_CATEGORY_NAME" />
+        </property>
+        
+        <property name="rateProductCategoryType" type="java.lang.String" >
+        <column name="RATE_PRODUCT_CATEGORY_TYPE" />
+        </property>
+        <property name="dtToBranch" column="DT_TO_BRANCH"/>
+        <property name="isOriginConsidered" column="ORIGIN_CONSIDERED"/>
+        <property name="calculationType" column="CALCULATION_TYPE"/>
+    </class>
+
+</hibernate-mapping>

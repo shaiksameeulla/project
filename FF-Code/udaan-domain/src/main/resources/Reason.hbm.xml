@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="com.ff.domain.serviceOffering.ReasonDO" table="ff_d_reason">
+        <id name="reasonId" type="java.lang.Integer">
+            <column name="REASON_ID" />
+            <generator class="assigned" />
+        </id>
+        <property name="reasonCode" >
+            <column name="REASON_CODE"  />
+        </property>
+        <property name="reasonName" >
+            <column name="REASON_NAME"  />
+        </property>
+        <property name="reasonType" >
+            <column name="REASON_TYPE" />
+        </property>
+        <property name="reasonTypeDesc" >
+            <column name="REASON_TYPE_DESC" />
+        </property>
+        <property name="isPartyLetter" >
+            <column name="IS_PARTY_LETTER" />
+        </property>
+        
+        <many-to-one name="processDO"
+				class="com.ff.domain.tracking.ProcessDO" lazy="false" fetch="join">
+				<column name="PROCESS" />
+			</many-to-one>
+        	<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	    
+    </class>
+    <query name="getReasonName">
+        <![CDATA[From com.ff.domain.serviceOffering.ReasonDO Where reasonCode=:reasonCode]]>
+    </query>
+    
+    <query name="getReasonsByReasonType">
+        <![CDATA[From com.ff.domain.serviceOffering.ReasonDO Where reasonType=:reasonType]]>
+    </query>
+    
+    <query name="getAllReasons">
+        <![CDATA[From com.ff.domain.serviceOffering.ReasonDO ]]>
+    </query>
+    
+   <sql-query name="getReasonByConsignmentNoAndOriginOffice">
+		<return alias="reasonDO" class="com.ff.domain.serviceOffering.ReasonDO"/>
+		<![CDATA[ 
+			SELECT r.REASON_ID AS {reasonDO.reasonId},
+			       r.REASON_CODE AS {reasonDO.reasonCode},
+			       r.REASON_NAME AS {reasonDO.reasonName},
+			       r.REASON_TYPE AS {reasonDO.reasonType},
+			       r.REASON_TYPE_DESC AS {reasonDO.reasonTypeDesc},
+			       r.IS_PARTY_LETTER AS {reasonDO.isPartyLetter},
+			       r.DT_TO_BRANCH AS {reasonDO.dtToBranch},
+			       null AS {reasonDO.processDO}
+			  FROM ff_f_consignment c
+			       JOIN ff_f_consignment_return cr ON cr.CONSIGNMENT = c.CONSG_ID
+			       JOIN ff_f_consignment_return_reason crr
+			          ON crr.CONSIGNMENT_RETURN = cr.CONSIGNMENT_RETURN_ID
+			       JOIN ff_d_reason r ON r.REASON_ID = crr.REASON
+			 WHERE     c.CONSG_NO =:consigNo
+			       AND cr.RETURN_TYPE =:returnType
+			       AND cr.OFFICE =:originOffice
+			ORDER BY crr.DATE DESC, crr.TIME DESC
+			 LIMIT 1;
+      	]]>
+	</sql-query>
+    
+</hibernate-mapping>

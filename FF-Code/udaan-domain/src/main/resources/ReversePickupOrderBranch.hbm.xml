@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.ReversePickupOrderBranchMappingDO"
+		table="ff_f_rev_pickup_order_to_branch">
+		<id name="id" type="java.lang.Integer">
+			<column name="ID" />
+			<generator class="identity" />
+		</id>
+      <property name="orderAssignedBranch" type="java.lang.Integer">
+			<column name="BRANCH_ORDER_ASSIGNED_TO" />
+		</property>
+		
+		<property name="branchOrderRequestStatus" type="java.lang.String">
+			<column name="ORDER_REQUEST_STATUS" />
+		</property>
+		
+		<many-to-one name="pickupOrderDetail" class="com.ff.domain.pickup.ReversePickupOrderDetailDO" fetch="join" lazy="false">
+            <column name="REQUEST_DETAIL_ID" not-null="true" />
+        </many-to-one> 
+        
+        <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		
+		 <property name="dtUpdateToCentral">
+			<column name="DT_UPDATE_TO_CENTRAL" />
+		</property>
+		<property name="createdDate" type="java.util.Date" update="false">
+			<column name="CREATION_DATE" />
+		</property>
+		<property name="updatedDate" type="java.util.Date">
+			<column name="UPDATE_DATE" />
+		</property>
+		<property name="createdBy" column ="CREATED_BY" />		
+		<property name="updatedBy" column ="UPDATE_BY" />
+	</class>
+	
+		<query name="getPickupReqList">
+
+<![CDATA[ select distinct(branchesAssigned.pickupOrderDetail) from com.ff.domain.pickup.ReversePickupOrderBranchMappingDO branchesAssigned
+	where branchesAssigned.pickupOrderDetail.orderRequestStatus =:status
+	and   branchesAssigned.orderAssignedBranch =:officeId
+	and   branchesAssigned.branchOrderRequestStatus =:status
+	order by branchesAssigned.pickupOrderDetail.pickupOrderHeader.requestDate asc
+]]>
+	</query>
+	
+	 	<query name="updateBranchOrderDetails">
+
+<![CDATA[ update  com.ff.domain.pickup.ReversePickupOrderBranchMappingDO orderBranch
+          set orderBranch.branchOrderRequestStatus=:status,
+          orderBranch.updatedDate = :currentDate,
+          orderBranch.dtToCentral='N', orderBranch.dtUpdateToCentral='Y',orderBranch.updatedBy = :updatedBy
+          where orderBranch.orderAssignedBranch =:officeId
+          and   orderBranch.pickupOrderDetail.detailId=:detailId
+]]>
+	</query> 
+	
+	<!-- <query name="getUpdatePickupOrderRequest"> 
+	<![CDATA[ select branch.pickupOrderDetail.pickupOrderHeader From com.ff.domain.pickup.ReversePickupOrderBranchMappingDO branch
+		          where  branch.pickupOrderDetail.orderNumber IN (:ordernum) ]]>
+	</query> -->
+	
+</hibernate-mapping>

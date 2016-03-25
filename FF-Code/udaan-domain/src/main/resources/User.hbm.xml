@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.umc.UserDO" table="ff_d_user">
+
+		<id name="userId" type="java.lang.Integer">
+			<column name="USER_ID" />
+			<generator class="native" />
+		</id>
+		<property name="userName" type="java.lang.String">
+			<column name="USER_NAME" />
+		</property>
+	
+	<property name="userType" type="java.lang.String">
+			<column name="USER_TYPE" />
+		</property>
+
+		<property name="locked" type="java.lang.String">
+			<column name="LOCKED" />
+		</property>
+
+		<property name="active" type="java.lang.String">
+			<column name="ACTIVE" />
+		</property>
+		<property name="loginAttempt" type="java.lang.Integer">
+			<column name="LOGIN_ATTEMPT" />
+		</property>
+
+		<property name="lastLoginDate">
+			<column name="LAST_LOGIN_DATE" />
+		</property>
+		<!-- <property name="city" type="java.lang.String">
+			<column name="CITY" />
+		</property> -->
+		<property name="userCode" type="java.lang.String">
+			<column name="USER_CODE" />
+		</property>
+		
+		<property name="createdBy" type="java.lang.Integer">
+            <column name="CREATED_BY" />
+         </property>
+          <property name="updatedBy" type="java.lang.Integer">
+            <column name="UPDATE_BY" />
+         </property>
+         
+          <property name="createdDate" type="java.util.Date">
+            <column name="CREATION_DATE" />
+         </property>
+         <property name="updatedDate" type="java.util.Date">
+            <column name="UPDATE_DATE" />
+         </property>
+         
+        
+         
+        <property name="dtToBranch" column="DT_TO_BRANCH"/>
+         
+		<set name="userRights" table="ff_d_user_rights" cascade="all" lazy="false" fetch="join">
+            <key>
+                <column name="USER_ID" />
+            </key>
+            <one-to-many class="com.ff.domain.umc.UserRightsDO"  />
+        </set>
+        
+        <set name="userOfficeRightMappings" table="ff_d_user_office_rights" cascade="all" lazy="false" fetch="join">
+            <key>
+                <column name="USER_ID" />
+            </key>
+            <one-to-many class="com.ff.domain.umc.UserOfficeRightsMappingDO"  />
+        </set>
+</class>
+	<query name="getUserbyUserName">
+	<![CDATA[ FROM com.ff.domain.umc.UserDO user where user.userName =:userName ]]>
+	</query>
+
+	<!--  <query name="updateUserStatus">
+		<![CDATA[update com.ff.domain.umc.UserDO user set user.active =:status where user.userName =:userName ]]>
+	</query>  -->
+	
+	 <query name="updateUserStatus">
+		<![CDATA[update com.ff.domain.umc.UserDO user set 
+		user.active =:status,
+		user.locked =:userUnlocked,
+		user.loginAttempt =:loginAttempsZero, 
+		user.dtToBranch ='N',
+		user.lastLoginDate=:updatedDate
+		 where user.userName =:userName ]]>
+	</query>  
+	
+	<query name="getUserbyUserNameType">
+	<![CDATA[ FROM com.ff.domain.umc.UserDO user where user.userName =:userName and user.userType = :userType]]>
+	</query>
+	
+	<query name="getUserbyUserId">
+	<![CDATA[ FROM com.ff.domain.umc.UserDO user where user.userId =:userId ]]>
+	</query>
+	
+	<query name="getUserListByEmpId">
+	<![CDATA[ FROM com.ff.domain.umc.UserDO user where user.userId in(select employee.userId from com.ff.domain.umc.EmployeeUserDO employee where employee.empDO.employeeId =:employeeId ) ]]>
+	</query>
+	
+	<query name="getUsersAutocomplete">
+	<![CDATA[SELECT user.userId,user.userName FROM com.ff.domain.umc.UserDO user where user.userType = :userType ) ]]>
+	</query>
+	
+	<query name="getUserDtlsByUserID">
+	<![CDATA[
+		FROM com.ff.domain.umc.UserDO user 
+		where user.userId =:userId
+	]]>
+	</query>
+	
+	<query name="updateUser">
+	<![CDATA[
+		UPDATE	com.ff.domain.umc.UserDO userDo 
+		SET		userDo.active='N',userDo.dtToBranch='N'
+		WHERE	userDo.userId=:userId
+	]]>
+	</query>
+	
+	<query name="getUserIdByUserName">
+	<![CDATA[SELECT user.userId FROM com.ff.domain.umc.UserDO user where user.userName =:userName ) ]]>
+	</query>
+	
+<!-- 	  <query name="getUserJoinBean">
+	<![CDATA[select new com.ff.umc.action.UserJoinBean(user, empUser, pass,history,office) from com.ff.domain.umc.UserDO user, com.ff.domain.umc.EmployeeUserDO empUser, com.ff.domain.umc.PasswordDO pass,com.ff.domain.umc.LogInOutDetlDO history,com.ff.domain.organization.OfficeDO office
+		where user.userId=empUser.userId
+		and empUser.empDO.officeId=office.officeId
+		and user.userId = pass.userId
+		and pass.isActivePassword=:status
+		and history.userId=user.userId
+		and history.logInDate=(select max(history1.logInDate) from com.ff.domain.umc.LogInOutDetlDO history1 where history1.userId=user.userId)
+		and user.userName=:username
+		
+	]]>
+	</query>  --> 
+	
+	  <!-- <query name="getUserJoinBean">
+	<![CDATA[select new com.ff.umc.action.UserJoinBean(user, empUser, pass,history,office) from 
+			com.ff.domain.umc.UserDO as user inner left join com.ff.domain.umc.EmployeeUserDO as empUser on user.userId = empUser.userId
+			inner join com.ff.domain.organization.OfficeDO as office 
+	 inner join com.ff.domain.umc.PasswordDO as pass  inner join com.ff.domain.umc.LogInOutDetlDO as history  
+		where 
+		pass.isActivePassword=:status
+		and history.logInDate=(select max(history1.logInDate) from com.ff.domain.umc.LogInOutDetlDO history1 where history1.userId=user.userId)
+		and user.userName=:username
+		
+	]]>
+	</query>  --> 
+	
+	 <!-- <query name="getUserJoinBean">
+	<![CDATA[select new com.ff.umc.action.UserJoinBean(user, empUser, pass,history,office) from com.ff.domain.umc.UserDO user inner join com.ff.domain.umc.EmployeeUserDO empUser on user.userId=empUser.userId and inner join com.ff.domain.umc.PasswordDO pass on user.userId=pass.userId and inner join com.ff.domain.umc.LogInOutDetlDO history on user.userId=history.userId and inner join com.ff.domain.organization.OfficeDO office on empUser.empDO.officeId=office.officeId 
+		where 
+		history.logInDate=(select max(history1.logInDate) from com.ff.domain.umc.LogInOutDetlDO history1 where history1.userId=user.userId)
+		and user.userName=:username
+		
+	]]>
+	</query> -->
+	
+</hibernate-mapping>

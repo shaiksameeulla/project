@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.serviceOffering.CNPaperWorksDO" table="ff_d_cn_paper_works">
+		<id name="cnPaperWorkId" type="java.lang.Integer">
+			<column name="CN_PAPER_WORK_ID" />
+			<generator class="assigned" />
+		</id>
+		<property name="cnPaperWorkCode" type="java.lang.String">
+			<column name="CN_PAPER_WORK_CODE" />
+		</property>
+		<property name="cnPaperWorkName" type="java.lang.String">
+			<column name="CN_PAPER_WORK_NAME" />
+		</property>
+		<property name="cnPaperWorkDesc" type="java.lang.String">
+			<column name="CN_PAPER_WORK_DESC" />
+		</property>
+		<property name="status" type="java.lang.String">
+			<column name="STATUS" />
+		</property>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+		</class>
+		
+		<query name="getPaperWorks">
+	<![CDATA[ FROM com.ff.domain.serviceOffering.CNPaperWorksDO paperWork 
+	          where paperWork.cnPaperWorkId IN 
+	          (select paperpin.cnPaperWorkId FROM com.ff.domain.serviceOffering.PaperworksPincodeMapDO paperpin where paperpin.pincodeId IN
+	              (select pin.pincodeId FROM com.ff.domain.geography.PincodeDO pin where pin.pincode=:pincode AND pin.status='A')
+	          )]]>
+	</query>
+	
+	<query name="getPaperWorkByPincode">
+	<![CDATA[ FROM com.ff.domain.serviceOffering.CNPaperWorksDO paperWork 
+	          where paperWork.cnPaperWorkId IN 
+	          (select paperpin.cnPaperWorkId FROM com.ff.domain.serviceOffering.PaperworksPincodeMapDO paperpin where paperpin.pincodeId IN
+	              (select pin.pincodeId FROM com.ff.domain.geography.PincodeDO pin where pin.pincode=:pincode AND pin.status='A')
+	              and paperWork.cnPaperWorkName = :paperWorkName
+	          )]]>
+	</query>
+	
+	<query name="getAllPaperWork">
+	<![CDATA[ FROM com.ff.domain.serviceOffering.CNPaperWorksDO paperWork 
+	         
+	          ]]>
+	</query>
+	
+</hibernate-mapping>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.BcunRunsheetAssignmentHeaderDO" table="ff_f_pickup_assignment_header">
+		<id name="pickupAssignmentHeaderId" type="java.lang.Integer">
+			<column name="PICKUP_ASSIGNMENT_HEADER_ID" />
+			<generator class="native" />
+		</id>
+		<property name="pickupAssignmentCreatedAt" type="java.lang.Integer">
+			<column name="PICKUP_ASSIGNMENT_CREATED_AT" />
+		</property>
+		<property name="pickupAssignmentCreatedFor" type="java.lang.Integer">
+			<column name="PICKUP_ASSIGNMENT_CREATED_FOR" />
+		</property>
+		<property name="officeCreatedAt" type="java.lang.Integer">
+			<column name="OFFICE_CREATED_AT" />
+		</property>
+		<property name="officeCreatedFor" type="java.lang.Integer">
+			<column name="OFFICE_CREATED_FOR" />
+		</property>
+		<property name="employeeFieldStaff" type="java.lang.Integer">
+			<column name="EMPLOYEE_FIELD_STAFF" />
+		</property>
+		<property name="pickupAssignmentType" type="java.lang.Integer">
+			<column name="PICK_UP_ASSIGNMENT_TYPE" />
+		</property>
+		<property name="runsheetAssignmentStatus" type="java.lang.String">
+			<column name="RUNSHEET_ASSIGNMENT_STATUS" />
+		</property>
+		<!-- <property name="dataTransferStatus" type="java.lang.String">
+			<column name="DATA_TRANSFER_STATUS" />
+		</property> -->
+		<property name="createdDate" type="java.util.Date">
+			<column name="CREATION_DATE" />
+		</property>
+		<property name="updatedDate" type="java.util.Date">
+			<column name="UPDATE_DATE" />
+		</property>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL" />
+		<!-- Start of Changes by <48206> for opsman on 20/09/2013  -->
+		<property  name="dtToOpsman" type="java.lang.String">
+		<column name="DT_TO_OPSMAN"/>
+		</property>
+		
+		<property  name="dtFromOpsman" 	type="java.lang.String">
+		<column name="DT_FROM_OPSMAN"/>
+		</property>
+		<!-- End of Changes by <48206> for opsman on 20/09/2013  -->
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer"/>
+         <property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/>
+		<set name="assignmentDetails" fetch="join" lazy="false" inverse="true" cascade="all" >
+			<key column="PICKUP_ASSIGNMENT_HEADER_ID" />
+				<one-to-many class="com.ff.domain.pickup.BcunRunsheetAssignmentDetailDO" />
+		</set>
+	</class>
+	<!-- Start Queries For Data Sync -->
+	<query name="getUnsyncInboundRunsheetAssignmentHeaderData">
+		<![CDATA[FROM com.ff.domain.pickup.BcunRunsheetAssignmentHeaderDO assignmentHeader 
+					WHERE assignmentHeader.dtToCentral='N' AND assignmentHeader.runsheetAssignmentStatus='G']]>
+	</query>	
+	<!-- <query name="getAssignmentHeaderId">
+		<![CDATA[SELECT assignmentHeader.pickupAssignmentHeaderId 
+					FROM com.ff.domain.pickup.BcunRunsheetAssignmentHeaderDO assignmentHeader 
+					WHERE assignmentHeader.officeCreatedAt =:createdAtOfficeId
+					AND assignmentHeader.officeCreatedFor =:createdForOfficeId
+					AND assignmentHeader.employeeFieldStaff =:employeeFieldStaffId	
+					AND assignmentHeader.pickupAssignmentType =:pickupAssignmentType
+					AND assignmentHeader.createdDate =:pkupAssignmentCreateDate
+				ORDER BY assignmentHeader.createdDate DESC ]]>
+	</query> -->
+	<query name="getAssignmentHeader">
+        <![CDATA[FROM com.ff.domain.pickup.BcunRunsheetAssignmentHeaderDO assignmentHeader 
+                    WHERE assignmentHeader.officeCreatedAt=:createdAtOfficeId
+                    AND assignmentHeader.officeCreatedFor=:createdForOfficeId
+                    AND assignmentHeader.employeeFieldStaff=:employeeFieldStaffId
+                    AND assignmentHeader.pickupAssignmentType =:pickupAssignmentType
+					AND assignmentHeader.createdDate =:pkupAssignmentCreateDate
+				ORDER BY assignmentHeader.createdDate DESC ]]>
+    </query>
+	<!-- End Queries For Data Sync -->
+	
+</hibernate-mapping>

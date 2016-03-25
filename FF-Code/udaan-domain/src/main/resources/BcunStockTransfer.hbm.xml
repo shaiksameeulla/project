@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO" table="ff_f_stock_transfer" dynamic-update="true">
+		<id name="stockTransferId" type="java.lang.Long">
+			<column name="STOCK_TRANSFER_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name="stockTransferNumber" column="TRANSFER_NUMBER" />
+		<property name="stockIssueNumber" column="ISSUE_NUMBER" />
+		<property name="transferFromType" column="TRANSFER_FROM_TYPE" />
+		<property name="transferTOType" column="TRANSFER_TO_TYPE" />
+		<property name="transferDate" column="TRANSFER_DATE" />
+		
+		<property name="transferQuantity" column="QUANTITY" />
+		<property name="officeProductCodeInSeries" column="OFFICE_PRODUCT_CODE_IN_SERIES" />
+		<property name="startLeaf" column="START_LEAF" />
+		<property name="endLeaf" column="END_LEAF" />
+		<property name="startSerialNumber" column="START_SI_NUMBER" />
+		<property name="endSerialNumber" column="END_SI_NUMBER" />
+		<property name="shippedToCode" column="SHIPPED_TO_CODE" />
+
+	<!--  common attributes  START-->
+	
+	<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+	<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+	<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+	
+	<!--  common attributes  END-->
+	
+	<!-- Many -to- one relationships START -->
+		
+		<property name="itemId" column="ITEM_ID" type="java.lang.Integer"  />
+		
+		<property name="createdOfficeId" column="CREATED_BY_OFFICE" type="java.lang.Integer"  />
+		
+		<property name="transferFromBaId" column="FROM_BA_ID" type="java.lang.Integer"  />
+		
+		<property name="transferFromEmpId" column="FROM_EMPLOYEE_ID" type="java.lang.Integer"  />
+
+		<property name="transferFromCustomerId" column="FROM_CUSTOMER_ID" type="java.lang.Integer"  />
+		
+		<property name="transferTOOfficeId" column="TO_BRANCH_ID" type="java.lang.Integer"  />
+		
+		<property name="transferTOBaId" column="TO_BA_ID" type="java.lang.Integer"  />
+		
+		<property name="transferTOEmpId" column="TO_EMPLOYEE_ID" type="java.lang.Integer"  />
+		
+		
+		<property name="transferTOCustomerId" column="TO_CUSTOMER_ID" type="java.lang.Integer"  />
+			
+		<property name="createdBy" column="CREATED_BY_USER" />
+		<property name="updatedBy" column="UPDATED_BY_USER" />
+				
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		
+		
+	
+	</class>
+	
+	<!-- Query For Data Sync  Started -->
+	
+	
+	
+	
+	<query name="getstockTransferId">
+		<![CDATA[SELECT transferDO.stockTransferId From com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO where  transferDO.stockTransferNumber = :stockTransferNumber ]]>
+	</query>
+	
+		<!-- Query For BCUN OutBound Data Sync  Started  -->
+		<query name="getUnsyncOutboundStockTransfer">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO 
+					where transferDO.createdOfficeId=:branchId	 AND transferDO.dtToBranch='N' 
+					
+		]]>
+	</query>
+	<query name="getStockBAToBATransferOutboundForTransfer">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO   
+		where 
+		 transferDO.dtToBranch='N' 
+		 AND
+		 transferDO.transferFromBaId is not null
+	 	 AND transferDO.transferTOBaId IN  (
+							SELECT customer.customerId from com.ff.domain.business.CustomerDO customer 
+					inner join customer.officeMappedDO office where
+					office.cityId IN (SELECT cityOffice.cityId from com.ff.domain.organization.OfficeDO as cityOffice
+									where cityOffice.officeId=:branchId )
+	 	 )
+		 
+			
+					
+		 ]]>
+	</query>
+	
+	<query name="getStockBAToBrTransferOutboundForTransfer">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO   
+		where 
+		 transferDO.dtToBranch='N' 
+		 AND transferDO.transferTOOfficeId IN( 
+		 SELECT office.officeId from com.ff.domain.organization.OfficeDO office where
+					office.cityId IN (SELECT cityOffice1.cityId from com.ff.domain.organization.OfficeDO as cityOffice1
+									where cityOffice1.officeId=:branchId )
+									)
+		 AND transferDO.transferFromBaId IN (
+							SELECT customer.customerId from com.ff.domain.business.CustomerDO customer 
+					inner join customer.officeMappedDO office where
+					office.cityId IN (SELECT customerOffice.cityId from com.ff.domain.organization.OfficeDO as customerOffice
+									where customerOffice.officeId=:branchId )
+									)
+		 
+		
+					
+		 ]]>
+	</query>
+	
+	<query name="getStockEmp2BrTransferOutboundForTransfer">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO   
+		where 
+				   transferDO.transferFromEmpId IN (SELECT emp.employeeId from com.ff.domain.organization.EmployeeDO emp 
+					 where emp.officeId IN(SELECT office.officeId from com.ff.domain.organization.OfficeDO office where
+					office.cityId IN (SELECT cityOffice1.cityId from com.ff.domain.organization.OfficeDO as cityOffice1
+									where cityOffice1.officeId=:branchId )
+									)
+									)
+				AND transferDO.transferTOOfficeId =:branchId
+		 
+		AND transferDO.dtToBranch='N' 
+					
+		 ]]>
+	</query>
+	
+	<query name="getStockEmp2EmpTransferOutboundForTransfer">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO   
+		where 
+		 transferDO.transferFromEmpId is not null
+				 AND transferDO.transferTOEmpId IN (SELECT emp.employeeId from com.ff.domain.organization.EmployeeDO emp 
+					 where emp.officeId IN(SELECT office.officeId from com.ff.domain.organization.OfficeDO office where
+					office.cityId IN (SELECT cityOffice1.cityId from com.ff.domain.organization.OfficeDO as cityOffice1
+									where cityOffice1.officeId=:branchId )
+									))
+		 
+		AND transferDO.dtToBranch='N' 
+					
+		 ]]>
+	</query>
+	
+	
+	<query name="getStockCust2EmpTransferOutboundForTransfer">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO   
+		where 
+		 transferDO.dtToBranch='N' 
+		 AND EXISTS  ( from com.ff.domain.business.CustomerDO customer 
+					 where   customer.customerId=transferDO.transferFromCustomerId and customer.officeMappedDO is not null	and  customer.status='A'	 )
+				 AND transferDO.transferTOEmpId IN  (
+							SELECT emp.employeeId from com.ff.domain.organization.EmployeeDO emp 
+					 where emp.officeId =:branchId )
+					
+		 ]]>
+	</query>
+	
+	<query name="getStockCust2EmpTransferOutboundForTransferForContract">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO   
+		where 
+		 transferDO.dtToBranch='N' 
+		 AND EXISTS (from com.ff.domain.business.CustomerDO customer 
+					 where   customer.customerId=transferDO.transferFromCustomerId  and customer.officeMappedDO is  null	 and customer.status='A' )
+				 AND transferDO.transferTOEmpId IN  (
+							SELECT emp.employeeId from com.ff.domain.organization.EmployeeDO emp 
+					 where emp.officeId =:branchId )
+					
+		 ]]>
+	</query>
+	
+	<query name="getStockEmpTOCustTransferOutboundForTransfer">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO   
+		where 
+		 transferDO.dtToBranch='N' 
+		AND transferDO.transferFromEmpId IN 
+		(
+		SELECT emp.employeeId from com.ff.domain.organization.EmployeeDO emp 
+					 where emp.officeId IN(SELECT office.officeId from com.ff.domain.organization.OfficeDO office where
+					office.cityId IN (SELECT cityOffice1.cityId from com.ff.domain.organization.OfficeDO as cityOffice1
+									where cityOffice1.officeId=:branchId )
+									))
+				 AND exists ( from com.ff.domain.business.CustomerDO customer1 
+					where  customer1.customerId=transferDO.transferTOCustomerId AND customer1.officeMappedDO.officeId =:branchId 
+									)
+		 
+		
+					
+		 ]]>
+	</query>
+	
+	<query name="getStockCust2BrTransferOutboundForTransfer">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO   
+		where 
+		 transferDO.dtToBranch='N' 
+		AND
+		 transferDO.transferTOOfficeId =:branchId 
+				 AND transferDO.transferFromCustomerId is not null
+		 ]]>
+	</query>
+	
+	<query name="getStockCustTOCustTransferOutboundForTransfer">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO   
+		where 
+		 transferDO.transferFromCustomerId is not null 
+		 AND transferDO.dtToBranch='N' 
+				 AND transferDO.transferTOCustomerId IN (
+							SELECT customer1.customerId from com.ff.domain.business.CustomerDO customer1 
+					where customer1.officeMappedDO.officeId=:branchId )
+		 ]]>
+	</query>
+	
+	<query name="getStockCustTOCustTransferOutboundForTransferForContract">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO   
+		where 
+		transferDO.dtToBranch='N' 
+		AND
+		 transferDO.transferFromCustomerId is not null 
+				 AND transferDO.transferTOCustomerId is not null
+				 AND EXISTS (
+						  
+			from com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO as billingLocation  
+			inner join billingLocation.pickupDeliveryLocation as location
+			inner join location.pickupDlvContract as pickupContract
+			inner join pickupContract.customer as customerDO
+			where 
+			 pickupContract.office.officeId =:branchId
+			AND  pickupContract.contractType='P'
+			 AND customerDO.customerId=transferDO.transferTOCustomerId
+			 AND
+		 	customerDO.status ='A')
+				AND EXISTS (from com.ff.domain.business.CustomerDO customerOff 
+				where customerOff.customerId=transferDO.transferTOCustomerId 
+				and customerOff.officeMappedDO.officeId is null and customerOff.status='A' )
+					
+		 ]]>
+	</query>
+	
+	
+	<query name="getStockEmpTOCustTransferOutboundForTransferForContract">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO   
+		where 
+		 transferDO.transferFromEmpId is not null 
+		 AND transferDO.transferTOCustomerId  is not null
+				 AND EXISTS (
+						  
+			from com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO as billingLocation  
+			inner join billingLocation.pickupDeliveryLocation as location
+			inner join location.pickupDlvContract as pickupContract
+			inner join pickupContract.customer as customerDO
+			inner join pickupContract.office as office
+			where 
+			office.officeId =:branchId
+			AND pickupContract.contractType='P'
+			AND customerDO.customerId=transferDO.transferTOCustomerId
+			 AND
+		 	customerDO.status ='A'	)
+					AND EXISTS ( from com.ff.domain.business.CustomerDO customerOff where customerOff.customerId=transferDO.transferTOCustomerId and customerOff.officeMappedDO.officeId is null and customerOff.status='A' )
+		 
+		AND transferDO.dtToBranch='N' 
+					
+		 ]]>
+	</query>
+	
+	
+	<query name="getStockTransferDtlsByNumber">
+		<![CDATA[  FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO  transferDO   
+		where 
+		 transferDO.stockTransferNumber =:stockTransferNumber
+					
+		 ]]>
+	</query>
+	
+	<query name="getStockTransferShippedCodeByCustomerId">
+<![CDATA[
+ 
+ 	select transfer.shippedToCode FROM com.ff.domain.stockmanagement.operations.transfer.BcunStockTransferDO transfer
+ 		 	WHERE transfer.transferTOBaId =:customerId
+ 		 	OR
+ 		 	transfer.transferTOCustomerId=:customerId
+ 	
+ 
+ ]]>
+	</query>
+	
+	
+<!-- Query For Data Sync  End -->	
+</hibernate-mapping>

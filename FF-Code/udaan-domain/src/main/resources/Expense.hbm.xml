@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.expense.ExpenseDO" table="ff_f_expense">
+		<id name="expenseId" type="java.lang.Long">
+			<column name="EXPENSE_ID" />
+			<generator class="native" />
+		</id>
+		<property name="txNumber" column="TRANSACTION_NO" />
+		<property name="postingDate" column="POSTING_DATE" />
+		<property name="documentDate" column="DOCUMENT_DATE" />
+		<property name="expenseFor" column="EXPENSE_FOR" />
+		<property name="chequeNo" column="CHEQUE_NO" />
+		<property name="chequeDate" column="CHEQUE_DATE" />
+		<property name="branchName" column="BRANCH_NAME" />
+		<property name="totalExpense" column="TOTAL_EXPENSE" />
+		<property name="expenseOfficeRho" column="EXPENSE_OFFICE_RHO" />
+		<property name="status" column="STATUS" />
+		<property name="remarks" column="REMARKS" />
+
+		<!--  common attributes  START-->
+		<property name="createdBy" column="CREATED_BY" update="false" />
+		<property name="createdDate" column="CREATION_DATE" update="false" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		<property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL" />
+		
+		<!--  common attributes  END-->
+	
+		<!-- One -to- Many relationships START -->
+		<set name="expenseEntries" lazy="false" cascade="all" inverse="true" fetch="join">
+            <key column="EXPENSE_ID"/>
+            <one-to-many class="com.ff.domain.mec.expense.ExpenseEntriesDO"/>
+        </set> 
+		<!-- One -to- Many relationships END -->
+
+		<!-- Many -to- one relationships START -->
+		<many-to-one name="bankDO"
+			class="com.ff.domain.mec.GLMasterDO" lazy="false" fetch="join">
+			<column name="BANK_GL_ID" />
+		</many-to-one>
+		
+		<many-to-one name="typeOfExpense"
+			class="com.ff.domain.mec.GLMasterDO" lazy="false" fetch="join">
+			<column name="TYPE_OF_EXPENSE" />
+		</many-to-one>
+		
+		<many-to-one name="modeOfExpense"
+			class="com.ff.domain.serviceOffering.PaymentModeDO" lazy="false" fetch="join">
+			<column name="MODE_OF_EXPENSE" />
+		</many-to-one>
+		
+		<many-to-one name="expenseOfficeId"
+			class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="EXPENSE_OFFICE_ID" />
+		</many-to-one>
+		<!-- Many -to- one relationships END -->
+		
+	</class>
+	
+<query name="getExpenseDtlsForExpInterface">
+	<![CDATA[
+	 FROM	com.ff.domain.mec.expense.ExpenseDO expDO
+	 WHERE	expDO.sapStatus=:sapStatus
+	 AND	expDO.status=:status
+	 AND	expDO.expenseOfficeRho=:expenseOfficeRho
+	]]>
+</query>
+
+<query name="getExpenseCount">
+	<![CDATA[
+		 SELECT COUNT(*)
+		 FROM	com.ff.domain.mec.expense.ExpenseDO expDO
+		 WHERE	expDO.sapStatus=:sapStatus
+		 AND	expDO.status=:status
+		 AND	expDO.expenseOfficeRho=:expenseOfficeRho
+	]]>
+</query>
+
+<query name="updateExpenseDetailsForSAP">
+	<![CDATA[ 
+	UPDATE com.ff.domain.mec.expense.ExpenseDO expDO 
+		SET expDO.sapStatus=:sapStatus,expDO.sapTimestamp=:sapTimestamp
+		WHERE expDO.txNumber=:txNumber
+	]]>
+</query>
+
+<query name="getExpensesRHOOffice">
+	<![CDATA[
+		 FROM	com.ff.domain.mec.expense.ExpenseDO expDO
+		 WHERE	expDO.expenseId
+		 IN		(SELECT 	expenseDO.expenseId 
+		 		 FROM		com.ff.domain.mec.expense.ExpenseDO expenseDO
+		 		 GROUP BY	expenseDO.expenseOfficeRho	)
+	]]>
+</query>
+
+<query name="getExpenseDtlsByTxNo">
+	<![CDATA[ 
+		FROM com.ff.domain.mec.expense.ExpenseDO expDO
+		WHERE expDO.txNumber=:txNumber 
+		AND expDO.expenseOfficeId.officeId=:officeId
+	]]>
+</query>
+
+<query name="getTxNosForValidate">
+	<![CDATA[
+		FROM com.ff.domain.mec.expense.ExpenseDO expDO
+		WHERE expDO.status=:status
+		AND expDO.expenseOfficeId.officeId=:officeId
+		AND (expDO.postingDate>=:fromDate AND expDO.postingDate<=:toDate)
+	]]>
+</query>
+
+<query name="getTxNosByTxNoForValidate">
+	<![CDATA[
+		FROM com.ff.domain.mec.expense.ExpenseDO expDO
+		WHERE expDO.status=:status
+		AND expDO.expenseOfficeId.officeId=:officeId
+		AND (expDO.postingDate>=:fromDate AND expDO.postingDate<=:toDate)
+		AND expDO.txNumber=:txNumber
+	]]>
+</query>
+
+<query name="updateExpenseStatusByExpenseId">
+	<![CDATA[
+		UPDATE com.ff.domain.mec.expense.ExpenseDO expDO
+		SET expDO.status=:status, expDO.sapStatus=:sapStatus 
+		WHERE expDO.expenseId=:expenseId
+	]]>
+</query>
+
+<query name="getTotalExpenseOfOfficeOfThatDay">
+	<![CDATA[
+		SELECT SUM(expense.totalExpense) FROM com.ff.domain.mec.expense.ExpenseDO expense WHERE 
+		LENGTH(expense.txNumber) <= 13 AND
+		(expense.postingDate>=:prevDate AND expense.postingDate<:currentDate) AND 
+		expense.expenseOfficeId.officeId=:officeId AND 
+		expense.status NOT IN (:status) AND
+		expense.modeOfExpense.paymentId IN (SELECT payment.paymentId FROM 
+		com.ff.domain.serviceOffering.PaymentModeDO payment WHERE payment.paymentCode IN (:paymentMode)) AND
+		expense.typeOfExpense.glId IN (SELECT glRegion.glMasterDO.glId FROM 
+			com.ff.domain.mec.GLRegionDO glRegion WHERE glRegion.regionDO.regionId IN (:regionId) AND 
+			glRegion.glMasterDO.glId IN (SELECT gl.glId FROM com.ff.domain.mec.GLMasterDO gl WHERE gl.nature IN (:nature))
+		)
+	]]>
+</query>
+
+<query name="getCashWithdrawalBankAmtOfThatDay">
+	<![CDATA[
+		SELECT SUM(expense.totalExpense) FROM com.ff.domain.mec.expense.ExpenseDO expense WHERE 
+		LENGTH(expense.txNumber)<= 13 AND
+		(expense.postingDate>=:prevDate AND expense.postingDate<:currentDate) AND 
+		expense.expenseOfficeId.officeId=:officeId AND 
+		expense.status NOT IN (:status) AND
+		expense.modeOfExpense.paymentId IN (SELECT payment.paymentId FROM 
+		com.ff.domain.serviceOffering.PaymentModeDO payment WHERE payment.paymentCode IN (:paymentMode)) AND
+		expense.typeOfExpense.glId IN (SELECT glRegion.glMasterDO.glId FROM 
+			com.ff.domain.mec.GLRegionDO glRegion WHERE glRegion.regionDO.regionId IN (:regionId) AND 
+			glRegion.glMasterDO.glId IN (SELECT gl.glId FROM com.ff.domain.mec.GLMasterDO gl WHERE gl.nature IN (:nature)
+			AND gl.isBankGL='Y')
+		)
+	]]>
+</query>
+
+<query name="getExpenseDeductionOfThatDayForExpense">
+	<![CDATA[
+		SELECT 
+			SUM(exp2.totalExpense-exp1.totalExpense) 
+		FROM 
+			com.ff.domain.mec.expense.ExpenseDO exp1,
+			com.ff.domain.mec.expense.ExpenseDO exp2 
+		WHERE 
+			exp1.txNumber LIKE ('%-%')
+			AND (exp1.postingDate>=:prevDate AND exp1.postingDate<:currentDate)
+			AND exp1.expenseOfficeId.officeId=:officeId
+			AND exp1.status NOT IN (:status) 
+			AND exp1.modeOfExpense.paymentId IN (
+				SELECT payment.paymentId FROM com.ff.domain.serviceOffering.PaymentModeDO payment WHERE 
+				exp2.typeOfExpense NOT IN (SELECT glId FROM com.ff.domain.mec.GLMasterDO WHERE  glCode IN(30202101,11102092,11102102,11102112,11102122,11102132,11102142,11102152,11102162,11102172,11101432,11101442,11101452,11101462,11101472,
+11101482,11101492,11101502,11102042,11102052,11102062,11102072,11102082,11101212,11101222,11101232,11101242,11101512,11101522,11101532,11101542,11101912,11101922,11101932,
+11101942,11101952,11101962,11101972,11101982,11101992,11102002,11102012,11102022,11102032,11102212,11102222,11102232,11102242,11102252,11102262,11102272,11102282,11102292,
+11102302,11101652,11101662,11101672,11101682,11101692,11102312,11102322,11102332,11102342,11101102,11101112,11101122,11101132,11101142,11101612,11101622,11101632,11101642,
+11101862,11101872,11101882,11101892,11101902,11101702,11101712,11101722,11101732,11101742,11101752,11101762,11101772,11101782,11101792,11101802,11101812,11101822,11101832,
+11101552,11101562,11101252,11101262,11101272,11101282,11101292,11101302,11101312,11101322,11101152,11101162,11101172,11101182,11101192,11101202,11102352,11102362,11102372,
+11102352,11102362,11102372,11101572,11101582,11101592,11101602,11101842,11101852,11101332,11101342,11101352,11101362,11101372,11101382,11101392,11101402,11101412,11101422,
+30102100,10801106))
+				AND payment.paymentCode IN (:paymentMode))
+			AND exp2.txNumber=(SUBSTRING(exp1.txNumber,1, length(exp2.txNumber))) 
+			AND exp2.totalExpense > exp1.totalExpense
+	]]>
+</query>
+
+<query name="getCollectionDeductionOfThatDayForExpense">
+	<![CDATA[
+		SELECT 
+			SUM(exp1.totalExpense-exp2.totalExpense) 
+		FROM 
+			com.ff.domain.mec.expense.ExpenseDO exp1,
+			com.ff.domain.mec.expense.ExpenseDO exp2 
+		WHERE 
+			exp1.txNumber LIKE ('%-%')
+			AND (exp1.postingDate>=:prevDate AND exp1.postingDate<:currentDate)
+			AND exp1.expenseOfficeId.officeId=:officeId
+			AND exp1.status NOT IN (:status) 
+			AND exp1.modeOfExpense.paymentId IN (
+				SELECT payment.paymentId FROM com.ff.domain.serviceOffering.PaymentModeDO payment WHERE 
+				payment.paymentCode IN (:paymentMode)
+			)
+			AND exp2.txNumber=(SUBSTRING(exp1.txNumber,1, length(exp2.txNumber))) 
+			AND exp2.totalExpense < exp1.totalExpense
+	]]>
+</query>
+
+<query name="getAllExpenseOfficesOfThatDay">
+	<![CDATA[ 
+		SELECT 
+			DISTINCT(exp.expenseOfficeId.officeId) 
+		FROM 
+			com.ff.domain.mec.expense.ExpenseDO exp 
+		WHERE
+			(exp.postingDate>=:prevDate AND exp.postingDate<:currentDate) AND
+			exp.status NOT IN (:status)
+		GROUP BY 
+			exp.expenseOfficeId.officeId
+	]]>
+</query>
+
+<query name="getAllBookingOfficesOfThatDay">
+	<![CDATA[ 
+		SELECT 
+			DISTINCT(booking.bookingOfficeId) 
+		FROM 
+			com.ff.domain.booking.BookingDO booking 
+		WHERE
+			(booking.bookingDate>=:prevDate AND booking.bookingDate<:currentDate) 
+		GROUP BY 
+			booking.bookingOfficeId
+	]]>
+</query>
+
+<query name="getInternationalCashSalesOfThatDay">
+	<![CDATA[ 
+		SELECT SUM(expense.totalExpense) FROM
+		com.ff.domain.mec.expense.ExpenseDO expense
+		WHERE
+		(expense.status = 'S' OR expense.status = 'V') AND
+		expense.typeOfExpense.glCode =:glCode AND
+		expense.modeOfExpense.paymentCode =:paymentMode AND
+		expense.expenseOfficeId.officeId =:officeId AND
+		(expense.postingDate>=:prevDate AND expense.postingDate<:currentDate)
+	]]>
+</query>
+
+
+<query name="getRhoCashSalesOfThatDay">
+	<![CDATA[ 
+		SELECT SUM(expense.totalExpense) FROM
+		com.ff.domain.mec.expense.ExpenseDO expense
+		WHERE
+		(expense.status = 'S' OR expense.status = 'V') AND length(expense.txNumber) <= 13 AND
+		expense.typeOfExpense.glCode =:glCode AND
+		expense.typeOfExpense.nature = 'P' AND
+		expense.modeOfExpense.paymentCode =:paymentMode AND
+		expense.expenseOfficeId.officeId =:officeId AND
+		(expense.postingDate>=:prevDate AND expense.postingDate<:currentDate)
+	]]>
+</query>
+
+
+<query name="getUpsCopCashSalesOfThatDay">
+	<![CDATA[ 
+		SELECT SUM(expense.totalExpense) FROM
+		com.ff.domain.mec.expense.ExpenseDO expense
+		WHERE
+		(expense.status = 'S' OR expense.status = 'V') AND length(expense.txNumber) <= 13 AND
+		expense.typeOfExpense.glCode =:glCode AND
+		expense.modeOfExpense.paymentCode =:paymentMode AND
+		expense.expenseOfficeId.officeId =:officeId AND
+		(expense.postingDate>=:prevDate AND expense.postingDate<:currentDate)
+	]]>
+</query>
+
+<sql-query name="getMiscellaneousExpenseOfThatDay">
+	<![CDATA[ 
+		SELECT 
+		CASE
+          WHEN SUM(TOTAL_EXPENSE) IS NULL THEN 0
+          ELSE SUM(TOTAL_EXPENSE)
+        END AS "MISCELLANEOUS INCOME Expense"
+  		FROM ff_f_expense
+ 		WHERE TYPE_OF_EXPENSE IN
+          (SELECT GL_ID FROM ff_d_gl_master
+            WHERE GL_CODE = 30202101)
+       		AND EXPENSE_ID IN
+              (SELECT EXPENSE_ID
+                 FROM ff_f_expense
+                WHERE LENGTH(TRANSACTION_NO) <= 13 AND (POSTING_DATE BETWEEN :prevDate AND :currentDate) AND
+				EXPENSE_OFFICE_ID=:officeId AND
+				STATUS NOT IN ('O') AND
+				MODE_OF_EXPENSE IN (SELECT PAYMENT_ID FROM ff_d_payment_mode WHERE PAYMENT_CODE=:paymentMode))
+	]]>
+</sql-query>
+
+
+<sql-query name="getMiscellaneousDeductionOfThatDay">
+	<![CDATA[ 
+		SELECT
+				CASE 
+				WHEN SUM(exp2.TOTAL_EXPENSE-exp1.TOTAL_EXPENSE) 
+				IS NULL THEN 0.0
+				ELSE SUM(exp2.TOTAL_EXPENSE-exp1.TOTAL_EXPENSE)
+	END AS "Miscellaneous Deduction" 
+	FROM ff_f_expense exp1
+	INNER JOIN ff_f_expense exp2 ON 
+	exp1.TRANSACTION_NO LIKE ('%-%')
+	AND (date(exp1.POSTING_DATE) BETWEEN :prevDate AND :currentDate)   
+	AND exp1.EXPENSE_OFFICE_ID=:officeId
+	AND exp1.STATUS NOT IN ('O') 
+	AND exp1.MODE_OF_EXPENSE IN (SELECT payment.PAYMENT_ID 
+	FROM ff_d_payment_mode payment WHERE 
+ 		exp2.TYPE_OF_EXPENSE   IN (SELECT GL_ID FROM 
+ 		ff_d_gl_master WHERE  GL_CODE IN(30202101,11102092,11102102,11102112,11102122,11102132,11102142,11102152,11102162,11102172,11101432,11101442,11101452,11101462,11101472,
+		11101482,11101492,11101502,11102042,11102052,11102062,11102072,11102082,11101212,11101222,11101232,11101242,11101512,11101522,11101532,11101542,11101912,11101922,11101932,
+		11101942,11101952,11101962,11101972,11101982,11101992,11102002,11102012,11102022,11102032,11102212,11102222,11102232,11102242,11102252,11102262,11102272,11102282,11102292,
+		11102302,11101652,11101662,11101672,11101682,11101692,11102312,11102322,11102332,11102342,11101102,11101112,11101122,11101132,11101142,11101612,11101622,11101632,11101642,
+		11101862,11101872,11101882,11101892,11101902,11101702,11101712,11101722,11101732,11101742,11101752,11101762,11101772,11101782,11101792,11101802,11101812,11101822,11101832,
+		11101552,11101562,11101252,11101262,11101272,11101282,11101292,11101302,11101312,11101322,11101152,11101162,11101172,11101182,11101192,11101202,11102352,11102362,11102372,
+		11102352,11102362,11102372,11101572,11101582,11101592,11101602,11101842,11101852,11101332,11101342,11101352,11101362,11101372,11101382,11101392,11101402,11101412,11101422,
+		30102100,10801106))
+ 		and
+		payment.PAYMENT_CODE=:paymentMode)
+		AND exp2.TRANSACTION_NO=(SUBSTRING(exp1.TRANSACTION_NO,1, length(exp2.TRANSACTION_NO))) 
+		AND exp2.TOTAL_EXPENSE > exp1.TOTAL_EXPENSE
+	]]>
+</sql-query>
+
+<query name="getMaxExpenseNumber">
+	<![CDATA[ 
+	   select max(exp.txNumber) FROM com.ff.domain.mec.expense.ExpenseDO exp
+		WHERE exp.txNumber like :prefix
+		AND exp.expenseOfficeId.officeId=:loggedInOfficeId
+		AND  length(exp.txNumber) = :numberLength
+		
+		
+	]]>
+</query>
+
+</hibernate-mapping>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWeightSlabDO" table="ff_f_rate_quotation_weight_slab">
+		<id name="rateQuotationWeightSlabId" type="java.lang.Integer" column="RATE_QUOTATION_WEIGHT_SLAB_ID">
+			<generator class="native" />
+		</id>
+		
+		 <many-to-one name="rateQuotProductCategoryHeaderDO" class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationProductCategoryHeaderDO"  lazy="false"  fetch="join">
+        <column name="RATE_QUOTATION_PRODUCT_CATEGORY_HEADER" ></column>
+        </many-to-one>	
+        
+         <many-to-one name="startWeight" class="com.ff.domain.ratemanagement.masters.WeightSlabDO"  lazy="false"  fetch="join">
+        <column name="START_WEIGHT" ></column>
+        </many-to-one>	
+        
+         <many-to-one name="endWeight" class="com.ff.domain.ratemanagement.masters.WeightSlabDO"  lazy="false"  fetch="join">
+        <column name="END_WEIGHT" ></column>
+        </many-to-one>
+        
+        <property name="order" column="SLAB_ORDER"/>
+        
+        <set name="rateQuotationSlabRateDO" table = "ff_f_rate_quotation_slab_rate" cascade="all-delete-orphan"  
+		inverse="true" lazy="false" fetch="join">
+		 
+		<key column="RATE_QUOTATION_WEIGHT_SLAB" />
+		<one-to-many class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSlabRateDO" />
+		 
+		</set>
+		
+		<set name="rateQuotationSpecialDestinationDO" table = "ff_f_rate_quotation_special_destination" cascade="all-delete-orphan"  
+		inverse="true" lazy="false" fetch="join">
+		 
+		<key column="RATE_QUOTATION_WEIGHT_SLAB" />
+		<one-to-many class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSpecialDestinationDO" />
+		 
+		</set>
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+		<property name="createdDate" column="CREATED_DATE" />
+ 		<property name="createdBy" column="CREATED_BY" />
+        <property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE"/>
+		<property name="rateConfiguredType" column="RATE_CONFIGURED_FOR_TYPE"/> 
+		</class>
+    
+    <query name = "deleteRateQuotationWeighSlabs">
+	<![CDATA[
+	
+		DELETE FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWeightSlabDO weightSlab 
+		
+		WHERE  weightSlab.rateQuotProductCategoryHeaderDO.rateQuotationProductCategoryHeaderId =:rateQuotationProductCategoryHeaderId 
+		
+	]]>
+	
+	</query>
+
+</hibernate-mapping>

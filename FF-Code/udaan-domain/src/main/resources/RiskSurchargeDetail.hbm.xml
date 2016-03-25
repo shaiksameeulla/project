@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.masters.RiskSurchargeDetailDO" table="ff_d_risk_surcharge_detail">
+		<id name="riskSurchargeDetailId" type="java.lang.Integer" column="Risk_Surchage_Detail_Id">
+			<generator class="native" />
+		</id>
+	
+		<property name="minimumThreshold" column="Minimum_threshold" type="java.lang.Double" />
+		<property name="maximumThreshold" column="Maximum_Threshold" type="java.lang.Double" />
+		<property name="minimumOnly" column="minimum_Only" type="java.lang.String" />		
+		<property name="riskSurchagePercentile" column="risk_surchage_Percentile" type="java.lang.Double" />
+		
+		
+		<many-to-one name="insuredBy" class="com.ff.domain.ratemanagement.masters.RiskSurchargeInsuredByDO"  lazy="false" fetch="join">
+        <column name="Insured_by" ></column>
+        </many-to-one>
+		<many-to-one name="riskSurcharge" class="com.ff.domain.ratemanagement.masters.RiskSurchargeDO"  lazy="false" fetch="join">
+        <column name="Risk_Surchage" ></column>
+        </many-to-one>
+		
+	</class>
+
+	
+	
+</hibernate-mapping>

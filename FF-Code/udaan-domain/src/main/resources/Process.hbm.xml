@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.tracking.ProcessDO" table="ff_d_process">
+		<id name="processId" column="PROCESS_ID" type="java.lang.Integer" >
+			<generator class="native" />
+		</id>
+		
+		<property name="processCode" column="PROCESS_CODE" type="java.lang.String" />
+		<property name="processName" column="PROCESS_NAME" type="java.lang.String"/>
+		<property name="processDesc" column="PROCESS_DESCRIPTION" type="java.lang.String"/>
+		<property name="processOrder" column="PROCESS_ORDER" type="java.lang.Integer"/>
+		<property name="trackingTxt" column="TRACKING_TXT_TMPL" type="java.lang.String"/>
+		<property name="trackingTxtMnf" column="TRACKING_TXT_TMPL_MNF"	type="java.lang.String"/>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+	</class>
+	
+	<!--  <query name="getProcessDetails">
+		<![CDATA[
+			 from com.ff.domain.tracking.ProcessDO process where process.processCode IN(:processCode) ]]>
+	</query>  -->
+   <query name="getProcessDetails">
+		<![CDATA[ from com.ff.domain.tracking.ProcessDO ]]>
+	</query>	
+	
+	 <query name="getProcessByCode">
+		<![CDATA[ from com.ff.domain.tracking.ProcessDO process where process.processCode=:processCode ]]>
+	</query>
+
+</hibernate-mapping>

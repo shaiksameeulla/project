@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.complaints.ServiceRequestFollowupDO" table="ff_f_service_request_followup">
+		<id name="followUpId" column="FOLLOWUP_ID" type="java.lang.Integer" >
+			<generator class="native" />
+		</id>
+		<property name="followUpDate" column="FOLLOWUP_DATE"/>
+		<property name="callFrom" column="CALL_FROM" />	
+		<property name="caller" column="CALLER" />
+		<property name="customerName" column="CUSTOMER_NAME" />
+		<property name="email" column="EMAIL" />	
+		<property name="followupNote" column="FOLLOWUP_NOTE" />
+		<many-to-one name="serviceRequestDO" class="com.ff.domain.complaints.ServiceRequestDO" lazy="false"  fetch="join">
+  		 <column name="SERVICE_REQUEST_ID" />
+		</many-to-one> 
+		<many-to-one name="employeeDO" class="com.ff.domain.organization.EmployeeDO" lazy="false"  fetch="join">
+  		 <column name="EMPLOYEE_ID" />
+		</many-to-one> 
+		<property name="createdBy" column="CREATED_BY" update="false" />
+		<property name="createdDate" column="CREATED_DATE" update="false" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE"/>
+	</class>							
+</hibernate-mapping>

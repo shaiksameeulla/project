@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.ff.domain.coloading.ColoadingAirAwbDO" table="ff_d_coloading_air_awb">
+        <id name="awbId" type="java.lang.Integer">
+            <column name="AWB_ID" />
+            <generator class="native" />
+        </id>
+        <many-to-one name="coloadingAir" class="com.ff.domain.coloading.ColoadingAirDO" fetch="select">
+            <column name="AIR_ID" not-null="true" />
+        </many-to-one>
+        <property name="airLineName" type="string">
+            <column name="AIR_LINE_NAME" length="50" not-null="true" />
+        </property>
+        <property name="flightNo" type="string">
+            <column name="FLIGHT_NO" length="10" not-null="true" />
+        </property>
+        <property name="flightType" type="string">
+            <column name="FLIGHT_TYPE" length="5" />
+        </property>
+        <property name="minTariff" type="double">
+            <column name="MIN_TARIFF" precision="10" not-null="true" />
+        </property>
+        <property name="w1" type="double">
+            <column name="W1" precision="10" not-null="true" />
+        </property>
+        <property name="w2" type="double">
+            <column name="W2" precision="10" not-null="true" />
+        </property>
+        <property name="w3" type="double">
+            <column name="W3" precision="10" not-null="true" />
+        </property>
+        <property name="w4" type="double">
+            <column name="W4" precision="10" not-null="true" />
+        </property>
+        <property name="w5" type="double">
+            <column name="W5" precision="10" not-null="true" />
+        </property>
+        <property name="w6" type="double">
+            <column name="W6" precision="10" not-null="true" />
+        </property>
+        <property name="fuelSurcharge" type="double">
+            <column name="FUEL_SURCHARGE" precision="10" not-null="true" />
+        </property>
+        <property name="octroiPerBag" type="double">
+            <column name="OCTROI_PER_BAG" precision="10" not-null="true" />
+        </property>
+        <property name="octroiPerKg" type="double">
+            <column name="OCTROI_PER_KG" precision="10" not-null="true" />
+        </property>
+        <property name="originTspFlatRate" type="double">
+            <column name="ORIGIN_TSP_FLAT_RATE" precision="10" not-null="true" />
+        </property>
+        <property name="originTspPerKgRate" type="double">
+            <column name="ORIGIN_TSP_PER_KG_RATE" precision="10" not-null="true" />
+        </property>
+        <property name="destTspFlatRate" type="double">
+            <column name="DEST_TSP_FLAT_RATE" precision="10" not-null="true" />
+        </property>
+        <property name="destTspPerKgRate" type="double">
+            <column name="DEST_TSP_PER_KG_RATE" precision="10" not-null="true" />
+        </property>
+        <property name="airportHandlingCharge" type="double">
+            <column name="AIRPORT_HANDLING_CHARGE" precision="10" not-null="true" />
+        </property>
+        <property name="xrayCharge" type="double">
+            <column name="XRAY_CHARGE" precision="10" not-null="true" />
+        </property>
+        <property name="originMinUtilCharge" type="double">
+            <column name="ORIGIN_MIN_UTIL_CHARGE" precision="10" not-null="true" />
+        </property>
+        <property name="originUtilChargePerKg" type="double">
+            <column name="ORIGIN_UTIL_CHARGE_PER_KG" precision="10" not-null="true" />
+        </property>
+        <property name="destMinUtilCharge" type="double">
+            <column name="DEST_MIN_UTIL_CHARGE" precision="10" not-null="true" />
+        </property>
+        <property name="destUtilChargePerKg" type="double">
+            <column name="DEST_UTIL_CHARGE_PER_KG" precision="10" not-null="true" />
+        </property>
+        <property name="airlineServiceCharge" type="double">
+            <column name="AIRLINE_SERVICE_CHARGE" precision="10" not-null="true" />
+        </property>
+        <property name="surcharge" type="double">
+            <column name="SURCHARGE" precision="10" not-null="true" />
+        </property>
+        <property name="airwayBill" type="double">
+            <column name="AIRWAY_BILL" precision="10" not-null="true" />
+        </property>
+        <property name="discountedPercentage" type="double">
+            <column name="DISCOUNTED_PERCENTAGE" precision="10" not-null="true" />
+        </property>
+        <property name="sspRate" type="double">
+            <column name="SSP_RATE" precision="10" not-null="true" />
+        </property>
+         <property name="storeStatus" type="char">
+            <column name="STORE_STATUS" length="1" not-null="true" />
+        </property>
+        <property name="createdBy" type="int" update="false">
+            <column name="CREATED_BY" not-null="true" />
+        </property>
+        <property name="updatedBy" type="int">
+            <column name="UPDATED_BY" not-null="true" />
+        </property>
+        <property name="createdDate" type="timestamp" update="false">
+            <column name="CREATED_DATE" length="19" not-null="true" />
+        </property>
+        <property name="updatedDate" type="timestamp">
+            <column name="UPDATED_DATE" length="19" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>

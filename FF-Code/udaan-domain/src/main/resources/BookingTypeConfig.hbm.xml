@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.booking.BookingTypeConfigDO" table="ff_d_booking_type_config">
+		<id name="bookingTypeConfigId" column="BOOKING_TYPE_CONFIG_ID" type="java.lang.Integer" >
+			<generator class="assigned" />
+		</id>
+		
+		<property name="maxDiscountAllowed" column="MAX_DISCOUNT_ALLOWED" type="java.lang.Double"/>	
+		<property name="isRateCalcRequired" column="IS_RATE_CALC_REQUIRED" type="java.lang.String"/>	
+		<property name="isDiscountAllowed" column="IS_DISCOUNT_ALLOWED" type="java.lang.String"/>
+		<property name="denominator" column="DENOMINATOR" type="java.lang.Integer"/>
+		<property name="maxDeclaredValAllowed" column="MAX_DECLARED_VALUE_ALLOWED" type="java.lang.Double"/>
+		
+		<many-to-one name="bookingType"
+			class="com.ff.domain.booking.BookingTypeDO" lazy="false"  fetch="join" >
+			<column name="BOOKING_TYPE_ID" />
+		</many-to-one>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+	</class>
+	
+		<query name="getBookingTypeConfig">
+		<![CDATA[ 
+			FROM com.ff.domain.booking.BookingTypeConfigDO as bookingTypeConfig 	
+			where bookingTypeConfig.bookingType.bookingType = :bookingType
+		 ]]>
+		 </query>
+
+</hibernate-mapping>

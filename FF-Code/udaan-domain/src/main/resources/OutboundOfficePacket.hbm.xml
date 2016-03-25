@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="WINDOWS-1251"?> <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<class name="com.ff.domain.bcun.OutboundOfficePacketDO" table="ff_d_outbound_office_packet" dynamic-update="true">
+		<id name="datasyncId" type="java.lang.Long">
+			<column name="DATA_SYNC_ID" />
+			<generator class="native" />
+		</id>
+		<property name="packetCreatedDate" column="PACKET_CREATED_DATE"  update="false"/>
+		<property name="transferStatus" column="TRANSFER_STATUS" not-null="true"/>
+		<property name="processedDate" column="PROCESSED_DATE" />
+		<property name="processName" column="PROCESS_NAME" />
+		<property name="outboundOfficeId" column="OFFICE_ID" not-null="true" update="false"/>
+		
+		<many-to-one name="packetDO"
+			class="com.ff.domain.bcun.OutboundDataPacketDO" lazy="false" >
+			<column name="PACKET_ID" not-null="true"></column>
+		</many-to-one>
+	</class>
+	<query name="getPacketDtlsByOfficeCode">
+		<![CDATA[
+			select outboundData FROM com.ff.domain.bcun.OutboundOfficePacketDO outboundData 
+			inner join outboundData.packetDO WHERE
+			outboundData.outboundOfficeId =(
+			select office.officeId 
+			from com.ff.domain.organization.OfficeDO office 
+			where office.officeCode=:branchCode )
+			and outboundData.transferStatus='N' order by outboundData.datasyncId asc
+		]]> 
+	</query> 
+	
+	<query name="getPacketDtlsByOfficeCodewrapper">
+		<![CDATA[
+			select new com.ff.domain.bcun.OutboundDataPacketWrapperDO(outboundData.datasyncId,packetDO.packetData) FROM com.ff.domain.bcun.OutboundOfficePacketDO outboundData 
+			inner join outboundData.packetDO packetDO WHERE
+			outboundData.outboundOfficeId =(
+			select office.officeId 
+			from com.ff.domain.organization.OfficeDO office 
+			where office.officeCode=:branchCode )
+			and outboundData.transferStatus='N' order by outboundData.datasyncId asc
+		]]> 
+	</query> 
+	<query name="updateFailedPackets">
+		<![CDATA[
+	update com.ff.domain.bcun.OutboundOfficePacketDO offPkt set offPkt.transferStatus='N' ,offPkt.processedDate=current_timestamp()
+					where offPkt.datasyncId IN (:datasyncId)
+]]> 
+	</query> 
+	<query name="updateTransferredStatus">
+		<![CDATA[
+	update com.ff.domain.bcun.OutboundOfficePacketDO offPkt set offPkt.transferStatus='T' ,offPkt.processedDate=current_timestamp()
+					where offPkt.datasyncId IN (:datasyncId)
+]]> 
+	</query> 
+	<query name="updateInitiatedStatus">
+		<![CDATA[
+	update com.ff.domain.bcun.OutboundOfficePacketDO offPkt set offPkt.transferStatus='I' ,offPkt.processedDate=current_timestamp()
+					where offPkt.datasyncId IN (:datasyncId)
+]]> 
+	</query> 
+	
+	<query name="updateManualPacketStatus">
+		<![CDATA[
+	update com.ff.domain.bcun.OutboundOfficePacketDO offPkt set offPkt.transferStatus='M' ,offPkt.processedDate=current_timestamp()
+					where offPkt.datasyncId IN (:datasyncId)
+]]> 
+	</query> 
+</hibernate-mapping>
+	
+

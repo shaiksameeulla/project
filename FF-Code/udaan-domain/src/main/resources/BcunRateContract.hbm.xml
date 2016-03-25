@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.masters.BcunRateContractDO"
+		table="ff_d_rate_contract">
+		<id name="rateContractId" type="java.lang.Integer" column="RATE_CONTRACT_ID">
+			<generator class="assigned" />
+		</id>
+		<property name="rateContractNo" column="RATE_CONTRACT_NUMBER" />
+		<property name="billingContractType" column="BILLING_CONTRACT_TYPE" />
+		<property name="typeOfBilling" column="TYPE_OF_BILLING" />
+		<property name="modeOfBilling" column="MODE_OF_BILLING" />
+		<property name="billingCycle" column="BILLING_CYCLE" />
+		<property name="paymentTerm" column="PAYMENT_TERM" />
+		<property name="octraiBourneBy" column="OCTRAI_BOURNE_BY" />
+		<property name="contractFor" column="CONTRACT_FOR" />
+		
+		<property name="validFromDate" column="VALID_FROM_DATE" type="java.util.Date" />
+		<property name="validToDate" column="VALID_TO_DATE" type="java.util.Date" />
+
+		<property name="rateContractType" column="RATE_CONTRACT_TYPE" />
+		<property name="contractStatus" column="CONTRACT_STATUS" />
+
+		<property name="customerId" column="CUSTOMER" type="java.lang.Integer" />
+
+		<property name="isRenewed" column="CONTRACT_RENEWED" type="java.lang.String" />
+		<!-- <property name="rateQuotationId" column="RATE_QUOTATION"/> -->
+		<property name="originatedRateContractId" column="RATE_CONTRACT_ORIGINATED_FROM"/>
+		
+		<!-- One -to- Many relationships START -->
+		<set name="conPayBillLocDO" table="ff_d_contract_payment_billing_location" 
+				lazy="false" cascade="all"  fetch="join">
+            <key column="RATE_CONTRACT"/>
+            <one-to-many 
+            	class="com.ff.domain.ratemanagement.masters.BcunContractPaymentBillingLocationDO"/>
+        </set>
+       
+        <many-to-one name="rateQuotationDO"
+			class="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationDO" lazy="false" cascade="all"  fetch="join">
+			<column name="RATE_QUOTATION"/>
+		</many-to-one>
+		
+		<!-- One -to- Many relationships END -->
+		<property name="createdBy" column="CREATED_BY"  />
+		<property name="createdDate" column="CREATED_DATE"/>
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+	</class>
+	
+	<query name="getContractDtlsByContractNo">
+	<![CDATA[
+		FROM	com.ff.domain.ratemanagement.masters.BcunRateContractDO rate
+		WHERE	rate.rateContractNo=:rateContractNo
+	]]>
+	</query>
+	
+	<query name="getUnsyncOutboundRateContract">
+		<![CDATA[ select contractDO From com.ff.domain.ratemanagement.masters.BcunRateContractDO contractDO
+					where contractDO.dtToBranch='N'   AND  (contractDO.contractStatus = 'A' or contractDO.contractStatus = 'B' or contractDO.contractStatus = 'I')	
+		]]>
+	</query>
+	<query name="updateUnsyncOutboundRateContract">
+		<![CDATA[ update com.ff.domain.ratemanagement.masters.BcunRateContractDO contractDO
+					set contractDO.dtToBranch='Y'   where contractDO.rateContractId IN (:pojoPrimarykey)	
+		]]>
+	</query>
+
+</hibernate-mapping>

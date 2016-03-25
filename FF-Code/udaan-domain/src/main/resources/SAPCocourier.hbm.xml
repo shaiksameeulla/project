@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.ff.domain.coloading.SAPCocourierDO" table="ff_f_sap_co_courier">
+        <id name="id" type="java.lang.Long">
+            <column name="ID" />
+            <generator class="native" />
+        </id>
+       	 <property name="date" column="DATE" />
+       	 <property name="vendorCode" column = "VENDOR_CODE" />
+       	 <property name="status" column="STATUS" />
+       	 <property name="qty" column = "QUANTITY" />
+       	 <property name="productCode" column="PRODUCT_CODE" />
+       	 <property name="offCode" column = "OFFICE_CODE" />
+       	 <property name="consgType" column="CONSG_TYPE" />
+       	 <property name="serviceType" column = "SERVICE_TYPE" />
+       	 <property name="weight" column="WEIGHT" />
+       	 <property name="sapStatus" column = "DT_SAP_OUTBOUND" />
+       	 <property name="sapTimestamp" column="SAP_TIMESTAMP" />
+       	 <property name="exception" column = "EXCEPTION" />
+       	  <property name="deliveryDetailId" column = "DELIVERY_DETAIL_ID" />
+    </class>
+    
+    <query name="getCocourierDtlsFromStaging">
+		<![CDATA[
+			 FROM	com.ff.domain.coloading.SAPCocourierDO sapCocourierDO
+			 WHERE	sapCocourierDO.sapStatus=:sapStatus and ( sapCocourierDO.exception IS NULL or LENGTH(sapCocourierDO.exception ) < 1)
+		]]>
+	</query>
+
+	<query name="updateCocourierDtlsSAPFlag">
+		<![CDATA[ 
+			UPDATE	com.ff.domain.coloading.SAPCocourierDO sapCocourierDO
+			SET		sapCocourierDO.sapStatus=:sapStatus,sapCocourierDO.sapTimestamp=:sapTimestamp,sapCocourierDO.exception=:exception
+			WHERE 	sapCocourierDO.id=:id
+		]]>
+	</query>
+	
+</hibernate-mapping>

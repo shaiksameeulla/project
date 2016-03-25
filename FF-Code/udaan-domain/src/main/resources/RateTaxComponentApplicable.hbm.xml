@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+
+
+
+	
+	<class name="com.ff.domain.ratemanagement.masters.RateTaxComponentAplicableDO" table="ff_d_rate_tax_component_applicable">
+		<id name="rateTaxComponentAplicableId" type="java.lang.Integer" column="TAX_COMPONENT_APPLICABLE_ID">
+			<generator class="native" />
+		</id>
+		
+		<many-to-one name="rateTaxComponentDO" class="com.ff.domain.ratemanagement.masters.RateTaxComponentDO"  lazy="false"  fetch="join">
+		<column name="TAX_COMPONENT" />
+		</many-to-one>
+		
+		<many-to-one name="rateIndustryTypeDO" class="com.ff.domain.ratemanagement.masters.RateIndustryTypeDO"  lazy="false"  fetch="join">
+		<column name="INDUSTRY_TYPE" />
+		</many-to-one>
+		
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+      
+    </class>
+
+</hibernate-mapping>

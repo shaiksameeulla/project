@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.BcunPickupDeliveryLocationDO" table="ff_d_pickup_delivery_location">
+		<id name="pickupDlvLocId" column="LOCATION_ID" type="java.lang.Integer" >
+			<generator class="assigned" />
+		</id>		
+		<property name="pickupDlvLocCode" type="java.lang.String">
+			<column name="LOCATION_CODE" />
+		</property>
+		<!-- <property name="addressId" column="ADDRESS"/> -->
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		<many-to-one name="pickupDlvContract"
+			class="com.ff.domain.pickup.BcunPickupDeliveryContractDO" column="CONTRACT_ID" cascade="all" lazy="false"	fetch="join"/>
+		<many-to-one name="addressDO" class="com.ff.domain.pickup.BcunAddressDO"
+			cascade="all" lazy="false" fetch="join">
+			<column name="ADDRESS" />
+		</many-to-one>	
+	</class>
+	
+	
+
+</hibernate-mapping>

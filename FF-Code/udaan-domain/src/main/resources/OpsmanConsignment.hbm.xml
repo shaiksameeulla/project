@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.consignment.OpsmanConsignmentDO" table="ff_f_consignment">
+		<id name="consgId" column="CONSG_ID" type="java.lang.Integer" >
+			<generator class="native" />
+		</id>
+		
+		<property 	name="createdBy" column="CREATED_BY" type="java.lang.Integer" update="false"/>
+		<property 	name="updatedBy" column="UPDATE_BY" type="java.lang.Integer" />
+		<property 	name="createdDate" column="CREATED_DATE" type="java.util.Date" update="false"/>
+		<property 	name="updatedDate" column="UPDATE_DATE" type="java.util.Date" />
+		<property	name="consgNo"	column="CONSG_NO" type="java.lang.String"/>
+		<property	name="orgOffId"	column="ORG_OFF" type="java.lang.Integer"/>
+		<property   name="noOfPcs" column="NO_OF_PCS" type="java.lang.Integer"/>
+		<property   name="consgType" column="CONSG_TYPE" type="java.lang.Integer"/>
+		<property   name="price" column="PRICE" type="java.lang.Double"/>
+		<property   name="productId" column="PRODUCT" type="java.lang.Integer"/>
+		<property   name="actualWeight" column="ACTUAL_WEIGHT" type="java.lang.Double"/>
+		<property   name="volWeight" column="VOL_WEIGHT" type="java.lang.Double" />
+		<property   name="finalWeight" column="FINAL_WEIGHT" type="java.lang.Double"/>
+		<property   name="height" column="HEIGHT" type="java.lang.Double"/>
+		<property   name="length" column="LENGTH" type="java.lang.Double"/>
+		<property   name="breath" column="BREATH" type="java.lang.Double"/>
+		<property   name="cnContentId" column="CONTENT" type="java.lang.Integer"/>
+		<property   name="cnPaperWorkId" column="PAPER_WORK" type="java.lang.Integer"/>
+		<property   name="otherCNContent" column="OTHERS_CN_CONTENT" type="java.lang.String"/>
+		<property   name="insurencePolicyNo" column="INSURANCE_POLICY_NO" type="java.lang.String"/>
+		<property   name="refNo" column="REF_NO" type="java.lang.String"/>
+		<property   name="insuredBy" column="INSURED_BY" type="java.lang.Integer"/>
+		<property   name="customerId" column="CUSTOMER" type="java.lang.Integer"/>
+		<property	name="consigneeId"	column="CONSIGNEE" type="java.lang.Integer"/>
+		<property	name="consignorId"	column="CONSIGNOR" type="java.lang.Integer"/>
+		<property	name="consgStatus"	column="CONSG_STATUS" type="java.lang.String"/>
+		<property	name="billingStatus" column="BILLING_STATUS" type="java.lang.String" update="false"/>
+		<property	name="changedAfterBillingWtDest" column="CHANGED_AFTER_BILLING_WEIGHT_DEST" type="java.lang.String"/>
+		<property	name="changedAfterNewRateCmpnt" column="CHANGED_AFTER_NEW_RATE_COMPONENT" type="java.lang.String"/>
+		<property   name="declaredValue" column="DECLARED_VALUE" type="java.lang.Double"/>
+		<property	name="operatingOffice"	column="OPERATING_OFFICE" type="java.lang.Integer"/>
+		<property	name="lcBankName"	column="LC_BANK_NAME" type="java.lang.String"/>
+		<property	name="eventDate"	column="EVENT_DATE" type="java.util.Date"/>
+		<property	name="topayAmt"	column="TOPAY_AMT" type="java.lang.Double"/>
+		<property	name="codAmt"	column="COD_AMT" type="java.lang.Double"/>
+		<property	name="lcAmt"	column="LC_AMT" type="java.lang.Double"/>
+		<property	name="servicedOn"	column="SERVICED_ON" type="java.lang.String"/>
+		<property	name="rateType"	column="RATE_TYPE" type="java.lang.String"/>
+		<property   name="mobileNo" column="MOBILE_NO" type="java.lang.String"/>
+		<property	name="dtToBranch" column="DT_TO_BRANCH" type="java.lang.String"/>
+		<property	name="dtToCentral" column="DT_TO_CENTRAL" type="java.lang.String"/>
+		<property	name="dtToOpsman" column="DT_TO_OPSMAN" type="java.lang.String"/>
+		<property	name="dtFromOpsman" column="DT_FROM_OPSMAN"	type="java.lang.String"/>
+		<property	name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL"	type="java.lang.String"/>
+		<property   name="sapStatus" column="DT_SAP_OUTBOUND" type="java.lang.String"/>
+		<property   name="remarks" column="REMARKS" type="java.lang.String"/>
+		<property   name="isExcessConsg" column="IS_EXCESS_CONSG" type="java.lang.String"/>
+		<property   name="baAmt" column="BA_AMT" type="java.lang.Double"/>
+		<property   name="deliveredDate" column="DLV_DATE_TIME"	type="java.util.Date"/>
+		<property   name="recvNameOrCompName" column="RECV_NAME_OR_COMP_SEAL" type="java.lang.String"/>
+		
+		<many-to-one name="updatedProcess"  class="com.ff.domain.tracking.ProcessDO" lazy="false" fetch="join" unique="true">
+			<column  name="UPDTAED_PROCESS_FROM" />
+		</many-to-one>
+		
+		<many-to-one name="destPincodeDO" class="com.ff.domain.geography.PincodeDO" lazy="false" fetch="join" >
+			<column name="DEST_PINCODE"/>
+		</many-to-one>
+		
+		<set name="consgRateDtls" table="ff_f_consignment_rate" cascade="all" lazy="false" fetch="join" inverse="true">
+            <key>
+                <column name="CONSIGNMENT_ID" not-null="true"/>
+            </key>
+            <one-to-many class="com.ff.domain.billing.OpsmanConsignmentBillingRateDO" />
+        </set>
+        
+        <many-to-one name="cnReturnReason" class="com.ff.domain.serviceOffering.ReasonDO" lazy="false" unique="true" fetch="join">
+			<column name="RTH_RTO_REASON"/>
+		</many-to-one>	
+	</class>
+
+	<query name="getOpsmanConsignmentByConsgNo">
+		<![CDATA[ 
+			FROM com.ff.domain.consignment.OpsmanConsignmentDO consignment 
+		    WHERE consignment.consgNo IN (:consgNo)
+		]]>
+	</query>
+	
+	<sql-query name="getConsignmentsForRateCalculation">
+		<return alias="consignmentDO" class="com.ff.domain.consignment.OpsmanConsignmentDO"/>
+		<![CDATA[
+			select c.* from ff_f_booking b left join ff_f_consignment c on
+			b.CONSG_NUMBER=c.CONSG_NO left join ff_f_consignment_rate r on r.CONSIGNMENT_ID = c.CONSG_ID
+			where
+			r.CONSIGNMENT_RATE_ID is null and
+			b.DT_FROM_OPSMAN = 'Y' and
+			b.BOOKING_TYPE != 1
+		]]>
+	</sql-query>
+		
+	<query name="getStockTransferDetailsByConsgNumber">
+		<![CDATA[
+ 			select customer FROM com.ff.domain.stockmanagement.operations.transfer.StockTransferDO  customer 
+ 		 		WHERE :startSerialNumber between customer.startSerialNumber and customer.endSerialNumber
+ 			AND length(customer.startSerialNumber) = length(:startSerialNumber)
+       		AND customer.transactionStatus = :transactionStatus
+       		ORDER BY customer.transactionModifiedDate DESC
+		]]>
+	</query>
+	
+	<query name="getStockIssueDetailsByConsgNumber">
+		<![CDATA[
+ 			select customer FROM com.ff.domain.stockmanagement.operations.issue.StockIssueItemDtlsDO  customer 
+ 		 		WHERE :startSerialNumber between customer.startSerialNumber and customer.endSerialNumber
+ 			AND length(customer.startSerialNumber) = length(:startSerialNumber)
+       		AND customer.transactionStatus = :transactionStatus
+       		ORDER BY customer.transactionModifiedDate DESC
+		]]>
+	</query>	
+		
+</hibernate-mapping>

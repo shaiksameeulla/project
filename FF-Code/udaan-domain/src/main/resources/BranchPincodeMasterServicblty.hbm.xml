@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.organization.BranchPincodeMasterServiceabilityDO" table="ff_d_branch_pincode_serviceablity">
+		<id name="branchPincodeMasterId" type="java.lang.Integer">
+			<column name="PINCODE_SERVICES_BRANCH_ID" />
+			<generator class="native" />
+		</id>		
+        <property name="officeId" column="OFFICE_ID"/>        
+       
+        
+        <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	 
+		
+		<property name="transactionCreateDate">
+			<column name="CREATION_DATE"/>
+		</property>	 
+		
+		<property name="transactionModifiedDate">
+			<column name="UPDATE_DATE"/>
+		</property>	 
+		
+		<property name="createdBy">
+			<column name="CREATED_BY" />
+		</property>	 
+		
+		<property name="updatedBy">
+			<column name="UPDATE_BY" />
+		</property>	 
+		
+		<property name="status">
+			<column name="STATUS" />
+		</property>	 
+		
+		 <many-to-one name="pincodeId" class="com.ff.domain.geography.PincodeMasterDO" 
+			lazy="false" fetch="join" cascade="all">
+			<column name="PINCODE_ID"/>
+		</many-to-one> 
+		     
+	</class>	
+</hibernate-mapping>

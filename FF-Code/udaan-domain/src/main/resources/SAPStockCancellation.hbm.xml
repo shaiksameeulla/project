@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.cancel.SAPStockCancellationDO" table="ff_f_sap_stock_cancellation">
+		<id name="Id" type="java.lang.Long">
+			<column name="ID" />
+			<generator class="native" />
+		</id>
+		<property name="documentDate" column="TRANS_CREATED_DATE_TIME" />
+		<property name="reason" column="REASON" />
+		<property name="itemCode" column="ITEM_CODE" />
+		<property name="quantity" column="QUANTITY" />
+		<property name="cancellationNumber" column="CANCELLATION_NUMBER"/>
+		<property name="cancellationOfcCode" column="CANCELLATION_OFFICE_CODE" />
+		<property name="cancelledDate" column="CANCELLED_DATE"/>
+		<!--  common attributes  START-->
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<property name="exception" column="EXCEPTION" />
+		<!--  common attributes  END-->
+	</class>
+
+<!-- <sql-query name="getStockCancelDtlsFromSAPCancel">
+	<return alias="sapStkCancel" class="com.ff.domain.stockmanagement.operations.cancel.SAPStockCancellationDO"/>
+		SELECT	sapStkCancel.TRANS_CREATED_DATE_TIME AS {sapStkCancel.documentDate},
+				sapStkCancel.CANCELLATION_NUMBER AS {sapStkCancel.cancellationNumber}
+		FROM 	ff_f_sap_stock_cancellation sapStkCancel
+		WHERE	sapStkCancel.DT_SAP_OUTBOUND=:sapStkCancel.sapStatus
+</sql-query> -->
+	
+<query name="getStockCancelDtlsFromSAPCancel">
+	<![CDATA[
+		 FROM	com.ff.domain.stockmanagement.operations.cancel.SAPStockCancellationDO stkCancelDO
+		 WHERE	stkCancelDO.sapStatus=:sapStatus and ( stkCancelDO.exception IS NULL or LENGTH(stkCancelDO.exception ) < 1)
+	]]>
+</query>
+
+<query name="updateStockCancelDtlsSAPFlag">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.stockmanagement.operations.cancel.SAPStockCancellationDO stkCancelDO
+		SET		stkCancelDO.sapStatus=:sapStatus,stkCancelDO.sapTimestamp=:sapTimestamp,stkCancelDO.exception=:exception
+		WHERE 	stkCancelDO.Id=:Id
+	]]>
+</query>
+	
+</hibernate-mapping>

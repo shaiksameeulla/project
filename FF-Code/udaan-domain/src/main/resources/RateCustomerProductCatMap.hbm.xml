@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.ratemanagement.masters.RateCustomerProductCatMapDO" table="ff_d_rate_customer_product_cat_map">
+		<id name="rateCustomerProductCatMapId" type="java.lang.Integer" column="RATE_CUSTOMER_PRODUCT_CAT_MAP_ID">
+			<generator class="native" />
+		</id>
+				
+        <many-to-one name="rateCustomerCategoryDO" class="com.ff.domain.ratemanagement.masters.RateCustomerCategoryDO"  lazy="false"  fetch="join">
+        <column name="RATE_CUSTOMER_CATEGORY" ></column>
+        </many-to-one>	
+        <many-to-one name="rateProductCategoryDO" class="com.ff.domain.ratemanagement.masters.RateProductCategoryDO"  lazy="false"  fetch="join">
+        <column name="RATE_PRODUCT_CATEGORY" ></column>
+        </many-to-one>
+        <property name="dtToBranch" column="DT_TO_BRANCH"/>
+    </class>
+
+</hibernate-mapping>

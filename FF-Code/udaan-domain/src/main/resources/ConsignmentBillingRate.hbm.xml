@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.billing.ConsignmentBillingRateDO" table="ff_f_consignment_rate">
+		<id name="consignmentRateId" type="java.lang.Integer" column="CONSIGNMENT_RATE_ID">
+			<generator class="native" />
+		</id>
+		
+		 
+         <property  name="rateCalculatedFor" 	type="java.lang.String">
+		<column name="RATE_CALCULATED_FOR"/>
+		</property>
+       
+       <property name="finalSlabRate" column="FINAL_SLAB_RATE" type="java.lang.Double"/>
+       <property name="fuelSurcharge" column="FUEL_SURCHARGE" type="java.lang.Double"/>
+       <property name="riskSurcharge" column="RISK_SURCHARGE" type="java.lang.Double"/>
+       <property name="tOPayCharge" column="TO_PAY_CHARGE" type="java.lang.Double"/>
+       <property name="codCharges" column="COD_CHARGES" type="java.lang.Double"/>
+       <property name="parcelHandlingCharge" column="PARCEL_HANDLING_CHARGE" type="java.lang.Double"/>
+       <property name="airportHandlingCharge" column="AIRPORT_HANDLING_CHARGE" type="java.lang.Double"/>
+       <property name="documentHandlingCharge" column="DOCUMENT_HANDLING_CHARGE" type="java.lang.Double"/>
+       <property name="rtoDiscount" column="RTO_DISCOUNT" type="java.lang.Double"/>
+       <property name="otherOrSpecialCharge" column="OTHER_OR_SPECIAL_CHARGES" type="java.lang.Double"/>
+       <property name="discount" column="DISCOUNT" type="java.lang.Double"/>
+       <property name="serviceTax" column="SERVICE_TAX" type="java.lang.Double"/>
+       <property name="educationCess" column="EDUCATION_CESS" type="java.lang.Double"/>
+       <property name="higherEducationCess" column="HIGHER_EDUCATION_CES" type="java.lang.Double"/>
+       <property name="stateTax" column="STATE_TAX" type="java.lang.Double"/>
+       <property name="surchargeOnStateTax" column="SURCHARGE_ON_STATE_TAX" type="java.lang.Double"/>
+       <property name="octroi" column="OCTROI" type="java.lang.Double"/>
+       <property name="octroiServiceCharge" column="SERVICE_CHARGE_ON_OCTROI" type="java.lang.Double"/>
+       <property name="serviceTaxOnOctroiServiceCharge" column="SERVICE_TAX_ON_OCTROI_SERVICE_CHARGE" type="java.lang.Double"/>
+       <property name="eduCessOnOctroiServiceCharge" column="EDU_CESS_ON_OCTROI_SERVICE_CHARGE" type="java.lang.Double"/>
+       <property name="higherEduCessOnOctroiServiceCharge" column="HIGHER_EDU_CESS_ON_OCTROI_SERVICE_CHARGE" type="java.lang.Double"/>
+       <property name="totalWithoutTax" column="TOTAL_WITHOUT_TAX" type="java.lang.Double"/>
+       <property name="grandTotalIncludingTax" column="GRAND_TOTAL_INCLUDING_TAX" type="java.lang.Double"/>
+       <property name="lcCharge" column="LC_CHARGE" type="java.lang.Double"/>
+       <property name="declaredValue" column="DECLARED_VALUE" type="java.lang.Double"/>
+       <property name="slabRate" column="SLAB_RATE" type="java.lang.Double"/>
+       <property name="finalSlabRateAddedToRiskSurcharge" column="FINAL_SLAB_RATE_ADDED_TO_RISK_SURCHARGE" type="java.lang.Double"/>
+       <property name="lcAmount" column="LC_AMOUNT" type="java.lang.Double"/>
+       <property name="stateTaxOnOctroiServiceCharge" column="OCTROI_SALES_TAX_ON_OCTROI_SERVICE_CHARGE" type="java.lang.Double"/>
+       <property name="surchargeOnStateTaxOnoctroiServiceCharge" column="OCTROI_SURCHARGE_ON_STATE_TAX_ON_OCTROI_SERVICE_CHARGE" type="java.lang.Double"/>
+       <property name="codAmount" column="COD_AMOUNT" type="java.lang.Double"/>
+       
+       <property name="createdBy" column="CREATED_BY" type="java.lang.Integer" />
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer" />
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date" />
+		<property name="updatedDate" column="UPDATE_DATE" type="java.util.Date" />
+		
+		<many-to-one name="consignmentDO" 
+			class="com.ff.domain.consignment.ConsignmentDO" lazy="false" fetch="join" >
+			<column name="CONSIGNMENT_ID"/>
+		</many-to-one>
+		
+		<property  name="billed" 	type="java.lang.String">
+		  <column name="BILLED"/>
+		</property>
+		
+		    <!-- <property name="consignmentId" column="CONSIGNMENT_ID " type="java.lang.Integer" />  -->
+        
+	</class>
+	
+	<sql-query name="getBillingConsolidation" callable="true">
+	    <![CDATA[CALL sp_billing_consolidation()]]>
+    </sql-query>
+	
+	
+	<sql-query name="getCashSalesOfThatDay">
+	<return class="com.ff.domain.billing.ConsignmentBillingRateDO"/>
+		<![CDATA[ 
+			SELECT cr.*
+          FROM ff_f_consignment_rate cr
+          JOIN ff_f_consignment c ON (c.CONSG_ID = cr.CONSIGNMENT_ID)
+          JOIN ff_f_booking b ON (b.CONSG_NUMBER = c.CONSG_NO)
+          JOIN ff_f_booking_payment bp on (b.booking_payment_id = bp.booking_payment_id)
+    	  WHERE     b.booking_type IN (1, 3)
+          AND b.BOOKING_DATE BETWEEN :prevDate AND :currentDate
+          AND bp.PAYMENT_mode = 1
+          AND c.PRODUCT IN (1,5,6,8,11)
+          AND b.BOOKING_OFF = :officeId
+		]]>
+	</sql-query>
+	
+	<!-- <query name="getCollectionConsg">
+		<![CDATA[ 
+		
+			SELECT	new com.ff.domain.booking.BookingInterfaceWrapperDO (booking.bookingOfficeId, booking.bookingDate,sum(consignmentRate.grandTotalIncludingTax))
+			FROM 	com.ff.domain.billing.ConsignmentBillingRateDO consignmentRate,
+					com.ff.domain.booking.BookingDO booking,
+					com.ff.domain.consignment.ConsignmentDO consignment 
+			WHERE 
+				consignment.consgNo = booking.consgNumber
+				AND consignmentRate.consignmentDO.consgId = consignment.consgId	 
+				AND booking.bookingType.bookingTypeId IN 
+					(
+						SELECT 
+							bookingType.bookingTypeId 
+						FROM 
+							com.ff.domain.booking.BookingTypeDO bookingType 
+						WHERE 
+							bookingType.bookingType =:bookingType
+					) 
+				AND booking.bookingPayment.bookingPaymentId IN 
+					(
+						SELECT 
+							bookingPayment.bookingPaymentId 
+						FROM 
+							com.ff.domain.booking.BookingPaymentDO bookingPayment 
+						WHERE 
+							bookingPayment.paymentModeId IN 
+							(
+								SELECT 
+									paymentMode.paymentId 
+								FROM 
+									com.ff.domain.serviceOffering.PaymentModeDO paymentMode 
+								WHERE 
+									paymentMode.paymentCode =:paymentCode
+							)
+					) 
+				AND booking.bookingOfficeId IN (:officeIds)
+				AND	 booking.sapStatus =:sapStatus
+				GROUP BY booking.bookingOfficeId, DATE_FORMAT(booking.bookingDate,GET_FORMAT(DATE,'USA'))
+				ORDER BY booking.bookingDate,booking.bookingOfficeId
+		]]>
+	</query> -->
+	
+	<sql-query name="getCollectionConsg">
+		<!-- <return alias="bookingInterfaceWrapperDO" class="com.ff.domain.booking.BookingInterfaceWrapperDO" /> -->
+			SELECT
+				booking.BOOKING_OFF,
+				max(booking.BOOKING_DATE),
+				SUM(consignmentRate.GRAND_TOTAL_INCLUDING_TAX)
+			FROM ff_f_consignment_rate consignmentRate INNER JOIN ff_f_consignment consignment ON consignment.CONSG_ID = consignmentRate.CONSIGNMENT_ID
+			INNER JOIN ff_f_booking booking ON booking.CONSG_NUMBER = consignment.CONSG_NO
+			WHERE booking.BOOKING_TYPE IN (SELECT bookingType.BOOKING_TYPE_ID FROM ff_d_booking_type bookingType WHERE bookingType.BOOKING_TYPE=:bookingType OR bookingType.BOOKING_TYPE='EB') 
+			AND booking.BOOKING_PAYMENT_ID IN (SELECT bookingPayment.BOOKING_PAYMENT_ID FROM ff_f_booking_payment bookingPayment WHERE bookingPayment.PAYMENT_MODE = (SELECT paymentMode.PAYMENT_ID FROM ff_d_payment_mode paymentMode WHERE paymentMode.PAYMENT_CODE=:paymentCode))
+			AND booking.BOOKING_OFF IN (:officeIds)
+			AND booking.DT_SAP_OUTBOUND=:sapStatus
+			GROUP BY booking.BOOKING_OFF, DATE(booking.BOOKING_DATE)
+			ORDER BY booking.BOOKING_DATE, booking.BOOKING_OFF
+	</sql-query>
+	
+</hibernate-mapping>

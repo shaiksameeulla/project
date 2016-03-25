@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.transport.TransportDO" table="ff_f_transport">
+		<id name="transportId" type="java.lang.Integer" column="TRANSPORT_ID">
+			<generator class="native" />
+		</id>
+				
+		<many-to-one name="transportModeDO" class="com.ff.domain.transport.TransportModeDO" lazy="false" fetch="join">
+			<column name="TRANSPORT_MODE" />
+		</many-to-one>
+		 					
+		<many-to-one name="flightDO" class="com.ff.domain.transport.FlightDO" lazy="false" fetch="join" cascade="all">
+			<column name="FLIGHT" />
+		</many-to-one>
+		 				
+		<many-to-one name="trainDO" class="com.ff.domain.transport.TrainDO" lazy="false" fetch="join" cascade="all">
+			<column name="TRAIN" />
+		</many-to-one>		  
+		
+		<many-to-one name="vehicleDO" class="com.ff.domain.transport.VehicleDO" lazy="false"  fetch="join"  cascade="all">
+			<column name="VEHICLE"/>
+		</many-to-one>	      
+	</class>
+	
+	<query name="getTransportDetailsByFlight">
+	<![CDATA[ FROM com.ff.domain.transport.TransportDO transport
+	 		  WHERE transport.transportModeDO.transportModeCode=:transportMode 
+	 		  AND transport.flightDO.flightId IN 
+	 		  	(SELECT flight.flightId FROM  com.ff.domain.transport.FlightDO flight 
+	 		  	where flight.flightNumber=:flightNumber)]]>
+	</query>
+	<query name="getTransportDetailsByTrain">
+	<![CDATA[ FROM com.ff.domain.transport.TransportDO transport
+	 		  WHERE transport.transportModeDO.transportModeCode=:transportMode AND transport.trainDO.trainId IN (SELECT train.trainId FROM  com.ff.domain.transport.TrainDO train where train.trainNumber=:trainNumber)]]>
+	</query>
+	<query name="getTransportDetailsByRoad">
+	<![CDATA[ FROM com.ff.domain.transport.TransportDO transport
+	 		  WHERE transport.transportModeDO.transportModeCode=:transportMode AND transport.vehicleDO.vehicleId IN (SELECT vehicle.vehicleId FROM  com.ff.domain.transport.VehicleDO vehicle where vehicle.regNumber=:regNumber)]]>
+	</query>
+	
+	<query name="getTransportDetailsByRoadRHOOfcAndRegion">
+	<![CDATA[ FROM com.ff.domain.transport.TransportDO transport
+	 		  WHERE transport.transportModeDO.transportModeCode=:transportMode AND transport.vehicleDO.vehicleId IN (SELECT vehicle.vehicleId FROM  com.ff.domain.transport.VehicleDO vehicle where vehicle.regNumber=:regNumber)
+	 		  AND transport.vehicleDO.regionalOfficeDO.officeId IN (select office.officeId FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeTypeDO.offcTypeCode=:officeTypeCode and  office.mappedRegionDO.regionId=:regionId)]]>
+	</query>
+	<query name="getTransportDetailsByRoadAndRHOOfc">
+	<![CDATA[ FROM com.ff.domain.transport.TransportDO transport
+	 		  WHERE transport.transportModeDO.transportModeCode=:transportMode AND transport.vehicleDO.vehicleId IN (SELECT vehicle.vehicleId FROM  com.ff.domain.transport.VehicleDO vehicle where vehicle.regNumber=:regNumber)
+	 		  AND transport.vehicleDO.regionalOfficeDO.officeId =:officeId]]>
+	</query>
+		
+</hibernate-mapping>

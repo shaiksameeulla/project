@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO" table="ff_f_stock_requisition_item_dtls" dynamic-update="true">
+		<id name="stockRequisitionItemDtlsId" type="java.lang.Long">
+			<column name="STOCK_REQ_ITEM_DTLS_ID" />
+			<generator class="native" />
+		</id>
+		<property name="rowNumber" column="ROW_NUMBER" />
+		<property name="uom" column="UOM" />
+		<property name="description" column="DESCRIPTION" />
+		<property name="requestedQuantity" column="REQUESTED_QUANTITY" />
+		<property name="approvedQuantity" column="APPROVED_QUANTITY" />
+		<property name="remarks" column="REMARKS" />
+		<property name="approveRemarks" column="APPROVE_REMARKS" />
+		<property name="balanceIssueQuantity" column="BALANCE_ISSUE_QUANTITY" />
+		<property name="balanceReceiptQuantity" column="BALANCE_RECEIPT_QUANTITY" />
+		<property name="sapStatusInBound" column="DT_SAP_INBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		
+		<property name="procurementType" column="PROCUREMENT_TYPE" /> 
+		
+		 <property name="requisitionCreatedOfficeId" column="REQUISITION_CREATED_OFFICE_ID" /> 
+		  <property name="seriesStartsWith" column="SERIES_STARTS_WITH" />
+		  <property name="isConsolidated" column="IS_CONSOLIDATED" /> 
+		
+
+<!--  common attributes  START-->
+	<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+	<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+	<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+	<!-- <property name="centralInboudStatus" column="DT_CENTRAL_INBOUND" />
+	<property name="centralOutboudStatus" column="DT_CENTRAL_OUTBOUND" /> -->
+	<!-- <property name="nodeId" column="TRANS_NODE_ID" /> -->
+	<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+	
+	
+	
+	<!--  common attributes  END-->
+	
+	<!-- Many -to- one relationships START -->
+		<many-to-one name="itemTypeDO"
+			class="com.ff.domain.stockmanagement.masters.ItemTypeDO" lazy="false" fetch="join">
+			<column name="ITEM_TYPE_ID" />
+		</many-to-one>
+		
+		<many-to-one name="itemDO"
+			class="com.ff.domain.stockmanagement.masters.ItemDO" lazy="false" fetch="join">
+			<column name="ITEM_ID" />
+		</many-to-one>
+		
+		<many-to-one name="requisitionDO"
+			class="com.ff.domain.stockmanagement.operations.requisition.StockRequisitionDO" lazy="false" fetch="join">
+			<column name="REQUISITION_ID" />
+		</many-to-one>
+		
+		<!-- Many -to- one relationships END -->
+	</class>
+<query name="getBalanceQntyForIssue">
+		<![CDATA[
+ 			SELECT reqDtls.balanceIssueQuantity from com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO reqDtls  
+ 			WHERE reqDtls.stockRequisitionItemDtlsId=:stockItemDtlsId
+		]]>
+	</query>
+	
+	<query name="getReceivedBalanceQntyForReceipt">
+		<![CDATA[
+ 			SELECT reqDtls.balanceReceiptQuantity from com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO reqDtls  
+ 			WHERE reqDtls.stockRequisitionItemDtlsId=:stockItemDtlsId
+		]]>
+	</query>
+	
+	<query name="updateBalanceQntyWithApprQntyForIssue">
+		<![CDATA[
+ 			UPDATE com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO reqDtls 
+ 			 SET reqDtls.balanceIssueQuantity = reqDtls.approvedQuantity - :issuedQuantity 
+ 			 WHERE reqDtls.stockRequisitionItemDtlsId = :stockItemDtlsId
+		]]>
+	</query>
+	<query name="updateBalanceQntyWithIssueQntyForIssue">
+		<![CDATA[
+ 			UPDATE com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO reqDtls 
+ 			 SET reqDtls.balanceIssueQuantity =  reqDtls.balanceIssueQuantity - :issuedQuantity 
+ 			 WHERE reqDtls.stockRequisitionItemDtlsId = :stockItemDtlsId
+		]]>
+	</query>
+	
+	<query name="updateBalanceQntyWithApprQntyForPRReceipt">
+		<![CDATA[
+ 			UPDATE com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO reqDtls 
+ 			 SET reqDtls.balanceReceiptQuantity = reqDtls.approvedQuantity - :receivedQuantity 
+ 			 WHERE reqDtls.stockRequisitionItemDtlsId = :stockItemDtlsId
+		]]>
+	</query>
+	<query name="updateBalanceQntyWithRecptQntyForPRReceipt">
+		<![CDATA[
+ 			UPDATE com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO reqDtls 
+ 			 SET reqDtls.balanceReceiptQuantity =  reqDtls.balanceReceiptQuantity - :receivedQuantity 
+ 			 WHERE reqDtls.stockRequisitionItemDtlsId = :stockItemDtlsId
+		]]>
+	</query>
+	
+	<query name="getRequisitionDetailsForSAP">
+		<![CDATA[ 
+			FROM	com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO reqDtls
+			WHERE 	(	(	reqDtls.procurementType='I' 
+							AND reqDtls.approvedQuantity IS NOT NULL 
+							AND reqDtls.requisitionDO.isPrConsolidated='N' 
+							AND reqDtls.sapStatus=:sapStatus	)
+						OR	(	reqDtls.requisitionDO.isPrConsolidated='Y' 
+								AND reqDtls.sapStatus=:sapStatus	)
+					)
+		]]>
+	</query>
+	
+	<query name="getRequisitionDtlsForSAPRHOExternal">
+		<![CDATA[ 
+			FROM 
+				com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO reqDtls
+			WHERE 
+				reqDtls.procurementType='E' 
+				AND reqDtls.requisitionDO.isPrConsolidated='N'
+				AND reqDtls.approvedQuantity IS NOT NULL 
+				AND reqDtls.sapStatus=:sapStatus
+				AND reqDtls.requisitionDO.requisitionOfficeDO.officeTypeDO.offcTypeCode='RO'
+		]]>
+	</query>
+	
+	<query name="getCountRequisitionDetailsForSAP">
+		<![CDATA[ 
+			Select	count(*)
+			FROM	com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO reqDtls
+			WHERE 	(	(	reqDtls.procurementType='I' 
+							AND reqDtls.approvedQuantity IS NOT NULL 
+							AND reqDtls.requisitionDO.isPrConsolidated='N' 
+							AND reqDtls.sapStatus=:sapStatus	)
+						OR	(	reqDtls.requisitionDO.isPrConsolidated='Y' 
+								AND reqDtls.sapStatus=:sapStatus	)
+					)
+		]]>
+	</query>
+	
+	<query name="getCountRequisitionDtlsForSAPRHOExternal">
+		<![CDATA[ 
+			SELECT 
+				COUNT(*) 
+			FROM 
+				com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO reqDtls
+			WHERE
+				reqDtls.procurementType='E' 
+				AND reqDtls.requisitionDO.isPrConsolidated='N'
+				AND reqDtls.approvedQuantity IS NOT NULL 
+				AND reqDtls.sapStatus=:sapStatus
+				AND reqDtls.requisitionDO.requisitionOfficeDO.officeTypeDO.offcTypeCode='RO'
+		]]>
+	</query>
+	
+	<query name="updateRequisitionDetailsForSAP">
+		<![CDATA[ 
+			UPDATE	com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO reqDtls 
+ 			SET 	reqDtls.sapStatus=:sapStatus,reqDtls.sapTimestamp=:sapTimestamp
+ 			WHERE 	reqDtls.stockRequisitionItemDtlsId=:stockRequisitionItemDtlsId
+		]]>
+</query>
+<query name="getRequisitionDtlsForRHO">
+<![CDATA[
+select reqdtls from com.ff.domain.stockmanagement.operations.requisition.StockRequisitionItemDtlsDO reqdtls
+inner join reqdtls.requisitionDO as req
+inner join req.supplyingOfficeDO as rhoOffice
+	WHERE 
+	rhoOffice.officeCode=:rhoCode
+ 	 AND  req.transactionStatus =:transactionStatus
+ 	 AND  reqdtls.transactionStatus =:transactionStatus
+ 	 AND (reqdtls.approvedQuantity IS NOT NULL
+ 	 		 and reqdtls.approvedQuantity >0	)
+ 	  AND  (reqdtls.isConsolidated =:isConsolidated
+ 	  		OR reqdtls.isConsolidated is NULL	)
+ 	  AND req.isPrConsolidated=:isConsolidated
+ 	  AND reqdtls.procurementType =:procureType
+ 
+ ]]>
+</query>
+
+</hibernate-mapping>

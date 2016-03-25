@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.masters.CSDSAPItemDO" table="ff_d_item">
+		<id name="itemId" type="java.lang.Integer">
+			<column name="ITEM_ID" />
+			<generator class="native" />
+		</id>
+		<property name="itemCode" column="ITEM_CODE" />
+		<property name="itemName" column="ITEM_NAME" />
+		 <property name="description" column="DESCRIPTION" /> 
+		<property name="uom" column="UNIT_OF_MEASURE" />
+		<property name="uomDescription" column="UOM_DESCRIPTION" />
+		<property name="itemSeries" column="ITEM_SERIES" />
+		<property name="seriesLength" column="SERIES_LENGTH" />
+		<property name="purchaseDate" column="PURCHASE_DATE" />
+		<property name="isActive" column="CUR_STATUS" />
+
+		<many-to-one name="itemTypeDO"
+			class="com.ff.domain.stockmanagement.masters.ItemTypeDO" lazy="false" fetch="join" cascade = "all">
+			<column name="ITEM_TYPE_ID" />
+		</many-to-one>
+		
+		<!--  common attributes  START-->
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="sapStatusInBound" column="DT_SAP_INBOUND" />
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATED_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATED_DATE" />
+		<!--  common attributes  END-->
+		
+	</class>
+
+<query name="getItemByCode">
+	<![CDATA[
+	 FROM	com.ff.domain.stockmanagement.masters.CSDSAPItemDO  item 
+	 WHERE	item.itemCode=:itemCode
+	 ]]>
+</query>
+
+</hibernate-mapping>

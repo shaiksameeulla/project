@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.cash.CashCODChargesDO" table="ff_f_rate_cash_cod_charge">
+		<id name="cashCodChargesId">
+			<column name="RATE_CASH_COD_CHARGE_ID" />
+			<generator class="native" />
+		</id>
+		<property name="considerFixed">
+            <column name="CONSIDER_FIXED" />
+        </property>
+        <property name="considerHigherFixedOrPercent">
+            <column name="CONSIDER_HIGHER_FIXED_OR_PERC" />
+        </property>
+		<property name="percentileValue">
+            <column name="PERCENTILE_VALUE" />
+        </property>
+        <property name="fixedChargeValue">
+            <column name="FIXED_VALUE" />
+        </property>
+        <many-to-one name="cashRateProductDO" class="com.ff.domain.ratemanagement.operations.cash.CashRateHeaderProductDO"  lazy="false" fetch="join" >
+		<column name="CASH_RATE_HEADER" />
+		</many-to-one>
+        
+        <many-to-one name="codCharge" class="com.ff.domain.ratemanagement.masters.CodChargeDO"  lazy="false" fetch="join" >
+		<column name="COD_CHARGE" />
+		</many-to-one>
+		<!-- <property name="dtToBranch" column="DT_TO_BRANCH" /> -->
+	</class>
+	
+	<query name="getCalculatedCashCODCharge">
+		<![CDATA[
+				SELECT cashCODChargesDO
+				FROM com.ff.domain.ratemanagement.operations.cash.CashCODChargesDO cashCODChargesDO
+				INNER JOIN cashCODChargesDO.codCharge codChargeDO
+				INNER JOIN cashCODChargesDO.cashRateProductDO cashRateProductDO
+			    WHERE cashRateProductDO.headerProductMapId=:header
+				AND (:codChargeSlab BETWEEN codChargeDO.minimumDeclaredValue
+									AND codChargeDO.maximumDeclaredValue)
+		]]>
+	</query>
+</hibernate-mapping>
+	

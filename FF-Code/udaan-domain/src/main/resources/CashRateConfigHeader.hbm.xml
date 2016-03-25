@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.cash.CashRateConfigHeaderDO" 
+			table="ff_f_rate_cash_rate_header">
+		<id name="cashRateHeaderId">
+			<column name="RATE_CASH_HEADER_ID" />
+			<generator class="native" />
+		</id>
+		<property name="regionId">
+            <column name="REGION" />
+        </property>
+		<property name="fromDate">
+        	<column name="FROM_DATE" />
+        </property>
+		<property name="toDate">
+			<column name="TO_DATE" />
+		</property>
+		<property name="headerStatus">
+			<column name="HEADER_STATUS" />
+		</property>
+		
+		<set name="cashRateProductDOs" table="ff_f_rate_cash_product_map" 
+			lazy="false"  fetch="join" cascade="all" inverse="true">
+			<key column="RATE_CASH_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.cash.CashRateConfigHeaderProductDO" />
+		</set>
+		<set name="cashRateConfigRtoChargesDOs" table="ff_f_rate_cash_rto_charge" 
+			lazy="false" fetch="join" cascade="all-delete-orphan" inverse="true">
+			<key column="CASH_RATE_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.cash.CashRateConfigRTOChargesDO" />
+		</set>
+		<set name="cashRateConfigFixedChargesDOs" table="ff_f_rate_cash_fixed_charges_config" 
+			lazy="false" fetch="join" cascade="all-delete-orphan" inverse="true">
+			<key column="CASH_RATE_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.cash.CashRateConfigFixedChargesDO" />
+		</set>
+		<set name="cashRateConfigAdditionalChargesDOs" table="ff_f_rate_cash_additional_charges" 
+			lazy="false" fetch="join" cascade="all-delete-orphan" inverse="true">
+			<key column="CASH_RATE_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.cash.CashRateConfigAdditionalChargesDO" />
+		</set>
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+	</class>
+	
+	<query name="getCashRateHeaderDtls">
+		<![CDATA[ 
+			FROM com.ff.domain.ratemanagement.operations.cash.CashRateConfigHeaderDO header
+			WHERE header.regionId=:regionId 
+			ORDER BY header.fromDate DESC LIMIT 2
+		]]>
+	</query>
+	<query name="updateCashRateHeaderStatus">
+		<![CDATA[ 
+			UPDATE com.ff.domain.ratemanagement.operations.cash.CashRateConfigHeaderDO header 
+			SET header.headerStatus=:status, 
+				header.fromDate=:fromDate, 
+				header.toDate=:toDate,
+				header.dtToBranch='N'	
+			WHERE header.cashRateHeaderId=:cashRateHeaderId
+		]]>
+	</query>
+	<query name="getCashRateHeaderDtlsForRenew">
+		<![CDATA[ 
+			FROM com.ff.domain.ratemanagement.operations.cash.CashRateConfigHeaderDO header
+			WHERE header.regionId=:regionId
+			AND header.fromDate > :fromDate
+		]]>
+	</query>
+	<query name="updateCashRateConfigToDate">
+		<![CDATA[ 
+			UPDATE com.ff.domain.ratemanagement.operations.cash.CashRateConfigHeaderDO header 
+			SET header.toDate=:toDate, header.dtToBranch='N'
+			WHERE header.cashRateHeaderId=:cashRateHeaderId
+		]]>
+	</query>
+	<query name="getFromDateByCashRateHeaderId">
+		<![CDATA[ 
+			SELECT header.fromDate FROM com.ff.domain.ratemanagement.operations.cash.CashRateConfigHeaderDO header 
+			WHERE header.cashRateHeaderId=:cashRateHeaderId
+		]]>
+	</query>
+	<query name="getCurrentPeriodCashConfig">
+		<![CDATA[ 
+			FROM com.ff.domain.ratemanagement.operations.cash.CashRateConfigHeaderDO header 
+			WHERE header.regionId=:regionId
+			AND header.headerStatus=:status
+			AND :loggedInDate>=header.fromDate
+			ORDER BY header.fromDate DESC
+		]]>
+	</query>
+	<query name="getCashRateDetailsByHeaderId">
+	<![CDATA[ 
+			FROM com.ff.domain.ratemanagement.operations.cash.CashRateConfigHeaderDO header 
+			WHERE header.cashRateHeaderId=:cashRateHeaderId
+		]]>
+	</query>
+</hibernate-mapping>
+	

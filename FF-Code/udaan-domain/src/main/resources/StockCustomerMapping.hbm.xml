@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.masters.StockCustomerMappingDO" table="ff_d_customer_stock_mapping">
+		<id name="stockId" type="java.lang.Integer">
+			<column name="STOCK_ID" />
+			<generator class="native" />
+		</id>
+		<property name="quantity" column="STOCK_QUANTITY" />
+		<property name="transactionStatus" column="CUR_STATUS" />
+
+		<!-- <many-to-one name="itemDO"
+			class="com.ff.domain.stockmanagement.masters.ItemDO" lazy="false">
+			<column name="ITEM_ID" />
+		</many-to-one>
+		<many-to-one name="customerDO"
+			class="com.ff.domain.business.CustomerDO" lazy="false">
+			<column name="CUSTOMER_ID" />
+		</many-to-one> -->
+		<property name="itemId" column="ITEM_ID" />
+		<property name="customerId" column="CUSTOMER_ID" />
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+	</class>
+	
+	<query name="stockDecreaseForCustomer">
+		<![CDATA[
+ 			update com.ff.domain.stockmanagement.masters.StockCustomerMappingDO customerStock
+ 			set customerStock.quantity = customerStock.quantity- :quantity
+ 			where customerStock.itemId= :itemId
+ 			AND
+ 			customerStock.customerId=:partyTypeId
+		]]>
+	</query>
+	
+	<query name="stockIncreaseForCustomer">
+		<![CDATA[
+ 			update com.ff.domain.stockmanagement.masters.StockCustomerMappingDO customerStock
+ 			set customerStock.quantity = customerStock.quantity + :quantity
+ 			where customerStock.itemId= :itemId
+ 			AND
+ 			customerStock.customerId=:partyTypeId
+		]]>
+	</query>
+</hibernate-mapping>

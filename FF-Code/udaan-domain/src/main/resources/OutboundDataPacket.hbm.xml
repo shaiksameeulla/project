@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="WINDOWS-1251"?> <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<class name="com.ff.domain.bcun.OutboundDataPacketDO"
+		table="ff_d_outbound_data_packet" dynamic-update="true">
+		<id name="dataPacketId" type="java.lang.Long">
+			<column name="PACKET_ID" />
+			<generator class="native" />
+		</id>
+		<property name="fileName" column="FILE_NAME" update="false" />
+		<property name="transactionCreateDate" column="TRANSACTION_CREATED_DATE" update="false"/>
+		<property name="packetData" column="DATA_PACKET" update="false"/>
+		<set name="outboundDtls" lazy="false" cascade="all-delete-orphan" inverse="true" fetch="join">
+            <key column="PACKET_ID"/>
+            <one-to-many class="com.ff.domain.bcun.OutboundOfficePacketDO"/>
+    	</set> 
+	</class>
+
+	
+</hibernate-mapping>
+	
+

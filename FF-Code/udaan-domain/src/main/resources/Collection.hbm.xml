@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.collection.CollectionDO" table="ff_f_collection"
+		dynamic-update="true">
+		<id name="collectionId" type="java.lang.Integer">
+			<column name="COLLECTION_ID" />
+			<generator class="native" />
+		</id>
+		<property name="txnNo" column="TRANSACTION_NO" />
+		<property name="collectionCategory" column="COLLECTION_CATEGORY" />
+		<property name="CollectionDate" column="COLLECTION_DATE" />
+		<property name="chqNo" column="CHEQUE_NO" />
+		<property name="chqDate" column="CHEQUE_DATE" />
+		<property name="bankName" column="BANK_NAME" />
+		<property name="totalAmount" column="TOTAL_COLLECTION_AMOUNT" />
+		<property name="status" column="STATUS" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="isReasonPartyLetter" column="IS_REASON_PARTY_LETTER" />
+		<property name="isRecalculationReq" column="IS_RECALCULATION_REQ" />
+
+		<!-- common attributes START -->
+		<property name="createdBy" column="CREATED_BY" update="false" />
+		<property name="createdDate" column="CREATION_DATE" update="false" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<!-- common attributes END -->
+
+		<!-- One -to- Many relationships START -->
+		<set name="collectionDtls" lazy="false" cascade="all-delete-orphan"
+			inverse="true" fetch="join">
+			<key column="COLLECTION_ID" />
+			<one-to-many class="com.ff.domain.mec.collection.CollectionDtlsDO" />
+		</set>
+		<!-- One -to- Many relationships END -->
+
+		<many-to-one name="paymentModeDO"
+			class="com.ff.domain.serviceOffering.PaymentModeDO" lazy="false"
+			fetch="join">
+			<column name="COLLECTION_MODE_ID" />
+		</many-to-one>
+
+		<many-to-one name="customerDO" class="com.ff.domain.business.CustomerDO"
+			lazy="false" fetch="join">
+			<column name="CUST_ID" />
+		</many-to-one>
+
+		<many-to-one name="bankGLDO" class="com.ff.domain.mec.GLMasterDO"
+			lazy="false" fetch="join">
+			<column name="BANK_GL" />
+		</many-to-one>
+
+		<many-to-one name="collectionOfficeDO" class="com.ff.domain.organization.OfficeDO"
+			lazy="false" fetch="join">
+			<column name="COLLECTION_OFFICE_ID" />
+		</many-to-one>
+
+	</class>
+
+	<query name="getCollectionDtlsForExpInterface">
+	<![CDATA[
+	 FROM	com.ff.domain.mec.collection.CollectionDO collectionDO
+	 WHERE	collectionDO.sapStatus IN ('I','N')
+	 AND	collectionDO.status=:status
+	 AND 	collectionDO.CollectionDate >= '2015-04-01'
+	]]>
+	</query>
+
+	<query name="getCollectionDetailsCount">
+	<![CDATA[
+	 SELECT COUNT(*)
+	 FROM	com.ff.domain.mec.collection.CollectionDO collectionDO
+	 WHERE	collectionDO.sapStatus IN ('I','N')
+	 AND	collectionDO.status=:status
+	 AND 	collectionDO.CollectionDate >= '2015-04-01'
+	]]>
+	</query>
+
+	<query name="updateCollectionDetailsForSAP">
+	<![CDATA[ 
+	UPDATE com.ff.domain.mec.collection.CollectionDO collectionDO 
+		SET collectionDO.sapStatus=:sapStatus,collectionDO.sapTimestamp=:sapTimestamp
+		WHERE collectionDO.txnNo=:txnNo
+	]]>
+	</query>
+	<query name="getBillCollectionDtls">
+	<![CDATA[ 
+	    FROM com.ff.domain.mec.collection.CollectionDO collectionDO
+		WHERE collectionDO.txnNo=:txnNo
+		AND collectionDO.collectionCategory=:collectionCategory
+	]]>
+	</query>
+
+	<query name="getCollectionDtlsByTxnNo">
+	<![CDATA[ 
+	    FROM com.ff.domain.mec.collection.CollectionDO collectionDO
+		WHERE collectionDO.txnNo=:txnNo
+	]]>
+	</query>
+
+	<query name="getCollectionStatus">
+	<![CDATA[ 
+	    SELECT collectionDO.status FROM com.ff.domain.mec.collection.CollectionDO collectionDO
+		WHERE collectionDO.txnNo=:txnNo
+	]]>
+	</query>
+
+	<query name="updateCollectionStatus">
+	<![CDATA[ 
+		UPDATE 
+			com.ff.domain.mec.collection.CollectionDO collectionDO 
+		SET 
+			collectionDO.status=:status,
+			collectionDO.sapStatus=:sapStatus
+		WHERE 
+			collectionDO.collectionId=:collectionId
+	]]>
+	</query>
+	<query name="getCollectionDtlsForValidate">
+	<![CDATA[ 
+	    FROM com.ff.domain.mec.collection.CollectionDO collectionDO
+		WHERE (collectionDO.CollectionDate>=:fromDate
+		AND collectionDO.CollectionDate<=:toDate
+		AND collectionDO.collectionOfficeDO.officeId =:officeId
+		AND collectionDO.status=:status)
+		OR (collectionDO.txnNo=:txnNo)
+	]]>
+	</query>
+	<query name="getAllCollectionOfficesOfThatDay">
+	<![CDATA[ 
+		SELECT 
+			DISTINCT(collectionDO.collectionOfficeDO.officeId) 
+		FROM 
+			com.ff.domain.mec.collection.CollectionDO collectionDO 
+		WHERE
+			collectionDO.CollectionDate=:prevDate AND
+			collectionDO.status NOT IN (:status) AND
+			collectionDO.isRecalculationReq=:isUpdateReq
+		GROUP BY 
+			collectionDO.collectionOfficeDO.officeId
+	]]>
+	</query>
+
+	<query name="getSavedCollectionDtlsOfThatDay">
+	<![CDATA[ 
+		FROM com.ff.domain.mec.collection.CollectionDO collectionDO WHERE
+		collectionDO.collectionCategory='C' AND 
+		collectionDO.status IN (:status) AND
+		(collectionDO.CollectionDate>=:prevDate AND collectionDO.CollectionDate<:currentDate) 
+	]]>
+	</query>
+
+	<query name="getExpenseDeductionOfThatDayForCollection">
+	<![CDATA[
+		SELECT 
+			SUM(coll1.totalAmount-coll2.totalAmount) 
+		FROM 
+			com.ff.domain.mec.collection.CollectionDO coll1,
+			com.ff.domain.mec.collection.CollectionDO coll2 
+		WHERE 
+			coll1.txnNo LIKE ('%-%')
+			AND (coll1.CollectionDate>=:prevDate AND coll1.CollectionDate<:currentDate)
+			AND coll1.collectionOfficeDO.officeId=:officeId
+			AND coll1.status NOT IN (:status) 
+			AND coll1.paymentModeDO.paymentId IN (
+				SELECT payment.paymentId FROM com.ff.domain.serviceOffering.PaymentModeDO payment WHERE 
+				payment.paymentCode IN (:paymentMode)
+			)
+			AND coll2.txnNo=(SUBSTRING(coll1.txnNo,1, length(coll2.txnNo))) 
+			AND coll2.totalAmount < coll1.totalAmount
+	]]>
+	</query>
+
+	<query name="getCollectionDeductionOfThatDayForCollection">
+	<![CDATA[
+		SELECT 
+			SUM(coll2.totalAmount-coll1.totalAmount) 
+		FROM 
+			com.ff.domain.mec.collection.CollectionDO coll1,
+			com.ff.domain.mec.collection.CollectionDO coll2 
+		WHERE 
+			coll1.txnNo LIKE ('%-%')
+			AND (coll1.CollectionDate>=:prevDate AND coll1.CollectionDate<:currentDate)
+			AND coll1.collectionOfficeDO.officeId=:officeId
+			AND coll1.status NOT IN (:status) 
+			AND coll1.paymentModeDO.paymentId IN (
+				SELECT payment.paymentId FROM com.ff.domain.serviceOffering.PaymentModeDO payment WHERE 
+				payment.paymentCode IN (:paymentMode)
+			)
+			AND coll2.txnNo=(SUBSTRING(coll1.txnNo,1, length(coll2.txnNo))) 
+			AND coll2.totalAmount > coll1.totalAmount
+	]]>
+	</query>
+
+	<query name="validateTxns">
+	<![CDATA[ 
+		UPDATE 
+			com.ff.domain.mec.collection.CollectionDO collection	
+		SET 
+			collection.status=:status,
+			collection.updatedBy=:updatedBy,
+			collection.updatedDate=:currentDateTime
+		WHERE 
+			collection.txnNo IN (:txNos)
+	]]>
+	</query>
+
+	<query name="getCollectionDtlsForRecalculation">
+	<![CDATA[ 
+		FROM com.ff.domain.mec.collection.CollectionDO collection 
+		WHERE 
+		collection.isRecalculationReq=:isRecalculationReq
+		AND collection.CollectionDate >= '2015-04-01'
+		ORDER BY collection.collectionOfficeDO.officeId
+	]]>
+	</query>
+
+	<query name="updateCollectionRecalcFlag">
+	<![CDATA[ 
+		UPDATE 
+			com.ff.domain.mec.collection.CollectionDO collection 
+		SET	
+			collection.isRecalculationReq=:isRecalculationReq,
+			collection.updatedDate=:currentDateTime
+		WHERE 
+			collection.collectionId IN (:collectionIds)
+	]]>
+	</query>
+
+	<!-- <query name="getUnsyncInboundCollectionDtls"> <![CDATA[From com.ff.domain.mec.collection.CollectionDO 
+		collection where collection.dtToCentral='N']]> </query> -->
+
+	<query name="getCollectionStatusByTxnNumber">
+		<![CDATA[select collection.status From com.ff.domain.mec.collection.CollectionDO collection where collection.txnNo=:txnNo]]>
+	</query>
+
+	<query name="getMaxCollectionNumber">
+	<![CDATA[ 
+	   select max(collectionDO.txnNo) FROM com.ff.domain.mec.collection.CollectionDO collectionDO
+		WHERE collectionDO.txnNo like :prefix
+		AND collectionDO.collectionOfficeDO.officeId=:loggedInOfficeId
+		AND  length(collectionDO.txnNo) = :numberLength
+	]]>
+	</query>
+
+	<sql-query name="getCollectionDtlsForPettyCashCalculation">
+	<![CDATA[ 
+		SELECT collection.COLLECTION_OFFICE_ID,collectionEntries.CONSG_DELIVERY_DATE,collection.COLLECTION_ID
+  		FROM ff_f_collection collection
+       	INNER JOIN ff_f_collection_entries collectionEntries
+       	ON collectionEntries.COLLECTION_ID = collection.COLLECTION_ID
+ 		WHERE collection.IS_RECALCULATION_REQ = :isRecalculationReq
+       	AND collection.COLLECTION_DATE between '2015-04-01' and :currentDateTime
+		ORDER BY collection.COLLECTION_ID
+	]]>
+	</sql-query>
+</hibernate-mapping>

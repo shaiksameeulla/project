@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.consignment.ConsignmentModifiedDO" table="ff_f_consignment_modified">
+		<id name="consgId" column="CONSG_ID" type="java.lang.Integer">
+			<generator class="native" />
+		</id>
+
+		<property name="consgNo" type="java.lang.String">
+			<column name="CONSG_NO" />
+		</property>
+		<property name="orgOffId" type="java.lang.Integer">
+			<column name="ORG_OFF" />
+		</property>
+		<!-- <property name="destPincodeId" type="java.lang.Integer" > <column 
+			name="DEST_PINCODE"/> </property> -->
+		<property name="noOfPcs" type="java.lang.Integer">
+			<column name="NO_OF_PCS" />
+		</property>
+
+		<many-to-one name="consgType"
+			class="com.ff.domain.serviceOffering.ConsignmentTypeDO" lazy="false" fetch="join" >
+			<column name="CONSG_TYPE" />
+		</many-to-one>
+
+		<many-to-one name="destPincodeId" class="com.ff.domain.geography.PincodeDO"
+			lazy="false" fetch="join" >
+			<column name="DEST_PINCODE" />
+		</many-to-one>
+
+		<property name="price" type="java.lang.Double">
+			<column name="PRICE" />
+		</property>
+		<property name="productId" type="java.lang.Integer">
+			<column name="PRODUCT" />
+		</property>
+		<property name="actualWeight" type="java.lang.Double">
+			<column name="ACTUAL_WEIGHT" />
+		</property>
+		<property name="volWeight">
+			<column name="VOL_WEIGHT" />
+		</property>
+		<property name="finalWeight" type="java.lang.Double">
+			<column name="FINAL_WEIGHT" />
+		</property>
+
+
+		<property name="eventDate" column="EVENT_DATE" type="java.util.Date" />
+		<property name="customer" column="CUSTOMER" type="java.lang.Integer" />
+
+		<property name="consgStatus" type="java.lang.String">
+			<column name="CONSG_STATUS" />
+		</property>
+
+
+
+		<property name="height" column="HEIGHT" type="java.lang.Double" />
+		<property name="length" column="LENGTH" type="java.lang.Double" />
+		<property name="breath" column="BREATH" type="java.lang.Double" />
+		<property name="insurencePolicyNo" column="INSURANCE_POLICY_NO"
+			type="java.lang.String" />
+		<property name="refNo" column="REF_NO" type="java.lang.String" />
+
+		<property name="mobileNo" column="MOBILE_NO" type="java.lang.String" />
+
+		<property name="receivedDateTime" column="RECEIVED_DATE"
+			type="java.util.Date" />
+		<property name="deliveredDate" column="DLV_DATE_TIME" type="java.util.Date" />
+		<property name="recvNameOrCompName" column="RECV_NAME_OR_COMP_SEAL"
+			type="java.lang.String" />
+		<property name="operatingOffice" column="OPERATING_OFFICE"
+			type="java.lang.Integer" />
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date"
+			update="false" />
+		<property name="updatedDate" column="UPDATE_DATE" type="java.util.Date" />
+		<property name="declaredValue" type="java.lang.Double">
+			<column name="DECLARED_VALUE" />
+		</property>
+		<property name="discount" column="DISCOUNT" type="java.lang.Double" />
+		<property name="topayAmt" column="TOPAY_AMT" type="java.lang.Double" />
+		<property name="splChg" column="SPL_CHG" type="java.lang.Double" />
+		<property name="codAmt" column="COD_AMT" type="java.lang.Double" />
+		<property name="lcAmount" column="LC_AMT" type="java.lang.Double" />
+		<property name="lcBankName" column="LC_BANK_NAME" type="java.lang.String" />
+		<property name="servicedOn" column="SERVICED_ON" type="java.lang.String" />
+		<property name="rateType" column="RATE_TYPE " type="java.lang.String" />
+		<property name="ebPreferencesCodes" column="EB_PREFEENCES_CODES "
+			type="java.lang.String" />
+
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer"
+			update="false" />
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer" />
+
+		<property name="misRouted" type="java.lang.String">
+			<column name="MIS_ROUTED" />
+		</property>
+
+		<many-to-one name="consignee"
+			class="com.ff.domain.business.ConsigneeConsignorDO" lazy="false"
+			 fetch="join"  cascade="all" unique="true">
+			<column name="CONSIGNEE" />
+		</many-to-one>
+		<many-to-one name="consignor"
+			class="com.ff.domain.business.ConsigneeConsignorDO" lazy="false"
+			fetch="join" cascade="all" unique="true">
+			<column name="CONSIGNOR" />
+		</many-to-one>
+
+		<!-- <many-to-one name="consignee" class="com.ff.domain.business.ConsigneeConsignorDO" 
+			lazy="false" unique="true"> <column name="CONSIGNEE" /> </many-to-one> <many-to-one 
+			name="consignor" class="com.ff.domain.business.ConsigneeConsignorDO" lazy="false" 
+			unique="true"> <column name="CONSIGNOR" /> </many-to-one> -->
+
+		<many-to-one name="cnContentId"
+			class="com.ff.domain.serviceOffering.CNContentDO" lazy="false" fetch="join">
+			<column name="CONTENT" />
+		</many-to-one>
+
+		<many-to-one name="cnPaperWorkId"
+			class="com.ff.domain.serviceOffering.CNPaperWorksDO" lazy="false" fetch="join" >
+			<column name="PAPER_WORK" />
+		</many-to-one>
+
+		<many-to-one name="insuredBy"
+			class="com.ff.domain.serviceOffering.InsuredByDO" lazy="false" fetch="join"
+			unique="true">
+			<column name="INSURED_BY" />
+		</many-to-one>
+
+		<many-to-one name="updatedProcess" class="com.ff.domain.tracking.ProcessDO"
+			lazy="false" fetch="join" unique="true">
+			<column name="UPDTAED_PROCESS_FROM" />
+		</many-to-one>
+
+		<!-- <set name="childCNs" table="ff_f_child_consignments" cascade="all-delete-orphan"
+			lazy="false" fetch="join">
+			<key>
+				<column name="CONSG_ID" />
+			</key>
+			<one-to-many class="com.ff.domain.consignment.ChildConsignmentDO" />
+		</set> -->
+
+		<!-- <set name="consgRateDtls" table="ff_f_consignment_rate" cascade="all-delete-orphan"
+			lazy="false"  fetch="join" inverse="true">
+			<key>
+				<column name="CONSIGNMENT_ID" />
+			</key>
+			<one-to-many class="com.ff.domain.billing.ConsignmentBillingRateDO" />
+		</set> -->
+
+		<!-- <many-to-one name="consgPricingDtls" class="com.ff.domain.booking.CNPricingDetailsDO" 
+			lazy="false" unique="true" cascade="all"> <column name="cn_price_id" /> </many-to-one> -->
+
+		<!-- <one-to-one name="consgPricingDtls" class="com.ff.domain.booking.CNPricingDetailsDO" 
+			property-ref="consgId" lazy="false" cascade="all" fetch="join"> </one-to-one> -->
+
+
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+
+		<property name="dtToOpsman" type="java.lang.String">
+			<column name="DT_TO_OPSMAN" />
+		</property>
+
+		<property name="dtFromOpsman" type="java.lang.String">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+
+		<property name="dtUpdateToCentral" type="java.lang.String">
+			<column name="DT_UPDATE_TO_CENTRAL" />
+		</property>
+
+		<property name="billingStatus" type="java.lang.String">
+			<column name="BILLING_STATUS" />
+		</property>
+
+		<property name="changedAfterBillingWtDest" type="java.lang.String">
+			<column name="CHANGED_AFTER_BILLING_WEIGHT_DEST" />
+		</property>
+
+		<property name="changedAfterNewRateCmpnt" type="java.lang.String">
+			<column name="CHANGED_AFTER_NEW_RATE_COMPONENT" />
+		</property>
+
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<many-to-one name="cnReturnReason" class="com.ff.domain.serviceOffering.ReasonDO"
+			lazy="false" unique="true" fetch="join">
+			<column name="RTH_RTO_REASON" />
+		</many-to-one>
+		<property name="remarks" column="REMARKS" />
+		<property name="otherCNContent" column="OTHERS_CN_CONTENT" />
+
+		<many-to-one name="altConsigneeAddr"
+			class="com.ff.domain.business.ConsigneeConsignorDO" lazy="false"
+			cascade="all" unique="true" fetch="join">
+			<column name="ALT_CONSIGNEE_ADDR" />
+		</many-to-one>
+
+		<many-to-one name="stopReason" class="com.ff.domain.serviceOffering.ReasonDO"
+			lazy="false" fetch="join">
+			<column name="STOP_DELIVERY_REASON" />
+		</many-to-one>
+
+		<property name="stopDelivery" type="java.lang.String">
+			<column name="STOP_DELIVERY" />
+		</property>
+
+		<property name="stopDelvDate" column="STOP_DELV_DATE" type="java.util.Date" />
+		<property name="isExcessConsg" column="IS_EXCESS_CONSG" />
+		<property name="baAmt" column="BA_AMT" type="java.lang.Double" />
+		<property name="stopDeliveryReqOff" column="STOP_DELIVERY_REQ_OFFICE"
+			type="java.lang.Integer" />
+	</class>
+</hibernate-mapping>

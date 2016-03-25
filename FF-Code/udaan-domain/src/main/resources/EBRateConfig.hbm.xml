@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.masters.EBRateConfigDO"
+		table="ff_d_eb_rate_config">
+		<id name="ebRateConfigId" type="java.lang.Integer">
+			<column name="EB_RATE_CONFIG_ID" />
+			<generator class="native" />
+		</id>
+
+		<property name="serviceTaxApplicable">
+			<column name="SERVICE_TAX_APPL" />
+		</property>
+		<property name="cessTaxApplicable">
+			<column name="CESS_TAX_APPLICABLE" />
+		</property>
+		<property name="hcesstaxApplicable">
+			<column name="HCESS_TAX_APPLICABLE" />
+		</property>
+		<property name="surchargeSTtaxApplicable">
+			<column name="SURCHARGE_ON_ST_APPL" />
+		</property>
+		<property name="stateTaxApplicable">
+			<column name="STATE_TAX_APPL" />
+		</property>
+		<property name="status">
+			<column name="STATUS" />
+		</property>
+		<property name="validToDate">
+			<column name="VALID_TO_DATE" />
+		</property>
+		<property name="validFromDate">
+			<column name="VALID_FROM_DATE" />
+		</property>
+
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+
+		<many-to-one name="originState" class="com.ff.domain.geography.StateDO"
+			lazy="false"  fetch="join">
+			<column name="ORIGIN_STATE" />
+		</many-to-one>
+
+
+
+		<set name="preferenceDOSet" table="ff_d_eb_preference_rate"
+			cascade="all" inverse="true" lazy="false" fetch="join">
+
+			<key column="EB_RATE_CONFIG_ID" />
+			<one-to-many
+				class="com.ff.domain.ratemanagement.masters.EBRatePreferenceDO" />
+
+		</set>
+	</class>
+
+
+	<query name="submitEBRate">
+		<![CDATA[
+			UPDATE com.ff.domain.ratemanagement.masters.EBRateConfigDO configDo
+				SET configDo.status = 'S'
+				WHERE configDo.ebRateConfigId =:ebRateConfigId
+		]]>
+	</query>
+
+
+	<query name="updateEBRateTODate">
+		<![CDATA[
+ 			update com.ff.domain.ratemanagement.masters.EBRateConfigDO configDo
+ 			set configDo.validToDate =:validToDate,
+ 				configDo.dtToBranch='N'
+ 			WHERE configDo.ebRateConfigId =:ebRateConfigId
+ 			]]>
+	</query>
+	
+	<query name="updateEBRateDTTOBranch">
+		<![CDATA[
+ 			update com.ff.domain.ratemanagement.masters.EBRateConfigDO configDo
+ 			set configDo.dtToBranch='N'
+ 			WHERE configDo.ebRateConfigId IN(select ratePref.ebRateConfigDO.ebRateConfigId FROM com.ff.domain.ratemanagement.masters.EBRatePreferenceDO ratePref
+ 			 where ratePref.ebRatePrefId  IN(:prefIds))
+ 			]]>
+	</query>
+	
+
+</hibernate-mapping>

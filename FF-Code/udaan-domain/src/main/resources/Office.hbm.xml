@@ -1,0 +1,880 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.organization.OfficeDO" table="ff_d_office">
+		<id name="officeId" type="java.lang.Integer">
+			<column name="OFFICE_ID" />
+			<generator class="native" />
+		</id>
+		<property name="officeCode" type="java.lang.String">
+			<column name="OFFICE_CODE" />
+		</property>
+		<property name="officeName" type="java.lang.String">
+			<column name="OFFICE_NAME" />
+		</property>
+
+		<property name="address1" type="java.lang.String">
+			<column name="ADDRESS_1" />
+		</property>
+		<property name="address2" type="java.lang.String">
+			<column name="ADDRESS_2" />
+		</property>
+		<property name="address3" type="java.lang.String">
+			<column name="ADDRESS_3" />
+		</property>
+
+		<!-- <property name="buildingName" type="java.lang.String"> <column name="BUILDING_NAME" 
+			/> </property> <property name="buildingBlock" type="java.lang.String"> <column 
+			name="BUILDING_BLOCK" /> </property> <property name="inChargeName" type="java.lang.String"> 
+			<column name="INCHARGE_NAME" /> </property> -->
+
+		<property name="phone" type="java.lang.String">
+			<column name="PHONE" />
+		</property>
+
+		<property name="email" type="java.lang.String">
+			<column name="EMAIL" />
+		</property>
+
+		<!-- <property name="fax" type="java.lang.String"> <column name="FAX" /> 
+			</property> -->
+
+		<property name="reportingRHO" type="java.lang.Integer">
+			<column name="REPORTING_RHO" />
+		</property>
+
+		<property name="reportingHUB" type="java.lang.Integer">
+			<column name="REPORTING_HUB" />
+		</property>
+
+		<!-- <property name="officeOpeningTime" type="java.lang.String"> <column 
+			name="OFFICE_OPENING_TIME" /> </property> -->
+
+		<property name="officeClosingTime" type="java.lang.String">
+			<column name="OFFICE_CLOSING_TIME" />
+		</property>
+
+		<property name="weeklyHoliday" type="java.lang.String">
+			<column name="WEEKLY_HOLIDAY" />
+		</property>
+
+		<property name="cityId" type="java.lang.Integer">
+			<column name="CITY_ID" />
+		</property>
+
+		<property name="pincodeId" type="java.lang.Integer">
+			<column name="PINCODE_ID" />
+		</property>
+
+		<!-- <property name="areaId" type="java.lang.Integer"> <column name="AREA_ID" 
+			/> </property> -->
+
+		<property name="pincode" type="java.lang.String">
+			<column name="PINCODE" />
+		</property>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="createdBy" column="CREATED_BY" update="false" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate" column="CREATION_DATE" update="false" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<property name="mobileNo" column="MOBILE_NO" />
+
+		<many-to-one name="officeTypeDO"
+			class="com.ff.domain.organization.OfficeTypeDO" lazy="false" fetch="join">
+			<column name="OFFICE_TYPE_ID" not-null="false" unique="true"></column>
+		</many-to-one>
+		<many-to-one name="mappedRegionDO" class="com.ff.domain.geography.RegionDO"
+			lazy="false" fetch="join">
+			<column name="MAPPED_TO_REGION"></column>
+		</many-to-one>
+		<!-- <property name="dtToBranch"> <column name="DT_TO_BRANCH" /> </property> -->
+	</class>
+
+	<query name="getDeliveryBranchesOfCustomer">
+
+<![CDATA[ FROM com.ff.domain.organization.OfficeDO office where office.officeId in 
+          (select pickup.office.officeId from com.ff.domain.pickup.PickupDeliveryContractDO pickup
+            where pickup.customer.customerId =:customerId 
+            and pickup.contractType='D')]]>
+	</query>
+
+
+	<query name="getOfficesServicingPincode">
+
+<![CDATA[ FROM com.ff.domain.organization.OfficeDO office where office.officeId in
+ 				(
+ select pinbranch.officeId from com.ff.domain.pickup.PincodeBranchMappingDO pinbranch where pinbranch.pincodeId
+
+ in  ( select pin.pincodeId FROM com.ff.domain.geography.PincodeDO pin where pin.pincode = :pinCode	 )
+ 
+ )
+
+ ]]>
+	</query>
+
+	<query name="getOfficesServicingPincodeForOpsman">
+
+<![CDATA[ FROM com.ff.domain.organization.OfficeDO office where office.officeId in
+ 				(
+ select pinbranch.officeId from com.ff.domain.pickup.PincodeBranchMappingDO pinbranch where pinbranch.pincodeId
+
+ in  ( select pin.pincodeId FROM com.ff.domain.geography.PincodeDO pin where pin.pincodeId = :pinCode	 )
+ 
+ )
+
+ ]]>
+	</query>
+
+
+	<query name="getBranchCode">
+
+<![CDATA[  FROM com.ff.domain.organization.OfficeDO office where office.officeName=:office)]]>
+	</query>
+
+	<query name="getOfficeDetails">
+
+<![CDATA[  FROM com.ff.domain.organization.OfficeDO office where office.officeId=:officeId)]]>
+	</query>
+
+	<query name="getOfficeByEmpId">
+        <![CDATA[ FROM com.ff.domain.organization.OfficeDO office where office.officeId =  
+        (Select employee.officeId from com.ff.domain.organization.EmployeeDO employee where employee.employeeId=:employeeId )]]>
+	</query>
+
+	<query name="getOfficeByCustId">
+        <![CDATA[ SELECT customer.salesOfficeDO FROM com.ff.domain.business.CustomerDO customer WHERE customer.customerId=:customerId]]>
+	</query>
+
+	<query name="validateHubByOfficeId">
+	<![CDATA[ FROM com.ff.domain.organization.OfficeDO office where office.officeId=:officeId 
+		and office.officeTypeDO in (select officeType.offcTypeId from com.ff.domain.organization.OfficeTypeDO officeType 
+		where officeType.offcTypeCode='HO')]]>
+	</query>
+
+	<query name="getBranchEmployeesForAssignment">
+		<![CDATA[
+			FROM 		com.ff.domain.organization.EmployeeDO e
+			where		e.officeId = :branchId and e.empStatus='A'
+		]]>
+	</query>
+
+	<query name="getOfficeByType">
+        <![CDATA[ FROM com.ff.domain.organization.OfficeDO office where office.officeTypeDO.offcTypeCode   =:offType ]]>
+	</query>
+
+	<query name="getOfficeByCity">
+        <![CDATA[ FROM com.ff.domain.organization.OfficeDO office 
+        			WHERE office.cityId IN (:cityId) and 
+        			office.officeTypeDO.offcTypeCode NOT IN ('CO','RO')
+        			ORDER BY office.officeName
+        
+         ]]>
+	</query>
+
+	<query name="getOfficeByRegion">
+        <![CDATA[ FROM com.ff.domain.organization.OfficeDO office 
+        			WHERE office.mappedRegionDO.regionId = :regionId
+        			ORDER BY office.officeName
+        
+         ]]>
+	</query>
+
+	<query name="getOfficeByRegionID">
+        <![CDATA[ 
+        		SELECT office.officeId
+        		FROM com.ff.domain.organization.OfficeDO office 
+        		WHERE office.mappedRegionDO.regionId = :regionId
+         ]]>
+	</query>
+
+	<query name="getOfficeByCityAndOfficeType">
+        <![CDATA[ FROM com.ff.domain.organization.OfficeDO office where office.cityId IN (:cityId) 
+        	and office.officeTypeDO.offcTypeId =:offTypeId 
+        	ORDER BY office.officeName       
+         ]]>
+	</query>
+
+	<query name="getOfficeByRegionAndOfficeType">
+        <![CDATA[ FROM com.ff.domain.organization.OfficeDO office where office.mappedRegionDO.regionId IN (:regionId) 
+        	and office.officeTypeDO.offcTypeId =:offTypeId 
+        	ORDER BY office.officeName       
+         ]]>
+	</query>
+
+	<query name="getAllOfficeIdByCity">
+        <![CDATA[ select office.officeId FROM com.ff.domain.organization.OfficeDO office where office.cityId IN (:cityId) 
+        	      
+         ]]>
+	</query>
+
+	<query name="getBranchesUnderHUB">
+		<![CDATA[
+			from		com.ff.domain.organization.OfficeDO office
+			where		office.officeTypeDO.offcTypeCode = 'BO'
+			and			office.reportingHUB = :officeId 
+			ORDER BY 	office.officeName
+		]]>
+	</query>
+
+	<query name="getOfficesByRegionalOfficeExcludeOffice">
+		<![CDATA[	FROM com.ff.domain.organization.OfficeDO office
+					where office.reportingRHO=:regionalOfficeId
+					and office.officeId!=:officeId
+        			ORDER BY office.officeName
+				]]>
+	</query>
+
+	<query name="getRegionalOffices">
+		<![CDATA[	FROM com.ff.domain.organization.OfficeDO office
+					where office.officeTypeDO.offcTypeCode=:offcTypeCode
+        			ORDER BY office.officeName
+				]]>
+	</query>
+
+	<query name="getRegionalOfficesByCityAndRHO">
+		<![CDATA[	FROM com.ff.domain.organization.OfficeDO office
+					where office.officeTypeDO.offcTypeCode=:offcTypeCode and cityId IN (:cityId)
+        			ORDER BY office.officeName
+				]]>
+	</query>
+
+	<query name="getOfficeNameByOfficeId">
+		<![CDATA[	FROM com.ff.domain.organization.OfficeDO office
+					where office.officeId=:officeId 
+				]]>
+	</query>
+
+	<query name="getOfficeIdByReportingRHOCode"> 
+		<![CDATA[	FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeCode=:officeCode 
+				]]>
+	</query>
+	<query name="getOfficeEmailIdByOfficeCode"> 
+		<![CDATA[	select  office.email FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeCode=:officeCode 
+				]]>
+	</query>
+
+
+	<query name="getRegionalBranchesByRegionIdAndOfficeTypeId"> 
+		<![CDATA[	FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeTypeDO.offcTypeId=:officeTypeId and  office.mappedRegionDO.regionId=:regionId
+				]]>
+	</query>
+
+	<query name="getOfficeByDestCityId"> 
+		<![CDATA[	FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId=:officeId
+					AND officeId IN (SELECT officeId
+					                 FROM  com.ff.domain.organization.OfficeDO office1
+					                 WHERE office1.cityId=:cityId 
+					                 AND   office1.officeTypeDO.offcTypeCode='HO') 
+				]]>
+	</query>
+
+	<query name="getAllRhoCodes"> 
+		<![CDATA[	select office.officeCode FROM com.ff.domain.organization.OfficeDO office
+					inner join office.officeTypeDO as officeType
+					where officeType.offcTypeCode=:officeType
+				]]>
+	</query>
+
+
+	<query name="getRHOOfficesByUserId"> 
+		<![CDATA[	FROM com.ff.domain.organization.OfficeDO office
+					WHERE  office.officeId IN (
+					SELECT userOfc.office.officeId FROM com.ff.domain.umc.UserOfficeRightsMappingDO userOfc WHERE  
+					userOfc.user.userId =:userId  AND userOfc.mappedTo = 'R' and userOfc.status = 'A')
+					or office.officeId IN
+					 (select empDO.officeId from com.ff.domain.umc.EmployeeUserDO empuser
+					   where empuser.userId =:userId)                                                    					
+				]]>
+	</query>
+
+	<query name="getAllHubsOftheBranchCity"> 
+		<![CDATA[	select distinct(office.officeId) FROM com.ff.domain.organization.OfficeDO office
+					inner join office.officeTypeDO as officeType
+					where 
+					officeType.offcTypeCode ='HO'
+					and office.cityId IN (select office1.cityId
+					FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId=:branchId)
+					
+				]]>
+	</query>
+	<query name="getAllBrOftheBranchCity"> 
+		<![CDATA[	select distinct(office.officeId) FROM com.ff.domain.organization.OfficeDO office
+					 
+					inner join office.officeTypeDO as officeType
+					where 
+					officeType.offcTypeCode ='BO'
+					and office.cityId IN ( select office1.cityId
+					FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId=:branchId)
+				]]>
+	</query>
+	<query name="getAllBranchesHubsOftheBranchCity">
+		<![CDATA[	select distinct(office.officeId) FROM com.ff.domain.organization.OfficeDO office
+					inner join office.officeTypeDO as officeType
+					where 
+					officeType.offcTypeCode IN ('HO', 'BO')
+					and office.cityId IN (select office1.cityId
+					FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId=:branchId)
+					
+				]]>
+	</query>
+	<query name="getAllOfficeByOfficeTypeAndCity"> 
+		<![CDATA[	select distinct(office.officeId) FROM com.ff.domain.organization.OfficeDO office
+					 
+					inner join office.officeTypeDO as officeType
+					where 
+					officeType.offcTypeCode IN (:officeTypeCode)
+					and office.cityId IN ( select office1.cityId
+					FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId=:branchId)
+				]]>
+	</query>
+
+	<query name="getAllOfficesOftheBranchCity"> 
+		<![CDATA[	select distinct(office.officeId) FROM com.ff.domain.organization.OfficeDO office
+					 
+					where office.cityId IN ( select office1.cityId
+					FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId=:branchId)
+				]]>
+	</query>
+
+	<query name="getAllHubsOfBranchCityAndLoggedInOfficeForStockCustomer"> 
+		<![CDATA[	select distinct(office.officeId) FROM com.ff.domain.organization.OfficeDO office
+					inner join office.officeTypeDO as officeType
+					where 
+					officeType.offcTypeCode IN (:officeTypeCode)
+					AND
+					 office.cityId IN ( select office1.cityId
+					FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId IN (:branchList))
+					AND office.cityId IN ( select office2.cityId
+					FROM com.ff.domain.organization.OfficeDO office2 where office2.officeId = :branchId)
+				]]>
+	</query>
+
+	<query name="getAllOfficeFromBranchContractForStockCustomer"> 
+		<![CDATA[	select distinct(office.officeId) FROM com.ff.domain.organization.OfficeDO office
+					where 
+					 office.officeId IN (select office1.officeId
+					FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId IN (:branchList) and office1.reportingRHO=office.reportingRHO)
+					AND office.reportingRHO IN ( select office2.reportingRHO
+					FROM com.ff.domain.organization.OfficeDO office2 where office2.officeId = :branchId)
+				]]>
+	</query>
+	<query name="getAllOfficeFromRHOForContractStockCustomer"> 
+		<![CDATA[	select distinct(office.officeId) FROM com.ff.domain.organization.OfficeDO office
+					where 
+					 office.officeId IN (select office1.officeId
+					FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId IN (:branchList) and office1.reportingRHO=office.reportingRHO)
+					AND office.reportingRHO = :branchId
+				]]>
+	</query>
+
+	<query name="getAllOfficesUnderLoggedInOffice"> 
+		<![CDATA[	select distinct(office.officeId) FROM com.ff.domain.organization.OfficeDO office
+					where office.reportingRHO =:branchId
+				]]>
+	</query>
+
+	<query name="getOfficeTypeByOfficeId"> 
+		<![CDATA[	select officeType.offcTypeCode FROM com.ff.domain.organization.OfficeDO office
+					 
+					inner join office.officeTypeDO as officeType
+					where 
+					office.officeId=:branchId
+				]]>
+	</query>
+
+	<query name="siblingsOfBranch"> 
+		<![CDATA[	select distinct(office.officeId) FROM com.ff.domain.organization.OfficeDO office
+					 inner join office.officeTypeDO as officeType
+					where
+					officeType.offcTypeCode !=:officeTypeCode
+					AND 
+					 office.reportingRHO IN (select office1.reportingRHO FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId=:branchId)
+				]]>
+	</query>
+
+	<query name="getDestnHubsOftheBranchCity"> 
+		<![CDATA[	select distinct(office.officeId) FROM com.ff.domain.organization.OfficeDO office
+					inner join office.officeTypeDO as officeType
+					where 
+					officeType.offcTypeCode ='HO'
+					and office.officeId!=:branchId
+					and office.cityId IN (select office1.cityId
+					FROM com.ff.domain.organization.OfficeDO office1 where office1.officeId=:branchId)
+					
+				]]>
+	</query>
+
+	<query name="getOfficeMapUnderBranch"> 
+		<![CDATA[	select new map(office.officeId as typeId,(concat(office.officeCode,'-' ,COALESCE (office.officeName ,''))) as typeName) FROM com.ff.domain.organization.OfficeDO office
+					 
+					where office.reportingRHO =:branchId
+				]]>
+	</query>
+
+	<query name="getAllOfficeAsMap"> 
+		<![CDATA[	select new map(office.officeId as typeId,COALESCE (office.officeName ,office.officeCode) as typeName) FROM com.ff.domain.organization.OfficeDO office
+					
+				]]>
+	</query>
+	<query name="getAllOfficeByTypeAsMap"> 
+		<![CDATA[	select new map(office.officeId as typeId,COALESCE (office.officeName ,office.officeCode) as typeName) FROM com.ff.domain.organization.OfficeDO office
+								inner join office.officeTypeDO as officeType
+								where officeType.offcTypeCode  IN (:offTypeCode)
+					
+				]]>
+	</query>
+
+	<query name="getOfcByCityID"> 
+		<![CDATA[	
+				FROM	com.ff.domain.organization.OfficeDO office
+				WHERE	office.cityId=:cityId
+				AND		office.officeTypeDO.offcTypeCode NOT IN ('CO','RO')
+		
+				]]>
+	</query>
+	<query name="getAllHubsByCityID"> 
+		<![CDATA[	
+				FROM	com.ff.domain.organization.OfficeDO office
+				WHERE	office.cityId=:cityId
+				AND		office.officeTypeDO.offcTypeCode IN ('HO')
+		
+				]]>
+	</query>
+	<query name="getOffficesAndHubOfficesServicedByPincode"> 
+		<![CDATA[	
+				FROM com.ff.domain.organization.OfficeDO office where office.officeId in
+ 				(
+ 				select pinbranch.officeId from com.ff.domain.pickup.PincodeBranchMappingDO 
+ 				pinbranch where pinbranch.pincodeId in  ( select pin.pincodeId 
+ 				FROM com.ff.domain.geography.PincodeDO pin where pin.pincode = :pincode	 AND pin.status='A' )
+				)
+				 or office.officeId in
+ 				( select ofc.reportingHUB FROM com.ff.domain.organization.OfficeDO ofc where ofc.officeId in (
+ 				  select pinbranch.officeId from com.ff.domain.pickup.PincodeBranchMappingDO pinbranch 
+ 				  where pinbranch.pincodeId in  ( select pin.pincodeId FROM com.ff.domain.geography.PincodeDO 
+ 				  pin where pin.pincode = :pincode))
+				)
+		
+				]]>
+	</query>
+	<!-- getOfcByCityIDForReport -->
+
+	<query name="getOfficecByCityIDForReport">
+				<![CDATA[
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	office.cityId=:cityId
+					group by office.officeName
+				
+				]]>
+
+	</query>
+
+	<query name="getOfficecByCityIDAndUserIDForReport">
+				<![CDATA[Select office
+					FROM	com.ff.domain.organization.OfficeDO office, com.ff.domain.umc.UserOfficeRightsMappingDO mmapOff
+					WHERE	
+					office.officeId = mmapOff.office.officeId
+					and mmapOff.user.userId=:userId
+					and office.cityId=:cityId
+					AND mmapOff.status = 'A'
+					group by office.officeName
+				]]>
+
+	</query>
+
+
+	<query name="getAllHubsByCity">
+				<![CDATA[
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	office.cityId=:cityId
+					and office.officeTypeDO.offcTypeCode=:offTypeCode
+					group by office.officeName
+				
+				]]>
+
+	</query>
+
+	<query name="getReportingHubOfLoggdInBranchOffice">
+				<![CDATA[
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	office.officeId=(select offc.reportingHUB from com.ff.domain.organization.OfficeDO offc where 
+					offc.officeId=:cityId)
+				]]>
+	</query>
+
+
+	<query name="checkRhoContainsOriginOff">
+				<![CDATA[
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	office.officeId=:branchOffId
+					AND office.reportingRHO=:rhoId
+				
+				]]>
+
+	</query>
+
+	<query name="getOfficeByUserId">
+				<![CDATA[
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	office.officeId = (select euser.empDO.officeId FROM com.ff.domain.umc.EmployeeUserDO euser where euser.userId =:userId)
+				]]>
+
+	</query>
+
+
+	<!-- <query name="getReportingHubOfLoggdInBranchOffice"> <![CDATA[ FROM 
+		com.ff.domain.organization.OfficeDO office WHERE office.officeId=(select 
+		offc.reportingHUB from com.ff.domain.organization.OfficeDO offc where offc.officeId=:cityId) 
+		]]> </query> -->
+
+	<query name="checkHubOffContainsOriginOff">
+				<![CDATA[
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	office.officeId=:branchOffId
+					AND office.reportingHUB=:hubOffId
+				
+				]]>
+
+	</query>
+
+
+	<query name="getAllHubOffice">
+				<![CDATA[
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	office.reportingRHO=office.reportingHUB
+					AND office.reportingRHO=:rhoId
+				
+				]]>
+
+	</query>
+
+	<query name="getAllBranchesUnderRepotingRHO">
+				<![CDATA[
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	office.reportingRHO = :officeId
+				]]>
+	</query>
+
+	<query name="getAllBranchesUnderRepotingHub">
+				<![CDATA[
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	office.reportingHUB = :officeId
+				]]>
+	</query>
+
+	<query name="getHubOfficeFromOfficeId">
+		<![CDATA[SELECT office.reportingHUB from com.ff.domain.organization.OfficeDO office WHERE office.officeId=:officeId]]>
+	</query>
+
+	<query name="getOfficeByOfficeCode">
+		<![CDATA[From com.ff.domain.organization.OfficeDO office WHERE office.officeCode =:officeCode]]>
+	</query>
+
+	<query name="getOfficecOfBranchUserByCityIDAndUserID">
+				<![CDATA[
+					Select  office
+					FROM	com.ff.domain.organization.OfficeDO AS office
+					WHERE	(office.officeId IN (SELECT 	office1.officeId  
+												FROM 	com.ff.domain.organization.OfficeDO AS office1,
+					        						 	com.ff.domain.umc.UserOfficeRightsMappingDO AS mmapOff
+					        					WHERE 	office1.officeTypeDO.offcTypeCode = 'BO'
+					        					AND		office1.officeId = mmapOff.office.officeId
+												and 	mmapOff.user.userId=:userId
+												and 	office1.cityId=:cityId
+												AND 	mmapOff.status = 'A')
+							OR office.officeId IN (SELECT officeDO.officeId FROM com.ff.domain.umc.EmployeeUserDO AS empuser,
+															com.ff.domain.organization.EmployeeDO AS emp,
+															com.ff.domain.organization.OfficeDO AS officeDO
+													WHERE   emp.employeeId = empuser.empDO.employeeId
+													AND		emp.officeId = officeDO.officeId
+													and 	officeDO.officeTypeDO.offcTypeCode = 'BO'
+													and 	empuser.userId =:userId
+													and 	officeDO.cityId=:cityId))
+						AND office.cityId IN (:cityId)
+					group by office.officeName
+				]]>
+
+	</query>
+
+	<query name="getOfficecByUserType">
+				<![CDATA[Select office
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	(office.officeId IN (SELECT 	office1.officeId  
+												FROM 	com.ff.domain.organization.OfficeDO AS office1,
+					        						 	com.ff.domain.umc.UserOfficeRightsMappingDO AS mmapOff
+					        					WHERE 	office1.officeTypeDO.offcTypeCode =:officeType
+					        					AND		office1.officeId = mmapOff.office.officeId
+												and 	mmapOff.user.userId=:userId
+												and 	office1.cityId=:cityId
+												AND 	mmapOff.status = 'A')
+					OR office.officeId IN (SELECT officeDO.officeId FROM com.ff.domain.umc.EmployeeUserDO AS empuser,
+															com.ff.domain.organization.EmployeeDO AS emp,
+															com.ff.domain.organization.OfficeDO AS officeDO
+													WHERE   emp.employeeId = empuser.empDO.employeeId
+													AND		emp.officeId = officeDO.officeId
+													and 	officeDO.officeTypeDO.offcTypeCode =:officeType
+													and 	empuser.userId =:userId
+													and 	officeDO.cityId=:cityId))
+					AND office.cityId IN (:cityId)
+					group by office.officeName
+				]]>
+
+	</query>
+	<query name="getOfficeForHubUserType">
+				<![CDATA[Select office
+					FROM	com.ff.domain.organization.OfficeDO office, com.ff.domain.umc.UserOfficeRightsMappingDO mmapOff
+					WHERE	
+					office.officeId = mmapOff.office.officeId
+					and office.reportingHUB = :officeId
+					and office.cityId=:cityId
+					AND mmapOff.status = 'A'
+					group by office.officeName
+				]]>
+
+	</query>
+	<query name="getOfficecOfRhoUserByCityIDAndUserID">
+				<![CDATA[Select office
+					FROM	com.ff.domain.organization.OfficeDO office, com.ff.domain.umc.UserOfficeRightsMappingDO mmapOff
+					WHERE	
+					office.officeId = mmapOff.office.officeId
+					and office.reportingRHO = :officeId
+					and office.cityId=:cityId
+					AND mmapOff.status = 'A'
+					group by office.officeName
+				]]>
+
+	</query>
+
+
+
+	<query name="getMultipleOfficecByUserType">
+				<![CDATA[Select office
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	(office.officeId IN (SELECT 	office1.officeId  
+												FROM 	com.ff.domain.organization.OfficeDO AS office1,
+					        						 	com.ff.domain.umc.UserOfficeRightsMappingDO AS mmapOff
+					        					WHERE 	office1.officeTypeDO.offcTypeCode =:officeType
+					        					AND		office1.officeId = mmapOff.office.officeId
+												and 	mmapOff.user.userId=:userId
+												and 	office1.cityId IN (:cityId)
+												AND 	mmapOff.status = 'A')
+					OR office.officeId IN (SELECT officeDO.officeId FROM com.ff.domain.umc.EmployeeUserDO AS empuser,
+															com.ff.domain.organization.EmployeeDO AS emp,
+															com.ff.domain.organization.OfficeDO AS officeDO
+													WHERE   emp.employeeId = empuser.empDO.employeeId
+													AND		emp.officeId = officeDO.officeId
+													and 	officeDO.officeTypeDO.offcTypeCode =:officeType
+													and 	empuser.userId =:userId
+													and 	officeDO.cityId IN (:cityId)))
+					AND office.cityId IN (:cityId)
+					group by office.officeName
+
+
+				]]>
+
+	</query>
+
+
+	<query name="getOfficecByMultipleCityIDForReport">
+				<![CDATA[
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	office.cityId IN (:cityId)
+					group by office.officeName
+				
+				]]>
+
+	</query>
+
+	<query name="getOfficecOfBranchUserByMultipleCityIDAndUserID">
+				<![CDATA[Select  office
+					FROM	com.ff.domain.organization.OfficeDO AS office
+					WHERE	(office.officeId IN (SELECT 	office1.officeId  
+												FROM 	com.ff.domain.organization.OfficeDO AS office1,
+					        						 	com.ff.domain.umc.UserOfficeRightsMappingDO AS mmapOff
+					        					WHERE 	office1.officeTypeDO.offcTypeCode = 'BO'
+					        					AND		office1.officeId = mmapOff.office.officeId
+												and 	mmapOff.user.userId=:userId
+												and 	office1.cityId IN (:cityId)
+												AND 	mmapOff.status = 'A')
+							OR office.officeId IN (SELECT officeDO.officeId FROM com.ff.domain.umc.EmployeeUserDO AS empuser,
+															com.ff.domain.organization.EmployeeDO AS emp,
+															com.ff.domain.organization.OfficeDO AS officeDO
+													WHERE   emp.employeeId = empuser.empDO.employeeId
+													AND		emp.officeId = officeDO.officeId
+													and 	officeDO.officeTypeDO.offcTypeCode = 'BO'
+													and 	empuser.userId =:userId
+													and 	officeDO.cityId IN (:cityId)))
+						 AND office.cityId IN (:cityId)
+					group by office.officeName
+
+				]]>
+
+	</query>
+
+
+	<query name="getOfficeMultipleForHubUserType">
+				<![CDATA[Select office
+					FROM	com.ff.domain.organization.OfficeDO office, com.ff.domain.umc.UserOfficeRightsMappingDO mmapOff
+					WHERE	
+					office.officeId = mmapOff.office.officeId
+					and office.reportingHUB = :officeId
+					and office.cityId IN (:cityId)
+					AND mmapOff.status = 'A'
+					group by office.officeName
+				]]>
+
+	</query>
+
+
+	<query name="getOfficecOfRhoUserByMultipleCityIDAndUserID">
+				<![CDATA[Select office
+					FROM	com.ff.domain.organization.OfficeDO office, com.ff.domain.umc.UserOfficeRightsMappingDO mmapOff
+					WHERE	
+					office.officeId = mmapOff.office.officeId
+					and office.reportingRHO = :officeId
+					and office.cityId IN (:cityId)
+					AND mmapOff.status = 'A'
+					group by office.officeName
+				]]>
+
+	</query>
+	<query name="getEmployeeOfficeOfUser">
+				<![CDATA[
+					SELECT office
+					FROM  com.ff.domain.umc.EmployeeUserDO empuser,
+					      com.ff.domain.organization.EmployeeDO emp,
+					      com.ff.domain.organization.OfficeDO office
+					WHERE empuser.empDO.employeeId = emp.employeeId
+					AND   emp.officeId = office.officeId
+					AND   office.cityId IN (:cityId)
+					AND   empuser.userId=:userId
+					AND   emp.empStatus = 'A'
+				]]>
+
+	</query>
+
+	<query name="getReportingOfficesForRhoUser">
+				<![CDATA[
+					Select  distinct office
+					FROM	com.ff.domain.organization.OfficeDO AS office
+					WHERE	(office.reportingRHO IN ((SELECT  office1.officeId  
+												FROM 	com.ff.domain.organization.OfficeDO AS office1,
+					        						 	com.ff.domain.umc.UserOfficeRightsMappingDO AS mmapOff
+					        					WHERE 	office1.officeTypeDO.offcTypeCode = 'RO'
+					        					AND		office1.officeId = mmapOff.office.officeId
+												and 	mmapOff.user.userId=:userId
+												and 	office1.cityId IN (:cityId)
+												AND 	mmapOff.status = 'A'))
+							OR office.officeId IN (:officeId, (SELECT 	office2.officeId  
+												FROM 	com.ff.domain.organization.OfficeDO AS office2,
+					        						 	com.ff.domain.umc.UserOfficeRightsMappingDO AS mmapOff1
+					        					WHERE 	office2.officeTypeDO.offcTypeCode = 'RO'
+					        					AND		office2.officeId = mmapOff1.office.officeId
+												and 	mmapOff1.user.userId=:userId
+												and 	office2.cityId IN (:cityId)
+												AND 	mmapOff1.status = 'A'))
+						   OR office.reportingRHO IN (:officeId)
+						   OR office.officeId IN (:officeId))
+						   AND office.cityId IN (:cityId)
+					ORDER BY office.officeName
+				]]>
+
+	</query>
+
+	<query name="getOfcIdByOfcCode">
+				<![CDATA[ 
+					Select office.officeId	FROM com.ff.domain.organization.OfficeDO office	WHERE office.officeCode = :ofcCode
+				]]>
+
+	</query>
+
+	<query name="getRegionalOfficeByRegionIdAndOfficeTypeCode"> 
+		<![CDATA[	FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeTypeDO.offcTypeCode=:officeTypeCode and  office.mappedRegionDO.regionId=:regionId
+				]]>
+	</query>
+
+	<query name="getOfficeByRegionAndOfcType">
+        <![CDATA[ 
+        		FROM	com.ff.domain.organization.OfficeDO office 
+        		WHERE	office.mappedRegionDO.regionId = :regionId
+        		AND		office.officeTypeDO.offcTypeCode = 'RO'
+         ]]>
+	</query>
+
+	<query name="getOffficesAndAllHubOfficesofCityServicedByPincode"> 
+		<![CDATA[	
+				FROM com.ff.domain.organization.OfficeDO office where office.officeId in
+ 				(
+ 				select pinbranch.officeId from com.ff.domain.pickup.PincodeBranchMappingDO 
+ 				pinbranch where pinbranch.pincodeId in  ( select pin.pincodeId 
+ 				FROM com.ff.domain.geography.PincodeDO pin where pin.pincode = :pincode	AND pin.status='A' )
+				)
+				 or office.officeId in
+ 				( select ofc.officeId FROM com.ff.domain.organization.OfficeDO ofc where ofc.cityId in 
+ 				( select pin.cityId FROM com.ff.domain.geography.PincodeDO 
+ 				  pin where pin.pincode = :pincode) and ofc.officeTypeDO.offcTypeCode = :hubOfcCode
+				)
+		
+				]]>
+	</query>
+
+	<query name="getReportingRhoOfLoggdInBranchOffice">
+				<![CDATA[
+					FROM	com.ff.domain.organization.OfficeDO office
+					WHERE	office.officeId=(select offc.reportingRHO from com.ff.domain.organization.OfficeDO offc where 
+					offc.officeId=:officeId)
+				]]>
+	</query>
+	<query name="getAllOfficesAndRHOOfcByCity">
+        <![CDATA[ FROM com.ff.domain.organization.OfficeDO office 
+        			WHERE office.cityId IN (:cityId) and 
+        			office.officeTypeDO.offcTypeCode NOT IN ('CO')
+        			ORDER BY office.officeName
+        
+         ]]>
+	</query>
+
+	<query name="getAllBranchOfficesByCity">
+        <![CDATA[ 
+        	FROM com.ff.domain.organization.OfficeDO office 
+        	WHERE office.cityId IN (:cityId) 
+        	AND office.officeTypeDO.offcTypeCode IN ('BO')
+    		ORDER BY office.officeName
+         ]]>
+	</query>
+
+	<query name="getAllBranchAndStandaloneOfficesByCity">
+        <![CDATA[ 
+        	FROM com.ff.domain.organization.OfficeDO office 
+        	WHERE office.cityId IN (:cityId) 
+        	AND office.officeTypeDO.offcTypeCode IN ('BO','HO')
+    		ORDER BY office.officeName
+         ]]>
+	</query>
+
+	<query name="getAllBranchAndHubOffices">
+		<![CDATA[ 
+			SELECT office.officeId 
+			FROM com.ff.domain.organization.OfficeDO office
+			WHERE
+			office.officeTypeDO.offcTypeCode IN ('HO','BO')
+			AND office.officeCode != '1001'
+         ]]>
+	</query>
+	<query name="getAllOfficesUnderReportingHub">
+				<![CDATA[
+					SELECT office.officeId 
+					FROM  com.ff.domain.organization.OfficeDO office
+					WHERE office.reportingHUB = :officeId
+				]]>
+	</query>	
+</hibernate-mapping>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.expense.BcunExpenseEntriesDO" table="ff_f_expense_entries">
+		<id name="expenseEntryId" type="java.lang.Long">
+			<column name="EXPENSE_ENTRY_ID" />
+			<generator class="native" />
+		</id>
+		<property name="amount" column="AMOUNT" />
+		<property name="serviceCharge" column="SERVICE_CHARGE" />
+		<property name="serviceTax" column="SERVICE_TAX" />
+		<property name="educationCess" column="EDUCATION_CESS" />
+		<property name="higherEducationCess" column="HIGHER_EDUCATION_CESS" />
+		<property name="stateTax" column="STATE_TAX" />
+		<property name="surchargeOnStateTax" column="SURCHARGE_ON_STATE_TAX" />
+		<property name="octroiBourneBy" column="OCTROI_BOURNE_BY" />
+		<property name="otherCharges" column="OTHER_CHARGES" />
+		<property name="totalExpenseEntryAmt" column="TOTAL_EXPENSE_ENTRY_AMT" />
+		<property name="remarks" column="REMARKS" />
+		<property name="position" column="POSITION" />
+		<property name="billingFlag" column="BILLING_FLAG" />
+		<property name="employeeDO" column="EMPLOYEE_ID" />
+		
+		<!--  common attributes  START-->
+		<property name="createdBy" column="CREATED_BY" update="false" />
+		<property name="createdDate" column="CREATION_DATE" update="false" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		<property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL" />
+		<!--  common attributes  END-->
+	
+		<!-- Many -to- one relationships START -->
+		<many-to-one name="expenseDO"
+			class="com.ff.domain.mec.expense.BcunExpenseDO" lazy="false" fetch="join">
+			<column name="EXPENSE_ID" />
+		</many-to-one>
+		
+		<many-to-one name="consignmentDO"
+			class="com.ff.domain.consignment.BcunConsignmentDO" lazy="false" fetch="join">
+			<column name="CONSG_ID" />
+		</many-to-one>
+		<!-- Many -to- one relationships END -->
+		
+	</class>
+	
+</hibernate-mapping>

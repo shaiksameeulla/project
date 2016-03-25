@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.manifest.StockManifestDO" table="ff_f_manifest" dynamic-update="true">
+		<id name="manifestId" type="java.lang.Integer" column="MANIFEST_ID">
+			<generator class="native" />
+		</id>
+		<property name="manifestNo" column="MANIFEST_NO" type="java.lang.String" update="false"/>
+		<property name="manifestType" column="MANIFEST_TYPE" type="java.lang.String" update="false"/>
+		<property name="bagLockNo" column="BAG_LOCK_NO" type="java.lang.String" update="false"/>
+		<property name="manifestDate" column="MANIFEST_DATE" update="false"/>
+		<property name="manifestStatus" column="MANIFEST_STATUS" update="false"/>
+		<property name="manifestDirection" column="MANIFEST_DIRECTION" update="false"/>
+		<property name="operatingOffice" column="OPERATING_OFFICE" type="java.lang.Integer" update="false"/>
+		<property name="originOffice" column="ORIGIN_OFFICE" type="java.lang.Integer" update="false"/>
+		<property name="isStockConsumed" column="IS_STOCK_CONSUMED"/>
+		<property name="dtFromOpsman" column ="DT_FROM_OPSMAN" update="false"/>
+	</class>
+	
+	<query name="getManifestStockReductionDtls">
+		<![CDATA[
+			FROM com.ff.domain.manifest.StockManifestDO manifest
+			WHERE 
+				manifest.isStockConsumed='N'
+				And
+				manifest.dtFromOpsman='N'
+				and
+				manifest.operatingOffice=manifest.originOffice
+			AND 
+			manifest.manifestDirection = :manifestDirection
+			AND 
+			(manifest.manifestDate BETWEEN :fromDate AND :toDate)
+			ORDER BY manifest.manifestDate
+		]]>
+	</query>
+	
+	<query name="updateStockConsumption">
+		<![CDATA[
+			update com.ff.domain.manifest.StockManifestDO manifest set manifest.isStockConsumed='Y'
+			where manifest.manifestId=:manifestId
+		]]>
+	</query>
+
+	<!-- Starting Data sync querys -->
+
+ 
+</hibernate-mapping>

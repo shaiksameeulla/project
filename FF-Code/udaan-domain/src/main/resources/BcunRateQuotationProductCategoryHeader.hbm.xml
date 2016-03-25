@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+  
+	<class name="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationProductCategoryHeaderDO" table="ff_f_rate_quotation_product_category_header">
+		<id name="rateQuotationProductCategoryHeaderId" type="java.lang.Integer" column="RATE_QUOTATION_PRODUCT_CATEGORY_HEADER_ID">
+			<generator class="assigned" />
+		</id>
+		
+		<property name="rateProductCategory" column="RATE_PRODUCT_CATEGORY"/>
+		<property name="minimumChargeableWeightId" column="MINIMUM_CHARGEABLE_WEIGHT_ID"/>
+		<property name="rateQuotationId" column="RATE_QUOTATION"/>
+		<property name="extendedFromPreviousQuotation" column="EXTENDED_FROM_PREVIOUS_QUOTATION" />
+		<property name="vobSlab" column="VOB_SLAB"/>
+		
+		<set name="rateQuotationWeightSlabDO" table = "ff_f_rate_quotation_weight_slab"  lazy="false" cascade="all-delete-orphan"  fetch="join">
+		 
+		<key column="RATE_QUOTATION_PRODUCT_CATEGORY_HEADER" />
+		<one-to-many class="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationWeightSlabDO" />
+		 
+		</set>
+      
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+		<property name="createdDate" column="CREATED_DATE" />
+ 		<property name="createdBy" column="CREATED_BY" />
+        <property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE"/>
+		<property name="flatRate" column="CALCULATION_METHOD"/>
+    </class>
+</hibernate-mapping>

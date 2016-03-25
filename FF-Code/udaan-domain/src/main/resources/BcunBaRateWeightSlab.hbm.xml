@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.ba.BcunBaRateWeightSlabDO" table="ff_f_rate_ba_weight_slab">
+		<id name="baWeightSlabId">
+			<column name="BA_WEIGHT_SLAB_ID" />
+			<generator class="assigned" />
+		</id>
+		
+		<property name="baRateConfigProductHeaderId" column="BA_RATE_PRODUCT_HEADER" />
+		<property name="startWeight" column="START_WEIGHT" />
+		<property name="endWeight" column="END_WEIGHT" />
+		<property name="slabOrder" column="SLAB_ORDER" />
+		
+		<set name="baSlabRateDO" table="ff_f_rate_ba_slab_rate"
+			lazy="false" cascade="all-delete-orphan" inverse="false">
+			<key column="BA_WEIGHT_SLAB" />
+			<one-to-many
+				class="com.ff.domain.ratemanagement.operations.ba.BcunBaRateConfigSlabRateDO" />
+		</set>
+		<set name="baSpecialDestinationRateDO"
+			table="ff_f_rate_ba_special_destination" cascade="all-delete-orphan" lazy="false" inverse="false">
+			<key column="BA_WEIGHT_SLAB" />
+			<one-to-many
+				class="com.ff.domain.ratemanagement.operations.ba.BcunBARateConfigSpecialDestinationRateDO" />
+		</set>
+	</class>
+</hibernate-mapping>

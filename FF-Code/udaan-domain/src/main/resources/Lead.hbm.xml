@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.leads.LeadDO" table="ff_f_lead">
+		<id name="leadId" column="LEAD_ID" type="java.lang.Integer" >
+			<generator class="native" />
+		</id>
+		
+		<property  name="customerName" column="CUSTOMER_NAME"	type="java.lang.String"/>
+		<property  name="leadNumber" column="LEAD_NUMBER"	type="java.lang.String"/>	
+		<property  name="contactPerson" column="CONTACT_PERSON"	type="java.lang.String"/>	
+		<property  name="phoneNoSTD" column="STD_CODE"	type="java.lang.String"/>
+		
+
+		 <set name="competitorListDOs" table="ff_f_lead_competitor" cascade="all" inverse="true" lazy="false" fetch="subselect">
+            <key>
+                <column name="LEAD_ID"/>
+            </key>
+            <one-to-many class="com.ff.domain.leads.LeadCompetitorDO"/>
+        </set>	
+		
+		
+		<property  name="phoneNo" column="PHONE_NO"	type="java.lang.String"/>
+		<property  name="mobileNo" column="MOBILE_NO"	type="java.lang.String"/>
+		<property  name="doorNoBuilding" column="DOOR_NO_BUILDING"	type="java.lang.String"/>
+		<property  name="street" column="STREET_ROAD"	type="java.lang.String"/>
+		<property  name="location" column="LOCATION"	type="java.lang.String"/>
+		<property  name="city" column="CITY"	type="java.lang.String"/>
+		<property  name="pincode" column="PINCODE"	type="java.lang.String"/>
+		<property  name="designation" column="DESIGNATION"	type="java.lang.String"/>
+		<property  name="emailAddress" column="EMAIL"	type="java.lang.String"/>
+		
+		<!-- <many-to-one name="rateIndustryCategoryDO" class="com.ff.domain.ratemanagement.masters.RateIndustryCategoryDO" lazy="false">
+			<column name="INDUSTRY_CATEGORY_ID" />
+		</many-to-one> -->
+		<property  name="industryCategoryCode" column="INDUSTRY_CATEGORY_CODE"	type="java.lang.String"/>
+		
+		<property  name="leadSourceCode" column="LEAD_SOURCE_CODE"	type="java.lang.String"/>
+				 		
+		<property  name="secondaryContact" column="SECONDRY_CONTACT"	type="java.lang.String"/>
+		
+		<many-to-one name="assignedToEmployeeDO" class="com.ff.domain.umc.EmployeeUserDO"  lazy="false" fetch="join">
+			<column name="ASSIGNED_TO" />
+		</many-to-one>
+	
+		<property  name="leadStatusCode" column="LEAD_STATUS_CODE"	type="java.lang.String"/>
+				
+		<many-to-one name="createdByEmployeeDO" class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join" update="false">
+			<column name="CREATED_BY" />
+		</many-to-one>
+				
+		<property name="createdDate"  column="CREATION_DATE" type="java.util.Date" update="false"/>
+		
+		<many-to-one name="updatedByEmployeeDO"  class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join">
+			<column name="UPDATE_BY" />
+		</many-to-one>
+		
+		<property  name="updatedDate" column="UPDATE_DATE"	type="java.util.Date"/>
+		
+		<property  name="businessType" column="BUSINESS_TYPE"	/>
+		
+			
+		
+	</class>
+	
+	<query name="getLeadsByStatus">
+	<![CDATA[ FROM com.ff.domain.leads.LeadDO lead 
+				WHERE lead.leadStatusCode=:leadStatusCode
+				ORDER BY lead.leadNumber ]]>
+	</query>
+	
+<!-- 	<query name="getLeadsByUser">
+	<![CDATA[ FROM com.ff.domain.leads.LeadDO lead 
+				WHERE lead.assignedToEmployeeDO.empUserId=
+				(SELECT employeeUser.empUserId from com.ff.domain.umc.EmployeeUserDO employeeUser WHERE employeeUser.userId = :userId)
+				ORDER BY lead.leadNumber]]>
+	</query> -->
+	
+	<query name="getLeadsByUser">
+	<![CDATA[ FROM com.ff.domain.leads.LeadDO lead 
+				WHERE lead.assignedToEmployeeDO.empUserId=
+				(SELECT employeeUser.empUserId from com.ff.domain.umc.EmployeeUserDO employeeUser WHERE employeeUser.userId = :userId)
+				and lead.createdDate between :effectiveFrom and :effectiveTo
+				ORDER BY lead.leadNumber]]>
+	</query>
+	
+	<query name="getLeadsByUserForAllStatus">
+	<![CDATA[ FROM com.ff.domain.leads.LeadDO lead 
+				WHERE lead.assignedToEmployeeDO.empUserId=
+				(SELECT employeeUser.empUserId from com.ff.domain.umc.EmployeeUserDO employeeUser WHERE employeeUser.userId = :userId)
+				and lead.createdDate between :effectiveFrom and :effectiveTo
+				and lead.leadStatusCode=:leadStatusCode
+				ORDER BY lead.leadNumber]]>
+	</query>
+	
+	<!-- and lead.createdDate >= :effectiveFrom  and lead.createdDate <= :effectiveTo  -->
+	
+	<query name="getLeadsByRegion">
+		<!-- <![CDATA[ FROM com.ff.domain.leads.LeadDO lead 
+					WHERE lead.assignedToEmployeeDO.empDO.officeId=:officeId]]> -->
+		<![CDATA[
+			select	lead
+			FROM 	com.ff.domain.leads.LeadDO lead,
+				 	com.ff.domain.organization.EmployeeDO emp,
+				 	com.ff.domain.organization.OfficeDO office,
+				 	com.ff.domain.organization.DepartmentDO department
+			where 	lead.assignedToEmployeeDO.empDO.employeeId = emp.employeeId
+			and		office.officeId = emp.officeId
+			and		department.departmentId = emp.departmentId
+			and		office.mappedRegionDO.regionId = :regionId
+			and		department.departmentName=:departmentName
+			and 	lead.createdDate between :effectiveFrom and :effectiveTo			
+			ORDER BY lead.leadNumber
+		]]>
+	</query>
+	
+ 	<query name="getLeadsByRegionAndStatus">
+		<![CDATA[
+			select	lead
+			FROM 	com.ff.domain.leads.LeadDO lead,
+				 	com.ff.domain.organization.EmployeeDO emp,
+				 	com.ff.domain.organization.OfficeDO office,
+				 	com.ff.domain.organization.DepartmentDO department
+			where 	lead.assignedToEmployeeDO.empDO.employeeId = emp.employeeId
+			and		office.officeId = emp.officeId
+			and		department.departmentId = emp.departmentId
+			and		office.mappedRegionDO.regionId = :regionId
+			and		department.departmentName=:departmentName
+			and 	lead.createdDate between :effectiveFrom and :effectiveTo
+			and 	lead.leadStatusCode=:leadStatusCode			
+			ORDER BY lead.leadNumber
+		]]>
+	</query>	 
+	
+		<query name="updateLeadsStatusByLeadId">
+		<![CDATA[
+			UPDATE com.ff.domain.leads.LeadDO lead
+			SET lead.leadStatusCode=:leadStatusCode
+			WHERE lead.leadId =:leadId
+		]]>
+	</query>
+	
+</hibernate-mapping>

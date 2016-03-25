@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.business.BcunCustomerDO" table="ff_d_customer">
+		<id name="customerId" type="java.lang.Integer">
+			<column name="CUSTOMER_ID" />
+			<generator class="assigned" />
+		</id>
+
+		<property name="mobile">
+			<column name="MOBILE" />
+		</property>
+		<property name="phone">
+			<column name="PHONE" />
+		</property>
+		<property name="email">
+			<column name="EMAIL" />
+		</property>
+		<property name="status">
+			<column name="CUR_STATUS" />
+		</property>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="createdDate" column="CREATED_DATE"/>
+		
+		<property name="officeMappedDO" column="OFFICE_MAPPED_TO" type="java.lang.Integer" />
+		<property name="salesOfficeDO" column="SALES_OFFICE" type="java.lang.Integer" />
+		<!-- <property name="primaryContactDO" column="PRIMARY_CONTACT" type="java.lang.Integer" /> 
+		<property name="secondaryContactDO" column="SECONDARY_CONTACT" type="java.lang.Integer" /> -->
+		<property name="industryCategoryDO" column="INDUSTRY_CATEGORY" type="java.lang.Integer" />
+		<property name="industryTypeDO" column="INDUSTRY_TYPE" type="java.lang.Integer" />
+		<property name="customerCategoryDO" column="CUSTOMER_CATEGORY" type="java.lang.Integer" />
+		<property name="salesPersonDO" column="SALES_PERSON" type="java.lang.Integer" />
+		<!-- <property name="addressDO" column="ADDRESS" type="java.lang.Integer" /> -->
+		<property name="customerType" column="CUSTOMER_TYPE" type="java.lang.Integer" />
+		<property name="groupKeyDO" column="GROUP_KEY" type="java.lang.Integer" />
+		
+		<property name="paymentTerm" column="PAYEMENT_TERM" />
+		<property name="billingCycle" column="BILLING_CYCLE" />
+		<property name="contractNo" column="CONTRACT_NO" />
+		<property name="customerCode" column="CUSTOMER_CODE" />
+		<property name="businessName" column="BUSINESS_NAME" />
+		<property name="tanNo" column="TAN_NO" />
+		<property name="distributionChannels" column="DISTRIBUTION_CHANNELS" />
+		<property name="panNo" column="PAN_NO" />
+		<property name="businessType" column="BUSINESS_TYPE" />
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+
+		<many-to-one name="addressDO" class="com.ff.domain.pickup.BcunAddressDO"
+			cascade="all" lazy="false" fetch="join">
+			<column name="ADDRESS" />
+		</many-to-one>
+		
+		<many-to-one name="primaryContactDO"
+			class="com.ff.domain.ratemanagement.masters.BcunContactDO" cascade="all"
+			lazy="false" fetch="join">
+			<column name="PRIMARY_CONTACT" />
+		</many-to-one>
+
+		<many-to-one name="secondaryContactDO"
+			class="com.ff.domain.ratemanagement.masters.BcunContactDO" cascade="all"
+			lazy="false" fetch="join">
+			<column name="SECONDARY_CONTACT" />
+		</many-to-one>
+	
+	</class>
+
+
+	
+</hibernate-mapping>

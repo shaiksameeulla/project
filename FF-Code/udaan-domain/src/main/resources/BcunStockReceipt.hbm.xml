@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.receipt.BcunStockReceiptDO" table="ff_f_stock_receipt" dynamic-update="true">
+		<id name="stockReceiptId" type="java.lang.Long">
+			<column name="STOCK_RECEIPT_ID" />
+			<generator class="native" />
+		</id>
+		<property name="requisitionNumber" column="REQUISITION_NUMBER" />
+		<property name="issueNumber" column="ISSUE_NUMBER" />
+		<property name="acknowledgementNumber" column="ACKNOWLEDGEMENT_NUMBER" />
+		<property name="issuedDate" column="ISSUED_DATE" />
+		<property name="receivedDate" column="RECEIVED_DATE" />
+		
+		<!-- common attributes START -->
+		<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+		<!-- <property name="centralInboudStatus" column="DT_CENTRAL_INBOUND" />
+		<property name="centralOutboudStatus" column="DT_CENTRAL_OUTBOUND" /> -->
+		<!-- <property name="nodeId" column="TRANS_NODE_ID" /> -->
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapStatusInBound" column="DT_SAP_INBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<!-- common attributes END -->
+		
+		<!-- One-to- Many relationships START -->
+		<set name="stockReceiptItemDtls" lazy="false" cascade="all-delete-orphan"   fetch="join">
+            <key column="STOCK_RECEIPT_ID"/>
+            <one-to-many class="com.ff.domain.stockmanagement.operations.receipt.BcunStockReceiptItemDtlsDO"/>
+    	</set> 
+		<!-- One-to-Many relationships END -->	
+		
+		<property name="receiptOfficeId" column="RECEIPT_OFFICE_ID" type="java.lang.Integer" />	
+		
+		<property name="issuedOfficeId" column="ISSUED_OFFICE_ID" type="java.lang.Integer" />
+			
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		
+		
+		<!-- Many -to- one relationships END  -->	
+	</class>
+
+<!-- Query For Data Sync  Started -->
+	
+	
+	<query name="getstockReceiptId">
+		<![CDATA[SELECT StockReceipt.issuedOfficeId From com.ff.domain.stockmanagement.operations.receipt.BcunStockReceiptDO StockReceipt where  StockReceipt.acknowledgementNumber = :acknowledgementNumber ]]>
+	</query>
+	
+	<query name="getUnsyncOutboundStockReceipt">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.receipt.BcunStockReceiptDO StockReceipt
+					where StockReceipt.receiptOfficeId=:branchId	 AND StockReceipt.dtToBranch='N' 
+					
+		]]>
+	</query>
+	<query name="getStockReceiptDtlsByNumber">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.receipt.BcunStockReceiptDO StockReceipt
+					where StockReceipt.acknowledgementNumber = :acknowledgementNumber
+		]]>
+	</query>
+	
+<!-- Query For Data Sync  End -->	
+
+</hibernate-mapping>

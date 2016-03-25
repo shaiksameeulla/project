@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+
+
+
+<hibernate-mapping>
+
+<class name="com.ff.domain.mec.SAPReportDO" table="ff_f_sap_report">
+		<id name="Id" type="java.lang.Long">
+			<column name="REPORT_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name = "reportName" column = "REPORT_NAME" />
+		<property name = "reportDescription" column = "REPORT_DESCRIPTION" />
+		
+		</class>
+		<query name="getReportsNameList">
+	<![CDATA[
+		FROM	com.ff.domain.mec.SAPReportDO	
+		
+	]]>
+</query>
+
+<query name="getUniqueReportsNameList">
+	<![CDATA[
+		SELECT distinct report.reportName, report.reportDescription, report.Id FROM
+			com.ff.domain.mec.SAPReportDO	report
+		
+	]]>
+</query>
+
+</hibernate-mapping>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<class name="com.ff.domain.mec.SAPOutstandingPaymentDO" table="ff_f_sap_outstanding_payment">
+		<id name="Id" type="java.lang.Long">
+			<column name="ID" />
+			<generator class="native" />
+		</id>
+		<property name = "billUpto" column = "BILL_UPTO_DATE" />
+		<property name = "paymentUpto" column = "PAYMENT_UPTO_DATE" />
+		<property name = "outStandingFor" column = "OUTSTANDING_FOR" />
+		<property name = "customerCode" column = "CUSTOMER_CODE" />
+		<property name = "empCode" column = "EMP_CODE" />
+		<property name = "ccemail" column = "EMAIL" />
+		<property name = "officeCode" column = "OFFICE_CODE" />
+		<property name = "sapStatus" column = "DT_SAP_OUTBOUND" />
+		<property name = "sapTimestamp" column = "SAP_TIMESTAMP" />
+		<property name = "reportName" column = "REPORT_NAME" />
+		<property name="exception" column="EXCEPTION" />
+	</class>
+
+<query name="getOutStandingPaymentDtls">
+	<![CDATA[
+		FROM	com.ff.domain.mec.SAPOutstandingPaymentDO	outStandingPayment
+		WHERE	outStandingPayment.sapStatus=:sapStatus
+	]]>
+</query>
+
+<query name="getOutstandingPaymentDtls">
+	<![CDATA[
+		SELECT COUNT(*)
+		FROM	com.ff.domain.mec.SAPOutstandingPaymentDO	outStandingPayment
+		WHERE	outStandingPayment.sapStatus=:sapStatus
+	]]>
+</query>
+
+<query name="updateOutStandingPaymentDtlsFlag">
+	<![CDATA[
+		UPDATE	com.ff.domain.mec.SAPOutstandingPaymentDO	outStandingPayment
+		SET		outStandingPayment.sapStatus=:sapStatus,outStandingPayment.sapTimestamp=:sapTimestamp,outStandingPayment.exception=:exception
+		WHERE 	outStandingPayment.Id=:Id
+	
+	]]>
+</query>
+
+</hibernate-mapping>

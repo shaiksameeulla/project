@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.LiabilityDO" table="ff_f_liability_payment">
+		<id name="liabilityId">
+			<column name="LIABILITY_ID" />
+			<generator class="native" />
+		</id>
+		<property name="txNumber" column="TRANSACTION_NO" />
+		<property name="liabilityDate" column="DATE" />
+		<property name="chqNo" column="CHEQUE_NO" />
+		<property name="chqDate" column="CHEQUE_DATE" />
+		<property name="liabiltyAmt" column="LIABILTIY_AMOUNT" />
+		<property name="status" column="LIABILITY_STATUS" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="paymentMode" column="PAYMENT_MODE" />
+
+		<!-- common attributes START -->
+		<property name="createdBy" column="CREATED_BY" update="false" />
+		<property name="createdDate" column="CREATION_DATE" update="false" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<!-- common attributes END -->
+
+		<!-- One -to- Many relationships START -->
+		<set name="liabilityDetailsList" lazy="false" cascade="all" fetch="join"
+			inverse="true">
+			<key column="LIABILITY_ID" />
+			<one-to-many class="com.ff.domain.mec.LiabilityDetailsDO" />
+		</set>
+
+		<!-- One -to- Many relationships END -->
+
+		<many-to-one name="regionId" class="com.ff.domain.geography.RegionDO"
+			lazy="false" fetch="join">
+			<column name="REGION_ID" />
+		</many-to-one>
+		<many-to-one name="custId" class="com.ff.domain.business.CustomerDO"
+			lazy="false" fetch="join">
+			<column name="CUSTOMER_ID" />
+		</many-to-one>
+		<many-to-one name="bankId" class="com.ff.domain.mec.GLMasterDO"
+			lazy="false" fetch="join">
+			<column name="BANK_ID" />
+		</many-to-one>
+
+		<many-to-one name="liabilityOffice" class="com.ff.domain.organization.OfficeDO"
+			lazy="false" fetch="join">
+			<column name="LIABILTY_OFFICE_ID" />
+		</many-to-one>
+
+	</class>
+
+
+
+	<query name="updateLiabilityDtlsForSAP">
+	<![CDATA[ 
+	UPDATE com.ff.domain.mec.LiabilityDO liabilityDO 
+		SET liabilityDO.sapStatus=:sapStatus,liabilityDO.sapTimestamp=:sapTimestamp
+		WHERE liabilityDO.txNumber=:txNumber
+	]]>
+	</query>
+
+	<query name="getLiabilityPaymentDtlsForInterface">
+	<![CDATA[ 
+	FROM com.ff.domain.mec.LiabilityDO liabilityDO 
+		WHERE liabilityDO.sapStatus=:sapStatus
+	]]>
+	</query>
+
+	<query name="getLiabilityPaymentCount">
+	<![CDATA[ 
+		SELECT COUNT(*)
+		FROM com.ff.domain.mec.LiabilityDO liabilityDO 
+		WHERE liabilityDO.sapStatus=:sapStatus
+	]]>
+	</query>
+
+
+	<query name="searchLiabilityByTxn">
+	<![CDATA[ 
+	FROM com.ff.domain.mec.LiabilityDO liabilityDO 
+		WHERE liabilityDO.txNumber=:txNumber
+
+	]]>
+	</query>
+
+	<query name="customerChequeNo">
+	<![CDATA[ 
+	FROM com.ff.domain.mec.LiabilityDO liabilityDO 
+		WHERE liabilityDO.custId.customerId=:customerId
+		AND liabilityDO.liabilityDate BETWEEN :fromDate AND :toDate
+	]]>
+	</query>
+	
+	<query name="getMaxLiabilityNumber">
+	<![CDATA[ 
+	   select max(liabilityDO.txNumber) FROM com.ff.domain.mec.LiabilityDO liabilityDO 
+		WHERE liabilityDO.txNumber like :prefix
+		AND liabilityDO.liabilityOffice.officeId=:loggedInOfficeId
+		AND  length(liabilityDO.txNumber) = :numberLength
+	]]>
+</query>
+
+</hibernate-mapping>

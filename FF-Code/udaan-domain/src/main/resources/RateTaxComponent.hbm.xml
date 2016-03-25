@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+   
+	<class name="com.ff.domain.ratemanagement.masters.RateTaxComponentDO" table="ff_d_rate_tax_component">
+		<id name="taxComponentId" type="java.lang.Integer" column="TAX_COMPONENT_ID">
+			<generator class="native" />
+		</id>
+		<property name="rateComponentCode" column="RATE_COMPONENT_CODE"/>
+		
+		<many-to-one name="state" class="com.ff.domain.geography.StateDO"  lazy="false"  fetch="join">
+		<column name="STATE" />
+		</many-to-one>
+		
+		<property name="taxPercentile" column="TAX_PERCENTILE" />
+		<property name="activeStatus" column="ACTIVE_STATUS" />
+		<property name="effectiveFrom" column="EFFECTIVE_FROM"  />
+		<property name="effectiveTo" column="EFFECTIVE_TO"  />
+		<property name="taxGroup" column="TAX_GROUP"/>
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+    </class>
+   
+	
+	<query name="getTaxComponents">
+		<![CDATA[
+			 FROM  com.ff.domain.ratemanagement.masters.RateTaxComponentDO rateTaxComponentDO
+			 WHERE rateTaxComponentDO.taxGroup =:taxGroup 
+			 AND   (:currentDate BETWEEN rateTaxComponentDO.effectiveFrom AND rateTaxComponentDO.effectiveTo) 
+			 AND   ((rateTaxComponentDO.state.stateId IS NULL) OR (rateTaxComponentDO.state.stateId =:state))  
+			 AND   rateTaxComponentDO.activeStatus = 'A' 
+			 ORDER BY rateTaxComponentDO.state DESC
+		]]>
+	</query>
+
+	<query name="getTaxComponentsForRateConfiguration">
+		<![CDATA[
+			 FROM  com.ff.domain.ratemanagement.masters.RateTaxComponentDO rateTaxComponentDO
+			 WHERE (:currentDate BETWEEN rateTaxComponentDO.effectiveFrom AND rateTaxComponentDO.effectiveTo) 
+			 AND   ((rateTaxComponentDO.state.stateId IS NULL) OR (rateTaxComponentDO.state.stateId =:state))  
+			 AND   rateTaxComponentDO.activeStatus = 'A' 
+			 ORDER BY rateTaxComponentDO.state DESC
+		]]>
+	</query>
+</hibernate-mapping>

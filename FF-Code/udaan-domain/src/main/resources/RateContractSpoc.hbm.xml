@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.masters.RateContractSpocDO" table="ff_d_rate_contract_spoc_contact_details">
+		<id name="contractSpocId" type="java.lang.Integer">
+			<column name="RATE_CONTRACT_CONTACT_DETAILS_ID" />
+			<generator class="native" />
+		</id>
+		<property name="complaintType" column="COMPLAINT_TYPE"/>
+		<property name="contactName" column="CONTACT_NAME"/>
+		<property name="contactNo" column="CONTACT_NO"/>
+		<property name="mobile" column="MOBILE"/>
+		<property name="fax" column="FAX"/>
+		<property name="email" column="EMAIL"/>
+		<property name="contactType" column="CONTACT_TYPE"/>
+		<!-- <property name="rateContractId" column="RATE_CONTRACT"/> -->
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+		<many-to-one name="rateContractDO" class="com.ff.domain.ratemanagement.masters.RateContractDO" lazy="false"  fetch="join">
+		<column name="RATE_CONTRACT" />
+		</many-to-one>
+			
+	</class>
+	
+	<query name="getRateContractSpocDetails">
+	<![CDATA[
+			From com.ff.domain.ratemanagement.masters.RateContractSpocDO spoc
+			WHERE  spoc.contactType =:contactType AND spoc.rateContractDO.rateContractId =:contractId
+	
+	]]>
+	
+	</query>
+</hibernate-mapping>

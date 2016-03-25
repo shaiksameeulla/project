@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.releasedscripts.ReleasedScriptsDO"
+		table="ff_f_released_scripts">
+		<id name="scriptId" type="java.lang.Integer">
+			<column name="SCRIPT_ID" />
+			<generator class="native" />
+		</id>
+		<property name="scriptName" type="java.lang.String">
+			<column name="SCRIPT_NAME" />
+		</property>
+		<property name="moduleName" type="java.lang.String">
+			<column name="MODULE_NAME" />
+		</property>
+		<property name="scriptContent" type="java.lang.String">
+			<column name="SCRIPT_CONTENT" />
+		</property>
+		<property name="releaseDate" type="java.util.Date">
+			<column name="RELEASE_DATE"></column>
+		</property>
+		<property name="isExecuted">
+			<column name="IS_EXECUTED" />
+		</property>
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date"
+			update="false" />
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="executedDate" column="EXECUTED_DATE" type="java.util.Date" />
+		<property name="exception" column="EXCEPTION" />
+	</class>
+	 <query name="getAllNonExcecutedScripts">
+	<![CDATA[ FROM com.ff.domain.releasedscripts.ReleasedScriptsDO releasedScriptsDo where releasedScriptsDo.isExecuted ='No'
+		]]>
+	</query>
+</hibernate-mapping>
+	

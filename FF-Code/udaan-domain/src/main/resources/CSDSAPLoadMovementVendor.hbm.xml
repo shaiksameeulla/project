@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.business.CSDSAPLoadMovementVendorDO" table="ff_d_vendor">
+		<id name="vendorId" type="java.lang.Integer" column="VENDOR_ID">
+			<generator class="native" />
+		</id>
+		
+        <property name="vendorCode" type="java.lang.String" column="VENDOR_CODE" />
+        <property name="firstname" type="java.lang.String" column="FIRST_NAME" />
+        <property name="lastName" type="java.lang.String" column="LAST_NAME" />
+        <property name="phone" type="java.lang.String" column="PHONE" />
+        <property name="businessName" type="java.lang.String" column="BUSINESS_NAME" />
+        <property name="mobile" column="MOBILE" />
+        <property name="fax" column="FAX" />
+        <property name="companyType" column="COMPANY_TYPE" />
+        <property name="service" column="SERVICE" />
+        <property name="email" column="EMAIL" />
+        <property name="address" column="ADDRESS" />
+        <property name="pincode" column="PINCODE" />
+        <!-- <property name="exception" column="" /> -->
+        <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> 
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate" column="CREATION_DATE" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+        
+      <!--   <property name="vendorType" type="java.lang.String" column="VENDOR_TYPE" /> -->
+        
+        <many-to-one name = "vendorTypeDO" class ="com.ff.domain.business.VendorTypeDO" lazy="false" fetch="join">
+        	<column name="VENDOR_TYPE" />
+		</many-to-one>
+        	
+         <many-to-one name="officeDO" class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="OFFICE_MAPPED_TO" />
+		</many-to-one>
+		
+		<!-- <many-to-one name="regionDO" class="com.ff.domain.geography.RegionDO" lazy="false" fetch="join">
+			<column name="REGION_MAPPED_TO" />
+		</many-to-one> -->
+		<set  name="vendorRegionMappingDO" lazy="false" fetch="join" cascade="all" inverse="true">
+            <key column="VENDOR_ID"/>
+            <one-to-many class="com.ff.domain.business.CSDSAPVendorRegionMapDO"/>
+        </set> 
+			 
+	</class>
+	
+	<query name="getVendorByCode">
+		<![CDATA[ 
+			FROM	com.ff.domain.business.CSDSAPLoadMovementVendorDO  vendorDO
+			WHERE 	vendorDO.vendorCode=:vendorCode
+		]]>
+	</query>
+	
+</hibernate-mapping>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.leads.LeadCompetitorDO" table="ff_f_lead_competitor">
+		<id name="leadCompetitorId" type="java.lang.Integer">
+			<column name="LEAD_COMPETITOR_ID" />
+			<generator class="native" />
+		</id>
+		
+		<many-to-one name="leadDO"   class="com.ff.domain.leads.LeadDO" lazy="false" fetch="join" >
+		<column name="LEAD_ID"/>
+		</many-to-one>
+		
+		<property name="leadProductCode"  type="java.lang.String" >
+		<column name="PRODUCT_CODE"/>
+		</property>
+		
+		<many-to-one name="competitorDO"   class="com.ff.domain.leads.CompetitorDO" lazy="false"  fetch="join">
+		<column name="COMPETITOR_ID"/>
+		</many-to-one>
+		
+		<property  name="potential" column="POTENTIAL"	type="java.math.BigDecimal"/>
+		
+		<property  name="expectedVolume" column="EXPECTED_VOLUME"	type="java.math.BigDecimal"/>
+		
+		<many-to-one name="createdByEmployeeDO" class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join">
+			<column name="CREATED_BY" />
+		</many-to-one>
+				
+		<property name="createdDate"  column="CREATED_DATE" type="java.util.Date"/>
+		
+		<many-to-one name="updatedByEmployeeDO" class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join">
+			<column name="UPDATED_BY" />
+		</many-to-one>
+		<property name="updatedDate"  column="UPDATED_DATE" type="java.util.Date"/>
+		
+		</class>
+		
+	
+	
+	 
+</hibernate-mapping>

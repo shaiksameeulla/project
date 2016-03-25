@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.transport.BcunTransportDO" table="ff_f_transport">
+		<id name="transportId" type="java.lang.Integer" column="TRANSPORT_ID">
+			<generator class="assigned" />
+		</id>
+				
+		<many-to-one name="transportModeDO" class="com.ff.domain.transport.TransportModeDO" lazy="false" fetch="join">
+			<column name="TRANSPORT_MODE" />
+		</many-to-one>
+		 					
+		<many-to-one name="flightDO" class="com.ff.domain.transport.BcunFlightDO" lazy="false" fetch="join" cascade="all">
+			<column name="FLIGHT" />
+		</many-to-one>
+		 				
+		<many-to-one name="trainDO" class="com.ff.domain.transport.BcunTrainDO" lazy="false" fetch="join" cascade="all">
+			<column name="TRAIN" />
+		</many-to-one>		  
+		
+		<many-to-one name="vehicleDO" class="com.ff.domain.transport.BcunVehicleDO" lazy="false" fetch="join"  cascade="all">
+			<column name="VEHICLE"/>
+		</many-to-one>	      
+	</class>
+		
+</hibernate-mapping>

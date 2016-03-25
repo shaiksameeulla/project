@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.umc.ApproverUserOfficeDO" table="ff_d_approver_user_office">
+		<id name="approverUserOfficeId" type="java.lang.Integer">
+			<column name="APPROVERUSEROFFICE_ID" />
+			<generator class="native" />
+		</id>
+		<property name="user" type="java.lang.Integer">
+			<column name="USER_ID" />
+		</property>
+		<property name="office" type="java.lang.Integer">
+			<column name="OFFICE" />
+		</property>
+		<property name="city" type="java.lang.Integer">
+			<column name="CITY" />
+		</property>	
+		<property name="regionalOffice" type="java.lang.Integer">
+			<column name="REGIONAL_OFFICE" />
+		</property>	
+		<property name="mappedTo" type="java.lang.String">
+			<column name="MAPPED_TO" />
+		</property>
+		<property name="active" >
+			<column name="ACTIVE" />
+		</property>
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>			
+	</class>
+	
+	
+	<query name="updateAssignApproverOffc">
+		<![CDATA[
+			Update  com.ff.domain.umc.ApproverUserOfficeDO apprUserOffic set apprUserOffic.active=:active,apprUserOffic.dtToBranch='N' where apprUserOffic.user = :userId
+			 and apprUserOffic.office=:officeId
+		]]>
+	
+	</query>
+	
+	
+	<query name="updateAssignApproverOffcforNoOffic">
+		<![CDATA[
+			Update  com.ff.domain.umc.ApproverUserOfficeDO apprUserOffic set apprUserOffic.active=:active,apprUserOffic.dtToBranch='N' where apprUserOffic.user = :userId
+			 and apprUserOffic.mappedTo IN (:mappedTO)
+		]]>
+	
+	</query>
+	
+</hibernate-mapping>
+	

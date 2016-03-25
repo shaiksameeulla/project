@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.tracking.BulkCnTrackDO" table="ff_f_bulk_cn_track">
+		<id name="consgNo" column="CONSG_NO" />
+		<property name="refNo" column="REF_NO" type="java.lang.String" />
+		<property name="bookingDate" column="BOOKING_DATE" type="java.lang.String" />
+		<property name="originCity" column="ORIGIN_CITY" type="java.lang.String" />
+		<property name="destCity" column="DEST_CITY" type="java.lang.String" />
+		<property name="cnStatus" column="CN_STATUS" type="java.lang.String" />
+		<property name="pendingReason" column="PENDING_REASON" type="java.lang.String" />
+		<property name="deliveryDate" column="DELIVERY_DATE" type="java.lang.String" />
+		<property name="receiverName" column="RECEIVER_NAME" type="java.lang.String" />
+		<property name="cnWeight" column="CN_WEIGHT" type="java.lang.String"/>
+		<property name="ogmNo" column="OGM_NO" type="java.lang.String" />
+		<property name="ogmDate" column="OGM_DATE" type="java.lang.String" />
+		<property name="bplNo" column="BPL_NO" type="java.lang.String" />
+		<property name="bplDate" column="BPL_DATE" type="java.lang.String" />
+		<property name="cdNo" column="CD_NO" type="java.lang.String" />	
+		<property name="cdDate" column="CD_DATE" type="java.lang.String" />	
+		<property name="flightNo" column="FLIGHT_NO" type="java.lang.String" />
+		<property name="flightDep" column="FLIGHT_DEP" type="java.lang.String" />	
+		<property name="flightArr" column="FLIGHT_ARR" type="java.lang.String" />	
+		<property name="rcvDate" column="RCV_DATE" type="java.lang.String" />
+		<property name="inMnfstDate" column="IN_MNFST_DATE" type="java.lang.String" />
+		
+		<property name="drsNo" column="DRS_NO" type="java.lang.String" />
+		<property name="thirdPartyName" column="THIRD_PARTY_NAME" type="java.lang.String" />
+		<property name="dlvBranchName" column="DELIVERY_OFFICE" type="java.lang.String" />
+	</class>
+	<sql-query name="getBulkCnTrackingDetails">
+	   <return alias="process" class="com.ff.domain.tracking.BulkCnTrackDO"/>
+	    <![CDATA[CALL sp_consignment_bulk_tracking(:trackType,:consgNum)]]>
+    </sql-query>
+    
+</hibernate-mapping>

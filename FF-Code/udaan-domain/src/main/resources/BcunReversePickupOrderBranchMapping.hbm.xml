@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.BcunReversePickupOrderBranchMappingDO"
+		table="ff_f_rev_pickup_order_to_branch">
+		<id name="id" type="java.lang.Integer">
+			<column name="ID" />
+			<generator class="identity" />
+		</id>
+      <property name="orderAssignedBranch" type="java.lang.Integer">
+			<column name="BRANCH_ORDER_ASSIGNED_TO" />
+		</property>
+		
+		<property name="branchOrderRequestStatus" type="java.lang.String">
+			<column name="ORDER_REQUEST_STATUS" />
+		</property>
+		
+		<many-to-one name="pickupOrderDetail" class="com.ff.domain.pickup.BcunReversePickupOrderDetailDO" fetch="join" lazy="false" cascade="all">
+            <column name="REQUEST_DETAIL_ID" not-null="true" />
+        </many-to-one> 
+        
+        <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<!-- Start of Changes by <48206> for opsman on 20/09/2013  -->
+		<property  name="dtToOpsman" type="java.lang.String">
+		<column name="DT_TO_OPSMAN"/>
+		</property>
+		
+		<property  name="dtFromOpsman" 	type="java.lang.String">
+		<column name="DT_FROM_OPSMAN"/>
+		</property>
+		<!-- End of Changes by <48206> for opsman on 20/09/2013  -->
+		 <property name="dtUpdateToCentral">
+			<column name="DT_UPDATE_TO_CENTRAL" />
+		</property>
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer"/>
+         <property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/>
+         <property name="transactionCreateDate">
+			<column name="CREATION_DATE" />
+		</property>
+		<property name="transactionModifiedDate" type="java.util.Date">
+			<column name="UPDATE_DATE" />
+		</property>
+	</class>
+	<!-- <query name="getUnsyncInboundPickupOrderRequest">
+		<![CDATA[FROM com.ff.domain.pickup.BcunReversePickupOrderBranchMappingDO revPkupBranch 
+				WHERE revPkupBranch.dtToCentral='N']]>
+	</query> -->
+	<query name="getAllRevPickupOrdersByBranch">
+		<![CDATA[ FROM com.ff.domain.pickup.BcunReversePickupOrderBranchMappingDO revPkupBranch  
+					WHERE revPkupBranch.orderAssignedBranch=:branchId
+					AND (revPkupBranch.dtToBranch='N')
+		]]>
+	</query>
+	<query name="getRevPickupOrdersByOrderNo">
+        <![CDATA[ FROM com.ff.domain.pickup.BcunReversePickupOrderBranchMappingDO revPkupBranch  
+                    WHERE revPkupBranch.pickupOrderDetail.orderNumber =:ordernum
+        ]]>
+    </query>
+	<query name="getRevPickupBranchMapId">
+		<![CDATA[ select revPkupBranch.id FROM com.ff.domain.pickup.BcunReversePickupOrderBranchMappingDO revPkupBranch  
+					WHERE revPkupBranch.pickupOrderDetail.orderNumber =:orderNumber
+					and revPkupBranch.orderAssignedBranch =:assignedBranchId
+		]]>
+	</query>
+</hibernate-mapping>

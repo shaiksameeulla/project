@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+
+<hibernate-mapping>
+	<class name="com.ff.domain.geography.PincodeProductServiceabilityDO" table="ff_d_pincode_product_serviceability">
+		<id name="pincodeDeliveryTimeMapId" type="java.lang.Integer">
+			<column name="PINCODE_DLV_TIME_MAP_ID" />
+			<generator class="native"/>
+		</id>
+		
+		<property name="deliveryTime" column="DELIVERY_TIME" type="java.lang.String"/>
+		<property name="dlvTimeQualification" column="DLV_TIME_QUALIFICATION" type="java.lang.String"/>
+		
+		<property name="status" column="STATUS" />
+		
+		 <many-to-one name="pincode" class="com.ff.domain.geography.PincodeDO" lazy="false" fetch="join">
+			<column name="PINCODE_ID"/>
+		</many-to-one> 
+		
+		
+		<many-to-one name="originCity" class="com.ff.domain.geography.CityDO" lazy="false" fetch="join">
+			<column name="ORIGIN_CITY_ID" />
+		</many-to-one>
+		
+		<many-to-one name="productGroupId" class="com.ff.domain.serviceOffering.ProductGroupServiceabilityDO" lazy="false" fetch="join">
+			<column name="PROD_GROUP_ID" />
+		</many-to-one>
+			<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+	
+	</class>
+	
+	<query name="getPincodeDlvTimeMap">
+		<![CDATA[
+			From com.ff.domain.geography.PincodeProductServiceabilityDO dlvTimeMap where  dlvTimeMap.pincode.pincode =:pincode 
+			and dlvTimeMap.originCity.cityId = :cityId
+			and dlvTimeMap.productGroupId.prodGroupId = 
+				(SELECT product.productGroup.prodGroupId from com.ff.domain.serviceOffering.ProductDO product where product.consgSeries = :consgSeries) 
+		]]>
+	
+	</query>
+	
+	<query name="getPincodeProdServiceability">
+		<![CDATA[
+			From com.ff.domain.geography.PincodeProductServiceabilityDO pincodeProduct where  pincodeProduct.pincode.pincode =:pincode 
+			and pincodeProduct.pincode.status = 'A'
+			and pincodeProduct.productGroupId.prodGroupId = 
+				(SELECT product.productGroup.prodGroupId from com.ff.domain.serviceOffering.ProductDO product where product.consgSeries = :consgSeries) 
+		]]>
+	
+	</query>
+	
+	<query name="isValidPincodeProdServiceabilityByPincodeIdAndSeries">
+		<![CDATA[
+			select pincodeProduct.pincodeDeliveryTimeMapId From com.ff.domain.geography.PincodeProductServiceabilityDO pincodeProduct where  pincodeProduct.pincode.pincodeId =:pincodeId 
+			and pincodeProduct.productGroupId.prodGroupId = 
+				(SELECT product.productGroup.prodGroupId from com.ff.domain.serviceOffering.ProductDO product where product.productId = :productId) 
+		]]>
+	
+	</query>
+	
+	<query name="getPincodeProdServiceabilityDtls">
+		<![CDATA[
+			From com.ff.domain.geography.PincodeProductServiceabilityDO pincodeProduct where  pincodeProduct.pincodeDeliveryTimeMapId = :pincodeProductMapId
+		]]>
+	
+	</query>
+	
+	<sql-query name="getProductsServicedByPincode">
+		select distinct(rpc.PRODUCT_CATEGORY_NAME) from ff_d_pincode_product_serviceability pps
+		inner join ff_d_product pro
+		on pro.PROD_GROUP_ID = pps.PROD_GROUP_ID
+		inner join ff_d_rate_prod_prod_cat_map cm
+		on cm.PRODUCT = pro.PRODUCT_ID
+		inner join ff_d_rate_product_category rpc
+		on cm.RATE_PRODUCT_CATEGORY = rpc.RATE_PRODUCT_CATEGORY_ID
+		where
+		pps.PINCODE_ID = :pincodeId
+	</sql-query>
+	
+</hibernate-mapping>

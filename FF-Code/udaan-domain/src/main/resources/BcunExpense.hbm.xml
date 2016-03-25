@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.expense.BcunExpenseDO" table="ff_f_expense">
+		<id name="expenseId" type="java.lang.Long">
+			<column name="EXPENSE_ID" />
+			<generator class="native" />
+		</id>
+		<property name="txNumber" column="TRANSACTION_NO" />
+		<property name="postingDate" column="POSTING_DATE" />
+		<property name="documentDate" column="DOCUMENT_DATE" />
+		<property name="expenseFor" column="EXPENSE_FOR" />
+		<property name="chequeNo" column="CHEQUE_NO" />
+		<property name="chequeDate" column="CHEQUE_DATE" />
+		<property name="branchName" column="BRANCH_NAME" />
+		<property name="totalExpense" column="TOTAL_EXPENSE" />
+		<property name="expenseOfficeRho" column="EXPENSE_OFFICE_RHO" />
+		<property name="status" column="STATUS" />
+		<property name="remarks" column="REMARKS" />
+		<property name="typeOfExpense" column="TYPE_OF_EXPENSE"/>
+		<property name="modeOfExpense" column="MODE_OF_EXPENSE"/>
+		<property name="bankDO" column="BANK_GL_ID"/>
+		<property name="expenseOfficeId" column="EXPENSE_OFFICE_ID"/>
+
+		<!-- common attributes  START-->
+		<property name="createdBy" column="CREATED_BY" update="false" />
+		<property name="createdDate" column="CREATION_DATE" update="false" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		<property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL" />
+		<!-- common attributes  END-->
+		
+		<set name="expenseEntries" lazy="false" cascade="all" inverse="true" fetch="join">
+            <key column="EXPENSE_ID"/>
+            <one-to-many class="com.ff.domain.mec.expense.BcunExpenseEntriesDO"/>
+        </set> 
+		
+	</class>
+	
+	<query name="getBcunExpenseDtls">
+		<![CDATA[
+			FROM 	com.ff.domain.mec.expense.BcunExpenseDO expDO
+			WHERE 	expDO.status!='O' 
+			AND		LENGTH(expDO.txNumber)=12
+			AND 	expDO.dtToBranch='N'
+		]]>
+	</query>
+
+	<query name="getBcunExpenseDtlsByTxNo">
+		<![CDATA[
+			FROM 	com.ff.domain.mec.expense.BcunExpenseDO expDO
+			WHERE 	expDO.txNumber=:transactionNo
+		]]>
+	</query>
+
+</hibernate-mapping>

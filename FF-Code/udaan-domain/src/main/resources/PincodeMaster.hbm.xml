@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.geography.PincodeMasterDO" table="ff_d_pincode">
+		<id name="pincodeId" type="java.lang.Integer">
+			<column name="PINCODE_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name="pincode" type="java.lang.String">
+			<column name="PINCODE" />
+		</property>
+
+		<property name="cityId" type="java.lang.Integer">
+			<column name="CITY_ID" />
+		</property>
+		
+		<property name="location" type="java.lang.String">
+			<column name="LOCATION" />
+		</property>
+		
+ 		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+		
+		
+		<property name="createdDate">
+			<column name="CREATION_DATE" />
+		</property>	
+		
+		
+		<property name="updatedDate">
+			<column name="UPDATE_DATE" />
+		</property>	
+		
+		
+		<property name="createdBy">
+			<column name="CREATED_BY" />
+		</property>	
+		
+		
+		<property name="updatedBy">
+			<column name="UPDATE_BY" />
+		</property>	
+		
+		<property name="status">
+			<column name="STATUS" />
+		</property>	
+		
+		
+		
+		
+		<set name="branchPincodeServiceables" lazy="false" cascade="all" inverse="true" fetch="join">
+            <key column="PINCODE_ID"/>
+            <one-to-many class="com.ff.domain.organization.BranchPincodeMasterServiceabilityDO"/>
+        </set> 
+        
+        <set name="paperWorkPincodes" lazy="false" cascade="all" inverse="true" fetch="join">
+            <key column="PINCODE_ID"/>
+            <one-to-many class="com.ff.domain.serviceOffering.PaperworksPincodeMasterMapDO"/>
+        </set> 
+        
+         <set name="productPincodeServiceables" lazy="false" cascade="all" inverse="true" fetch="join">
+            <key column="PINCODE_ID"/>
+            <one-to-many class="com.ff.domain.geography.PincodeMasterProductServiceabilityDO"/>
+        </set> 
+		
+	</class>
+	<query name="getPincodeByPincodeNo">
+	<![CDATA[ FROM com.ff.domain.geography.PincodeMasterDO pin where pin.pincode=:pincodeNo]]>
+	</query>
+	
+	<!-- <query name="getPincodeByPincodeNo">
+	<![CDATA[ FROM com.ff.domain.geography.PincodeMasterDO pin where pin.pincode=:pincodeNo and pin.status='A']]>
+	</query> -->
+	
+</hibernate-mapping>

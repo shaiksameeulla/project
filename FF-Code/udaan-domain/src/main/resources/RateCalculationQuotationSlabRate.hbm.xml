@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.ratequotation.RateCalculationQuotationSlabRateDO"  table="ff_f_rate_quotation_slab_rate">
+		<id name="slabRateId" type="java.lang.Integer" column="RATE_QUOTATION_SLAB_RATE_ID">
+			<generator class="native" />
+		</id>
+		<property name="originSector" column="RATE_QUOTATION_ORIGIN_SECTOR"/>
+		<property name="destinationSector" column="RATE_QUOTATION_DESTINATION_SECTOR"/>
+		<property name="rateQuotationProductCategoryHeader" column="RATE_QUOTATION_PRODUCT_CATEGORY_HEADER"/>
+		<many-to-one name="rateCalculationWeightSlabDO" class="com.ff.domain.ratemanagement.operations.ratequotation.RateCalculationWeightSlabDO" lazy="false"  fetch="join">
+		<column name="RATE_QUOTATION_WEIGHT_SLAB" />
+		</many-to-one>
+		<property name="rate" column="RATE" type="java.lang.Double" />
+		<property name="rateCalculatedFor" column="RATE_CONFIGURED_FOR_TYPE"/>      
+    </class>
+  	<query name="getNormalRateSlabs">
+		<![CDATA[
+				  SELECT slab
+				  FROM  com.ff.domain.ratemanagement.operations.ratequotation.RateCalculationQuotationSlabRateDO slab
+				  INNER JOIN slab.rateCalculationWeightSlabDO weightDO
+                  WHERE slab.rateQuotationProductCategoryHeader=:rateQuotationProductCategoryHeaderId
+                  AND (((:originConsidered = 'N') AND (slab.originSector IS NULL))
+                                OR ((:originConsidered = 'Y') AND  (slab.originSector =:originSector)))
+                  AND ((slab.rateCalculatedFor IS NULL) OR (slab.rateCalculatedFor =:rateCalculatedFor) OR (slab.rateCalculatedFor = 'B'))
+                  AND slab.destinationSector =:destinationSector
+                  ORDER BY weightDO.order
+		]]>
+	</query>
+</hibernate-mapping>

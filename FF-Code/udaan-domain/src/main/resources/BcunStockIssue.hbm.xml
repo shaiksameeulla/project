@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.issue.BcunStockIssueDO" table="ff_f_stock_issue" dynamic-update="true">
+		<id name="stockIssueId" type="java.lang.Long">
+			<column name="STOCK_ISSUE_ID" />
+			<generator class="native" />
+		</id>
+		<property name="requisitionNumber" column="REQUISITION_NUMBER" update="false"/>
+		<property name="stockIssueNumber" column="ISSUE_NUMBER" update="false" />
+		<property name="stockIssueDate" column="ISSUE_DATE" update="false" />
+		<property name="issuedToType" column="ISSUED_TO_TYPE" update="false" />
+		<property name="shippedToCode" column="SHIPPED_TO_CODE" update="false" />
+		<!-- common attributes START -->
+		<property name="transactionStatus" column="TRANS_ACTIVE_STATUS" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+		
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapStatusInBound" column="DT_SAP_INBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<!-- common attributes END -->
+	
+
+		<!-- One-to- Many relationships START -->
+		<set name="issueItemDtlsDO" lazy="false" cascade="all-delete-orphan"  fetch="join">
+            <key column="STOCK_ISSUE_ID"/>
+            <one-to-many class="com.ff.domain.stockmanagement.operations.issue.BcunStockIssueItemDtlsDO"/>
+    	</set> 
+		<!-- One-to-Many relationships END -->
+		<property name="issueOfficeId" column="ISSUE_OFFICE_ID" type="java.lang.Integer"  />
+		
+		<property name="issuedToOfficeId" column="ISSUED_TO_OFFICE" type="java.lang.Integer"  />
+				
+		<property name="issuedToBAId" column="ISSUED_TO_BA" type="java.lang.Integer" />	
+		
+		<property name="issuedToFranchiseeId" column="ISSUED_TO_FRANCHISEE" type="java.lang.Integer" />	
+		
+		<property name="issuedToPickupBoyId" column="ISSUED_TO_PICKUP_BOY" type="java.lang.Integer" />	
+		
+		<property name="issuedToCustomerId" column="ISSUED_TO_CUSTOMER" type="java.lang.Integer" />	
+					
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		
+		
+	</class>
+	
+<!-- Query For Data Sync  Started -->
+	
+	
+	
+	<query name="getstockIssueId">
+		<![CDATA[SELECT issueDO.stockIssueId From com.ff.domain.stockmanagement.operations.issue.BcunStockIssueDO issueDO where  issueDO.stockIssueNumber = :stockIssueNumber ]]>
+	</query>
+	
+	<query name="getOutboundStockIssueTOBranch">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.issue.BcunStockIssueDO issueDO
+					where issueDO.issuedToOfficeId=:branchId	 AND issueDO.dtToBranch='N' 
+					
+		]]>
+	</query>
+	
+	<query name="getOutboundStockIssueToEmployee">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.issue.BcunStockIssueDO issueDO
+					where 
+					issueDO.dtToBranch='N'
+					AND issueDO.issuedToPickupBoyId is not null
+					AND issueDO.issuedToPickupBoyId IN (
+					select emp.employeeId from com.ff.domain.organization.EmployeeDO
+					 emp where emp.empVirtual='N' and emp.officeId =:branchId
+					
+					)
+		]]>
+	</query>
+	
+	<query name="getOutboundStockIssueToCustomer">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.issue.BcunStockIssueDO issueDO
+					where 
+					issueDO.dtToBranch='N' 
+					AND issueDO.issuedToCustomerId is not null
+					AND
+					EXISTS (
+						 from com.ff.domain.business.CustomerDO customer  where 
+						 customer.customerId=issueDO.issuedToCustomerId 
+						 and customer.officeMappedDO.officeId=:branchId and customer.status='A' )
+					
+					
+		]]>
+	</query>
+	
+		<query name="getOutboundStockIssueToCustomerForContract">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.issue.BcunStockIssueDO issueDO
+					where 
+					issueDO.dtToBranch='N' 
+					AND issueDO.issuedToCustomerId is not null
+					AND
+					exists (
+						  
+			from com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO as billingLocation  
+			inner join billingLocation.pickupDeliveryLocation as location
+			inner join location.pickupDlvContract as pickupContract
+			inner join pickupContract.customer as customerDO
+			where 
+			customerDO.customerId=issueDO.issuedToCustomerId
+			and 
+			pickupContract.contractType='P'
+			AND
+			 pickupContract.office.officeId =:branchId
+			 AND
+		 	customerDO.status ='A'	)	AND  
+					EXISTS (
+						 from com.ff.domain.business.CustomerDO customer  where customer.customerId=issueDO.issuedToCustomerId 
+						 and customer.officeMappedDO.officeId  is  null and customer.status='A')
+					
+					
+		]]>
+	</query>
+	
+	<query name="getOutboundStockIssueToFranchise">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.issue.BcunStockIssueDO issueDO
+					where 
+					issueDO.dtToBranch='N' 
+					AND issueDO.issuedToFranchiseeId is not null
+					AND issueDO.issuedToFranchiseeId IN (
+					SELECT customer.customerId from com.ff.domain.business.CustomerDO customer  where customer.officeMappedDO.officeId=:branchId and customer.status='A')
+					)
+					
+					
+		]]>
+	</query>
+	
+	<query name="getOutboundStockIssueToFranchiseForContract">
+		<![CDATA[ SELECT issueDO
+					From com.ff.domain.stockmanagement.operations.issue.BcunStockIssueDO issueDO
+					where 
+					issueDO.dtToBranch='N' 
+					AND issueDO.issuedToFranchiseeId is not null
+					AND
+					exists (
+			from com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO as billingLocation  
+			inner join billingLocation.pickupDeliveryLocation as location
+			inner join location.pickupDlvContract as pickupContract
+			inner join pickupContract.customer as customerDO
+			WHERE 
+			customerDO.customerId=issueDO.issuedToFranchiseeId
+			and
+			pickupContract.contractType='P'
+			AND
+			 pickupContract.office.officeId =:branchId
+			 AND
+		 	customerDO.status ='A'	)	
+					AND  
+					exists (
+						 from com.ff.domain.business.CustomerDO customer  
+						 where customer.customerId=issueDO.issuedToFranchiseeId 
+						 and customer.officeMappedDO.officeId  is  null 
+						 and customer.status='A' )
+					
+					
+		]]>
+	</query>
+	
+	
+	
+	<query name="getOutboundStockIssueTOBA">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.issue.BcunStockIssueDO issueDO
+					WHERE  
+					 issueDO.dtToBranch='N' 
+					AND
+					issueDO.issuedToBAId is not null
+					AND
+					issueDO.issuedToBAId IN (
+					select ba.customerId from com.ff.domain.business.CustomerDO ba 
+					inner join ba.officeMappedDO office where
+					office.cityId IN(select cityOffice.cityId from com.ff.domain.organization.OfficeDO as cityOffice	where cityOffice.officeId=:branchId)
+					 )
+					
+					
+		]]>
+	</query>
+	
+	
+	<query name="getstockIssueDtlsByNumber">
+		<![CDATA[ From com.ff.domain.stockmanagement.operations.issue.BcunStockIssueDO issueDO where  issueDO.stockIssueNumber = :stockIssueNumber ]]>
+	</query>
+	
+	<query name="deleteFromStockIssue">
+		<![CDATA[  delete From com.ff.domain.stockmanagement.operations.issue.BcunStockIssueDO issueDO where  issueDO.stockIssueNumber = :stockIssueNumber ]]>
+	</query>
+	
+	
+	<query name="getStockIssueShippedCodeByCustomerId">
+<![CDATA[
+ 
+ 	select issue.shippedToCode FROM com.ff.domain.stockmanagement.operations.issue.BcunStockIssueDO issue
+ 		 	WHERE issue.issuedToBAId =:customerId
+ 		 	OR
+ 		 	issue.issuedToFranchiseeId=:customerId
+ 		 	OR
+ 		 	issue.issuedToCustomerId=:customerId
+ 		 	
+ 	
+ 
+ ]]>
+	</query>
+<!-- Query For Data Sync  End -->	
+	
+</hibernate-mapping>

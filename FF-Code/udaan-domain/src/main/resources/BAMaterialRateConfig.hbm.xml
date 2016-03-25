@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+	
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.ba.BAMaterialRateConfigDO" 
+		table="ff_d_ba_material_rate_config">
+		<id name="baMaterialRateId" type="java.lang.Long">
+			<column name="BA_MATERIAL_RATE_ID" />
+			<generator class="native" />
+		</id>
+		<property name="validFromDate" column="VALID_FROM_DATE" />
+		<property name="validToDate" column="VALID_TO_DATE" />
+		<property name="createdOfficeId" column="CREATED_OFFICE" />
+		
+		<!-- Common Attributes START -->
+		<property name="createdBy" column="CREATED_BY_USER" update="false" />
+		<property name="updatedBy" column="UPDATED_BY_USER" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" update="false" />
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		
+		<!-- Common Attributes END -->
+		
+		<!-- one-to-many relationships START -->
+		<set name="baMaterialRateDtls" lazy="false" fetch="join" cascade="all-delete-orphan" 
+			inverse="true">
+			<key column="BA_MATERIAL_RATE_ID" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.ba.BAMaterialRateDetailsDO" />
+		</set>
+		<!-- one-to-many relationships END -->
+	</class>
+<!-- Query START -->
+<query name="getBAMaterialRateConfigDtls">
+	<![CDATA[
+		FROM com.ff.domain.ratemanagement.operations.ba.BAMaterialRateConfigDO baMtrlRate
+		WHERE 
+		(:loggedInDate BETWEEN baMtrlRate.validFromDate AND baMtrlRate.validToDate) OR 
+		(	baMtrlRate.validToDate IS NULL AND
+			(:loggedInDate>=baMtrlRate.validFromDate OR :loggedInDate<=baMtrlRate.validFromDate)
+		)
+	]]>
+</query>
+<query name="getRenewedBAMtrlRateConfigDtls">
+	<![CDATA[
+		FROM com.ff.domain.ratemanagement.operations.ba.BAMaterialRateConfigDO baMtrlRate
+		WHERE (baMtrlRate.validToDate IS NULL AND baMtrlRate.validFromDate>:loggedInDate)
+		ORDER BY baMtrlRate.validFromDate DESC
+	]]>
+</query>
+<query name="updateValidToDate">
+	<![CDATA[
+		UPDATE com.ff.domain.ratemanagement.operations.ba.BAMaterialRateConfigDO baMtrlRate 
+		SET baMtrlRate.validToDate=:validToDate
+		WHERE baMtrlRate.baMaterialRateId=:baMaterialRateId
+	]]>
+</query>
+<!-- Query END -->
+</hibernate-mapping>

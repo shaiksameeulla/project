@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationWeightSlabDO" table="ff_f_rate_quotation_weight_slab">
+		<id name="rateQuotationWeightSlabId" type="java.lang.Integer" column="RATE_QUOTATION_WEIGHT_SLAB_ID">
+			<generator class="assigned" />
+		</id>
+		
+		<property name="rateQuotProductCategoryHeaderId" column="RATE_QUOTATION_PRODUCT_CATEGORY_HEADER"/>
+        <property name="startWeight" column="START_WEIGHT"/>
+        <property name="endWeight" column="END_WEIGHT"/>
+        <property name="order" column="SLAB_ORDER"/>
+        
+        <set name="rateQuotationSlabRateDO" table = "ff_f_rate_quotation_slab_rate" lazy="false" cascade="all-delete-orphan"  fetch="join">
+		 
+		<key column="RATE_QUOTATION_WEIGHT_SLAB" />
+		<one-to-many class="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationSlabRateDO" />
+		 
+		</set>
+		
+		<set name="rateQuotationSpecialDestinationDO" table = "ff_f_rate_quotation_special_destination" lazy="false" cascade="all-delete-orphan"  fetch="join">
+		 
+		<key column="RATE_QUOTATION_WEIGHT_SLAB" />
+		<one-to-many class="com.ff.domain.ratemanagement.operations.ratequotation.BcunRateQuotationSpecialDestinationDO" />
+		 
+		</set>
+
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+		<property name="createdDate" column="CREATED_DATE" />
+ 		<property name="createdBy" column="CREATED_BY" />
+        <property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE"/>
+		<property name="rateConfiguredType" column="RATE_CONFIGURED_FOR_TYPE"/> 
+		</class>
+
+</hibernate-mapping>

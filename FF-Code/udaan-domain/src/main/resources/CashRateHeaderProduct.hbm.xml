@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.cash.CashRateHeaderProductDO" table="ff_f_rate_cash_product_map">
+		<id name="headerProductMapId">
+			<column name="RATE_CASH_PRODUCT_MAP_ID" />
+			<generator class="native" />
+		</id>
+        <many-to-one name="headerDO" class="com.ff.domain.ratemanagement.operations.cash.CashRateHeaderDO" lazy="false"  fetch="join">
+           <column name="RATE_CASH_HEADER" not-null="true"/>
+        </many-to-one> 
+        
+        <many-to-one name="rateProductCategoryDO" class="com.ff.domain.ratemanagement.masters.RateProductCategoryDO"  lazy="false"  fetch="join">
+		<column name="RATE_PRODUCT_CATEGORY" />
+		</many-to-one> 
+        
+        <property name="dtToBranch" column="DT_TO_BRANCH" />
+        <many-to-one name="minChargeableWeightDO" class="com.ff.domain.ratemanagement.masters.RateMinChargeableWeightDO"  lazy="false"  fetch="join">
+		<column name="MINIMUM_CHARGEABLE_WEIGHT" />
+		</many-to-one>
+	</class>
+	
+	<query name="getCashProductHeaderMap">
+		<![CDATA[ 
+			SELECT productHeader
+			FROM   com.ff.domain.ratemanagement.operations.cash.CashRateHeaderProductDO productHeader 
+			INNER JOIN productHeader.headerDO header
+			INNER JOIN productHeader.rateProductCategoryDO rateProdCat
+			WHERE header.regionId = ( SELECT	city.region
+									  FROM	    com.ff.domain.geography.CityDO city 
+									  WHERE	    city.cityCode=:cityCode )
+			AND	 rateProdCat.rateProductCategoryId  IN ( SELECT 	rateProductCategoryId 
+														 FROM 		com.ff.domain.ratemanagement.masters.RateProductProductCategoryMapDO 
+														 WHERE	productId = ( SELECT productId FROM com.ff.domain.serviceOffering.ProductDO
+																  	  		  WHERE productCode =:productCode)
+										   				)
+			AND   (:currentDate BETWEEN header.fromDate AND header.toDate) 
+		]]>
+	</query>
+	<query name="isProductValidForCashContract">
+		<![CDATA[ 
+			SELECT productHeader.rateProductCategoryDO.rateProductCategoryId
+			FROM  com.ff.domain.ratemanagement.operations.cash.CashRateHeaderProductDO productHeader 
+			WHERE productHeader.headerDO.regionId = ( SELECT	city.region
+													  FROM	    com.ff.domain.geography.CityDO city 
+													  WHERE	     city.cityCode=:cityCode
+													)
+			AND	 productHeader.rateProductCategoryDO.rateProductCategoryId IN (	SELECT 	rateProductCategoryId 
+																				FROM 	com.ff.domain.ratemanagement.masters.RateProductProductCategoryMapDO 
+																				WHERE	productId = ( SELECT productId from com.ff.domain.serviceOffering.ProductDO
+																  	  								  WHERE productCode =:productCode
+																     								)
+																			  )
+			AND   (:currentDate BETWEEN productHeader.headerDO.fromDate AND productHeader.headerDO.toDate) 
+			AND	  productHeader.headerDO.headerStatus = 'A'
+		]]>
+	</query>
+</hibernate-mapping>
+	

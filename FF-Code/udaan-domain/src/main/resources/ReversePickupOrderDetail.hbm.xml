@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.ReversePickupOrderDetailDO" table="ff_f_rev_pickup_order_request_detail">
+		<id name="detailId" type="java.lang.Integer">
+			<column name="REQUEST_DETAIL_ID" />
+			<generator class="native" />
+		</id>
+		<property name="orderNumber" type="java.lang.String">
+			<column name="ORDER_NO" />
+		</property>
+		
+		<property name="consignnorName" type="java.lang.String">
+			<column name="CONSIGNOR_NAME" />
+		</property>
+		<property name="address" type="java.lang.String">
+			<column name="ADDRESS" />
+		</property>
+		<property name="city" type="java.lang.Integer">
+			<column name="CITY" />
+		</property>
+		<property name="pincode" type="java.lang.Integer">
+			<column name="PINCODE" />
+		</property>
+		<property name="telephone" type="java.lang.String">
+			<column name="TELEPHONE" />
+		</property>
+		
+		<property name="mobile" type="java.lang.String">
+			<column name="MOBILE" />
+		</property>
+		
+		<property name="assignedBranch" type="java.lang.Integer">
+			<column name="BRANCH_ORDER_ASSIGNED_TO" />
+		</property>
+		<property name="email" type="java.lang.String">
+			<column name="EMAIL_ID" />
+		</property>
+		<property name="consignmentType" type="java.lang.Integer">
+			<column name="CONSIGNMENT_TYPE" />
+		</property>
+		
+		<!-- <property name="materialVal" type="java.lang.Integer">
+			<column name="MATERIAL_VALUE" />
+		</property> -->
+		<property name="materialDesc" type="java.lang.String">
+			<column name="MATERIAL_DESC" />
+		</property>
+		<property name="insuaranceRefNum" type="java.lang.String">
+			<column name="INSURANCE_REF_NO" />
+		</property>
+		 <property name="remarks" type="java.lang.String">
+			<column name="REMARKS" />
+		</property> 
+		<property name="orderRequestStatus" type="java.lang.String">
+			<column name="ORDER_REQUEST_STATUS" />
+		</property>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtUpdateToCentral">
+			<column name="DT_UPDATE_TO_CENTRAL" />
+		</property>
+		<property name="createdDate" type="java.util.Date" update="false">
+			<column name="CREATION_DATE" />
+		</property>
+		<property name="updatedDate" type="java.util.Date">
+			<column name="UPDATE_DATE" />
+		</property>
+		<property name="createdBy" column ="CREATED_BY" />		
+		<property name="updatedBy" column ="UPDATE_BY" />
+		 <many-to-one name="pickupOrderHeader" class="com.ff.domain.pickup.ReversePickupOrderHeaderDO" fetch="join" lazy="false">
+            <column name="REQUEST_HEADER_ID" not-null="true" />
+        </many-to-one>  
+        
+        <set  name="branchesAssignedDO" lazy="false" fetch="join" cascade="all-delete-orphan" inverse="true" >
+            <key column="REQUEST_DETAIL_ID"/>
+            <one-to-many class="com.ff.domain.pickup.ReversePickupOrderBranchMappingDO"/>
+        </set> 
+       
+	</class>
+
+	
+	 <query name="getPickupOrderDetail">
+		<![CDATA[
+			FROM 		com.ff.domain.pickup.ReversePickupOrderDetailDO detail
+			WHERE		detail.orderNumber =:orderNum
+		]]>
+	</query> 
+	 <query name="getPickupOrderDetailById">
+		<![CDATA[
+			FROM 		com.ff.domain.pickup.ReversePickupOrderDetailDO detail
+			WHERE		detail.detailId =:detailId
+		]]>
+	</query> 
+	
+	<query name="updatePickupOrderDetails">
+             <![CDATA[ UPDATE  com.ff.domain.pickup.ReversePickupOrderDetailDO detail
+                       SET detail.orderRequestStatus=:status,detail.assignedBranch=:officeId,
+                       detail.updatedDate =:currentDate,detail.updatedBy =:updatedBy
+                       WHERE detail.detailId =:detailId 
+               ]]>
+	</query> 
+	
+	<!-- <query name="updateReversePickupReqestStatus">
+	<![CDATA[UPDATE com.ff.domain.pickup.ReversePickupOrderDetailDO detail
+				SET detail.orderRequestStatus=:status, detail.dtToCentral='N', detail.dtUpdateToCentral='Y',
+				detail.updatedDate = :currentDate, detail.pickupOrderHeader.transactionModifiedDate = :currentDate
+				WHERE detail.detailId IN (:reverseDetailId)]]>
+	</query> -->
+</hibernate-mapping>

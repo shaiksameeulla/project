@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.PickupContractDO" table="ff_d_pickup_contract">
+		<id name="contractId" type="java.lang.Integer">
+			<column name="PICKUP_CONTRACT_ID" />
+			<generator class="native" />
+		</id>
+		
+		
+		
+		<many-to-one name="office" class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="OFFICE_ID" />
+		</many-to-one>
+
+		<many-to-one name="customer" class="com.ff.domain.business.CustomerDO" lazy="false" fetch="join">
+			<column name="CUSTOMER_ID" />
+		</many-to-one>
+		
+		<property name="status" type="java.lang.String">
+			<column name="STATUS" />
+		</property>
+
+		
+	</class>
+	
+	
+	<query name="getReverseCustomers">
+		<![CDATA[
+			from		com.ff.domain.pickup.PickupContractDO pickupContract
+			where		pickupContract.office.officeId = :branchId
+		]]>
+	</query>
+	
+</hibernate-mapping>

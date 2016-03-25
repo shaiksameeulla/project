@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.complaints.ServiceRequestDO" table="ff_f_service_request" dynamic-update="true">
+		<id name="serviceRequestId" column="SERVICE_REQUEST_ID" type="java.lang.Integer" >
+			<generator class="native" />
+		</id>
+		<property name="serviceRequestNo" column="SERVICE_REQUEST_NO" type="java.lang.String" update="false"/>
+		
+		<property name="callerName" column="CALLER_NAME" type="java.lang.String" update="false"/>	
+		<property name="callerPhone" column="CALLER_PHONE" type="java.lang.String" update="false"/>
+		<property name="callerEmail" column="CALLER_EMAIL" type="java.lang.String" />
+		<property name="linkedServiceReqNo" column="LINKED_SERVICE_REQUEST_NO"/>
+		<property name="remark" column ="REMARK"/>
+		 <property name="industryType" column ="INDUSTRY_TYPE"/> 
+		<property name="updatedBy" column="UPDATE_BY"/>
+		<property name="createdBy" column="CREATED_BY" update="false"/>
+		
+		
+		
+		<many-to-one name="serviceRequestCustTypeDO"  class="com.ff.domain.complaints.ServiceRequestCustTypeDO" lazy="false" update="false"  fetch="join">
+			<column name="SERVICE_CUSTOMER_TYPE" />
+		</many-to-one>
+		
+		<many-to-one name="serviceRequestQueryTypeDO"  class="com.ff.domain.complaints.ServiceRequestQueryTypeDO" lazy="false" update="false"  fetch="join">
+			<column name="QUERY_TYPE" />
+		</many-to-one>
+		
+		<many-to-one name="serviceRequestComplaintTypeDO"  class="com.ff.domain.complaints.ServiceRequestComplaintTypeDO" lazy="false" update="false"  fetch="join">
+			<column name="COMPLAINT_CATEGORY" />
+		</many-to-one>
+		
+		
+		
+		<many-to-one name="serviceRequestStatusDO"  class="com.ff.domain.complaints.ServiceRequestStatusDO" lazy="false"  fetch="join">
+			<column name="STATUS" />
+		</many-to-one>
+		
+		<!-- <many-to-one name="createdByUserDO"  class="com.ff.domain.umc.UserDO" lazy="false">
+			<column name="CREATED_BY" />
+		</many-to-one> -->
+		
+		<property name="createdDate"  column="CREATED_DATE" type="java.util.Date" update="false"/>
+		
+		<!-- <many-to-one name="updateByUserDO"  class="com.ff.domain.umc.UserDO" lazy="false">
+			<column name="UPDATE_BY" />
+		</many-to-one> -->
+		
+		<property  name="updateDate" column="UPDATE_DATE"	type="java.util.Date"/>
+		<property name="bookingNo" column="BOOKING_NO" type="java.lang.String" update="false"/>	
+		<property name="bookingNoType" column="NBOOKING_NO_TYPE" type="java.lang.String" update="false"/>
+		
+		<many-to-one name="originCity"  class="com.ff.domain.geography.CityDO" lazy="false"  fetch="join">
+			<column name="ORIGIN_CITY" />
+		</many-to-one>
+		
+		<many-to-one name="productType"  class="com.ff.domain.serviceOffering.ProductDO" lazy="false"  fetch="join">
+			<column name="PRODUCT_TYPE" />
+		</many-to-one>
+		
+		<many-to-one name="destPincode"  class="com.ff.domain.geography.PincodeDO" lazy="false"  fetch="join">
+			<column name="DEST_PINCODE" />
+		</many-to-one>
+			
+		<property name="weight" column="WEIGHT"/>
+		<property name="transactionOfficeId" column="TRANSACTION_OFFICE_ID" update="false"/>
+		
+		<property name="consignmentType" column="CONSIGNMENT_TYPE" type="java.lang.String" update="false"/>
+		<property name="complaintPaperType" column ="CCMPLAINT_PAPER_TYPE" type="java.lang.Integer"/>
+		
+		<many-to-one name="assignedTo"  class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join">
+			<column name="ASSIGNED_TO" />
+		</many-to-one>
+		
+		<property name="smsToConsignor" column="SMS_TO_CONSIGNOR" type="java.lang.String"/>
+		<property name="smsToConsignee" column="SMS_TO_CONSIGNEE" type="java.lang.String"/>
+		<property name="emailToCaller" column="EMAIL_TO_CALLER" type="java.lang.String"/>
+		<property name="serviceResult" column="SERVICE_RESULTS"/>
+		<property name="sourceOfQuery" column="SOURCE_OF_QUERY"/>
+		 <property name="originBranchId" column="ORIGIN_BRANCH_ID"/> 
+		
+		<many-to-one name="serviceRequestTransferToDO"  class="com.ff.domain.complaints.ServiceRequestTransfertoDO" lazy="false"  fetch="join">
+			<column name="TRANSFER_TO_ID" />
+		</many-to-one>
+		
+		
+	</class>
+	
+	<query name="getServiceRequestsByUser">
+		<![CDATA[ 
+			FROM com.ff.domain.complaints.ServiceRequestDO serviceRequestDO 
+			WHERE serviceRequestDO.assignedTo.employeeId=:employeeId
+		]]>
+	</query>
+	
+	<query name="getServiceRequestByServiceRequestNo">
+		<![CDATA[ 	
+			FROM com.ff.domain.complaints.ServiceRequestDO serviceRequestDO 
+			WHERE serviceRequestDO.serviceRequestNo=:serviceRequestNo
+		]]>
+	</query>	
+	
+	<query name="getServiceRequestByServiceRequestStatus">
+		<![CDATA[ 	
+			FROM com.ff.domain.complaints.ServiceRequestDO serviceRequestDO 
+			WHERE serviceRequestDO.serviceRequestStatusDO.statusName=:statusName
+		]]>
+	</query>	
+	<query name="getServiceRequestDtsStatusAndAssignedEmp">
+		<![CDATA[ 	
+			FROM com.ff.domain.complaints.ServiceRequestDO serviceRequestDO 
+			WHERE serviceRequestDO.serviceRequestStatusDO.statusName=:statusName
+			AND serviceRequestDO.assignedTo.employeeId=:employeeId
+		]]>
+	</query>	
+	
+	<query name="getMaxServiceRequestNumber">
+		<![CDATA[
+ 			select max(serviceRequestDO.serviceRequestNo) FROM com.ff.domain.complaints.ServiceRequestDO serviceRequestDO   
+ 		 	WHERE  
+ 		 	serviceRequestDO.transactionOfficeId =:officeId
+ 		 	AND  length(serviceRequestDO.serviceRequestNo) = :numberLength
+ 		 	AND serviceRequestDO.serviceRequestNo like :prefix
+		]]>
+	</query>
+	
+	<query name="getServiceRequestByServiceRequestId">
+		<![CDATA[ 	
+			FROM com.ff.domain.complaints.ServiceRequestDO serviceRequestDO 
+			WHERE serviceRequestDO.serviceRequestId=:serviceRequestId
+		]]>
+	</query>
+</hibernate-mapping>

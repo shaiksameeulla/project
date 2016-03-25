@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.manifest.BagRadioFrequencyDO" table="ff_d_bag_radio_freq_id">
+		<id name="bagRfidId" type="java.lang.Integer">
+			<column name="BAG_RFID_ID" />
+			<generator class="identity" />
+		</id>
+		
+		<property name="rfidNo" type="java.lang.String">
+			<column name="RFID_NO" />
+		</property>
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+         
+	</class>
+	 <query name="getRfIdByRfNo">
+		<![CDATA[
+			SELECT radionFreq.bagRfidId  from com.ff.domain.manifest.BagRadioFrequencyDO radionFreq where radionFreq.rfidNo =:rfIdNo ]]>
+	</query> 
+	
+	 <query name="getRfNoByRfId">
+		<![CDATA[
+			SELECT radioFreq.rfidNo  from com.ff.domain.manifest.BagRadioFrequencyDO radioFreq where radioFreq.bagRfidId =:rfId ]]>
+	</query> 
+	
+	
+	 <!-- Starting Data sync querys -->
+         
+	<query name="getUnsyncInboundBagRadioFrequency">
+		<![CDATA[From com.ff.domain.manifest.BagRadioFrequencyDO bagRadioFrequency where bagRadioFrequency.dtToCentral='N' or bagRadioFrequency.dtToCentral is null ]]>
+	</query>
+	
+	<query name="getUpdateBagRadioFrequency"> 
+	<![CDATA[ From com.ff.domain.manifest.BagRadioFrequencyDO bagRadioFrequency where  bagRadioFrequency.rfidNo IN (:rfidNo) ]]>
+	</query>
+	 <!-- Ending Data sync querys -->
+	
+	
+</hibernate-mapping>

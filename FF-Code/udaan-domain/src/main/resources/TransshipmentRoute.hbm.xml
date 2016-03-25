@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.routeserviced.TransshipmentRouteDO" table="ff_d_transshipment_route">
+		<id name="transshipmentRouteId" type="java.lang.Integer" column="TRANSSHIPMENT_ROUTE_ID">
+			<generator class="native" />
+		</id>		
+		<property name="transshipmentCityId" type="java.lang.Integer" column="TRANSSHIPMENT_CITY"/>
+		<property name="servicedCityId" type="java.lang.Integer" column="SERVICED_CITY"/>
+		<property name="active" type="java.lang.String" column="ACTIVE"/>	
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> 	
+	</class>
+	
+	<query name="getTransshipmentRoute">
+		<![CDATA[	FROM com.ff.domain.routeserviced.TransshipmentRouteDO transshipmentRoute
+					where transshipmentRoute.transshipmentCityId=:transshipmentCityId
+					and transshipmentRoute.servicedCityId=:servicedCityId
+				]]>
+	</query>
+	<query name="inActiveTransshipmentRouteDetails">
+		<![CDATA[
+ 			update FROM com.ff.domain.routeserviced.TransshipmentRouteDO transshipmentRoute
+ 			set transshipmentRoute.active =:active
+ 			where transshipmentRoute.transshipmentRouteId in (:transshipmentRouteId)
+		]]>
+	</query>
+	
+	<query name="getServicedCityByTransshipmentCity">
+		<![CDATA[	SELECT transshipmentRoute.servicedCityId 
+					FROM com.ff.domain.routeserviced.TransshipmentRouteDO transshipmentRoute
+					WHERE transshipmentRoute.transshipmentCityId=:transshipmentCityId
+				]]>
+	</query>
+	
+	<query name="getServicedByIdByTransCityAndDrsCity">
+		<![CDATA[	SELECT transshipmentRoute.transshipmentRouteId 
+					FROM com.ff.domain.routeserviced.TransshipmentRouteDO transshipmentRoute
+					WHERE 
+					transshipmentRoute.transshipmentCityId=:transshipmentCityId
+					and transshipmentRoute.servicedCityId=:servicedCityId
+					and transshipmentRoute.active='Y'
+				]]>
+	</query>
+	
+</hibernate-mapping>

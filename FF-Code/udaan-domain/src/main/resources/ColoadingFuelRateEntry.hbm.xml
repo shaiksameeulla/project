@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.ff.domain.coloading.ColoadingFuelRateEntryDO" table="ff_d_coloading_fuel_rate_entry">
+        <id name="id" type="java.lang.Integer">
+            <column name="ID" />
+            <generator class="native" />
+        </id>
+        <property name="cityId" type="int">
+            <column name="CITY_ID" not-null="true" />
+        </property>
+        <property name="effectiveFrom" type="date">
+            <column name="EFFECTIVE_FROM" length="10" not-null="true" />
+        </property>
+        <property name="effectiveTill" type="date">
+            <column name="EFFECTIVE_TILL" length="10" />
+        </property>
+        <property name="petrol" type="double">
+            <column name="PETROL" precision="10" not-null="true" />
+        </property>
+        <property name="diesel" type="double">
+            <column name="DIESEL" precision="10" not-null="true" />
+        </property>
+        <property name="cng" type="double">
+            <column name="CNG" precision="10" not-null="true" />
+        </property>
+        <property name="lpg" type="double">
+            <column name="LPG" precision="10" not-null="true" />
+        </property>
+         <property name="storeStatus" type="char">
+            <column name="STORE_STATUS" length="1" not-null="true" />
+        </property>
+        <property name="createdBy" type="int">
+            <column name="CREATED_BY" not-null="true" />
+        </property>
+        <property name="updatedBy" type="int">
+            <column name="UPDATED_BY" not-null="true" />
+        </property>
+        <property name="createdDate" type="timestamp">
+            <column name="CREATED_DATE" length="19" not-null="true" />
+        </property>
+        <property name="updatedDate" type="timestamp">
+            <column name="UPDATED_DATE" length="19" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>

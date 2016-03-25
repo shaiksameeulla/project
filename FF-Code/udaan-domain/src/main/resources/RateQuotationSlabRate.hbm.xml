@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSlabRateDO"  table="ff_f_rate_quotation_slab_rate">
+		<id name="slabRateId" type="java.lang.Integer" column="RATE_QUOTATION_SLAB_RATE_ID">
+			<generator class="native" />
+		</id>
+		
+		<property name="originSector" column="RATE_QUOTATION_ORIGIN_SECTOR"/>
+		<property name="destinationSector" column="RATE_QUOTATION_DESTINATION_SECTOR"/>
+		
+		<many-to-one name="rateQuotationWeightSlabDO" class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationWeightSlabDO" lazy="false"  fetch="join">
+		<column name="RATE_QUOTATION_WEIGHT_SLAB" />
+		</many-to-one>
+		
+		<many-to-one name="rateQuotationProductCategoryHeader" class="com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationProductCategoryHeaderDO"  lazy="false"  fetch="join">
+		<column name="RATE_QUOTATION_PRODUCT_CATEGORY_HEADER" />
+		</many-to-one> 
+		
+		<property name="rate" column="RATE" type="java.lang.Double" />
+		
+		<property name="valueFromROI" column="VALUE_FROM_ROI" type="java.lang.String" />
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+		<property name="createdDate" column="CREATED_DATE" />
+ 		<property name="createdBy" column="CREATED_BY" />
+        <property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE"/>
+		<property name="rateConfiguredType" column="RATE_CONFIGURED_FOR_TYPE"/>      
+    </class>
+   <query name="getRateQuotationSlabRateForOtherThanSpecialDest">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSlabRateDO sd
+				  WHERE sd.rateQuotationProductCategoryHeader.rateQuotationProductCategoryHeaderId=:rateQuotationProductCategoryHeader
+				  AND sd.originSector =:orgSectorId
+				  AND sd.destinationSector=:destSectorId
+				  AND (:weight between sd.rateQuotationWeightSlabDO.startWeight.startWeight AND sd.rateQuotationWeightSlabDO.endWeight.endWeight)
+		]]>
+	</query>
+	<query name="getSlabByCustomerProductNSector">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSlabRateDO slab
+			  WHERE slab.rateQuotationProductCategoryHeader.rateQuotationProductCategoryHeaderId=
+			  (
+			  	SELECT header.rateQuotationProductCategoryHeaderId FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationProductCategoryHeaderDO header
+			  		WHERE header.rateProductCategory.rateProductCategoryId=
+			  		(
+			  			select rpc.rateProductCategoryId from com.ff.domain.ratemanagement.masters.RateProductProductCategoryMapDO rpc
+			  			WHERE rpc.productId=
+			  			(
+			  				select p.productId FROM com.ff.domain.serviceOffering.ProductDO p WHERE p.productCode=:productSeries
+			  			)
+			  		)
+			  		and header.rateQuotationDO.rateQuotationId=
+			  		(
+			  			SELECT quotation.rateQuotationId FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+			  				WHERE quotation.customer.customerCode=:customerCode
+			  		)
+			  ) 
+			  and (slab.originSector=:orgSector or slab.originSector is null)
+			  and slab.destinationSector=:destSector
+			  order by slab.rateQuotationWeightSlabDO.order
+			  
+		]]>
+	</query>
+	<query name="getCourierProSlabsByCustomerNSector">
+		<![CDATA[
+			FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSlabRateDO slab
+				  WHERE slab.rateQuotationProductCategoryHeader.rateQuotationProductCategoryHeaderId=
+				  (
+				  	SELECT header.rateQuotationProductCategoryHeaderId FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationProductCategoryHeaderDO header
+				  		WHERE header.rateProductCategory.rateProductCategoryCode='CO'
+				  		and header.rateQuotationDO.rateQuotationId=
+					  		(
+					  			SELECT quotation.rateQuotationId FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationDO quotation
+					  				WHERE quotation.customer.customerCode=:customerCode
+					  		)
+				  ) 
+				  and slab.destinationSector=:destSectorId
+		]]>
+	</query>
+
+	<query name = "deleteRateQuotationSlabRateRecords">
+	<![CDATA[
+	
+		DELETE FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSlabRateDO slab 
+		
+		WHERE  slab.rateQuotationProductCategoryHeader.rateQuotationProductCategoryHeaderId =:rateQuotationProductCategoryHeaderId
+	]]>
+	
+	</query>
+	
+	<query name = "deleteRateQuotationOriginSectorSlabRateRecords">
+	<![CDATA[
+	
+		DELETE FROM com.ff.domain.ratemanagement.operations.ratequotation.RateQuotationSlabRateDO slab 
+		
+		WHERE  slab.rateQuotationProductCategoryHeader.rateQuotationProductCategoryHeaderId =:rateQuotationProductCategoryHeaderId 
+		
+		AND slab.originSector =:originSector
+	]]>
+	
+	</query>
+	
+
+</hibernate-mapping>

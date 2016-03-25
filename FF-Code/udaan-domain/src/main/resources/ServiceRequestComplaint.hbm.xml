@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.complaints.ServiceRequestComplaintDO" table="ff_f_service_request_complaint">
+		<id name="serviceRequestComplaintId" type="java.lang.Integer" column="SERVICE_REQUEST_COMPLAINT_ID">
+			<generator class="native" />
+		</id>
+		<property name="complaintCreationDate" column="COMPLAINT_CREATION_DATE" />
+		<property name="consignmentNumber" column="CONSIGNMENT_NUMBER" />
+		<property name="branch" column="BRANCH" />
+		<property name="reason" column="REASON" />
+		<property name="declaredValue" column="DECLARED_VALUE" />
+		<property name="consignerName" column="CONSIGNER_NAME" />
+		<property name="customerCode" column="CUSTOMER_CODE" />
+		<property name="customerAddress" column="CUSTOMER_ADDRESS" />
+		<property name="customerPhone" column="CUSTOMER_PHONE" />
+		<property name="customerEmail" column="CUSTOMER_EMAIL" />
+		<property name="informationGivenTo" column="INFORMATION_GIVEN_TO" />
+		<property name="firCopy" column="FIR_COPY" />
+		<property name="firDate" column="FIR_DATE" />
+		<property name="focNumber" column="FOC_NUMBER" />
+		<property name="customerType" column="CUSTOMER_TYPE" />
+		<property name="typeDate" column="TYPE_DATE" />
+		<property name="remark" column="REMARK" />
+		
+		<property name="lirCopy" column="LIR_COPY" />
+		<property name="lirDate" column="LIR_DATE" />
+		<property name="lirRemarks" column="LIR_REMARKS" />
+		<property name="lostLetter" column="LOST_LETTER" />
+		<property name="lostLetterDate" column="LOST_LETTER_DATE" />
+		<property name="lostLetterRemarks" column="LOST_LETTER_REMARKS" />
+		<property name="cofCopy" column="COF_COPY" />
+		<property name="cofDate" column="COF_DATE" />
+		<property name="cofRemarks" column="COF_REMARKS" />
+		<property name="criticalCmpltStatus" column="STATUS" />
+		
+		
+		<!--  common attributes  START-->
+		<property name="createdBy" column="CREATED_BY" update="false" />
+		<property name="createdDate" column="CREATED_DATE" update="false" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<!--  common attributes  END-->
+
+		<!-- Many -to- one relationships START -->
+		<many-to-one name="serviceRequestDO" class="com.ff.domain.complaints.ServiceRequestDO" 
+			lazy="false" fetch="join">
+			<column name="SERVICE_REQUEST_ID" />
+		</many-to-one>
+		
+		<many-to-one name="mailerPaperDO" class="com.ff.domain.complaints.ServiceRequestPapersDO" 
+			lazy="false" fetch="join" cascade="all">
+			<column name="MAILER_PAPER" />
+		</many-to-one>
+		
+		<!-- Many -to- one relationships END -->
+	</class>
+	
+<query name="isCriticalComplaintExist">
+	<![CDATA[
+		FROM com.ff.domain.complaints.ServiceRequestComplaintDO complaint 
+		WHERE complaint.serviceRequestDO.serviceRequestNo=:complaintNo
+	]]>
+</query>
+	
+</hibernate-mapping>
+
+

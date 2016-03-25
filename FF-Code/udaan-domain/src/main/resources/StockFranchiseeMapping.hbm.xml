@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.masters.StockFranchiseeMappingDO" table="ff_d_franchisee_stock_mapping">
+		<id name="stockId" type="java.lang.Integer">
+			<column name="STOCK_ID" />
+			<generator class="native" />
+		</id>
+		<property name="quantity" column="STOCK_QUANTITY" />
+		<property name="transactionStatus" column="CUR_STATUS" />
+
+		<!-- <many-to-one name="itemDO"
+			class="com.ff.domain.stockmanagement.masters.ItemDO" lazy="false">
+			<column name="ITEM_ID" />
+		</many-to-one>
+		<many-to-one name="franchiseeDO"
+			class="com.ff.domain.business.CustomerDO" lazy="false">
+			<column name="FRANCHISEE_ID" />
+		</many-to-one> -->
+		<property name="itemId" column="ITEM_ID" />
+		<property name="franchiseeId" column="FRANCHISEE_ID" />
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+	</class>
+	
+	<query name="stockDecreaseForFranchisee">
+		<![CDATA[
+ 			update com.ff.domain.stockmanagement.masters.StockFranchiseeMappingDO frStock
+ 			set frStock.quantity = frStock.quantity- :quantity
+ 			where frStock.itemId= :itemId
+ 			AND
+ 			frStock.franchiseeId=:partyTypeId
+		]]>
+	</query>
+	
+	<query name="stockIncreaseForFranchisee">
+		<![CDATA[
+ 			update com.ff.domain.stockmanagement.masters.StockFranchiseeMappingDO frStock
+ 			set frStock.quantity = frStock.quantity + :quantity
+ 			where frStock.itemId= :itemId
+ 			AND
+ 			frStock.franchiseeId=:partyTypeId
+		]]>
+	</query>
+	
+</hibernate-mapping>

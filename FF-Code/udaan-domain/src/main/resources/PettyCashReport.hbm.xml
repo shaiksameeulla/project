@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.mec.pettycash.PettyCashReportDO"
+		table="ff_f_petty_cash">
+		<id name="pettyCashId" type="java.lang.Long">
+			<column name="PETTY_CASH_ID" />
+			<generator class="native" />
+		</id>
+		<property name="closingDate" column="CLOSING_DATE" />
+		<property name="closingBalance" column="CLOSING_BALANCE" />
+		<property name="officeId" column="OFFICE_ID" />
+		<property name="isUpdateReq" column="IS_UPDATE_REQ" />
+
+		<!-- common attributes START -->
+		<property name="createdDate" column="TRANS_CREATED_DATE_TIME"
+			update="false" />
+		<property name="updatedDate" column="TRANS_UPDATED_DATE_TIME" />
+		<!-- common attributes END -->
+
+	</class>
+
+	<query name="getOpeningBalanceOfThatDay">
+	<![CDATA[
+		SELECT pettyCash.closingBalance FROM com.ff.domain.mec.pettycash.PettyCashReportDO pettyCash 
+		WHERE pettyCash.closingDate=:prevDate 
+		AND pettyCash.officeId=:officeId
+	]]>
+	</query>
+
+	<query name="getPettyCashDtlsByDate">
+	<![CDATA[
+		FROM 
+			com.ff.domain.mec.pettycash.PettyCashReportDO pettyCash 
+		WHERE 
+			pettyCash.closingDate=:paramDateObj AND 
+			pettyCash.officeId=:officeId 
+	]]>
+	</query>
+
+	<query name="getOfficesForUpdation">
+	<![CDATA[
+		SELECT 
+			DISTINCT(pettyCash.officeId)
+		FROM 
+			com.ff.domain.mec.pettycash.PettyCashReportDO pettyCash 
+		WHERE 
+			pettyCash.closingDate=:paramDateObj AND
+			pettyCash.isUpdateReq='Y'
+	]]>
+	</query>
+
+	<query name="getAllPreviosDayOffices">
+	<![CDATA[
+		SELECT 
+			DISTINCT(pettyCash.officeId)
+		FROM 
+			com.ff.domain.mec.pettycash.PettyCashReportDO pettyCash 
+		WHERE 
+			pettyCash.closingDate=:prevDate
+	]]>
+	</query>
+
+	<query name="getPettyCashDtlsForOneDay">
+	<![CDATA[
+		FROM com.ff.domain.mec.pettycash.PettyCashReportDO pettyCash 
+		WHERE 
+			pettyCash.closingDate=:paramDateObj AND 
+			pettyCash.officeId=:officeId 
+		ORDER BY pettyCash.pettyCashId DESC
+	]]>
+	</query>
+
+	<query name="updatePettyCashReportEntry">
+	<![CDATA[
+		UPDATE com.ff.domain.mec.pettycash.PettyCashReportDO pettyCash
+		SET pettyCash.closingBalance =:closingBalance, pettyCash.updatedDate =:updatedDate
+		WHERE
+		pettyCash.officeId =:officeId AND pettyCash.closingDate =:closingDate 
+	]]>
+	</query>
+	
+	<query name="getNumberOfClosingBalancesForGivenDate">
+	<![CDATA[
+		SELECT COUNT(pettyCash.pettyCashId) FROM com.ff.domain.mec.pettycash.PettyCashReportDO pettyCash
+		WHERE
+		pettyCash.closingDate =:closingDate 
+	]]>
+	</query>
+
+</hibernate-mapping>

@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.consignment.ConsignmentDO" table="ff_f_consignment" dynamic-update="true">
+		<id name="consgId" column="CONSG_ID" type="java.lang.Integer">
+			<generator class="native" />
+		</id>
+		
+		<property name="consgNo" column="CONSG_NO" not-null="true" update="false"/>
+		
+		<property name="orgOffId" type="java.lang.Integer">
+			<column name="ORG_OFF" not-null="true" />
+		</property>
+		<!-- <property name="destPincodeId" type="java.lang.Integer" > <column 
+			name="DEST_PINCODE"/> </property> -->
+		<property name="noOfPcs" type="java.lang.Integer">
+			<column name="NO_OF_PCS" />
+		</property>
+
+		<many-to-one name="consgType"
+			class="com.ff.domain.serviceOffering.ConsignmentTypeDO" lazy="false" fetch="join">
+			<column name="CONSG_TYPE"  not-null="true"/>
+		</many-to-one>
+
+		<many-to-one name="destPincodeId" class="com.ff.domain.geography.PincodeDO"
+			lazy="false" fetch="join">
+			<column name="DEST_PINCODE" not-null="true" />
+		</many-to-one>
+
+		<property name="price" type="java.lang.Double">
+			<column name="PRICE" />
+		</property>
+		<property name="productId" type="java.lang.Integer" >
+			<column name="PRODUCT" not-null="true" />
+		</property>
+		<property name="actualWeight" type="java.lang.Double">
+			<column name="ACTUAL_WEIGHT" />
+		</property>
+		<property name="volWeight">
+			<column name="VOL_WEIGHT" />
+		</property>
+		<property name="finalWeight" type="java.lang.Double">
+			<column name="FINAL_WEIGHT" not-null="true" />
+		</property>
+
+
+		<property name="eventDate" column="EVENT_DATE" type="java.util.Date" />
+		<property name="customer" column="CUSTOMER" type="java.lang.Integer" />
+
+		<property name="consgStatus" type="java.lang.String">
+			<column name="CONSG_STATUS" not-null="true"/>
+		</property>
+
+
+
+		<property name="height" column="HEIGHT" type="java.lang.Double" />
+		<property name="length" column="LENGTH" type="java.lang.Double" />
+		<property name="breath" column="BREATH" type="java.lang.Double" />
+		<property name="insurencePolicyNo" column="INSURANCE_POLICY_NO"
+			type="java.lang.String" />
+		<property name="refNo" column="REF_NO" type="java.lang.String" />
+
+		<property name="mobileNo" column="MOBILE_NO" type="java.lang.String" />
+
+		<property name="receivedDateTime" column="RECEIVED_DATE"
+			type="java.util.Date" />
+		<property name="deliveredDate" column="DLV_DATE_TIME" type="java.util.Date" />
+		<property name="recvNameOrCompName" column="RECV_NAME_OR_COMP_SEAL"
+			type="java.lang.String" />
+		<property name="operatingOffice" column="OPERATING_OFFICE"
+			type="java.lang.Integer" not-null="true"/>
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date"
+			update="false" />
+		<property name="updatedDate" column="UPDATE_DATE" type="java.util.Date" />
+		<property name="declaredValue" type="java.lang.Double">
+			<column name="DECLARED_VALUE" />
+		</property>
+		<property name="discount" column="DISCOUNT" type="java.lang.Double" />
+		<property name="topayAmt" column="TOPAY_AMT" type="java.lang.Double" />
+		<property name="splChg" column="SPL_CHG" type="java.lang.Double" />
+		<property name="codAmt" column="COD_AMT" type="java.lang.Double" />
+		<property name="lcAmount" column="LC_AMT" type="java.lang.Double" />
+		<property name="lcBankName" column="LC_BANK_NAME" type="java.lang.String" />
+		<property name="servicedOn" column="SERVICED_ON" type="java.lang.String" />
+		<property name="rateType" column="RATE_TYPE " type="java.lang.String" />
+		<property name="ebPreferencesCodes" column="EB_PREFEENCES_CODES "
+			type="java.lang.String" />
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer" />
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer" />
+
+		<property name="misRouted" type="java.lang.String">
+			<column name="MIS_ROUTED" />
+		</property>
+
+		<many-to-one name="consignee"
+			class="com.ff.domain.business.ConsigneeConsignorDO" lazy="false"
+			 fetch="join"  cascade="all" unique="true">
+			<column name="CONSIGNEE" />
+		</many-to-one>
+		<many-to-one name="consignor"
+			class="com.ff.domain.business.ConsigneeConsignorDO" lazy="false"
+			fetch="join" cascade="all" unique="true">
+			<column name="CONSIGNOR" />
+		</many-to-one>
+
+		<!-- <many-to-one name="consignee" class="com.ff.domain.business.ConsigneeConsignorDO" 
+			lazy="false" unique="true"> <column name="CONSIGNEE" /> </many-to-one> <many-to-one 
+			name="consignor" class="com.ff.domain.business.ConsigneeConsignorDO" lazy="false" 
+			unique="true"> <column name="CONSIGNOR" /> </many-to-one> -->
+
+		<many-to-one name="cnContentId"
+			class="com.ff.domain.serviceOffering.CNContentDO" lazy="false" fetch="join">
+			<column name="CONTENT" />
+		</many-to-one>
+
+		<many-to-one name="cnPaperWorkId"
+			class="com.ff.domain.serviceOffering.CNPaperWorksDO" lazy="false" fetch="join" >
+			<column name="PAPER_WORK" />
+		</many-to-one>
+
+		<many-to-one name="insuredBy"
+			class="com.ff.domain.serviceOffering.InsuredByDO" lazy="false" fetch="join"
+			unique="true">
+			<column name="INSURED_BY" />
+		</many-to-one>
+
+		<many-to-one name="updatedProcess" class="com.ff.domain.tracking.ProcessDO"
+			lazy="false" fetch="join" unique="true">
+			<column name="UPDTAED_PROCESS_FROM" />
+		</many-to-one>
+
+		<set name="childCNs" table="ff_f_child_consignments" cascade="all-delete-orphan"
+			lazy="false" fetch="join">
+			<key>
+				<column name="CONSG_ID" />
+			</key>
+			<one-to-many class="com.ff.domain.consignment.ChildConsignmentDO" />
+		</set>
+
+		<set name="consgRateDtls" table="ff_f_consignment_rate" cascade="all-delete-orphan"
+			lazy="false"  fetch="join" inverse="true">
+			<key>
+				<column name="CONSIGNMENT_ID" />
+			</key>
+			<one-to-many class="com.ff.domain.billing.ConsignmentBillingRateDO" />
+		</set>
+
+		<!-- <many-to-one name="consgPricingDtls" class="com.ff.domain.booking.CNPricingDetailsDO" 
+			lazy="false" unique="true" cascade="all"> <column name="cn_price_id" /> </many-to-one> -->
+
+		<!-- <one-to-one name="consgPricingDtls" class="com.ff.domain.booking.CNPricingDetailsDO" 
+			property-ref="consgId" lazy="false" cascade="all" fetch="join"> </one-to-one> -->
+
+
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+
+		<property name="dtToOpsman" type="java.lang.String">
+			<column name="DT_TO_OPSMAN" />
+		</property>
+
+		<property name="dtFromOpsman" type="java.lang.String">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+
+		<property name="dtUpdateToCentral" type="java.lang.String">
+			<column name="DT_UPDATE_TO_CENTRAL" />
+		</property>
+
+		<property name="billingStatus" type="java.lang.String">
+			<column name="BILLING_STATUS" />
+		</property>
+
+		<property name="changedAfterBillingWtDest" type="java.lang.String">
+			<column name="CHANGED_AFTER_BILLING_WEIGHT_DEST" />
+		</property>
+
+		<property name="changedAfterNewRateCmpnt" type="java.lang.String">
+			<column name="CHANGED_AFTER_NEW_RATE_COMPONENT" />
+		</property>
+
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<many-to-one name="cnReturnReason" class="com.ff.domain.serviceOffering.ReasonDO"
+			lazy="false" unique="true" fetch="join">
+			<column name="RTH_RTO_REASON" />
+		</many-to-one>
+		<property name="remarks" column="REMARKS" />
+		<property name="otherCNContent" column="OTHERS_CN_CONTENT" />
+
+		<many-to-one name="altConsigneeAddr"
+			class="com.ff.domain.business.ConsigneeConsignorDO" lazy="false"
+			cascade="all" unique="true" fetch="join">
+			<column name="ALT_CONSIGNEE_ADDR" />
+		</many-to-one>
+
+		<many-to-one name="stopReason" class="com.ff.domain.serviceOffering.ReasonDO"
+			lazy="false" fetch="join">
+			<column name="STOP_DELIVERY_REASON" />
+		</many-to-one>
+
+		<property name="stopDelivery" type="java.lang.String">
+			<column name="STOP_DELIVERY" />
+		</property>
+
+		<property name="stopDelvDate" column="STOP_DELV_DATE" type="java.util.Date" />
+		<property name="isExcessConsg" column="IS_EXCESS_CONSG" />
+		<property name="baAmt" column="BA_AMT" type="java.lang.Double" />
+		<property name="stopDeliveryReqOff" column="STOP_DELIVERY_REQ_OFFICE"
+			type="java.lang.Integer" />
+
+	</class>
+
+	<query name="getMasterConsignmentId">
+		<![CDATA[
+			SELECT cosignment.consgId from com.ff.domain.consignment.ConsignmentDO cosignment where cosignment.consgNo = :consgNumber ]]>
+	</query>
+
+	<query name="getConsignmentDetails">
+		<![CDATA[ FROM com.ff.domain.consignment.ConsignmentDO consignment 
+		          WHERE consignment.consgNo IN(:consgNumber)
+		          AND consignment.consgType.consignmentCode=:consgTypeCode
+		]]>
+	</query>
+
+	<query name="getConsignmentIdByConsgNo">
+		<![CDATA[ SELECT consignment.consgId FROM 
+				  com.ff.domain.consignment.ConsignmentDO consignment 
+		          WHERE consignment.consgNo IN(:consgNumber)
+		]]>
+
+	</query>
+	
+	
+<!-- unused -->
+	<query name="getUpdateConsignment"> 
+	<![CDATA[ From com.ff.domain.consignment.ConsignmentDO consignment where  consignment.consgNo IN (:consgNo) ]]>
+	</query>
+<!-- unused -->
+
+	<query name="getChildConsignmentDetails">
+		<![CDATA[ FROM com.ff.domain.consignment.ConsignmentDO consignment 
+		          WHERE consignment.consgNo =:consgNum
+		]]>
+	</query>
+	
+	
+<!-- unused -->
+	<query name="getConsignmentById">
+		<![CDATA[ 
+			FROM com.ff.domain.consignment.ConsignmentDO consignment 
+		    WHERE consignment.consgId IN (:consgId)
+		]]>
+	</query>
+<!-- unused -->
+
+	<query name="getConsignmentByConsgNo">
+		<![CDATA[ 
+			FROM com.ff.domain.consignment.ConsignmentDO consignment 
+		    WHERE consignment.consgNo IN (:consgNo)
+		]]>
+	</query>
+
+	<query name="updateConsignmentWeight">
+		<![CDATA[ 
+			UPDATE com.ff.domain.consignment.ConsignmentDO consignment 
+			SET consignment.finalWeight=:finalWeight,
+				consignment.updatedProcess.processId=:processId
+		    WHERE consignment.consgId IN (:consgId)
+		]]>
+	</query>
+
+	<query name="updateConsignmentStatus">
+		<![CDATA[ 
+			UPDATE com.ff.domain.consignment.ConsignmentDO consignment 
+			SET consignment.consgStatus=:consignmentStatus,
+				consignment.updatedProcess.processId= (SELECT process.processId 
+															FROM com.ff.domain.tracking.ProcessDO process 
+															WHERE process.processCode=:processCode)
+		    WHERE consignment.consgNo IN (:consignmentNos)
+		]]>
+	</query>
+
+	<query name="getBookedConsignmentsByDateRange">
+		<![CDATA[ 	FROM com.ff.domain.consignment.ConsignmentDO consignment
+					where consignment.consgNo
+					IN (
+						Select booking.consgNumber from 
+						com.ff.domain.booking.BookingDO booking
+						where 
+						booking.customerId.customerId IN (:customerId)
+						AND booking.bookingDate>=:startDate
+						AND booking.bookingDate<=:endDate
+					)
+				]]>
+	</query>
+
+	<query name="getBookedTransferredConsignmentsByDateRange">
+		<![CDATA[ 	SELECT consignment1 FROM
+						com.ff.domain.consignment.ConsignmentDO AS consignment1,
+						com.ff.domain.booking.BookingDO AS booking,
+						com.ff.domain.billing.BillingConsignmentDO AS billingConsg,
+						com.ff.domain.billing.BillingConsignmentSummaryDO AS billConsgSummary
+					WHERE
+						consignment1.consgNo=booking.consgNumber
+						AND consignment1.consgNo=billingConsg.consgNo
+						AND billingConsg.billingConsignmentSummaryDO.billingConsignmentSummaryId=
+							billConsgSummary.billingConsignmentSummaryId					
+						AND booking.bookingDate>=:startDate
+						AND booking.bookingDate<=:endDate
+						AND booking.customerId.customerId IN (:customerId)
+						AND billConsgSummary.transferStatus='Y'
+				]]>
+	</query>
+
+	<query name="getConsignmentForRate">
+		<![CDATA[ FROM com.ff.domain.consignment.ConsignmentDO consignment 
+		          WHERE consignment.billingStatus =:billingStatus
+		]]>
+	</query>
+
+	<query name="getBookedCodLcConsg">
+		<![CDATA[ 
+				FROM	com.ff.domain.consignment.ConsignmentDO consg 
+			    WHERE	consg.sapStatus=:sapStatus
+			    AND		consg.productId IN (:productIDList)
+			    AND		(((consg.codAmt IS NOT NULL ) AND (consg.codAmt != 0)  
+			    			AND (consg.productId != (SELECT product.productId 
+			    									 FROM com.ff.domain.serviceOffering.ProductDO product 
+			    									 WHERE product.consgSeries IN ('T'))))
+			   				OR (( consg.lcAmount IS NOT NULL ) AND ( consg.lcAmount != 0))
+			   				OR ((consg.baAmt IS NOT NULL) AND (consg.baAmt != 0))
+			   			)
+			   	AND consg.isExcessConsg = 'N'
+		]]>
+	</query>
+
+	<query name="getLiabilityEntriesCount">
+		<![CDATA[ 
+				SELECT 	count(*)
+				FROM	com.ff.domain.consignment.ConsignmentDO consg
+			    WHERE	consg.sapStatus=:sapStatus
+			    AND 	consg.isExcessConsg = 'N'
+			    AND		consg.productId IN (:productIDList)
+			    AND		(((consg.codAmt IS NOT NULL ) AND (consg.codAmt != 0)  
+			    			AND (consg.productId != (SELECT product.productId 
+			    									 FROM com.ff.domain.serviceOffering.ProductDO product 
+			    									 WHERE product.consgSeries IN ('T'))))
+			   				OR (( consg.lcAmount IS NOT NULL ) AND ( consg.lcAmount != 0))
+			   				OR ((consg.baAmt IS NOT NULL) AND (consg.baAmt != 0))
+			   			)
+		]]>
+	</query>
+
+	<query name="updateCODLCEntriesForSAP">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.consignment.ConsignmentDO consg
+		SET		consg.sapStatus=:sapStatus
+		WHERE	consg.consgId=:consgId
+	]]>
+	</query>
+
+	<query name="getConsgStatusDelivered">
+	<![CDATA[ 
+		FROM	com.ff.domain.consignment.ConsignmentDO consg
+		WHERE	consg.consgNo=:consgNo
+		AND		consg.consgStatus='D'
+	]]>
+	</query>
+
+	<query name="getConsgStatusRTODRS">
+	<![CDATA[
+		FROM	com.ff.domain.consignment.ConsignmentDO consg
+		WHERE	consg.consgNo=:consgNo
+		AND		consg.consgStatus='S'	
+	]]>
+	</query>
+
+	<query name="updateConsignmentBillingStatus">
+		<![CDATA[ 
+			UPDATE com.ff.domain.consignment.ConsignmentDO consignment 
+			SET consignment.billingStatus=:consignmentbillingStatus ,consignment.updatedDate=:updatedDate ,consignment.updatedBy=:updatedBy
+				WHERE consignment.consgNo IN (:consgNos)
+		]]>
+	</query>
+
+	<query name="getConsgDtlsByBookingRefNo">
+		<![CDATA[
+			FROM com.ff.domain.consignment.ConsignmentDO consg
+			WHERE consg.consgNo IN (
+				SELECT booking.consgNumber FROM com.ff.domain.booking.BookingDO booking 
+				WHERE booking.refNo=:bookingRefNo
+			)
+		]]>
+	</query>
+
+	<query name="updateStopDeliveryFlag">
+		<![CDATA[ 
+		 
+			UPDATE com.ff.domain.consignment.ConsignmentDO consignment 
+			SET consignment.stopDelivery=:stopDeliveryFlag ,consignment.stopReason=:stopReason , consignment.dtToBranch='N',consignment.stopDelvDate=:stopDelvDate,consignment.updatedDate=:updatedDate,consignment.updatedBy=:updatedBy,consignment.consgStatus='X',consignment.stopDeliveryReqOff=:stopDelvReqOff    
+				WHERE consignment.consgNo=:consgNo
+		]]>
+	</query>
+
+	<query name="updateStopDeliveryFlagWithRemark">
+		<![CDATA[ 
+		 
+			UPDATE com.ff.domain.consignment.ConsignmentDO consignment 
+			SET consignment.stopDelivery=:stopDeliveryFlag ,consignment.stopReason=:stopReason,consignment.remarks=:remark ,consignment.dtToBranch='N', consignment.stopDelvDate=:stopDelvDate,consignment.updatedDate=:updatedDate,consignment.updatedBy=:updatedBy,consignment.consgStatus='X',consignment.stopDeliveryReqOff=:stopDelvReqOff   
+				WHERE consignment.consgNo=:consgNo
+		]]>
+	</query>
+
+
+
+	<query name="updateConsgForCustModification">
+		<![CDATA[ 
+		 
+			UPDATE com.ff.domain.consignment.ConsignmentDO consignment 
+			SET consignment.customer=:custId,consignment.isExcessConsg=:isExcessConsg,consignment.actualWeight=:actualWeight,consignment.finalWeight=:finalWeight,consignment.rateType=:rateType,consignment.updatedDate=:updatedDate,consignment.updatedBy=:updatedBy 
+				WHERE consignment.consgId=:consgId
+		]]>
+	</query>
+
+	<!-- Data Sync For Consignment Started -->
+
+	<query name="getUnsyncInboundConsignment">
+		<![CDATA[
+		
+		From com.ff.domain.consignment.ConsignmentDO consignment
+					where consignment.dtToCentral='N'
+		]]>
+	</query>
+
+	<query name="getUnsyncOutboundConsignment">
+		<![CDATA[
+				Select consignment FROM com.ff.domain.consignment.ConsignmentDO consignment
+				inner join consignment.destPincodeId as pincode
+				 WHERE consignment.dtToBranch='N'
+					AND consignment.consgStatus='X'
+					AND consignment.stopDelivery='Y'		          
+					AND pincode.cityId IN (
+						SELECT office.cityId
+						FROM com.ff.domain.organization.OfficeDO office
+						inner join office.officeTypeDO as officeType
+						WHERE officeType.offcTypeCode IN ('HO', 'BO')
+						AND office.officeId IN (:branchId)
+					  )
+		]]>
+	</query>
+
+<!-- 	<query name="getUnsyncOutboundConsignment">
+		<![CDATA[
+				  FROM com.ff.domain.consignment.ConsignmentDO consignment
+		          WHERE consignment.dtToBranch='N'
+		          AND consignment.consgStatus='X'
+		          AND consignment.stopDelivery='Y'		          
+		          AND consignment.destPincodeId.cityId IN (
+			          SELECT office.cityId
+					  FROM com.ff.domain.organization.OfficeDO office
+					  WHERE office.officeTypeDO.offcTypeCode IN ('HO', 'BO')
+					  AND office.officeId IN (:branchId)
+		          )
+		]]>
+	</query> -->
+	<!-- Data Sync For Consignment Ended -->
+
+	
+
+	<query name="updateConsignmentReBillingStatus">
+		<![CDATA[ 
+			UPDATE com.ff.domain.consignment.ConsignmentDO consignment 
+			SET consignment.billingStatus=:consignmentbillingStatus ,consignment.changedAfterBillingWtDest='N', consignment.createdBy = 1
+				WHERE consignment.consgNo IN (:consgNos)
+		]]>
+	</query>
+
+	<query name="isConsginmentBooked">
+		<![CDATA[
+			SELECT count(*) from com.ff.domain.consignment.ConsignmentDO consignment where consignment.consgNo =:consgNumber)]]>
+	</query>
+
+	<query name="getConsignorMobileNumber">
+		<![CDATA[
+		select consnor.mobile From com.ff.domain.consignment.ConsignmentDO consignment
+				inner join consignment.consignor as consnor
+					where consignment.consgNo =:consgNumber
+					OR 
+					consignment.refNo =:bookingRefNo
+
+	]]>
+	</query>
+
+	<query name="getConsigneeMobileNumber">
+		<![CDATA[
+				select consnee.mobile From com.ff.domain.consignment.ConsignmentDO consignment
+					inner join consignment.consignee as consnee
+					where consignment.consgNo =:consgNumber
+					OR 
+					consignment.refNo =:bookingRefNo
+
+	]]>
+	</query>
+	
+	<query name="getConsgOriginOffIdByConsgNo">
+		<![CDATA[ SELECT consignment.orgOffId FROM 
+				  com.ff.domain.consignment.ConsignmentDO consignment 
+		          WHERE consignment.consgNo IN(:consgNumber)
+		]]>
+	</query>
+	
+	<query name="updateConsgBillingStatus">
+		<![CDATA[
+				UPDATE com.ff.domain.consignment.ConsignmentDO consignment
+				SET consignment.billingStatus='TBB'
+				WHERE consignment.consgNo=:consgNumber
+				AND consignment.billingStatus='PFB'
+		]]>
+	</query>
+	
+	<query name="getConsgDtlsWhoseRateIsNull">
+		<![CDATA[
+			SELECT consignment FROM com.ff.domain.consignment.ConsignmentDO consignment
+			WHERE consignment.consgId NOT IN (SELECT cn1.consgId 
+			FROM com.ff.domain.billing.ConsignmentBillingRateDO consgRate INNER JOIN consgRate.consignmentDO as cn1)
+			AND DATE(consignment.createdDate) > STR_TO_DATE('2014-11-29', '%Y-%m-%d')
+			AND consignment.isExcessConsg != 'Y'
+		]]>
+	</query>
+	<!--  Changes here -->
+	<query name="getConsgDetailsByCnNumber">
+		<![CDATA[
+			SELECT con FROM com.ff.domain.consignment.ConsignmentDO con where con.consgNo=:consgNumber
+		]]>
+	</query>
+	<query name="updateConsgDestinforBillingFromDRS">
+		<![CDATA[
+				UPDATE com.ff.domain.consignment.ConsignmentDO consignment
+				SET consignment.destPincodeId.pincodeId =:pincodeId , consignment.billingStatus='TBB' ,consignment.dtToBranch='N',consignment.dtToCentral='N'
+				WHERE consignment.consgId=:consgId
+				
+		]]>
+	</query>
+	
+	<query name="getPendingConsignmentsForBulkSMS">
+		<![CDATA[
+				SELECT consignment.consgId, consignment.consgNo, consignment.createdDate, cne.mobile, consignment.mobileNo, dlvReason.reasonName
+				FROM com.ff.domain.delivery.DeliveryDetailsDO dd
+					LEFT JOIN dd.consignmentDO consignment
+					LEFT JOIN dd.deliveryDO dlv
+					LEFT JOIN dd.reasonDO dlvReason
+					LEFT JOIN consignment.consignee cne
+				WHERE dlv.createdOfficeDO.officeId = :officeId
+				AND (case when dd.transactionModifiedDate > consignment.eventDate then dd.transactionModifiedDate end) BETWEEN :fromDate AND :toDate
+				AND consignment.consgStatus NOT IN ('D','S')
+				AND dd.deliveryStatus = 'P' 
+				GROUP BY consignment.consgNo			
+		]]>
+	</query>
+	<query name="getRTHedConsignmentsForBulkSMS">
+		<![CDATA[
+				SELECT consignment.consgId, consignment.consgNo, consignment.createdDate, cne.mobile, consignment.mobileNo, rthReason.reasonName
+				FROM com.ff.domain.manifest.ConsignmentManifestDO cnManifested, com.ff.domain.delivery.DeliveryDetailsDO dd
+					LEFT JOIN cnManifested.consignment consignment
+					LEFT JOIN cnManifested.manifest manifest
+					LEFT JOIN consignment.cnReturnReason rthReason
+					LEFT JOIN consignment.consignee cne 
+				WHERE manifest.operatingOffice = :officeId
+				AND (case when manifest.manifestDate > dd.transactionModifiedDate then manifest.manifestDate end) BETWEEN :fromDate AND :toDate
+				AND manifest.manifestType = 'T' 
+				GROUP BY consignment.consgNo			
+		]]>
+	</query>
+</hibernate-mapping>

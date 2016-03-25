@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.consignment.ConsignmentDOXDO" table="ff_f_consignment">
+		<id name="consgId" column="CONSG_ID" type="java.lang.Integer">
+			<generator class="native" />
+		</id>
+
+		<property name="consgNo" type="java.lang.String">
+			<column name="CONSG_NO" />
+		</property>
+		<many-to-one name="consgType"
+			class="com.ff.domain.serviceOffering.ConsignmentTypeDO" lazy="false" fetch="join">
+			<column name="CONSG_TYPE" />
+		</many-to-one>
+
+		<many-to-one name="destPincodeId" class="com.ff.domain.geography.PincodeDO"
+			lazy="false" fetch="join">
+			<column name="DEST_PINCODE" />
+		</many-to-one>
+		<property name="actualWeight" type="java.lang.Double">
+			<column name="ACTUAL_WEIGHT" />
+		</property>
+		<property name="finalWeight" type="java.lang.Double">
+			<column name="FINAL_WEIGHT" />
+		</property>
+		<property name="consgStatus" type="java.lang.String">
+			<column name="CONSG_STATUS" />
+		</property>
+		<many-to-one name="consignee"
+			class="com.ff.domain.business.ConsigneeConsignorDO" lazy="false" fetch="join"
+			unique="true" cascade="all">
+			<column name="CONSIGNEE" />
+		</many-to-one>
+		<many-to-one name="updatedProcess" class="com.ff.domain.tracking.ProcessDO"
+			lazy="false" fetch="join" unique="true">
+			<column name="UPDTAED_PROCESS_FROM" />
+		</many-to-one>
+		<property name="lcAmount" column="LC_AMT" />
+		<property name="lcBankName" column="LC_BANK_NAME" />
+		<property name="codAmt" column="COD_AMT" />
+	</class>
+
+
+</hibernate-mapping>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+
+
+<hibernate-mapping>
+	<class name="com.ff.domain.serviceOffering.PrivilegeCardTransactionDO" table="ff_f_privilege_card_trans">
+		<id name="privilegeCardTransactionId" type="java.lang.Integer">
+			<column name="PRIVILEGE_CARD_TRANS_ID" />
+			<generator class="native" />
+		</id>
+		
+		
+		<many-to-one name="bookingType"  class="com.ff.domain.booking.BookingTypeDO" lazy="false" fetch="join">
+		<column  name="BOOKING_TYPE_ID" />
+		</many-to-one>
+				
+		<many-to-one name="privilegeCard"  class="com.ff.domain.serviceOffering.PrivilegeCardDO" lazy="false" fetch="join" >
+		<column  name="PRIVILEGE_CARD_ID" />
+		</many-to-one>
+		
+	<property name="amount" column="AMOUNT" type="java.lang.Double" />
+	<property name="customerId" column="CUSTOMER_ID" type="java.lang.Integer" />
+	<property name="consgNumber" column="CONSG_NUMBER" type="java.lang.String" />
+		
+	
+	</class>
+	
+	<query name="getPrivilegeCardTransDtls">
+		<![CDATA[
+			From com.ff.domain.serviceOffering.PrivilegeCardTransactionDO privgCardTrans where privgCardTrans.privilegeCard.privilegeCardNo=:privilegeCardNo
+		]]>
+	</query>
+	
+</hibernate-mapping>

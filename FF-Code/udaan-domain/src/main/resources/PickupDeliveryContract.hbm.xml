@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.pickup.PickupDeliveryContractDO" table="ff_d_pickup_delivery_contract">
+		<id name="contractId" type="java.lang.Integer">
+			<column name="CONTRACT_ID" />
+			<generator class="native" />
+		</id>
+		<many-to-one name="customer"
+					class="com.ff.domain.business.CustomerDO"
+					column="CUSTOMER_ID"
+					unique="true"
+					lazy="false"
+					fetch="join"/>
+		
+		<many-to-one name="office"
+					class="com.ff.domain.organization.OfficeDO"
+					column="OFFICE_ID"
+					unique="true"
+					lazy="false"
+					fetch="join"/>
+		<property name="contractType" column="CONTRACT_TYPE"/>
+		<property name="status" column="STATUS"/>
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer"/>
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/>
+		<property name="createdDate" column ="CREATION_DATE" type="java.util.Date"/>
+		<property name="updatedDate" column ="UPDATE_DATE" type="java.util.Date"/>			
+		<property name="dtToBranch" column="DT_TO_BRANCH"/>
+	</class>
+	
+	 <query name="getReverseLogisticsCustomerList">
+      <![CDATA[    select contract.customer 
+                  from  com.ff.domain.pickup.PickupDeliveryContractDO contract 
+                  where contract.office.officeId=:officeId
+                  and contract.contractType= 'P'
+                  and contract.customer.customerType.customerTypeCode=:custTypeCode)]]>
+      </query>
+      <!-- Commented below query and added new query to get Reverse logistic customers for whom contract is defined -->
+    <!-- <query name="getNewReverseLogisticsCustomerList">
+      <![CDATA[    
+				from  com.ff.domain.business.CustomerDO cust 
+                  where cust.customerType.customerTypeCode=:custTypeCode
+                  and cust.officeMappedDO.officeId in(select offic.officeId from com.ff.domain.organization.OfficeDO offic where 
+					offic.mappedRegionDO.regionId = (select office.mappedRegionDO.regionId 
+					from com.ff.domain.organization.OfficeDO office
+					where office.officeId = :officeId))]]>
+      </query> -->
+	<query name="getReverseLogisticsCustomersInContract">
+      <![CDATA[    
+				SELECT DISTINCT(customer.customerId), customer.businessName, customer.customerCode,  paymentLoc.shippedToCode
+  				FROM com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO AS paymentLoc
+  				INNER JOIN paymentLoc.pickupDeliveryLocation dlvLoc 
+               	INNER JOIN dlvLoc.pickupDlvContract AS dlvContract                	
+           		INNER JOIN dlvContract.customer AS customer 
+				WHERE customer.contractNo IS NOT NULL
+				AND customer.status = 'A'
+				AND dlvContract.customer.customerCode IS NOT NULL
+				AND customer.customerType.customerTypeCode =:custTypeCode
+				AND dlvLoc.pickupDlvContract.contractId = dlvContract.contractId
+				AND dlvContract.customer.customerId = customer.customerId
+				AND paymentLoc.pickupDeliveryLocation.pickupDlvLocId = dlvLoc.pickupDlvLocId
+				AND dlvContract.contractType = 'D'				
+       			AND (dlvContract.office.officeId IN (SELECT office.officeId FROM com.ff.domain.organization.OfficeDO office
+                 											WHERE (office.officeId = :officeId)
+                       										OR (office.reportingRHO = :officeId)
+                       										OR (office.reportingHUB = :officeId)))										
+   ]]>
+	</query>
+	<query name="getOfficeDeliverContracByCustomer">
+		<![CDATA[
+			from 		com.ff.domain.pickup.PickupDeliveryContractDO delContract
+			where		delContract.customer.customerId = :customerId
+			and			delContract.office.officeId = :officeId
+		]]>
+	</query>
+	<query name="getPickupContracByCustomerAndOffice">
+		<![CDATA[
+			from 		com.ff.domain.pickup.PickupDeliveryContractDO delContract
+			where		delContract.customer.customerId = :customerId
+			and			delContract.office.officeId = :officeId
+			and			delContract.contractType='P'
+		]]>
+	</query>
+	
+	<query name="getCustomersByPickupDeliveryLocation">
+		<![CDATA[
+			SELECT DISTINCT contract.customer 
+			FROM 		com.ff.domain.pickup.PickupDeliveryContractDO contract,
+						com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO billingLoc,
+						com.ff.domain.pickup.PickupDeliveryLocationDO pickupLoc
+			WHERE		contract.office.officeId = :officeId
+			AND			contract.contractId = pickupLoc.pickupDlvContract.contractId
+			AND			pickupLoc.pickupDlvLocId = billingLoc.pickupDeliveryLocation.pickupDlvLocId
+			AND			billingLoc.locationOperationType IN ('P','BP')
+		]]>
+	</query>
+	
+	
+	<query name="getPickupctrctDtlsByOfcId">
+		<![CDATA[
+			SELECT	new com.ff.domain.pickup.PickupDeliveryContractWrapperDO ( contract.contractId,contract.customer.customerId,
+						contract.office.officeId )
+			FROM	com.ff.domain.pickup.PickupDeliveryContractDO contract
+			WHERE	contract.office.officeId=:officeId
+		]]>
+	</query>
+	
+	
+	<query name="geBusinessNameAndCustCodeByOfcId">
+		<![CDATA[
+			SELECT new com.ff.domain.pickup.PickupDeliveryContractWrapperDO(customer.businessName, customer.customerCode)
+			FROM    com.ff.domain.business.CustomerDO as customer,
+					com.ff.domain.pickup.PickupDeliveryContractDO as contract,
+					com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO as billingLocation
+			WHERE 	contract.customer.customerId = customer.customerId
+			AND 	contract.office.officeId =:officeId
+			AND		contract.contractId = billingLocation.pickupDeliveryLocation.pickupDlvLocId	
+			AND   	contract.contractId in (	SELECT	billingLocationNew.pickupDeliveryLocation.pickupDlvLocId 
+												FROM 	com.ff.domain.ratemanagement.masters.ContractPaymentBillingLocationDO billingLocationNew
+												WHERE	billingLocationNew.locationOperationType in ('BP', 'B'))
+		]]>
+	</query>
+	
+	
+	<query name="getOffAndContractID">
+		<![CDATA[
+			SELECT	new com.ff.domain.pickup.PickupDeliveryContractWrapperDO ( contract.contractId,
+						contract.office.officeId )
+			FROM	com.ff.domain.pickup.PickupDeliveryContractDO contract
+			WHERE	contract.customer.customerId=:customerId
+		]]>
+	</query>
+		
+	
+</hibernate-mapping>
+		

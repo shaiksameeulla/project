@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.booking.StockBookingDO" table="ff_f_booking">
+		<id name="bookingId" column="BOOKING_ID" type="java.lang.Integer">
+			<generator class="native" />
+		</id>
+
+		<property name="consgNumber" column="CONSG_NUMBER" update="false" />
+		<property name="cnStatus" column="TRANS_STATUS" update="false" />
+		<property name="status" column="STATUS" update="false" />
+		<property name="bookingDate" column="BOOKING_DATE" update="false" />
+		<property name="bookingOfficeId" column="BOOKING_OFF" update="false" />
+		<property name="dtFromOpsman" column="DT_FROM_OPSMAN" update="false" />
+		<property name="consgTypeId" column="CONSG_TYPE" update="false" />
+		
+		<property name="consgTypeCode" formula="(SELECT consgType.CONSIGNMENT_CODE from ff_d_consignment_type as consgType where consgType.CONSIGNMENT_TYPE_ID=CONSG_TYPE )" />
+		<property name="isStockConsumed" column="IS_STOCK_CONSUMED" />
+	</class>
+<query name="getConsgStockReductionDtls">
+		<![CDATA[
+			from com.ff.domain.booking.StockBookingDO consg
+			WHERE consg.isStockConsumed='N'
+			AND
+			consg.dtFromOpsman='N'
+			AND (consg.bookingDate BETWEEN :fromDate AND :toDate)
+			ORDER BY consg.bookingDate
+		]]>
+	</query>
+
+</hibernate-mapping>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.cash.CashSpecialDestinationDO" table="ff_f_rate_cash_special_destination">
+		<id name="specialDestId">
+			<column name="RATE_CASH_SPECIA_DEST" />
+			<generator class="native" />
+		</id>
+		<property name="productHeaderMap">
+            <column name="RATE_CASH_PRODUCT_MAP" />
+        </property>
+		<property name="cityId">
+            <column name="CITY" />
+         </property>
+		<!-- <property name="pincode">
+			<column name="PINCODE" />
+		</property> -->
+		<property name="slabRate">
+			<column name="SLAB_RATE" />
+		</property>
+		<many-to-one name="weightSlab" class="com.ff.domain.ratemanagement.masters.WeightSlabDO" fetch="select"  lazy="false">
+           <column name="CASH_WEIGHT_SLAB" not-null="true"/>
+        </many-to-one>
+        <property name="servicedOn">
+			<column name="SERVICED_ON" />
+		</property>
+		<property name="stateId">
+            <column name="STATE_ID" />
+         </property>
+        <property name="dtToBranch" column="DT_TO_BRANCH" />
+        <property name="originSector" column="ORIGIN_SECTOR" />
+	</class>
+	
+	<query name="getCashSpecialDestinationSlabs">
+		<![CDATA[ 
+			FROM   com.ff.domain.ratemanagement.operations.cash.CashSpecialDestinationDO specialDest 
+			WHERE  specialDest.productHeaderMap=:header 
+			AND    specialDest.cityId =(SELECT 	city.cityId 
+										FROM	com.ff.domain.geography.CityDO city 
+										WHERE	city.region=:regionId)
+		]]>
+	</query>
+</hibernate-mapping>
+	

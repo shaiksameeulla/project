@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.serviceOffering.ProductDO" table="ff_d_product">
+		<id name="productId" column="PRODUCT_ID" type="java.lang.Integer" >
+			<generator class="native" />
+		</id>
+		
+		<property name="productCode"  column="PRODUCT_CODE" type="java.lang.String" />
+		<property name="productName" column="PRODUCT_NAME" type="java.lang.String"/>
+		<property  name="ProductDesc" column="PRODUCT_DESC"	type="java.lang.String"/>
+		<property  name="consgSeries" column="CONSG_SERIES" />
+		<property  name="status" column="STATUS" type="java.lang.String"/>
+		<many-to-one name="productGroup" class="com.ff.domain.serviceOffering.ProductGroupServiceabilityDO" lazy="false" fetch="join">
+			<column name="PROD_GROUP_ID" />
+		</many-to-one>
+		
+		<property name="consolidationWindow" column="CONSOLIDATION_WINDOW" type="java.lang.Integer"/>
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> 
+	</class>
+	
+	<query name="getProductByProductId">
+		<![CDATA[ FROM com.ff.domain.serviceOffering.ProductDO product 
+		          WHERE product.productId =:productId
+		]]>
+	</query>
+	
+	<query name="getAllProducts">
+		<![CDATA[ FROM com.ff.domain.serviceOffering.ProductDO product 
+				  WHERE product.status = 'A'
+		]]>
+	</query>
+	
+	<query name="getProductByConsgSeries">
+		<![CDATA[ 
+			FROM com.ff.domain.serviceOffering.ProductDO product 
+		    WHERE product.consgSeries IN ('L','D','T')
+		]]>
+	</query>
+	
+	<sql-query name="getProductByCustomers">
+		<return alias="products" class="com.ff.domain.serviceOffering.ProductDO" />
+		SELECT
+		  fdp.*
+		FROM
+		  ff_d_customer fdc
+		  JOIN ff_d_rate_customer_category fdrcc
+		    ON fdc.CUSTOMER_CATEGORY = fdrcc.RATE_CUSTOMER_CATEGORY_ID
+		  JOIN ff_d_rate_customer_product_cat_map fdrcpcm
+		    ON fdrcpcm.RATE_CUSTOMER_CATEGORY = fdrcc.RATE_CUSTOMER_CATEGORY_ID
+		  JOIN ff_d_rate_product_category fdrpc
+		    ON fdrcpcm.RATE_PRODUCT_CATEGORY = fdrpc.RATE_PRODUCT_CATEGORY_ID
+		  JOIN ff_d_rate_prod_prod_cat_map fdrppcm
+		    ON fdrppcm.RATE_PRODUCT_CATEGORY = fdrpc.RATE_PRODUCT_CATEGORY_ID
+		  JOIN ff_d_product fdp
+		    ON fdp.PRODUCT_ID = fdrppcm.PRODUCT
+		WHERE
+		  fdc.CUSTOMER_ID in (:custIds)
+		GROUP BY
+		  fdp.PRODUCT_ID		  
+	</sql-query>
+	
+	<sql-query name="getProductForAllCustomers">
+		<return alias="products" class="com.ff.domain.serviceOffering.ProductDO" />
+		SELECT
+		  fdp.*
+		FROM
+		  ff_d_customer fdc
+		  JOIN ff_d_rate_customer_category fdrcc
+		    ON fdc.CUSTOMER_CATEGORY = fdrcc.RATE_CUSTOMER_CATEGORY_ID
+		  JOIN ff_d_rate_customer_product_cat_map fdrcpcm
+		    ON fdrcpcm.RATE_CUSTOMER_CATEGORY = fdrcc.RATE_CUSTOMER_CATEGORY_ID
+		  JOIN ff_d_rate_product_category fdrpc
+		    ON fdrcpcm.RATE_PRODUCT_CATEGORY = fdrpc.RATE_PRODUCT_CATEGORY_ID
+		  JOIN ff_d_rate_prod_prod_cat_map fdrppcm
+		    ON fdrppcm.RATE_PRODUCT_CATEGORY = fdrpc.RATE_PRODUCT_CATEGORY_ID
+		  JOIN ff_d_product fdp
+		    ON fdp.PRODUCT_ID = fdrppcm.PRODUCT
+		GROUP BY
+		  fdp.PRODUCT_ID		  
+	</sql-query>
+	<query name="getProductSeriesByProductId">
+		<![CDATA[select product.consgSeries FROM com.ff.domain.serviceOffering.ProductDO product 
+		          WHERE product.productId =:productId
+		]]>
+	</query>
+	<query name="getProductIdBySeries">
+		<![CDATA[select product.productId FROM com.ff.domain.serviceOffering.ProductDO product 
+		          WHERE product.consgSeries = :consgSeries
+		]]>
+	</query>
+</hibernate-mapping>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.stockreturn.SAPStockReturnDO" table="ff_f_sap_stock_return">
+		<id name="Id" type="java.lang.Long">
+			<column name="ID" />
+			<generator class="native" />
+		</id>
+		<property name="returnDate" column="RETURN_DATE" />
+		<property name="returnQty" column="RETURNING_QUANTITY" />
+		<property name="itemCode" column="ITEM_CODE" />
+		<property name="returningOfcCode" column="RETURNING_OFFICE_CODE"/>
+		<property name="returnNumber" column="RETURN_NUMBER"/>
+		<property name="issueDate" column="ISSUED_DATE" />
+		<property name="custNo" column="CUSTOMER_NUMBER" />
+		<property name="issueNumber" column="ISSUE_NUMBER" />
+		
+		<!--  common attributes  START-->
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="exception" column="EXCEPTION" />
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<!--  common attributes  END-->
+	</class>
+	
+<query name="getStockReturnDtlsFromSAPRet">
+	<![CDATA[
+		 FROM	com.ff.domain.stockmanagement.operations.stockreturn.SAPStockReturnDO sapStkRetDO
+		 WHERE	sapStkRetDO.sapStatus=:sapStatus and ( sapStkRetDO.exception IS NULL or LENGTH(sapStkRetDO.exception ) < 1)
+	]]>
+</query>
+
+<query name="updateStockReturnSAPFlag">
+	<![CDATA[ 
+		UPDATE	com.ff.domain.stockmanagement.operations.stockreturn.SAPStockReturnDO sapStkRetDO
+		SET		sapStkRetDO.sapStatus=:sapStatus,sapStkRetDO.sapTimestamp=:sapTimestamp,sapStkRetDO.exception=:exception
+		WHERE 	sapStkRetDO.Id=:Id
+	]]>
+</query> 
+
+</hibernate-mapping>

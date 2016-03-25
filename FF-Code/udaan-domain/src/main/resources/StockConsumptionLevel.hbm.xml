@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.stockmanagement.operations.reduction.StockConsumptionLevelDO" 
+		table="ff_f_stock_consumption_level" dynamic-update="true">
+		<id name="transactionId" type="java.lang.Long">
+			<column name="TRANSACTION_ID" />
+			<generator class="native" />
+		</id>
+		<property name="consignmentManifestNo" column="CONSIGNMENT_MANIFEST_NUMBER" />
+		<property name="transactionDate" column="TRANSACTION_DATE" />
+		<property name="stockFranchiseeId" column="STOCK_FRANCHISEE_ID" />
+		<property name="stockEmployeeId" column="STOCK_EMPLOYEE_ID" />
+		<property name="stockCustomerId" column="STOCK_CUSTOMER_ID" />
+		<property name="stockBaId" column="STOCK_BA_ID" />
+		<property name="generatedTransactionNo" column="GENERATED_TRANSACTION_NUMBER" />
+		<property name="isConsolidated" column="IS_CONSOLIDATED" />
+		<property name="csdStockReductionStatus" column="CSD_STOCK_REDUCTION_STATUS" />
+		<property name="transactionDateWithoutTime" formula="DATE(TRANSACTION_DATE)" />
+		
+		<property name="itemId" column="ITEM_ID" />
+		<property name="transactionCreatedOfficeId" column="TRANSATION_CREATED_OFFICE" />
+		<property name="stockOfficeId" column="STOCK_OFFICE_ID" />
+		<property name="TransactionOfficeCode" formula="(select office.office_code from ff_d_office office where office.office_id=TRANSATION_CREATED_OFFICE)" />
+		
+	</class>
+
+<query name="getStockConsolidationDtls">
+	<![CDATA[
+		FROM com.ff.domain.stockmanagement.operations.reduction.StockConsumptionLevelDO stockLevel
+		WHERE stockLevel.isConsolidated='N'
+		ORDER BY DATE_FORMAT(stockLevel.transactionDate, '%Y-%m-%d'), stockLevel.transactionCreatedOfficeId, stockLevel.itemId
+	]]>
+</query>
+
+</hibernate-mapping>

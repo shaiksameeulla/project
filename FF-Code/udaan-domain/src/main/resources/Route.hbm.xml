@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.routeserviced.RouteDO" table="ff_d_route">
+		<id name="routeId" type="java.lang.Integer" column="ROUTE_ID">
+			<generator class="native" />
+		</id>
+		
+        <property name="distance" type="java.lang.Double" column="DISTANCE" />
+		
+		<many-to-one name="originCityDO" class="com.ff.domain.geography.CityDO" lazy="false" fetch="join">
+			<column name="ORIGIN_CITY" />
+		</many-to-one>
+				
+		<many-to-one name="destCityDO" class="com.ff.domain.geography.CityDO" lazy="false" fetch="join">
+			<column name="DEST_CITY" />
+		</many-to-one>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+	</class>
+</hibernate-mapping>

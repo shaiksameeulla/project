@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.consignment.DuplicateConsignmentDO" table="ff_f_consignment_duplicate">
+		<id name="consignmentId" column="CONSG_ID" type="java.lang.Integer">
+			<generator class="native"/>
+		</id>
+		
+        <property name="consgNo" column="CONSG_NO"/>
+        <property name="consgStatus" column="CONSG_STATUS"/>
+        <property name="orgOffId" column="ORG_OFF" type="java.lang.Integer"/>
+        <property name="noOfPcs" column="NO_OF_PCS" type="java.lang.Integer"/>
+        
+        <property name="price" column="PRICE" type="java.lang.Double"/>
+        <property name="actualWeight" column="ACTUAL_WEIGHT" type="java.lang.Double"/>
+        <property name="volWeight" column="VOL_WEIGHT" type="java.lang.Double"/>
+        <property name="finalWeight" column="FINAL_WEIGHT" type="java.lang.Double"/>
+        
+		<property name="customer" column="CUSTOMER" type="java.lang.Integer"/>		
+		<property name="insurencePolicyNo" column="INSURANCE_POLICY_NO"/>
+		<property name="refNo" column="REF_NO"/>		
+		<property name="mobileNo" column="MOBILE_NO"/>		
+		<property name="receivedDateTime" column="RECEIVED_DATE" type="java.util.Date"/>
+		<property name="deliveredDate" column="DLV_DATE_TIME"	type="java.util.Date"/>
+		<property name="declaredValue" column="DECLARED_VALUE"	type="java.lang.Double"/>		
+		<property name="lcBankName" column="LC_BANK_NAME"/>		
+		<property name="otherCNContent" column="OTHERS_CN_CONTENT"/>
+		
+		<property name="consigneeDetails" column="CONSIGNEE_DETAILS"/>
+		<property name="consignorDetails" column="CONSIGNOR_DETAILS"/>
+		
+		<property name="operatingOffice" column="OPERATING_OFFICE"	type="java.lang.Integer"/>
+		<property name="createdDate"  column="CREATED_DATE" type="java.util.Date" update="false" />
+		<property name="updatedDate" column="UPDATE_DATE"	type="java.util.Date"/>
+		<property name="createdBy" column="CREATED_BY"	type="java.lang.Integer" update="false" />
+		<property name="updatedBy" column="UPDATE_BY"	type="java.lang.Integer"/>
+		
+		<property name="destinationPincodeId" column="DEST_PINCODE"	type="java.lang.Integer"/>
+		<property name="consignmentTypeId" column="CONSG_TYPE"	type="java.lang.Integer"/>
+		<property name="cnContentsId" column="CONTENT"	type="java.lang.Integer"/>
+		<property name="cnPaperWorksId" column="PAPER_WORK"	type="java.lang.Integer"/>
+		<property name="insuredById" column="INSURED_BY"	type="java.lang.Integer"/>
+		
+		<!-- <many-to-one name="consignmentTypeDO"  class="com.ff.domain.serviceOffering.ConsignmentTypeDO" lazy="false">
+			<column name="CONSG_TYPE"/>
+		</many-to-one>
+		
+		<many-to-one  name="destPincodeDO"  class="com.ff.domain.geography.PincodeDO" lazy="false">
+			<column  name="DEST_PINCODE" />
+		</many-to-one>		
+		
+		<many-to-one name="cnContentDO"  class="com.ff.domain.serviceOffering.CNContentDO" lazy="false" > 
+			<column  name="CONTENT" />
+		</many-to-one> 
+		
+		<many-to-one name="cnPaperWorksDO"  class="com.ff.domain.serviceOffering.CNPaperWorksDO" lazy="false" >
+			<column  name="PAPER_WORK" />
+		</many-to-one>
+		
+		<many-to-one name="insuredByDO"  class="com.ff.domain.serviceOffering.InsuredByDO" lazy="false" unique="true">
+			<column  name="INSURED_BY" />
+		</many-to-one> -->
+
+		<set name="duplicateChildCNs" table="ff_f_child_consignments_duplicate" cascade="all" lazy="false" fetch="join" >
+            <key>
+                <column name="CONSG_ID" />
+            </key>
+            <one-to-many class="com.ff.domain.consignment.DuplicateChildConsignmentDO"  />
+        </set>
+        
+	</class>
+</hibernate-mapping>

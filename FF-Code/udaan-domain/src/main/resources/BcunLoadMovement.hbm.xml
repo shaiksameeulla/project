@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.loadmanagement.BcunLoadMovementDO" table="ff_f_load_movement">
+		<id name="loadMovementId" type="java.lang.Integer" column="LOAD_MOVEMENT_ID">
+			<generator class="native" />
+		</id>
+		
+        <property name="movementDirection" type="java.lang.String" column="MOVEMENT_DIRECTION"/>
+        <property name="gatePassNumber" type="java.lang.String" column="GATE_PASS_NUMBER"/>
+        <property name="vehicleType" type="java.lang.String" column="VEHICLE_TYPE"/>
+        <property name="vehicleRegNumber" type="java.lang.String" column="VEHICLE_REG_NUMBER"/>
+        <property name="driverName" type="java.lang.String" column="DRIVER_NAME"/>
+        <property name="loadingDate" type="java.util.Date" column="LOADING_DATE"/>
+        <property name="loadingTime" type="java.lang.String" column="LOADING_TIME"/>
+        <property name="routeServicedTransportType" type="java.lang.String" column="ROUTE_SERVICED_TRANSPORT_TYPE"/>
+        <property name="routeServicedTransportNumber" type="java.lang.String" column="ROUTE_SERVICED_TRANSPORT_NUMBER"/>
+        <property name="receivedAtTime" type="java.lang.String" column="RECEIVED_AT_TIME"/>
+        <property name="receivedStatus" type="java.lang.String" column="RECEIVED_STATUS"/>
+        <property name="receiveType" type="java.lang.String" column="RECEIVE_TYPE"/>
+        <!-- removed for bcun perspective 
+        <property name="receivedAgainst" type="java.lang.Integer" column="RECEIVED_AGAINST"/> 
+        -->
+        <property name="processNumber" type="java.lang.String" column="PROCESS_NO"/>
+        <property name="receiveNumber" type="java.lang.String" column="RECEIVE_NUMBER"/>
+		<property name="operatingOffice" type="java.lang.Integer" column="OPERATING_OFFICE"/>
+        
+        <property name="dtToBranch" column="DT_TO_BRANCH"/>
+        <property name="dtToCentral" column="DT_TO_CENTRAL"/>
+        <property name="dtFromOpsman" column="DT_FROM_OPSMAN" update="false"/>
+        <property name="dtToOpsman">
+			<column name="DT_TO_OPSMAN" />
+		</property>
+        <property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL"/>
+        
+		<property name="createdDate"  column="CREATED_DATE" type="java.util.Date"/>
+		<property  name="updatedDate" column="UPDATE_DATE"	type="java.util.Date"/>    
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer"/>
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/>
+			
+        <property name="originOfficeId" column="ORIGIN_OFFICE"/>
+        <property name="destOfficeId" column="DEST_OFFICE"/>
+        <property name="tripServicedById" column="TRIP_SERVICED_BY"/>
+        <property name="vehicleId" column="VEHICLE"/>
+        <property name="transportModeId" column="TRANSPORT_MODE"/>
+        <property name="processId" column="UPDATED_PROCESS_FROM"/>
+        
+        <set name="loadConnectedDOs" table="ff_f_load_connected" cascade="all" lazy="false" fetch="subselect">
+            <key>
+                <column name="LOAD_MOVEMENT"/>
+            </key>
+            <one-to-many class="com.ff.domain.loadmanagement.BcunLoadConnectedDO"/>
+        </set>
+        
+    </class>
+    
+	<!-- Data Sync For Dispatch and Receive Module  Started-->
+	
+	<query name="getUnsyncInboundLoadMovement">
+		<![CDATA[From com.ff.domain.loadmanagement.BcunLoadMovementDO loadMovement 
+					where loadMovement.dtToCentral='N'
+		]]>
+	</query>
+		
+	<query name="getUnsyncOutboundLoadMovement">
+		<![CDATA[From com.ff.domain.loadmanagement.BcunLoadMovementDO loadMovement 
+					where loadMovement.destOfficeId=:branchId
+					AND loadMovement.movementDirection='D'
+					AND loadMovement.dtToBranch='N'
+		]]>
+	</query>
+	
+	<query name="getLoadMovementId4Dispatch">
+		<![CDATA[Select loadMovement.loadMovementId  
+					From com.ff.domain.loadmanagement.BcunLoadMovementDO loadMovement 
+					where loadMovement.gatePassNumber=:gatePassNumber 
+					and  loadMovement.movementDirection=:movementDirection 
+					and loadMovement.originOfficeId=:officeId
+		 ]]>
+	</query>
+	
+	<query name="getLoadMovementId4ReceiveLocal">
+		<![CDATA[ Select loadMovement.loadMovementId 
+					From com.ff.domain.loadmanagement.BcunLoadMovementDO loadMovement 
+					where loadMovement.gatePassNumber=:gatePassNumber 
+					and loadMovement.movementDirection=:movementDirection 
+					and loadMovement.receiveType=:receiveType
+					and loadMovement.destOfficeId=:destOfficeId
+		 ]]>
+	</query>
+	
+	<query name="getLoadMovementId4ReceiveOutStation">
+		<![CDATA[ Select loadMovement.loadMovementId From 
+					com.ff.domain.loadmanagement.BcunLoadMovementDO loadMovement 
+					where loadMovement.receiveNumber=:receiveNumber 
+					and loadMovement.movementDirection=:movementDirection 
+					and loadMovement.receiveType=:receiveType
+					and loadMovement.destOfficeId=:destOfficeId
+		 ]]>
+	</query>
+
+	<!-- Data Sync For Dispatch and Receive Module  Ended-->
+	
+	<!-- Start of Changes by <48206> for opsaman on 20/09/2013  -->
+	<query name="getOpsmanInboundLoadMovement">
+		<![CDATA[From com.ff.domain.loadmanagement.BcunLoadMovementDO loadMovement where 
+				 loadMovement.dtToOpsman != 'Y' AND 
+				 loadMovement.dtFromOpsman != 'Y' AND
+				 loadMovement.movementDirection = 'D' AND
+				 loadMovement.originOfficeId IN (:officeIds)
+				 ]]>
+	</query>
+	 <!-- AND loadMovement.movementDirection = 'R' loadMovement.originOfficeId in (55,672) AND
+				 loadMovement.createdDate BETWEEN '2014-06-14' AND '2014-06-16'-->
+	<!-- End of Changes by <48206> for opsaman on 20/09/2013  -->
+	
+</hibernate-mapping>

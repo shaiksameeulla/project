@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.loadmanagement.LoadConnectedDO" table="ff_f_load_connected">
+		<id name="loadConnectedId" type="java.lang.Integer" column="LOAD_CONNECTED_ID">
+			<generator class="native" />
+		</id>
+		
+        <property name="dispatchWeight" type="java.lang.Double" column="DISPATCH_WEIGHT"/>
+        <property name="connectWeight" type="java.lang.Double" column="CONNECT_WEIGHT"/>
+        <property name="tokenNumber" type="java.lang.String" column="TOKEN_NUMBER"/>
+        <property name="lockNumber" type="java.lang.String" column="LOCK_NUMBER"/>
+        <property name="remarks" type="java.lang.String" column="REMARKS"/>
+        <property name="receivedStatus" type="java.lang.String" column="RECEIVED_STATUS"/>
+        <property name="recvTransportNumber" type="java.lang.String" column="RECV_TRANSPORT_NUMBER"/>
+        <property name="recvGatepassNumber" type="java.lang.String" column="RECV_GATEPASS_NUMBER"/>
+        <property name="recvVendorName" type="java.lang.String" column="RECV_VENDOR_NAME"/>
+		
+        <property name="coloadingDispatchedUsing" column="COLOADING_DISPATCHED_USING"/>        
+        <property name="coloadingDispatchedType" column="COLOADING_DISPATCHED_TYPE"/>
+        <property name="coloadingRateCalculated" column="COLOADING_RATE_CALCULATED"/>
+        
+        <!-- <property name="dtToBranch" column="DT_TO_BRANCH"/>
+        <property name="dtToCentral" column="DT_TO_CENTRAL"/>
+        <property name="dtFromOpsman" column="DT_FROM_OPSMAN"/>
+        <property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL"/>
+        
+		<property name="createdDate"  column="CREATED_DATE" type="java.util.Date" update="false"/>
+		<property  name="updatedDate" column="UPDATE_DATE"	type="java.util.Date"/>    
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer" update="false"/>
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/> -->
+		
+		<many-to-one name="manifestDO"  class="com.ff.domain.manifest.ManifestDO" lazy="false" fetch="join">
+			<column name="MANIFEST"/>
+		</many-to-one>
+		
+		<many-to-one name="loadMovementDO" class="com.ff.domain.loadmanagement.LoadMovementDO" lazy="false" fetch="join">
+			<column name="LOAD_MOVEMENT"/>
+		</many-to-one>						
+		
+		<many-to-one name="recvTransportModeDO" class="com.ff.domain.transport.TransportModeDO" lazy="false" fetch="join">
+			<column name="RECV_TRANSPORT_MODE"/>
+		</many-to-one>
+	</class>
+	
+	<query name="getLoadConnectedForManifest">
+		<![CDATA[	FROM com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+					where loadConnected.loadMovementDO.originOfficeDO.officeId=:originOfficeId
+					and loadConnected.loadMovementDO.movementDirection=:movementDirection
+					and loadConnected.manifestDO.manifestId in (
+					Select manifest.manifestId from com.ff.domain.manifest.ManifestDO manifest
+					where manifest.manifestNo=:manifestNumber
+					)
+				]]>
+	</query>
+		
+	<query name="deleteLoadConnectedByIdList">
+		<![CDATA[	Delete FROM com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+					where loadConnected.loadConnectedId in (:loadConnectedIdList)
+				]]>
+	</query>	
+		
+	<query name="getLoadConnected4ReceiveLocalByDispatchManifestNo">
+		<![CDATA[	FROM com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+					where loadConnected.loadMovementDO.loadMovementId=:loadMovementId
+					and loadConnected.loadMovementDO.movementDirection='D'
+					and loadConnected.manifestDO.manifestId in (
+					Select manifest.manifestId from com.ff.domain.manifest.ManifestDO manifest
+					where manifest.manifestNo=:manifestNumber
+					)
+				]]>
+	</query>
+				
+	<query name="getLoadConnected4ReceiveLocalByReceiveManifestNo">
+		<![CDATA[	FROM com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+					where loadConnected.loadMovementDO.loadMovementId=:loadMovementId
+					and loadConnected.loadMovementDO.movementDirection='R'
+					and loadConnected.loadMovementDO.receiveType='L'
+					and loadConnected.receivedStatus='N'
+					and loadConnected.manifestDO.manifestId in (
+					Select manifest.manifestId from com.ff.domain.manifest.ManifestDO manifest
+					where manifest.manifestNo=:manifestNumber
+					)
+				]]>
+	</query>
+				
+	<query name="getLoadConnectedFromDispatchAsNotReceived">
+		<![CDATA[	FROM com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+					where loadConnected.loadMovementDO.loadMovementId=:loadMovementId
+					and loadConnected.loadMovementDO.movementDirection='D'
+					and loadConnected.manifestDO.manifestId not in (
+					Select manifest.manifestId from com.ff.domain.manifest.ManifestDO manifest
+					where manifest.manifestNo in (:manifestNumberList)
+					)
+				]]>
+	</query>	
+				
+	<query name="getLoadConnectedIdsAsNotReceived">
+		<![CDATA[	Select loadConnected.loadConnectedId FROM 
+					com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+					where loadConnected.loadMovementDO.loadMovementId=:loadMovementId
+					and loadConnected.loadMovementDO.movementDirection='R'
+					and loadConnected.loadMovementDO.receiveType='L'
+					and loadConnected.receivedStatus='N'
+				]]>
+	</query>
+	
+	<query name="getLoadConnectedByManifestNo">
+		<![CDATA[	FROM com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+					WHERE loadConnected.loadMovementDO.movementDirection='R'
+					AND loadConnected.loadMovementDO.receiveType='O' 
+					AND	loadConnected.manifestDO.manifestId IN(
+					SELECT manifest.manifestId FROM com.ff.domain.manifest.ManifestDO manifest
+					WHERE manifest.manifestNo IN (:manifestNumber)
+					)
+				]]>
+	</query>
+	
+	<!-- removed local check now its for both L/O  and loadConnected.loadMovementDO.receiveType='L' -->
+	<query name="isManifestReceived">
+		<![CDATA[	select loadConnected.loadConnectedId FROM 
+					com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+					where loadConnected.loadMovementDO.destOfficeDO.officeId=:destOfficeId
+					and loadConnected.loadMovementDO.movementDirection='R'
+					and (loadConnected.receivedStatus!='N' OR loadConnected.receivedStatus IS NULL)
+					and loadConnected.manifestDO.manifestId in (
+					Select manifest.manifestId from com.ff.domain.manifest.ManifestDO manifest
+					where manifest.manifestNo=:manifestNumber
+					)
+				]]>
+	</query>
+					
+	<query name="isManifestReceived4Outstation">
+		<![CDATA[	select loadConnected.loadConnectedId FROM 
+					com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+					where loadConnected.loadMovementDO.destOfficeDO.officeId=:destOfficeId
+					and loadConnected.loadMovementDO.movementDirection='R'
+					and loadConnected.loadMovementDO.receiveType='O'
+					and loadConnected.manifestDO.manifestId in (
+					Select manifest.manifestId from com.ff.domain.manifest.ManifestDO manifest
+					where manifest.manifestNo=:manifestNumber
+					)
+				]]>
+	</query>
+				
+	<query name="getLoadConnected4ReceiveOutstationByDispatchManifestNo">
+		<![CDATA[	FROM com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+					where loadConnected.loadMovementDO.movementDirection='D'
+					and loadConnected.manifestDO.manifestId in (
+					Select manifest.manifestId from com.ff.domain.manifest.ManifestDO manifest
+					where manifest.manifestNo=:manifestNumber
+					)
+					ORDER BY loadConnected.loadMovementDO.loadingTime DESC
+				]]>
+	</query>
+<!-- 					
+	<query name="getLoadConnected4CdAwbModifaction">
+		<![CDATA[	SELECT loadConnected.loadConnectedId, loadConnected.tokenNumber, 
+					loadConnected.coloadingDispatchedUsing, loadConnected.coloadingDispatchedType
+					FROM com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+					WHERE loadConnected.loadMovementDO.loadMovementId IN (
+						SELECT loadMovementId FROM com.ff.domain.loadmanagement.LoadMovementDO
+						where movementDirection='D'
+						and originOfficeDO.mappedRegionDO.regionId in (:regionId)
+						and (loadingDate BETWEEN :fromDate AND :toDate)
+					)
+					AND loadConnected.loadMovementDO.loadMovementId NOT IN (
+						SELECT loadConnectedIn.loadMovementDO.loadMovementId 
+						FROM com.ff.domain.loadmanagement.LoadConnectedDO loadConnectedIn
+						WHERE (loadConnectedIn.tokenNumber='' OR loadConnectedIn.tokenNumber IS NULL)
+						AND loadConnectedIn.loadMovementDO.loadMovementId IN (
+							SELECT loadMovementId FROM com.ff.domain.loadmanagement.LoadMovementDO
+							where movementDirection='D'
+							and originOfficeDO.mappedRegionDO.regionId in (:regionId)
+							and (loadingDate BETWEEN :fromDate AND :toDate)
+						)
+					)
+				]]>
+	</query>
+		 -->
+		 
+	<query name="getLoadConnected4CdAwbModifaction">
+		<![CDATA[	SELECT loadConnected.loadConnectedId, 
+					loadConnected.loadMovementDO.loadMovementId, loadConnected.tokenNumber, 
+					loadConnected.coloadingDispatchedUsing, loadConnected.coloadingDispatchedType,
+					loadConnected.loadMovementDO.transportModeDO.transportModeCode,
+					loadConnected.loadMovementDO.loadingDate, loadConnected.loadMovementDO.gatePassNumber,
+					loadConnected.loadMovementDO.tripServicedByDO.servicedByDO.loadMovementVendorDO.businessName, 
+					loadConnected.loadMovementDO.destOfficeDO.officeName
+					FROM com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+					WHERE loadConnected.loadMovementDO.loadMovementId IN (
+						SELECT loadMovementId FROM com.ff.domain.loadmanagement.LoadMovementDO
+						where movementDirection='D'
+						and originOfficeDO.mappedRegionDO.regionId in (:regionId)
+						and (loadingDate BETWEEN :fromDate AND :toDate)
+					)
+					AND loadConnected.tokenNumber!=''
+					AND loadConnected.tokenNumber IS NOT NULL
+				]]>
+	</query>
+
+	<query name="updateCdAwbDetailsByLoadMovementId">
+		<![CDATA[
+				UPDATE com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+				SET loadConnected.coloadingDispatchedUsing=:dispatchedUsing,
+				loadConnected.coloadingDispatchedType=:dispatchedType
+				WHERE loadConnected.loadMovementDO.loadMovementId IN (:loadMovementId)
+		]]>
+	</query>
+	
+	<query name="updateIfRateCalculated">
+		<![CDATA[
+				UPDATE com.ff.domain.loadmanagement.LoadConnectedDO loadConnected
+				SET loadConnected.coloadingRateCalculated='Y'
+				WHERE loadConnected.tokenNumber IN (:tokenNumbers)
+		]]>
+	</query>
+	
+	<!-- Data Sync For Dispatch and Receive Module  Started-->
+	<!-- 
+	<query name="getUnsyncInboundUpdateLoadConnected4Dispatch">
+		<![CDATA[ 	FROM com.ff.domain.loadmanagement.LoadConnectedDO loadConnected 
+					where loadConnected.loadMovementDO.gatePassNumber=:gatePassNumber 
+					and  loadConnected.loadMovementDO.movementDirection=:movementDirection 
+					and loadConnected.loadMovementDO.originOfficeDO.officeId=:officeId
+					and loadConnected.manifestDO.manifestNo=:manifestNumber
+		 ]]>
+	</query>
+		
+	Receive Local Grid details
+	<query name="getUnsyncInboundUpdateLoadMovement4ReceiveLocalGrid">
+		<![CDATA[ 	From com.ff.domain.loadmanagement.LoadConnectedDO loadConnected 
+					where loadConnected.loadMovementDO.gatePassNumber=:gatePassNumber 
+					and  loadConnected.loadMovementDO.movementDirection=:movementDirection 
+					and loadConnected.loadMovementDO.receiveType=:receiveType
+					and loadConnected.loadMovementDO.destOfficeDO.officeId=:destOfficeId
+					and loadConnected.manifestDO.manifestNo=:manifestNumber
+		 ]]>
+	</query>
+	
+	Receive OutStation Grid details
+	<query name="getUnsyncInboundUpdateLoadMovement4ReceiveOutStationGridDtls">
+		<![CDATA[	From com.ff.domain.loadmanagement.LoadConnectedDO loadConnected 
+					where loadConnected.loadMovementDO.receiveNumber=:receiveNumber 
+					and  loadConnected.loadMovementDO.movementDirection=:movementDirection 
+					and loadConnected.loadMovementDO.receiveType=:receiveType
+					and loadConnected.loadMovementDO.destOfficeDO.officeId=:destOfficeId
+					and loadConnected.manifestDO.manifestNo=:manifestNumber
+		 ]]>
+	</query>
+ -->
+	<!-- Data Sync For Dispatch and Receive Module  Ended-->
+	
+</hibernate-mapping>

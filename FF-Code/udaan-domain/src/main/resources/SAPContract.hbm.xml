@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.masters.SAPContractDO" table="ff_f_sap_contract">
+		<id name="Id" type="java.lang.Long">
+			<column name="ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name="contractNo" column="CONTRACT_NO" />
+		<property name="customerNo" column="CUSTOMER_NO" />
+		<property name="salesOfcCode" column="SALES_OFFICE_CODE" />
+		<property name="salesPersonCode" column="SALES_PERSON_CODE"/>
+		<property name="industryTypeCode" column="INDUSTRY_TYPE_CODE"/>
+		<property name="customerGroup" column="CUSTOMER_GROUP" />
+		<property name="disChannel" column="DIS_CHANNNEL" />
+		<property name="groupKey" column="GROUP_KEY" />
+		<property name="customerName" column="CUSTOMER_NAME" />
+		<property name="address1" column="ADDRESS_1" />
+		<property name="address2" column="ADDRESS_2" />
+		<property name="address3" column="ADDRESS_3" />
+		<property name="city" column="CITY" />
+		<property name="pincode" column="PINCODE"/>
+		<property name="state" column="STATE"/>
+		<property name="priTitle" column="PRI_TITLE" />
+		<property name="priPersonName" column="PRI_PERSON_NAME" />
+		<property name="priEmail" column="PRI_EMAIL" />
+		<property name="priContactNo" column="PRI_CONTACT_NO" />
+		<property name="priExt" column="PRI_EXT" />
+		<property name="priFax" column="PRI_FAX" />
+		<property name="priMobile" column="PRI_MOBILE" />
+		<property name="secTitle" column="SEC_TITLE" />
+		<property name="secPersonName" column="SEC_PERSON_NAME" />
+		<property name="secEmail" column="SEC_EMAIL"/>
+		<property name="secContactNo" column="SEC_CONTACT_NO"/>
+		<property name="secExt" column="SEC_EXT" />
+		<property name="secMobile" column="SEC_MOBILE" />
+		<property name="secFax" column="SEC_FAX" />
+		<property name="billingCycle" column="BILLING_CYCLE" />
+		<property name="paymentTermsCode" column="PAYMENT_TERMS_CODE" />
+		<property name="plantCode" column="PLANT_CODE" />
+		<property name="tanNo" column="TAN_NO" />
+		<property name="panNo" column="PAN_NO" />
+		<property name="status" column="STATUS" />
+		<property name="salesDistrict" column="SALES_DISTRICT" />
+		<property name="legacyCustCode" column="LEGACY_CUSTOMER_CODE"/>
+		<!--  common attributes  START-->
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<property name="createdBy" column="CREATED_BY" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="createdDate" column="CREATED_DATE" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		<property name="exception" column="EXCEPTION" />
+	</class>
+	
+<query name="getContractDtlsFromStaging">
+		<![CDATA[ 
+			FROM	com.ff.domain.ratemanagement.masters.SAPContractDO contractDO 
+			WHERE	contractDO.sapStatus=:sapStatus and ( contractDO.exception IS NULL or LENGTH(contractDO.exception ) < 1)
+		]]>
+</query>
+
+<query name="updateContractDetailsInStaging">
+		<![CDATA[ 
+			UPDATE	com.ff.domain.ratemanagement.masters.SAPContractDO contractDO 
+ 			SET		contractDO.sapStatus=:sapStatus,contractDO.sapTimestamp=:sapTimestamp,contractDO.exception=:exception
+ 			WHERE	contractDO.Id=:Id
+		]]>
+</query>
+	
+</hibernate-mapping>

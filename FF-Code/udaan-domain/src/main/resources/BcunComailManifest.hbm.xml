@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.manifest.BcunComailManifestDO" table="ff_f_comail_manifested">
+		<id name="bcunCoMailManifestId"  type="java.lang.Integer">
+			<column name="COMAIL_MANIFESTED_ID" />
+			<generator class="native" />
+		</id>
+		
+		<many-to-one name="comailDO" class="com.ff.domain.manifest.ComailDO" lazy="false" unique="true" cascade="all"  fetch="join">
+		<column name="COMAIL_ID"/>
+		</many-to-one>
+		
+		<many-to-one name="manifestDO" class="com.ff.domain.manifest.ManifestDO" lazy="false" unique="true" cascade="all"  fetch="join">
+		<column name="MANIFEST_ID"/>
+		</many-to-one>
+			
+		
+		 <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> 
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtFromOpsman">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		<property name="position" column="POSITION" type="java.lang.Integer" />
+         	
+	</class>
+	
+	
+
+	
+	<!-- Starting Data sync querys -->
+	
+	
+	<query name="getUnsyncInboundBcunCoMailManifest">
+		<![CDATA[From com.ff.domain.manifest.BcunComailManifestDO comail where comail.dtToCentral='N' or comail.dtToCentral is null ]]>
+	</query>
+	
+	<query name="getUnsyncOutboundBcunCoMailManifest">
+		<![CDATA[from com.ff.domain.manifest.BcunComailManifestDO comail where comail.comailDO.destinationOffice=:branchId and (comail.dtToBranch='N') ]]>
+	</query>
+	
+	
+	
+	
+	
+	<!-- Ending Data sync querys -->
+	
+</hibernate-mapping>

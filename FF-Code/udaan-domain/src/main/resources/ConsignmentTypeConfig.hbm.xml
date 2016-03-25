@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<class name="com.ff.domain.serviceOffering.ConsignmentTypeConfigDO" table="ff_d_consignment_type_config">
+		<id name="consignmentTypeConfigId" type="java.lang.Integer">
+			<column name="CONSIGNMENT_TYPE_CONFIG_ID" />
+			<generator class="assigned" />
+		</id>
+		<many-to-one name="consignmentId" class="com.ff.domain.serviceOffering.ConsignmentTypeDO" lazy="false" fetch="join" >
+			<column name="CONSIGNMENT_TYPE"  />
+		</many-to-one>
+		
+  		<property name="declaredValue" type="java.lang.Double">
+			<column name="DECLARED_VALUE" />
+		</property>
+		
+		<property name="isPaperworkMandatory" type="java.lang.String">
+			<column name="IS_PAPERWORK_MANDATORY" />
+		</property>
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>	
+		</class>
+	</hibernate-mapping>

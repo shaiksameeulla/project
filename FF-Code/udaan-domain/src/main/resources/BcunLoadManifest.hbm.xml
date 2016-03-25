@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.manifest.BcunLoadManifestDO" table="ff_f_manifest">
+		<id name="manifestId" type="java.lang.Integer" column="MANIFEST_ID">
+			<generator class="native" />
+		</id>
+		
+		<property name="manifestNo" column="MANIFEST_NO" type="java.lang.String" />
+		<property name="manifestType" column="MANIFEST_TYPE" type="java.lang.String"  update="false"/>
+		<property name="manifestEmbeddedIn" column="MANIFEST_EMBEDDED_IN" update="false"/>
+		
+		<property name="misrouteTypeCode" column="MISROUTE_TYPE_CODE"
+			type="java.lang.String"  update="false"/>
+		<property name="manifestWeight" column="MANIFEST_WEIGHT"
+			type="java.lang.Double"  update="false"/>
+		<property name="manifestDate" column="MANIFEST_DATE"  update="false"/>
+		<property name="noOfElements" column="NO_OF_ELEMENTS" type="java.lang.Integer"  update="false"/>
+		<property name="containsOnlyCoMail" column="CONTAINS_ONLY_COMAIL"
+			type="java.lang.String"  update="false"/>
+		<property name="manifestStatus" column="MANIFEST_STATUS"
+			type="java.lang.String"  update="false"/>
+		<property name="bagRFID" column="BAG_RFID" type="java.lang.Integer"  update="false"/>
+		<property name="allowSpecificContent" column="ALLOW_SPECIFIC_CONTENT" update="false"/>
+		<property name="bagLockNo" column="BAG_LOCK_NO" type="java.lang.String"  update="false"/>
+		<property name="receivedStatus" column="RECEIVED_STATUS"  update="false"/>
+		<property name="remarks" column="REMARKS"  update="false"/>
+		<property name="position" column="POSITION" type="java.lang.Integer"  update="false"/>
+		<property name="multipleDestination" column="MULTIPLE_DESTINATION"  update="false"/>
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer"  update="false"/>
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"  update="false"/>
+		<property name="createdDate" column="CREATED_DATE" type="java.util.Date"  update="false"/>
+		<property name="updatedDate" column="UPDATE_DATE" type="java.util.Date"  update="false"/>
+
+		<property name="manifestDirection" type="java.lang.String" update="false">
+			<column name="MANIFEST_DIRECTION"/>
+		</property>
+		<property name="manifestOpenType" type="java.lang.String" update="false">
+			<column name="MANIFEST_OPEN_TYPE" />
+		</property>
+		<property name="bplManifestType" type="java.lang.String" update="false">
+			<column name="BPL_MANIFEST_TYPE" />
+		</property>
+		<property name="loadLotId" type="java.lang.Integer" update="false">
+			<column name="LOAD_LOT_ID" />
+		</property>
+		<property name="thirdPartyType" type="java.lang.String" update="false">
+			<column name="THIRD_PARTY_TYPE" />
+		</property>
+		<property name="vendorId" type="java.lang.Integer" update="false">
+			<column name="VENDOR_ID" />
+		</property>
+		<property name="manifestedProductSeries" type="java.lang.Integer" update="false">
+			<column name="MANIFESTED_PRODUCT_SERIES" />
+		</property>
+		<property name="originOffice" type="java.lang.Integer" update="false">
+			<column name="ORIGIN_OFFICE" />
+		</property>
+		
+		<property name="destOffice" type="java.lang.Integer" update="false">
+			<column name="DESTINATION_OFFICE" />
+		</property>
+		
+		<property name="officeType" type="java.lang.Integer" update="false">
+			<column name="OFFICE_TYPE_FILTER" />
+		</property>		
+		
+		<property name="updatingProcess" type="java.lang.Integer" update="false">
+			<column name="UPDATING_PROCESS" />
+		</property>
+		
+		<property name="destinationCity" type="java.lang.Integer" update="false">
+			<column name="DESTINATION_CITY" />
+		</property>
+		
+		<property name="manifestLoadContent" type="java.lang.Integer" update="false">
+			<column name="MANIFEST_LOAD_CONTENT" />
+		</property>
+
+		<property name="operatingOffice" column="OPERATING_OFFICE" type="java.lang.Integer"  update="false"/>			
+		<property name="manifestProcessCode" column="MANIFEST_PROCESS_CODE" update="false"/>
+		<property name="gridItemPosition" column="GRID_ITEM_POSITION"  update="false"/>
+		
+		<property name="dtToBranch" update="false">
+			<column name="DT_TO_BRANCH" />
+		</property>
+
+		<property name="dtToCentral" update="false">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		<property name="dtUpdateToCentral" column="DT_UPDATE_TO_CENTRAL"  update="false"/>
+		<property name="dtFromOpsman" update="false">
+			<column name="DT_FROM_OPSMAN" />
+		</property>
+		<property  name="dtToOpsman" type="java.lang.String" update="false">
+			<column name="DT_TO_OPSMAN"/>
+		</property>
+		
+	</class>
+	
+	<query name="getManifestByOperatOfficeNoTypeAndProcess4Load">
+		<![CDATA[
+			FROM com.ff.domain.manifest.BcunLoadManifestDO manifest
+			WHERE manifest.manifestNo=:manifestNo
+			and manifest.operatingOffice=:operatingOffice
+			and manifest.manifestType=:manifestType
+			and manifest.manifestProcessCode=:manifestProcessCode
+		]]>
+	</query>
+	
+</hibernate-mapping>

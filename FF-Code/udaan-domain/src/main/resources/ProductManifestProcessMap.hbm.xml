@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="com.ff.domain.manifest.ProductManifestProcessMapDO" table="ff_d_product_manifest_process_mapping">
+		<id name="productManifestProcessMapId" type="java.lang.Integer">
+			<column name="PRODUCT_MANIFEST_PROCESS_ID" />
+			<generator class="identity" />
+		</id>
+		
+		<property name="scannedProduct" type="java.lang.Integer">
+			<column name="SCANNED_PRODUCT" />
+		</property>
+		
+		<property name="manifestProcess" type="java.lang.String">
+			<column name="MANIFEST_PROCESS" />
+		</property>
+		
+		<property name="consignmentType" type="java.lang.Integer">
+			<column name="CONSIGNMENT_TYPE" />
+		</property>
+		
+		<property name="allowedProduct" type="java.lang.Integer">
+			<column name="ALLOWED_PRODUCT" />
+		</property>
+		
+		<property name="manifestOpenType" type="java.lang.String">
+			<column name="MANIFEST_OPEN_TYPE" />
+		</property>
+		
+		<property name="allowManifest" type="java.lang.String">
+			<column name="ALLOW_MANIFEST" />
+		</property>
+		
+		<property name="loggedInOfficeType" type="java.lang.Integer">
+			<column name="LOGGED_IN_OFFICE_TYPE" />
+		</property>
+		
+		<property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property>
+		
+		<property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property>
+		
+	</class>
+		<query name="getManifestProductMapDtls">
+		<![CDATA[
+			SELECT mnfstProductMap.allowedProduct,mnfstProductMap.allowManifest 
+			FROM com.ff.domain.manifest.ProductManifestProcessMapDO mnfstProductMap
+			WHERE mnfstProductMap.scannedProduct=(SELECT product.productId 
+													FROM com.ff.domain.serviceOffering.ProductDO product 
+													WHERE product.consgSeries=:scannedProduct) 
+				AND mnfstProductMap.manifestProcess=:processCode
+				AND mnfstProductMap.consignmentType=(select congType.consignmentId 
+														from com.ff.domain.serviceOffering.ConsignmentTypeDO congType 
+														where congType.consignmentName=:consignmentType) 
+				AND mnfstProductMap.manifestOpenType=:manifestOpenType 
+				AND mnfstProductMap.loggedInOfficeType=(SELECT offType.offcTypeId 
+													FROM com.ff.domain.organization.OfficeTypeDO offType 
+													WHERE offType.offcTypeCode=:officeType)
+		]]>
+	</query>
+		
+</hibernate-mapping>
+	

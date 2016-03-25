@@ -1,0 +1,1229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.delivery.DeliveryDetailsDO" table="ff_f_delivery_dtls" dynamic-update="true">
+		<id name="deliveryDetailId" type="java.lang.Long">
+			<column name="DELIVERY_DETAIL_ID" />
+			<generator class="native" />
+		</id>
+		<property name="rowNumber" column="ROW_NUMBER" update="false"/>
+		<property name="consignmentNumber" column="CONSIGNMENT_NUMBER" update="false" />
+		<property name="missedCardNumber" column="MISSED_CARD_NUMBER"/>
+		<property name="remarks" column="REMARKS"  />
+		
+		<property name="deliveryType" column="DELIVERY_TYPE " />
+		<property name="companySealSign" column="COMPANY_SEAL_SIGN" />
+		<property name="receiverName" column="RECEIVER_NAME" />
+		<property name="contactNumber" column="CONTACT_NUMBER" />
+		<property name="idNumber" column="ID_NUMBER" />
+		<property name="modeOfPayment" column="MODE_OF_PAYMENT" />
+		<property name="chequeDDNumber" column="CHEQUE_DD_NO" />
+		<property name="chequeDDDate" column="CHEQUE_DD_DATE" />		
+		<property name="bankNameBranch" column="BANK_NAME_BRANCH" />
+		
+		<property name="deliveryDate" column="DELIVERY_TIME " />
+		
+	 	<!-- The delivery status.O-OUT FOR DELIVERY,D-DELIVERED,P-PENDING/NON DELIVERED  -->
+		<property name="deliveryStatus" column="DELIVERY_STATUS" />
+		
+		<!-- The recordStatus.A-Active,I-Inactive  -->
+		<property name="recordStatus" column="RECORD_STATUS" />
+		
+		<property name="noOfPieces" column="NO_OF_PIECES" />
+		 <property name="attemptNumber" column="ATTEMPT_NUMBER" />
+		 
+		 <property name="vendorCode" column="VENDOR_CODE"  />
+		 <property name="vendorName" column="VENDOR_NAME"  />
+		
+		<!-- common attributes START -->
+		<!-- <property name="transactionStatus" column="TRANS_ACTIVE_STATUS" /> -->
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+		<!-- <property name="centralInboudStatus" column="DT_CENTRAL_INBOUND" />
+		<property name="centralOutboudStatus" column="DT_CENTRAL_OUTBOUND" /> -->
+		<!-- <property name="nodeId" column="TRANS_NODE_ID" /> -->
+		<!-- <property name="sapStatus" column="DT_SAP" /> -->
+		<!-- common attributes END -->
+		<property name="sapStatus" column="DT_SAP_OUTBOUND" />
+		<property name="sapTimestamp" column="SAP_TIMESTAMP" />
+		<!-- <property name="createdBy" column="CREATED_BY_USER" />
+		<property name="updatedBy" column="UPDATED_BY_USER" />
+		 -->
+		<property name="codAmount" column="COD_AMOUNT" />
+		<property name="lcAmount" column="LC_AMOUNT" />
+		<property name="toPayAmount" column="TO_PAY_AMOUNT" />
+		<property name="baAmount" column="BA_AMT" />
+		<property name="otherAmount" column="OTHER_AMOUNT" />
+		<property name="additionalCharges" column="ADDITIONAL_CHARGES" />
+		
+		<property name="parentChildCnType" column="PARENT_CHILD_CN_TYPE" />
+		<property name="collectionStatus" column="COLLECTION_STATUS" />
+		<property name="productId" column="PRODUCT_ID" />
+		<property name="officeCode" column="OFFICE_CODE" />
+		<property name="consignmentUpdateFlag" column="CONSIGNMENT_UPDATE_FLAG" />
+		
+		<!-- Many-to-one relationships START -->
+		<many-to-one name="deliveryDO"
+			class="com.ff.domain.delivery.DeliveryDO" lazy="false" fetch="join">
+			<column name="DELIVERY_ID" />
+		</many-to-one>
+		
+		<many-to-one name="consignmentDO"
+			class="com.ff.domain.consignment.ConsignmentDO" lazy="false" fetch="join" update="false">
+			<column name="CONSIGNMENT_ID" />
+		</many-to-one>
+		
+		<many-to-one name="relationDO"
+			class="com.ff.domain.serviceOffering.RelationDO" lazy="false" fetch="join">
+			<column name="RELATION_ID" />
+		</many-to-one>
+		
+		<many-to-one name="idProofDO"
+			class="com.ff.domain.serviceOffering.IdentityProofTypeDO" lazy="false" fetch="join">
+			<column name="ID_PROOF_TYPE_ID" />
+		</many-to-one>
+		
+		<many-to-one name="reasonDO"
+			class="com.ff.domain.serviceOffering.ReasonDO" lazy="false" fetch="join">
+			<column name="REASON_ID" />
+		</many-to-one>
+		
+		<many-to-one name="originCityDO"
+			class="com.ff.domain.geography.CityDO" lazy="false" fetch="join">
+			<column name="ORIGIN_CITY_ID" />
+		</many-to-one>
+		
+		
+		
+		<!-- Many-to-one relationships END -->
+	</class>
+	
+		<query name="getCoCourierDtls">
+		<![CDATA[
+			SELECT delDtlsDO
+			FROM com.ff.domain.delivery.DeliveryDetailsDO delDtlsDO
+			INNER JOIN delDtlsDO.deliveryDO deliveryDo
+			INNER JOIN	deliveryDo.createdOfficeDO ofcDO
+			WHERE	deliveryDo.deliveryId in (SELECT deliveryDo1.deliveryId 
+														FROM com.ff.domain.delivery.DeliveryDO deliveryDo1
+														LEFT JOIN deliveryDo1.baDO bado
+														LEFT JOIN deliveryDo1.franchiseDO frdo
+														LEFT JOIN deliveryDo1.coCourierDO codo
+														WHERE (bado.vendorId IS NOT NULL
+																OR frdo.vendorId IS NOT NULL
+																OR codo.vendorId IS NOT NULL)	
+														AND 	delDtlsDO.deliveryStatus ='D'
+														AND 	delDtlsDO.sapStatus=:sapStatus
+														)
+			ORDER BY 	delDtlsDO.consignmentNumber,ofcDO.officeId
+		]]>
+	</query>
+	
+	<query name="getCountCoCourierDtls">
+		<![CDATA[ 
+			Select	count(delDtlsDO)
+			FROM 	com.ff.domain.delivery.DeliveryDetailsDO delDtlsDO
+			INNER 	JOIN delDtlsDO.deliveryDO deliveryDo
+			INNER 	JOIN	deliveryDo.createdOfficeDO ofcDO
+			WHERE	deliveryDo.deliveryId in (SELECT deliveryDo1.deliveryId 
+														FROM com.ff.domain.delivery.DeliveryDO deliveryDo1
+														LEFT JOIN deliveryDo1.baDO bado
+														LEFT JOIN deliveryDo1.franchiseDO frdo
+														LEFT JOIN deliveryDo1.coCourierDO codo
+														WHERE (bado.vendorId IS NOT NULL
+																OR frdo.vendorId IS NOT NULL
+																OR codo.vendorId IS NOT NULL)	
+														AND 	delDtlsDO.deliveryStatus ='D'
+														AND 	delDtlsDO.sapStatus=:sapStatus
+														)
+			ORDER BY 	delDtlsDO.consignmentNumber,ofcDO.officeId
+		]]>
+	</query>
+	
+	<query name="updateCocourierDtls">
+		<![CDATA[ 
+			UPDATE	com.ff.domain.delivery.DeliveryDetailsDO delDtlsDO
+			SET		delDtlsDO.sapStatus=:sapStatus,delDtlsDO.sapTimestamp=:sapTimestamp
+			WHERE 	delDtlsDO.deliveryDetailId=:deliveryDetailId
+		]]>
+	</query>
+
+	<query name="getConsgStatusFromDelivery">
+		<![CDATA[select dlvDtls.deliveryStatus FROM com.ff.domain.delivery.DeliveryDetailsDO dlvDtls
+					WHERE 	 dlvDtls.consignmentNumber=:consignmentNumber
+					and dlvDtls.recordStatus =:recordStatus
+					order by dlvDtls.transactionCreateDate desc
+		]]>
+	</query>
+	
+	<query name="isConsgExistInDeliveryByParentCn">
+		<![CDATA[select dlvDtls.deliveryStatus FROM com.ff.domain.delivery.DeliveryDetailsDO dlvDtls
+					WHERE 	 dlvDtls.consignmentDO.consgId IN (select  cosignment.consgId from com.ff.domain.consignment.ConsignmentDO cosignment WHERE cosignment.consgNo =:consignmentNumber)
+					and dlvDtls.recordStatus =:recordStatus
+					order by dlvDtls.transactionCreateDate desc
+		]]>
+	</query>
+	
+	<query name="disardDeliveryDetails">
+		<![CDATA[
+				UPDATE com.ff.domain.delivery.DeliveryDetailsDO drs SET drs.recordStatus=:recordStatus ,drs.transactionModifiedDate=current_timestamp()
+					WHERE drs.deliveryDO.deliveryId =:deliveryId
+ 			
+		]]>
+	</query>
+	
+	<query name="getLatestDateForConsgnNumber">
+		<![CDATA[
+				select dlvDtls.transactionCreateDate  FROM com.ff.domain.delivery.DeliveryDetailsDO dlvDtls
+									WHERE dlvDtls.consignmentNumber=:consignmentNumber
+									AND dlvDtls.recordStatus =:recordStatus
+									order by transactionCreateDate desc
+ 			
+		]]>
+	</query>
+	<!--Below Query For DOX/Parent consignments START  -->
+	<query name="getBookedConsgDtlsByConsgNumber">
+		<![CDATA[ 
+				 from com.ff.domain.consignment.ConsignmentDO cosignment WHERE cosignment.consgNo 
+				 IN
+				(SELECT booking.consgNumber From com.ff.domain.booking.BookingDO booking 
+					where  booking.consgNumber = :consignmentNumber 
+						AND
+					 	booking.cnStatus='A'
+					 	AND
+						booking.bookingOfficeId = :loggedInOfficeId
+						AND (
+						booking.pincodeId.pincodeId 
+								IN (select pin.pincodeId
+						FROM com.ff.domain.geography.PincodeDO pin where  pin.cityId IN
+						(SELECT office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId =:loggedInOfficeId)
+						)
+						)
+						
+			)
+			
+			]]>
+	</query>
+	<query name="getConsignmentStatusFromConsgForParent">
+		<![CDATA[ 
+				select  cosignment.consgStatus from com.ff.domain.consignment.ConsignmentDO cosignment WHERE cosignment.consgNo =:consignmentNumber 
+			
+			]]>
+	</query>
+	
+	<query name="getConsignmentTypeForConsg">
+		<![CDATA[ 
+				select  type.consignmentCode from com.ff.domain.consignment.ConsignmentDO cosignment
+				inner join cosignment.consgType type
+				 WHERE cosignment.consgNo =:consignmentNumber or EXISTS(from com.ff.domain.consignment.ChildConsignmentDO child where child.consignment=cosignment and child.childConsgNumber=:consignmentNumber)
+			
+			]]>
+	</query>
+	
+	<query name="getConsignmentTypeForChildConsg">
+		<![CDATA[ 
+				select  type.consignmentCode from com.ff.domain.consignment.ConsignmentDO cosignment
+				inner join cosignment.consgType type
+				 WHERE cosignment.consgId =(select child.consignment.consgId from com.ff.domain.consignment.ChildConsignmentDO child where  child.childConsgNumber=:consignmentNumber)
+			
+			]]>
+	</query>
+	<query name="getConsignmentTypeForParentConsg">
+		<![CDATA[ 
+				select  type.consignmentCode from com.ff.domain.consignment.ConsignmentDO cosignment
+				inner join cosignment.consgType type
+				 WHERE cosignment.consgNo =:consignmentNumber	
+			]]>
+	</query>
+	<query name="getConsignmentStatusFromConsg">
+		<![CDATA[ 
+				select  cosignment.consgStatus from com.ff.domain.consignment.ConsignmentDO cosignment
+				 WHERE cosignment.consgNo =:consignmentNumber or EXISTS(from com.ff.domain.consignment.ChildConsignmentDO child where child.consignment=cosignment and child.childConsgNumber=:consignmentNumber)
+			
+			]]>
+	</query>
+	
+	<query name="getConsignmentStatusFromConsgForChild">
+		<![CDATA[ 
+				select  consg.consgStatus from com.ff.domain.consignment.ChildConsignmentDO cosignment
+				left join cosignment.consignment as consg
+				 WHERE cosignment.childConsgNumber =:consignmentNumber 
+			
+			]]>
+	</query>
+	
+	
+	<query name="getManifestConsgnDtlsForDrs">
+		<![CDATA[ SELECT consgn
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+		          WHERE consgn.consgNo =:consignmentNumber
+		          AND 
+		          mnfst.manifestType =:manifestType
+		          order by mnfst.createdDate desc
+		]]>
+	</query>
+	
+	<query name="getManifestConsgnDtlsForThirdPartyManifestDrsPatentCn">
+		<![CDATA[ SELECT consgn
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+		          WHERE consgn.consgNo =:consignmentNumber
+		          AND
+		          mnfst.manifestNo =:manifestNo
+		          AND 
+		          mnfst.manifestType =:manifestType
+		          order by mnfst.createdDate desc
+		]]>
+	</query>
+	
+	<query name="getManifestConsgnDtlsForThirdPartyManifestDrsChildCn">
+		<![CDATA[ SELECT consgn.consgNo
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+		          WHERE consgn.consgId IN (select  childCn.consignment.consgId from com.ff.domain.consignment.ChildConsignmentDO childCn where  childCn.childConsgNumber =:consignmentNumber)
+		        	 AND
+		          mnfst.manifestNo =:manifestNo
+		          AND 
+		          mnfst.manifestType =:manifestType
+		          order by mnfst.createdDate desc
+		]]>
+	</query>
+	
+	
+	<query name="getInManifestedComailDtls">
+		<![CDATA[select comailDo From com.ff.domain.manifest.ComailManifestDO as comailMnfst 
+		
+		 inner join comailMnfst.comailDO as comailDo
+		          WHERE comailDo.coMailNo =:consignmentNumber
+		          AND 
+		          EXISTS( from com.ff.domain.manifest.ManifestDO as mnfst where mnfst.manifestType =:manifestType and mnfst.manifestId = comailMnfst.manifestId)
+		          
+		 ]]>
+	</query>
+	<query name="getConsignmentCount">
+		<![CDATA[ select count(dlvDtls.consignmentNumber)  FROM com.ff.domain.delivery.DeliveryDetailsDO dlvDtls
+									WHERE dlvDtls.consignmentNumber=:consignmentNumber
+									AND dlvDtls.recordStatus =:recordStatus
+		]]>
+	</query>
+	<!--Below Query For DOX/Parent consignments END  -->
+	<!--  For DRS Update for Pending consg-->
+	<query name="getDrsDtlsByConsgAndDrsNumber">
+		<![CDATA[ select dlvDtls  FROM com.ff.domain.delivery.DeliveryDetailsDO as dlvDtls
+				 inner join dlvDtls.deliveryDO as deliveryDo
+									WHERE dlvDtls.consignmentNumber=:consignmentNumber
+									AND dlvDtls.recordStatus =:recordStatus
+									AND deliveryDo.drsNumber=:drsNumber
+		]]>
+	</query>
+	<query name="getDrsDtlsByDetailId">
+		<![CDATA[
+				from com.ff.domain.delivery.DeliveryDetailsDO drs 
+				WHERE drs.deliveryDetailId =:deliveryDetailId
+ 			
+		]]>
+	</query>
+	
+	<query name="isComailNumberValid">
+		<![CDATA[
+			SELECT comail.coMailNo FROM com.ff.domain.manifest.ComailDO comail 
+			WHERE comail.coMailNo=:consignmentNumber 
+		]]>
+	</query>	
+	<!-- For POD Module Only -->
+	<!--Below Query For getting delivery consignment details Start  -->
+	<query name="getDeliveredConsignmentDtls">
+		<![CDATA[
+		FROM com.ff.domain.delivery.DeliveryDetailsDO drs where 
+		drs.consignmentNumber = :consignmentNumber AND
+		drs.deliveryStatus =:deliveryStatus AND
+		drs.consignmentNumber in (	SELECT cosignment.consgNo 
+									FROM com.ff.domain.consignment.ConsignmentDO cosignment  
+									WHERE (cosignment.orgOffId = :orgOffId 
+									OR (:orgOffId IN (	SELECT offc.officeId 
+														FROM com.ff.domain.organization.OfficeDO offc 
+														INNER JOIN offc.officeTypeDO officeType
+														WHERE offc.cityId IN (	SELECT office.cityId 
+														   						FROM com.ff.domain.organization.OfficeDO office 
+														   						WHERE office.officeId =cosignment.orgOffId
+														   					  )
+														AND officeType.offcTypeCode = 'HO'
+													)
+										)
+								  )
+								)
+		]]>
+	</query>
+	<!--Below Query For getting delivery consignment details End  -->
+	
+<!-- 	<query name="getCongPricingDtls"> 
+      <![CDATA[ From com.ff.domain.booking.CNPricingDetailsDO cnPricingDtls where  cnPricingDtls.consignment.consgId IN (select consg.consgId from com.ff.domain.consignment.ConsignmentDO consg where  consg.consgNo=:consignmentNumber) ]]>
+      </query>
+      
+      <query name="getChildCongPricingDtls"> 
+      <![CDATA[ From com.ff.domain.booking.CNPricingDetailsDO cnPricingDtls 
+      where  cnPricingDtls.consignment.consgId IN 
+      (select consg.consgId from com.ff.domain.consignment.ConsignmentDO consg where  consg.consgId IN(
+      select consignment.consgId FROM com.ff.domain.consignment.ChildConsignmentDO consg where  consg.childConsgNumber=:consignmentNumber
+      )
+      )
+      ]]>
+      </query> -->
+       <query name="getParentConsgDtlsForDrs"> 
+      <![CDATA[  FROM com.ff.domain.consignment.ConsignmentDO consg where  consg.consgNo=:consignmentNumber AND size(consg.childCNs) <= 0 ]]>
+      </query>
+      
+       <query name="isConsgHavingChildCns"> 
+      <![CDATA[ select consg.consgNo FROM com.ff.domain.consignment.ConsignmentDO consg where  consg.consgNo=:consignmentNumber AND size(consg.childCNs) >=1 ]]>
+      </query>
+       <query name="getChildConsgDtlsForDrs"> 
+      <![CDATA[  FROM com.ff.domain.consignment.ChildConsignmentDO consg where  consg.childConsgNumber=:consignmentNumber  AND consg.consignment is not null]]>
+      </query>
+      <query name="isChildConsg"> 
+      <![CDATA[  select consg.childConsgNumber FROM com.ff.domain.consignment.ChildConsignmentDO consg where  consg.childConsgNumber=:consignmentNumber  AND consg.consignment is not null]]>
+      </query>
+      
+      <query name="getMnfstChildConsgnDtlsForDrsForPPX">
+		<![CDATA[ SELECT consgn.consgNo
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+		          WHERE consgn.consgId IN ( select childConsg.consignment.consgId FROM com.ff.domain.consignment.ChildConsignmentDO childConsg where  childConsg.childConsgNumber=:consignmentNumber)
+		          AND 
+		          mnfst.manifestType =:manifestType
+		]]>
+	</query>
+	
+	<query name="getBookedConsgDtlsByConsgNumberForPpx">
+		<![CDATA[ 
+		select childConsg FROM com.ff.domain.consignment.ChildConsignmentDO as childConsg 
+		inner join childConsg.consignment as consg
+		WHERE  childConsg.childConsgNumber=:consignmentNumber
+				 and exists
+				(SELECT booking.consgNumber From com.ff.domain.booking.BookingDO booking 
+					where  booking.consgNumber = consg.consgNo 
+						AND
+					 	booking.cnStatus='A'
+					 	AND
+						booking.bookingOfficeId = :loggedInOfficeId
+						AND (
+						booking.pincodeId.pincodeId 
+								IN (select pin.pincodeId
+						FROM com.ff.domain.geography.PincodeDO pin where  pin.cityId IN
+						(SELECT office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId =:loggedInOfficeId)
+						)
+						)
+				)
+			
+			]]>
+	</query>
+	<query name="manifetedDateForConsgForParentCn"> 
+      <![CDATA[  
+     SELECT mnfst.createdDate
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join mnfst.updatingProcess as process
+				  
+				  where consgn.consgNo = :consignmentNumber
+				  AND 
+    		 mnfst.manifestType =:manifestType
+    		 AND
+    		 process.processCode=:processCode
+    		 AND mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where 
+    		  mnfst1.operatingOffice =:operatingOffice 
+    		  and
+    		 consgn1.consgNo = :consignmentNumber
+    		 
+    		 )
+      ]]>
+      </query>
+	<query name="manifetedDateForConsgForParentCnTPManifest"> 
+      <![CDATA[  
+     SELECT mnfst.createdDate
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join mnfst.updatingProcess as process
+				  
+				  where consgn.consgNo = :consignmentNumber
+				  AND 
+				  mnfst.manifestNo =:manifestNo
+				  AND
+    		 mnfst.manifestType =:manifestType
+    		 AND
+    		 process.processCode=:processCode
+    		 AND mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where 
+    		  mnfst1.operatingOffice =:operatingOffice and
+    		 consgn1.consgNo = :consignmentNumber 
+    		 )
+      ]]>
+      </query>
+      
+      <query name="getLoggedInManifestedNumberForParentConsg"> 
+      <![CDATA[  
+     SELECT mnfst.manifestNo
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join mnfst.updatingProcess as process
+				  
+				  where consgn.consgNo = :consignmentNumber
+				  AND 
+    		 mnfst.manifestType =:manifestType
+    		 AND
+    		 process.processCode=:processCode
+    		 AND mnfst.operatingOffice=:loggedInOfficeId
+    		 AND mnfst.destinationCity.cityId IN (select office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId=:loggedInOfficeId )
+    		 AND mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where
+    		  mnfst1.operatingOffice =:loggedInOfficeId and
+    		  consgn1.consgNo = :consignmentNumber 
+    		 )
+      ]]>
+      </query>
+      
+      
+        <query name="getManifestedNumberByLoggedinOfficeForParentConsgTPManifest"> 
+      <![CDATA[  
+     SELECT mnfst.manifestNo
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join mnfst.updatingProcess as process
+				  
+				  where consgn.consgNo = :consignmentNumber
+				  AND 
+    		 mnfst.manifestType =:manifestType
+    		  AND 
+				  mnfst.manifestNo =:manifestNo
+    		 AND
+    		 process.processCode=:processCode
+    		 AND mnfst.operatingOffice=:loggedInOfficeId
+    		 AND mnfst.destinationCity.cityId IN (select office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId=:loggedInOfficeId )
+    		 AND mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where 
+    		  mnfst1.operatingOffice =:loggedInOfficeId and
+    		 consgn1.consgNo = :consignmentNumber 
+    		 )
+      ]]>
+      </query>
+      
+      <query name="manifetedDateForConsgForChildCn"> 
+      <![CDATA[  
+     SELECT mnfst.createdDate
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join mnfst.updatingProcess as process
+				  
+				  where 
+    		 mnfst.manifestType =:manifestType
+    		 AND
+    		 process.processCode=:processCode
+    		 AND mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where 
+    		  mnfst1.operatingOffice =:operatingOffice and
+    		 consgn1.consgId IN (select childConsg.consignment.consgId FROM com.ff.domain.consignment.ChildConsignmentDO as childConsg  where childConsg.childConsgNumber = :consignmentNumber)  
+    		 )
+    		 AND exists ( FROM com.ff.domain.consignment.ChildConsignmentDO as childConsg  where childConsg.childConsgNumber = :consignmentNumber
+    		 and childConsg.consignment=consgn
+    		 )
+      ]]>
+      </query>
+      <query name="manifetedDateForConsgForChildCnTPManifest"> 
+      <![CDATA[  
+     SELECT mnfst.createdDate
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join mnfst.updatingProcess as process
+				  
+				  where 
+    		 mnfst.manifestType =:manifestType
+    		 AND
+    		  mnfst.manifestNo =:manifestNo
+    		 AND 
+    		 process.processCode=:processCode
+    		 AND mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where 
+    		  mnfst1.operatingOffice =:operatingOffice 
+    		  and
+    		 consgn1.consgId IN (select childConsg.consignment.consgId FROM com.ff.domain.consignment.ChildConsignmentDO as childConsg  where childConsg.childConsgNumber = :consignmentNumber)  
+    		 )
+    		 AND exists ( FROM com.ff.domain.consignment.ChildConsignmentDO as childConsg  where childConsg.childConsgNumber = :consignmentNumber
+    		 and childConsg.consignment=consgn
+    		 )
+      ]]>
+      </query>
+      
+      <query name="getLoggedInManifestedNumberForChildCn"> 
+      <![CDATA[  
+     SELECT mnfst.manifestNo
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join mnfst.updatingProcess as process
+				  
+				  where 
+    		 mnfst.manifestType =:manifestType
+    		 AND
+    		 process.processCode=:processCode
+    		 AND mnfst.operatingOffice=:loggedInOfficeId
+    		 AND mnfst.destinationCity.cityId IN (select office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId=:loggedInOfficeId )
+    		 AND mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where 
+    		  mnfst1.operatingOffice =:loggedInOfficeId 
+    		  and
+    		 consgn1.consgId IN (select childConsg.consignment.consgId FROM com.ff.domain.consignment.ChildConsignmentDO as childConsg  where childConsg.childConsgNumber = :consignmentNumber)  
+    		 )
+    		 AND exists ( FROM com.ff.domain.consignment.ChildConsignmentDO as childConsg  where childConsg.childConsgNumber = :consignmentNumber
+    		 and childConsg.consignment=consgn
+    		 )
+      ]]>
+      </query>
+       <query name="getManifestedNumberByLoggedInOfficeForChildCnTPManifest"> 
+      <![CDATA[  
+     SELECT mnfst.manifestNo
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join mnfst.updatingProcess as process
+				  
+				  where 
+    		 mnfst.manifestType =:manifestType
+    		 AND
+    		 process.processCode=:processCode
+    		  AND 
+				  mnfst.manifestNo =:manifestNo
+    		 
+    		 AND mnfst.operatingOffice=:loggedInOfficeId
+    		 AND mnfst.destinationCity.cityId IN (select office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId=:loggedInOfficeId )
+    		 AND mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where 
+    		  mnfst1.operatingOffice =:loggedInOfficeId 
+    		  and
+    		 consgn1.consgId IN (select childConsg.consignment.consgId FROM com.ff.domain.consignment.ChildConsignmentDO as childConsg  where childConsg.childConsgNumber = :consignmentNumber)  
+    		 )
+    		 AND exists ( FROM com.ff.domain.consignment.ChildConsignmentDO as childConsg  where childConsg.childConsgNumber = :consignmentNumber
+    		 and childConsg.consignment=consgn
+    		 )
+      ]]>
+      </query>
+      <query name="getInManifestedComailDate">
+		<![CDATA[select max(mnfst.createdDate) From com.ff.domain.manifest.ComailManifestDO as comailMnfst,
+				com.ff.domain.manifest.ManifestDO  as mnfst
+			inner join mnfst.updatingProcess as process
+		 		inner join comailMnfst.comailDO as comailDo
+		          WHERE comailDo.coMailNo =:consignmentNumber
+		          AND mnfst.manifestId = comailMnfst.manifestId
+		          AND 
+		          mnfst.manifestType =:manifestType
+		          AND
+		           process.processCode=:processCode
+		          
+		 ]]>
+	</query>
+	<!-- For RTO COD DRS START -->
+     <query name="getMnfstParntConsgDtlsForRtoDrs">
+		<![CDATA[ SELECT consgn
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join  mnfst.destOffice as office
+		          WHERE 
+		            mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where consgn1.consgNo = :consignmentNumber 
+    		 and mnfst1.operatingOffice =:officeId 
+    		 )
+    		 AND
+		          consgn.consgNo =:consignmentNumber
+		          AND 
+		          mnfst.manifestType IN (:manifestType)
+		          AND office.cityId IN (SELECT office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId =:officeId)
+		]]>
+	</query>
+	
+	<query name="getMnfstChildConsgDtlsForRtoDrs">
+		<![CDATA[ SELECT consgn.consgNo
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				   inner join  mnfst.destOffice as office
+		          WHERE consgn.consgId IN ( select childConsg.consignment.consgId FROM com.ff.domain.consignment.ChildConsignmentDO childConsg where  childConsg.childConsgNumber=:consignmentNumber)
+		          AND 
+		          mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where 
+    		  mnfst1.operatingOffice =:officeId 
+    		  and
+    		 consgn1.consgId IN (select childConsg.consignment.consgId FROM com.ff.domain.consignment.ChildConsignmentDO as childConsg  where childConsg.childConsgNumber = :consignmentNumber)
+    		 )
+		          AND
+		          mnfst.manifestType IN(:manifestType)
+		          AND office.cityId IN (SELECT office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId =:officeId)
+		]]>
+	</query>
+	
+	<query name="getCustomerDtlsByConsgNumFrmBkng">
+		<![CDATA[
+			select booking.customerId from com.ff.domain.booking.BookingDO booking where booking.consgNumber =:consignmentNumber]]>
+	</query> 
+	
+	<query name="getVendorDtlsByConsgNumFrmBkng">
+		<![CDATA[
+			select booking.bulkBookingVendorDtls from com.ff.domain.booking.BookingDO booking where booking.consgNumber =:consignmentNumber]]>
+	</query> 
+		<!-- For RTO COD DRS END -->
+<!-- DRS consignment Status Update  START -->
+
+<query name="getDrsDtlsByConsgStatus">
+		<![CDATA[
+			 select drs from com.ff.domain.delivery.DeliveryDetailsDO drs 
+				WHERE drs.deliveryStatus IN (:drsDeliveryStatus)
+					AND drs.recordStatus = 'A'
+				AND (drs.parentChildCnType ='P' and drs.consignmentUpdateFlag='N')
+				AND exists(  FROM com.ff.domain.consignment.ConsignmentDO consg  where (consg.consgStatus NOT IN (:cnDeliveryStatus) or consg.consgStatus is null) and consg.consgNo= drs.consignmentNumber)
+			]]>
+	</query>
+	
+	<query name="updateConsgDtlsByConsg">
+		<![CDATA[
+			update  com.ff.domain.consignment.ConsignmentDO consg 
+			SET 
+			consg.consgStatus =:deliveryStatus
+			, 
+			consg.deliveredDate =:deliveryDateTime
+			, 
+			consg.dtToCentral='N'
+			
+			where consg.consgNo=:consignmentNumber
+			 
+			]]>
+	</query>
+	<query name="updateConsgDtlsByConsgForBcun">
+		<![CDATA[
+			update  com.ff.domain.consignment.ConsignmentDO consg 
+			SET 
+			consg.consgStatus =:deliveryStatus
+			, 
+			consg.deliveredDate =:deliveryDateTime
+			,
+			consg.recvNameOrCompName =:recvNameOrCompName
+			where consg.consgId=:consgId and consg.consgStatus NOT IN ('D','S')
+			 
+			]]>
+	</query>
+	<query name="updateConsgDtlsByPincodeForCentralDrsBcun">
+		<![CDATA[
+			update  com.ff.domain.consignment.ConsignmentDO consg 
+			SET 
+			consg.destPincodeId.pincodeId =:pincodeId
+			, 
+			consg.changedAfterBillingWtDest ='Y'
+			,
+			consg.billingStatus='TBB'
+			
+			where consg.consgId=:consgId 
+			 
+			]]>
+	</query>
+	<query name="updateConsgRateDtlsForCentralDrsBcun">
+		<![CDATA[
+			update  com.ff.domain.billing.ConsignmentBillingRateDO consg 
+			SET 
+			consg.billed ='N'
+			where consg.consignmentDO.consgId =:consgId 
+			 
+			]]>
+	</query>
+
+<sql-query name="getDrsDtlsByChildConsgStatus">
+<!--  select drs from com.ff.domain.delivery.DeliveryDetailsDO drs 
+				WHERE drs.deliveryStatus IN (:drsDeliveryStatus)
+					AND drs.recordStatus = 'A'
+				AND drs.parentChildCnType ='C'
+				and drs.consignmentNumber =ALL (select childCn.childConsgNumber from com.ff.domain.consignment.ConsignmentDO consg
+				join consg.childCNs childCn
+				where 
+				consg.consgStatus NOT IN (:cnDeliveryStatus) or consg.consgStatus is null
+				) -->
+				
+<return alias="dlvDtls" class="com.ff.domain.delivery.DeliveryDetailsDO"/>
+		<![CDATA[
+				SELECT distinct {dlvDtls.*}
+  FROM ff_f_delivery_dtls as dlvDtls
+  inner join ff_f_consignment as consg
+  WHERE
+		dlvDtls.DELIVERY_STATUS = (:drsDeliveryStatus)
+  		AND
+  		dlvDtls.RECORD_STATUS='A'
+  		AND 
+  		dlvDtls.PARENT_CHILD_CN_TYPE='C'
+ 		 AND
+ 		 dlvDtls.CONSIGNMENT_UPDATE_FLAG='N'
+ 		 AND
+  		consg.CONSG_STATUS NOT IN (:cnDeliveryStatus)
+  		AND
+ dlvDtls.consignment_id IN
+          (SELECT DISTINCT consignment_id
+             FROM ((SELECT DISTINCT dlvDtlsinner.consignment_id, count(*) D_CNT
+                      FROM ff_f_delivery_dtls dlvDtlsinner
+                     WHERE dlvDtlsinner.DELIVERY_STATUS = 'D'
+                    GROUP BY dlvDtlsinner.consignment_id) A,
+                   (SELECT distinct childCn.CONSG_ID, count(*) T_CNT
+                      FROM ff_f_child_consignments childCn where childCn.consg_id IN (select parentCn.consg_id from ff_f_consignment parentCn where parentCn.CONSG_STATUS NOT IN (:cnDeliveryStatus))
+                    GROUP BY childCn.CONSG_ID) B)
+            WHERE A.D_CNT = B.T_CNT AND A.consignment_id = B.CONSG_ID) ORDER BY dlvDtls.DELIVERY_TIME DESC
+            
+            
+			]]>
+			</sql-query>
+	
+<!-- DRS consignment Status Update  END -->
+	
+	<query name="getDrsDtlsByConsgNo">
+		<![CDATA[
+				from com.ff.domain.delivery.DeliveryDetailsDO drs 
+				WHERE 	consignmentDO.consgNo =:consgNo	
+						AND drs.recordStatus = 'A'	
+						order by transactionCreateDate desc
+		]]>
+	</query>
+	
+	<query name="isPartyShiftedReasonConsg">
+		<![CDATA[
+				 from com.ff.domain.delivery.DeliveryDetailsDO drs ,com.ff.domain.serviceOffering.ReasonDO reason
+				WHERE 	drs.reasonDO.reasonId=reason.reasonId
+						AND drs.deliveryStatus = 'P'	
+						AND reason.reasonCode =:reasonCode
+						AND drs.consignmentDO.consgId =:consgId	
+						
+		]]>
+	</query>
+	
+	<query name="getDrsDtlsForCollectionIntegration">
+		<![CDATA[
+				 select  new com.ff.domain.delivery.DrsCollectionIntegrationWrapperDO(drs.consignmentDO.consgId,drs.deliveryDetailId,drs.consignmentNumber,drs.officeCode,drs.modeOfPayment,drs.chequeDDNumber,drs.chequeDDDate,drs.bankNameBranch,drs.deliveryDate,drs.codAmount,drs.lcAmount,drs.toPayAmount,drs.otherAmount,drs.baAmount,drs.additionalCharges)
+				  from com.ff.domain.delivery.DeliveryDetailsDO drs
+				 where 
+				 drs.deliveryStatus =:deliveryStatus
+				 AND
+				 drs.collectionStatus= :collectionStatus
+				  AND 
+				  drs.transactionModifiedDate between :yesterdayDate and :todayDate
+				 AND
+				 drs.productId IN (2,3,9) 
+		]]>
+	</query>
+	<query name="getDrsDtlsForCollectionIntegrationForMiscCharges">
+		<![CDATA[
+				select  new com.ff.domain.delivery.DrsCollectionIntegrationWrapperDO(drs.consignmentDO.consgId,drs.deliveryDetailId,drs.consignmentNumber,drs.officeCode,drs.modeOfPayment,drs.chequeDDNumber,drs.chequeDDDate,drs.bankNameBranch,drs.deliveryDate,drs.codAmount,drs.lcAmount,drs.toPayAmount,drs.otherAmount,drs.baAmount,drs.additionalCharges)
+				  from com.ff.domain.delivery.DeliveryDetailsDO drs
+				
+				 where 
+				 drs.deliveryStatus =:deliveryStatus
+				 AND
+				 drs.collectionStatus= :collectionStatus
+				  AND 
+				  drs.transactionModifiedDate between :yesterdayDate and :todayDate
+				   AND
+				( drs.otherAmount>0
+				 OR
+				drs.additionalCharges >0 )
+				  AND drs.modeOfPayment is null
+				
+				
+		]]>
+	</query>
+	<query name="getDrsDtlsForCollectionIntegrationForBaAmount">
+		<![CDATA[
+				select  new com.ff.domain.delivery.DrsCollectionIntegrationWrapperDO(drs.consignmentDO.consgId,drs.deliveryDetailId,drs.consignmentNumber,drs.officeCode,drs.modeOfPayment,drs.chequeDDNumber,drs.chequeDDDate,drs.bankNameBranch,drs.deliveryDate,drs.codAmount,drs.lcAmount,drs.toPayAmount,drs.otherAmount,drs.baAmount,drs.additionalCharges)
+				  from com.ff.domain.delivery.DeliveryDetailsDO drs
+				 where 
+				 drs.deliveryStatus =:deliveryStatus
+				 AND
+				 drs.collectionStatus= :collectionStatus
+				  AND 
+				  drs.transactionModifiedDate between :yesterdayDate and :todayDate
+				  AND drs.baAmount>0
+				 
+				 
+		]]>
+	</query>
+	
+	
+	
+	<query name="updateDrsDtlsForCollection">
+		<![CDATA[
+				UPDATE
+				 from com.ff.domain.delivery.DeliveryDetailsDO drs
+				 set drs.collectionStatus =:collectionStatus
+				 where drs.deliveryDetailId =:deliveryDetailId
+		]]>
+	</query>
+	<query name="updateDrsDtlsByParentCnForCollection">
+		<![CDATA[
+				UPDATE
+				 from com.ff.domain.delivery.DeliveryDetailsDO drs
+				 set drs.collectionStatus =:collectionStatus
+				 where drs.consignmentDO.consgId=:consgId
+				 and drs.deliveryStatus=:drsStatus
+		]]>
+	</query>
+	
+	<query name="getThirdPartyMnfstDtsForDrs">
+		<![CDATA[
+			select mnfst from com.ff.domain.manifest.ManifestDO mnfst 
+			left join mnfst.updatingProcess as process
+			join fetch mnfst.consignments
+			where  mnfst.manifestNo=:manifestNo
+			AND
+			process.processCode IN (:processCode)
+			AND mnfst.originOffice.officeId=:officeId
+			
+		]]>
+	</query>
+	
+	<query name="getThirdPartyMnfstDtsHeaderForDrs">
+		<![CDATA[
+			select mnfst from com.ff.domain.manifest.ManifestDO mnfst 
+			left join mnfst.updatingProcess as process
+			where  mnfst.manifestNo=:manifestNo
+			AND
+			process.processCode IN (:processCode)
+			AND mnfst.originOffice.officeId=:officeId
+			
+		]]>
+	</query>
+	<query name="getConsignmentCountOfManifestByMnfstNo">
+		<![CDATA[
+			select distinct (mnfst.consignments) from com.ff.domain.manifest.ManifestDO mnfst 
+			left join mnfst.updatingProcess as process
+			where  mnfst.manifestNo=:manifestNo
+			AND
+			process.processCode IN (:processCode)
+			AND mnfst.originOffice.officeId=:officeId
+			
+		]]>
+	</query>
+	
+	<query name="getManifestedTypeForConsgByLoggedInOffice"> 
+      <![CDATA[  
+     SELECT  new map(process.processCode as typeId,mnfst.manifestType as typeName)
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join mnfst.updatingProcess as process
+				  
+				  where consgn.consgNo = :consignmentNumber
+    		 AND mnfst.operatingOffice=:loggedInOfficeId
+    		 AND mnfst.destinationCity.cityId IN (select office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId=:loggedInOfficeId )
+    		 AND mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where 
+    		  mnfst1.operatingOffice =:loggedInOfficeId 
+    		  and
+    		 consgn1.consgNo = :consignmentNumber 
+    		 
+    		 or EXISTS(from com.ff.domain.consignment.ChildConsignmentDO child where child.consignment=consgn1 and child.childConsgNumber=:consignmentNumber)
+    		 )
+      ]]>
+      </query>
+      <query name="getManifestedTypeForConsgByLoggedInOfficeForChild"> 
+      <![CDATA[  
+     SELECT  new map(process.processCode as typeId,mnfst.manifestType as typeName)
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join mnfst.updatingProcess as process
+				  
+				  where consgn.consgId = (select child.consignment.consgId from com.ff.domain.consignment.ChildConsignmentDO child where  child.childConsgNumber=:consignmentNumber)
+    		 AND mnfst.operatingOffice=:loggedInOfficeId
+    		 AND mnfst.destinationCity.cityId IN (select office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId=:loggedInOfficeId )
+    		 AND mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where 
+    		  mnfst1.operatingOffice =:loggedInOfficeId 
+    		  and
+    		 consgn1.consgId = (select child1.consignment.consgId from com.ff.domain.consignment.ChildConsignmentDO child1 where child1.childConsgNumber=:consignmentNumber)
+    		 )
+      ]]>
+      </query>
+      
+      
+      <query name="getOctroiAmountForConsignment">
+		<![CDATA[select sum(COALESCE(expEntries.amount,0.0)) FROM com.ff.domain.mec.expense.ExpenseEntriesDO expEntries
+		  inner join expEntries.consignmentDO consg
+		  inner join expEntries.expenseDO expDo
+		  inner join expDo.typeOfExpense as expenseGlType
+					WHERE  
+					 ( expEntries.octroiBourneBy=:octroiBourneBy  OR  expenseGlType.isOctroiGL ='Y')
+					 and
+					 consg.consgNo=:consignmentNumber
+					 
+		]]>
+	</query>
+	
+	<query name="getOctroiAmountForConsignmentForChildCn">
+		<![CDATA[select sum(COALESCE(expEntries.amount,0.0)) FROM com.ff.domain.mec.expense.ExpenseEntriesDO expEntries
+		  inner join expEntries.consignmentDO  as consg
+		  inner join expEntries.expenseDO as expDo
+		  inner join expDo.typeOfExpense as expenseGlType
+					WHERE   ( expEntries.octroiBourneBy=:octroiBourneBy  OR  expenseGlType.isOctroiGL ='Y')
+					 and
+					 consg.consgId IN ( select childConsg.consignment.consgId from com.ff.domain.consignment.ChildConsignmentDO childConsg where  childConsg.childConsgNumber =:consignmentNumber)
+					
+					 
+		]]>
+	</query>
+	<query name="IsCollectionDtlsAlreadyPostedByDrsForCn">
+		<![CDATA[
+			select  collectionDtls.entryId from com.ff.domain.mec.collection.CollectionDtlsDO collectionDtls where collectionDtls.consgDO.consgId=:consgId
+			 and  collectionDtls.consgDeliveryDate is not null
+		]]>
+	</query>
+	
+	<query name="isPaymentDetailsCapturedByCn">
+		<![CDATA[
+			select drs.deliveryDetailId from com.ff.domain.delivery.DeliveryDetailsDO drs
+				 where drs.consignmentDO.consgId=:consgId
+				 and drs.deliveryStatus=:drsStatus
+				 and drs.modeOfPayment is not null
+		]]>
+	</query>
+	
+	
+	 <query name="getConsDelivDetailsForDestBranchToDestHub"> 
+      <![CDATA[  
+	     FROM   com.ff.domain.delivery.DeliveryDetailsDO delivryDetailsDO where delivryDetailsDO.deliveryDO.deliveryId in(select delivery.deliveryId from com.ff.domain.delivery.DeliveryDO delivery  where delivery.createdOfficeDO.officeId=:orgOffId )
+	     and delivryDetailsDO.deliveryStatus=:deliveryStatus
+	     and delivryDetailsDO.consignmentNumber=:consignmentNumber
+      ]]>
+      </query>
+      
+      <query name="getConsDelivDetailsForDestBranchToDestHubForParentCN"> 
+      <![CDATA[  
+	     FROM   com.ff.domain.delivery.DeliveryDetailsDO delivryDetailsDO
+	     WHERE delivryDetailsDO.deliveryDO.deliveryId in (select delivery.deliveryId 
+	     												  from com.ff.domain.delivery.DeliveryDO delivery  
+	     												  where delivery.createdOfficeDO.officeId=:orgOffId 
+	     												  )
+	     AND delivryDetailsDO.deliveryStatus=:deliveryStatus
+	     AND delivryDetailsDO.consignmentNumber In (SELECT childCn.childConsgNumber 
+	     										   FROM  com.ff.domain.consignment.ChildConsignmentDO childCn
+	     										   INNER JOIN childCn.consignment consignment
+	     										   WHERE consignment.consgNo=:consignmentNumber
+	     											)
+      ]]>
+      </query>
+      
+      
+	<query name="getDrsDtlsForExpenseTypeCollectoin">
+		<![CDATA[
+			SELECT DISTINCT(drs) FROM com.ff.domain.delivery.DeliveryDetailsDO drs
+			WHERE (drs.deliveryDate BETWEEN :yesterdayDate AND :todayDate)
+			AND drs.deliveryStatus=:deliveryStatus 
+		]]>
+	</query>
+	
+	
+	
+	 <query name="getManifestedNumberByLoggedinOfficeForParentConsgTPManifestForManualDRS"> 
+      <![CDATA[  
+     SELECT mnfst.manifestNo
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join mnfst.updatingProcess as process
+				  
+				  where consgn.consgNo = :consignmentNumber
+				  AND 
+				   mnfst.manifestStatus=:manifestStatus
+				   AND
+    		 mnfst.manifestType =:manifestType
+    		 AND
+    		 process.processCode=:processCode
+    		 AND mnfst.operatingOffice=:loggedInOfficeId
+    		 AND mnfst.destinationCity.cityId IN (select office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId=:loggedInOfficeId )
+    		 AND mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where 
+    		  mnfst1.operatingOffice =:loggedInOfficeId and
+    		 consgn1.consgNo = :consignmentNumber 
+    		 )
+      ]]>
+      </query>
+      
+       <query name="getManifestedNumberByLoggedInOfficeForChildCnTPManifestForManualDrs"> 
+      <![CDATA[  
+     SELECT mnfst.manifestNo
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+				  inner join mnfst.updatingProcess as process
+				  
+				  where 
+    		 mnfst.manifestType =:manifestType
+    		 AND
+    		 mnfst.manifestStatus=:manifestStatus
+    		 AND
+    		 process.processCode=:processCode
+    		
+    		  
+    		 AND mnfst.operatingOffice=:loggedInOfficeId
+    		 AND mnfst.destinationCity.cityId IN (select office.cityId from com.ff.domain.organization.OfficeDO office where office.officeId=:loggedInOfficeId )
+    		 AND mnfst.createdDate IN (
+    		 select max(mnfst1.createdDate)  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest1
+    		 			inner join consgManifest1.consignment as consgn1
+				  inner join consgManifest1.manifest as mnfst1
+    		 where 
+    		  mnfst1.operatingOffice =:loggedInOfficeId and
+    		 consgn1.consgId IN (select childConsg.consignment.consgId FROM com.ff.domain.consignment.ChildConsignmentDO as childConsg  where childConsg.childConsgNumber = :consignmentNumber)  
+    		 )
+    		 AND exists ( FROM com.ff.domain.consignment.ChildConsignmentDO as childConsg  where childConsg.childConsgNumber = :consignmentNumber
+    		 and childConsg.consignment=consgn
+    		 )
+      ]]>
+      </query>
+	
+	 <query name="getDeliveryStatusOfThirdPartyConsignment"> 
+      <![CDATA[  
+	    SELECT delivryDetailsDO.deliveryStatus FROM   com.ff.domain.delivery.DeliveryDetailsDO delivryDetailsDO where delivryDetailsDO.consignmentNumber=:consignmentNumber
+      ]]>
+      </query>
+      
+      
+      <query name="getDeliveryDetails"> 
+	      <![CDATA[  
+		    	SELECT	delivryDetailsDO.deliveryDO.createdOfficeDO.officeCode 
+		    	FROM  	com.ff.domain.delivery.DeliveryDetailsDO delivryDetailsDO 
+		    	WHERE	delivryDetailsDO.consignmentNumber=:consignmentNumber
+	      ]]>
+      </query>
+      
+       <query name="getDeliveredOfficeIdForCollection"> 
+	      <![CDATA[  
+		    	SELECT	delivryDetailsDO.deliveryDO.createdOfficeDO.officeId 
+		    	FROM  	com.ff.domain.delivery.DeliveryDetailsDO delivryDetailsDO
+		    	WHERE	delivryDetailsDO.deliveryDetailId=:deliveryDetailId
+	      ]]>
+      </query>
+      
+      <query name="getDeliveredOfficeCodeByOfficeId"> 
+	      <![CDATA[  
+		    	select  office.officeCode FROM com.ff.domain.organization.OfficeDO office
+					WHERE office.officeId=:officeId
+	      ]]>
+      </query>
+	
+	
+	<query name="getConsgwiseDeliveryDetailsForBcun">
+<![CDATA[
+ select new map(delivryDetailsDO.consignmentNumber as typeId,delivryDetailsDO as typeName)FROM com.ff.domain.delivery.DeliveryDetailsDO delivryDetailsDO 
+ 			where delivryDetailsDO.deliveryDO.deliveryId IN (select deliveryDo.deliveryId from com.ff.domain.delivery.DeliveryDO deliveryDo where deliveryDo.drsNumber = :drsNumber)
+ ]]>
+</query>
+<query name="validateCnForRTOMnaifestForParentCn">
+		<![CDATA[ SELECT consgManifest.consignmentManifestId
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+		          WHERE consgn.consgNo =:consignmentNumber
+		          AND
+		          mnfst.manifestType =:manifestType
+		          
+		]]>
+	</query>
+	<query name="validateCnForRTOMnaifestForChildCn">
+		<![CDATA[ SELECT consgManifest.consignmentManifestId
+				  FROM com.ff.domain.manifest.ConsignmentManifestDO as consgManifest 
+				  inner join consgManifest.consignment as consgn
+				  inner join consgManifest.manifest as mnfst
+		          WHERE consgn.consgId IN (select  childCn.consignment.consgId from com.ff.domain.consignment.ChildConsignmentDO childCn where  childCn.childConsgNumber =:consignmentNumber)
+		        	 AND
+		          mnfst.manifestType =:manifestType
+		]]>
+	</query>
+	
+	
+<!-- Changes Here -->	
+<query name="delivaryDetailsByConsgNo">
+		<![CDATA[
+		
+		 from com.ff.domain.delivery.DeliveryDetailsDO drs  
+				WHERE drs.consignmentDO.consgNo =:consgNumber
+					  ORDER BY transactionCreateDate DESC 	
+	
+						]]>
+	</query>
+	
+	<query name="PendingDetailsByConsgNo">
+		<![CDATA[
+		
+		from com.ff.domain.delivery.DeliveryDetailsDO drs  
+				WHERE drs.reasonDO.reasonId=drs.reasonDO.reasonId
+				         AND drs.deliveryStatus = 'P'
+						AND drs.consignmentDO.consgNo =:consgNumber
+						ORDER BY transactionCreateDate DESC	
+	
+						]]>
+	</query>
+	
+	<query name="drsNumberByConsignmentNumber">
+		<![CDATA[  
+		    	FROM  	com.ff.domain.delivery.DeliveryDetailsDO delivryDetailsDO 
+		    	WHERE	delivryDetailsDO.consignmentNumber=:consignmentNumber
+		    	order by delivryDetailsDO.transactionCreateDate DESC limit 1
+		          
+		]]>
+	</query>
+	<query name="getManifetedDateForBulkDrs"> 
+      <![CDATA[  
+   			select max(mnfst.manifestDate) from com.ff.domain.manifest.ManifestDO mnfst where mnfst.manifestNo=:manifestNo and mnfst.manifestType ='I'
+      ]]>
+      </query>
+	
+</hibernate-mapping>

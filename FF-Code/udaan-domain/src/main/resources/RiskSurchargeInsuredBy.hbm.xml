@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.masters.RiskSurchargeInsuredByDO" table="ff_d_insured_by">
+		<id name="riskSurchargeInsuredById" type="java.lang.Integer" column="INSURED_BY_ID">
+			<generator class="native" />
+		</id>
+	
+		<property name="riskSurchargeInsuredByDesc" column="INSURED_BY_DESC" type="java.lang.String" />
+		<property name="riskSurchargeInsuredByCode" column="INSURED_BY_CODE" type="java.lang.String" />
+		<property name="percentile" column="PERCENTILE"/>
+		
+	</class>
+  	<query name="getRiskSurchargeInsuredByForRateCalculation">
+		<![CDATA[
+			 FROM com.ff.domain.ratemanagement.masters.RiskSurchargeInsuredByDO riskSurchargeInsuredByDO
+			 WHERE riskSurchargeInsuredByDO.riskSurchargeInsuredById =:insuredBy
+		]]>
+	</query>
+	
+	<query name="getRiskSurchargeInsuredByCodeForRateCalculation">
+		<![CDATA[
+			 FROM com.ff.domain.ratemanagement.masters.RiskSurchargeInsuredByDO riskSurchargeInsuredByDO
+			 WHERE riskSurchargeInsuredByDO.riskSurchargeInsuredByCode =:insuredBy
+		]]>
+	</query>
+	
+</hibernate-mapping>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.cash.CashRateWeightSlabDO" table="ff_f_rate_cash_weight_slab">
+		<id name="weightSlabId">
+			<column name="CASH_WEIGHT_SLAB_ID" />
+			<generator class="native" />
+		</id>
+		<property name="productMapId">
+            <column name="RATE_CASH_PRODUCT_MAP" />
+        </property>
+		<property name="slabOrder">
+            <column name="SLAB_ORDER" />
+        </property>
+		<property name="additional">
+			<column name="ADDITIONAL" />
+		</property>
+		<property name="fromDate">
+			<column name="FROM_DATE" />
+		</property>
+		<property name="toDate">
+			<column name="TO_DATE" />
+		</property>
+		<many-to-one name="startWt" class="com.ff.domain.ratemanagement.masters.WeightSlabDO" lazy="false"  fetch="join">
+           <column name="START_WEIGHT"/>
+        </many-to-one>
+        <many-to-one name="endWt" class="com.ff.domain.ratemanagement.masters.WeightSlabDO" lazy="false"  fetch="join">
+           <column name="END_WEIGHT"/>
+        </many-to-one>
+	</class>
+</hibernate-mapping>
+	

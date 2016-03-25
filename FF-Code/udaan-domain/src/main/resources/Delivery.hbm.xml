@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.delivery.DeliveryDO" table="ff_f_delivery" dynamic-update="true">
+		<id name="deliveryId" type="java.lang.Long">
+			<column name="DELIVERY_ID" />
+			<generator class="native" />
+		</id>
+		<property name="drsNumber" column="DRS_NUMBER" update="false"/>
+		<property name="loadNumber" column="LOAD_NO" update="false" />
+		<property name="drsFor" column="DRS_FOR"/>
+		<property name="ypDrs" column="YP_DRS" update="false" />
+		
+		<property name="consignmentType" column="CONSIGNMENT_TYPE" update="false" />
+		<property name="drsDate" column="DRS_DATE" update="false" />
+		<property name="fsOutTime" column="FS_OUT_TIME" />
+		<property name="fsInTime" column="FS_IN_TIME" />
+		<property name="drsScreenCode" column="DRS_SCREEN_CODE" update="false"/>
+		<property name="drsStatus" column="DRS_STATUS" />
+		<property name="isDrsDicarded" column="IS_DRS_DISCARDED" />
+		<property name="manifestDrsType" column="MF_DRS_TYPE" update="false"/>
+					
+					
+					
+					
+					
+		<!-- common attributes START -->
+		 <property name="transactionStatus" column="TRANS_ACTIVE_STATUS" /> 
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE_TIME" />
+		<property name="transactionModifiedDate" column="TRANS_MODIFIED_DATE_TIME" />
+		<!-- <property name="centralInboudStatus" column="DT_CENTRAL_INBOUND" /> 
+		<property name="centralOutboudStatus" column="DT_CENTRAL_OUTBOUND" /> -->
+		<!-- <property name="nodeId" column="TRANS_NODE_ID" /> -->
+		<!-- <property name="sapStatus" column="DT_SAP" /> -->
+		<!-- common attributes END -->
+	
+		
+
+		<!-- One-to- Many relationships START -->
+		<set name="deliveryDtlsDO" lazy="false" cascade="all-delete-orphan" inverse="true" fetch="join">
+            <key column="DELIVERY_ID"/>
+            <one-to-many class="com.ff.domain.delivery.DeliveryDetailsDO"/>
+    	</set> 
+		<!-- One-to-Many relationships END -->
+		
+		<property name="createdBy" column="CREATED_BY_USER" />
+		<property name="updatedBy" column="UPDATED_BY_USER" />
+		
+		<!-- <property name="dtToBranch">
+			<column name="DT_TO_BRANCH" />
+		</property> -->
+		
+		 <property name="dtToBranch" column="DT_TO_BRANCH" /> 
+		 <property name="dtToCentral">
+			<column name="DT_TO_CENTRAL" />
+		</property> 
+		<!-- Start of Changes by <48206> for opsaman on 20/09/2013  -->
+		<property  name="dtToOpsman" type="java.lang.String">
+		<column name="DT_TO_OPSMAN"/>
+		</property>
+		<property  name="dtFromOpsman" 	type="java.lang.String">
+		<column name="DT_FROM_OPSMAN"/>
+		</property>
+		<!-- End of Changes by <48206> for opsaman on 20/09/2013  -->
+		<many-to-one name="createdOfficeDO"
+			class="com.ff.domain.organization.OfficeDO" lazy="false" fetch="join">
+			<column name="CREATED_OFFICE_ID" />
+		</many-to-one>
+		<many-to-one name="baDO"
+			class="com.ff.domain.business.LoadMovementVendorDO" lazy="false" fetch="join" > 
+			<column name="BA_ID" />
+		</many-to-one> 
+		<many-to-one name="franchiseDO"
+			class="com.ff.domain.business.LoadMovementVendorDO" lazy="false" fetch="join">
+			<column name="FRANCHISEE_ID" />
+		</many-to-one>
+		<many-to-one name="fieldStaffDO"
+			class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join">
+			<column name="EMPLOYEE_ID" />
+		</many-to-one>
+		<many-to-one name="coCourierDO"
+			class="com.ff.domain.business.LoadMovementVendorDO" lazy="false" fetch="join" >
+			<column name="VENDOR_ID" />
+		</many-to-one>
+		
+		
+		
+			
+		
+		<!-- Many-to-one relationships END -->
+	</class>
+	<query name="getMaxDrsNumber">
+		<![CDATA[
+ 			select max(drs.drsNumber)FROM com.ff.domain.delivery.DeliveryDO drs 
+ 		 	WHERE  	drs.transactionStatus =:transactionStatus
+ 		 		AND 
+ 		 	drs.createdOfficeDO.officeId =:officeId
+ 		 	AND  length(drs.drsNumber) = :numberLength
+ 		 	AND drs.drsNumber like :prefix
+		]]>
+	</query>
+	
+	<query name="discardDeliveryHeader">
+		<![CDATA[
+				UPDATE com.ff.domain.delivery.DeliveryDO drs 
+				SET 
+				drs.isDrsDicarded=:discard
+				,
+				drs.dtToCentral=:dtToCentral,
+				drs.transactionModifiedDate=current_timestamp()
+				WHERE drs.deliveryId =:deliveryId
+ 			
+		]]>
+	</query>
+	<query name="updateDrsStatus">
+		<![CDATA[
+				UPDATE com.ff.domain.delivery.DeliveryDO drs SET drs.drsStatus=:drsStatus,
+				drs.updatedBy = :updatedBy,
+				drs.fsInTime = :fsInTime,
+				drs.dtToCentral=:dtToCentral,
+				drs.transactionModifiedDate=current_timestamp()
+				WHERE drs.deliveryId =:deliveryId
+ 			
+		]]>
+	</query>
+	<query name="updateDrsBcunFlag">
+		<![CDATA[
+				UPDATE com.ff.domain.delivery.DeliveryDO drs SET
+				drs.dtToCentral='Y'
+				WHERE drs.deliveryId = :pojoPrimarykey and drs.drsStatus =:businesskey
+ 			
+		]]>
+	</query>
+	
+	<query name="getDrsDetailsByDrsNumber">
+		<![CDATA[
+				from com.ff.domain.delivery.DeliveryDO drs WHERE drs.drsNumber=:drsNumber
+				AND drs.createdOfficeDO.officeId =:officeId
+		]]>
+	</query>
+	<query name="getDrsDetailsByDrsNumberForPrint">
+		<![CDATA[
+				from com.ff.domain.delivery.DeliveryDO drs WHERE drs.drsNumber=:drsNumber
+		]]>
+	</query>
+	
+	
+	<query name="getDeliveryEmployess">
+		<![CDATA[
+				select emp
+ 		FROM  com.ff.domain.delivery.DeliveryDO as drs 
+ 		inner join drs.fieldStaffDO as emp
+ 			where drs.createdOfficeDO.officeId =:officeId
+ 			AND drs.drsDate between :fromDate and :toDate
+ 			and drs.isDrsDicarded= :discard
+				
+		]]>
+	</query>
+	<query name="getDrsForDtlsByDate">
+		<![CDATA[
+				select new map(emp as emp, baDO as baDO,coCourierDO as coCourierDO,franchiseDO as franchiseDO)
+ 		FROM  com.ff.domain.delivery.DeliveryDO as drs
+ 		left join drs.fieldStaffDO as emp 
+ 		left join drs.baDO as baDO
+ 		left join drs.coCourierDO as coCourierDO
+ 		left join drs.franchiseDO as franchiseDO
+ 			where 
+ 			drs.createdOfficeDO.officeId =:officeId
+ 			AND drs.drsDate between :fromDate and :toDate
+ 			and drs.isDrsDicarded= :discard
+				
+		]]>
+	</query>
+	
+	<query name="getDrsByOfficeAndEmployee">
+		<![CDATA[
+				select distinct(drs.drsNumber)
+ 		FROM  com.ff.domain.delivery.DeliveryDO as drs 
+ 		inner join drs.fieldStaffDO as emp
+ 			where drs.createdOfficeDO.officeId =:officeId
+ 			and drs.isDrsDicarded= :discard
+ 			and emp.employeeId = :employeeId
+ 			AND drs.drsDate between :fromDate and :toDate
+ 			and  drs.loadNumber=:loadNumber
+ 			order by drs.drsNumber desc
+				
+		]]>
+	</query>
+	<query name="getDrsByOfficeAndBA">
+		<![CDATA[
+				select distinct(drs.drsNumber)
+ 		FROM  com.ff.domain.delivery.DeliveryDO as drs 
+ 		inner join drs.baDO as baDO
+ 			where drs.createdOfficeDO.officeId =:officeId
+ 			and drs.isDrsDicarded= :discard
+ 			and baDO.vendorId = :employeeId
+ 			AND drs.drsDate between :fromDate and :toDate
+ 			and  drs.loadNumber=:loadNumber
+ 			order by drs.drsNumber desc
+				
+		]]>
+	</query>
+	
+	<query name="getDrsByOfficeAndCC">
+		<![CDATA[
+				select distinct(drs.drsNumber)
+ 		FROM  com.ff.domain.delivery.DeliveryDO as drs 
+ 		inner join drs.coCourierDO as coCourierDO
+ 			where drs.createdOfficeDO.officeId =:officeId
+ 			and drs.isDrsDicarded= :discard
+ 			and coCourierDO.vendorId = :employeeId
+ 			AND drs.drsDate between :fromDate and :toDate
+ 			and  drs.loadNumber=:loadNumber
+ 			order by drs.drsNumber desc
+				
+		]]>
+	</query>
+	<query name="getDrsByOfficeAndFR">
+		<![CDATA[
+				select distinct(drs.drsNumber)
+ 		FROM  com.ff.domain.delivery.DeliveryDO as drs 
+ 		inner join drs.franchiseDO as franchiseDO
+ 			where drs.createdOfficeDO.officeId =:officeId
+ 			and drs.isDrsDicarded= :discard
+ 			and franchiseDO.vendorId = :employeeId
+ 			AND drs.drsDate between :fromDate and :toDate
+ 			and  drs.loadNumber=:loadNumber
+ 			order by drs.drsNumber desc
+				
+		]]>
+	</query>
+	<query name="getDrsStatusByDrsNumber">
+		<![CDATA[select drs.drsStatus FROM com.ff.domain.delivery.DeliveryDO drs where drs.drsNumber=:drsNumber]]>
+	</query>
+	<query name="getDeliveryIdByDrsNumber">
+		<![CDATA[select drs.deliveryId FROM com.ff.domain.delivery.DeliveryDO drs where drs.drsNumber=:drsNumber]]>
+	</query>
+	
+	<!-- Query For Data Sync Start -->
+	
+	 <query name="getUnsyncInboundDrsDtls">
+		<![CDATA[From com.ff.domain.delivery.DeliveryDO drs where drs.dtToCentral='N']]>
+	</query> 
+	
+	 <query name="getUnsyncOutboundDrsDtls">
+		<![CDATA[From com.ff.domain.delivery.DeliveryDO drs where drs.createdOfficeDO.officeId=:branchId and drs.dtToBranch='N']]>
+	</query> 
+	
+	<query name="getDataFromDrsNo">
+		<![CDATA[From com.ff.domain.delivery.DeliveryDO drs where drs.drsNumber=:drsNo]]>
+	</query>
+	
+	
+	<!-- Query For Data Sync End -->
+		
+	<!-- Start of Changes by <48206> for opsaman on 20/09/2013  -->
+	 <query name="getOpsmanInboundDrsDtls">
+		<![CDATA[From com.ff.domain.delivery.DeliveryDO drs where
+				 drs.transactionCreateDate >= '2014-06-23' and 
+				 drs.dtToOpsman!='Y' and 
+				 drs.dtFromOpsman!='Y' and
+				 drs.createdOfficeDO.officeId in (:officeIds)]]>
+	</query> 
+	
+	<query name="getDeliveryIdByDrsNumberForOpsman">
+		<![CDATA[select drs.deliveryId FROM com.ff.domain.delivery.DeliveryDO drs where drs.drsNumber=:drsNumber
+					and drs.dtFromOpsman = 'Y']]>
+	</query>
+	<!-- End of Changes by <48206> for opsaman on 20/09/2013  -->
+	
+	<!-- PnD Commission Delivery Commission Calculation START -->
+	<sql-query name="generateDlvCommissionCalc" callable="true">
+	    <![CDATA[ CALL sp_delivery_commission_calculation() ]]>
+	</sql-query>
+	<!-- PnD Commission Delivery Commission Calculation END -->
+	
+</hibernate-mapping>

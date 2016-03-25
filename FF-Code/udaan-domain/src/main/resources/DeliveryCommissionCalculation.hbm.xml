@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.pndcommission.DeliveryCommissionCalculationDO" table="ff_f_delivery_commission_calculation">
+		<id name="deliveryCommId" type="java.lang.Integer">
+			<column name="DELIVERY_COMM_ID" />
+			<generator class="native" />
+		</id>
+		<property name="productGroup" column="PRODUCT_GROUP" />
+		<property name="calculatedForPeriod" column="CALCULATED_FOR_PERIOD" />
+		<property name="deliveredCount" column="DELIVERED_COUNT" />
+		<property name="dlvDay1" column="DELIVERED_DAY_1" />
+		<property name="dlvDay2" column="DELIVERED_DAY_2" />
+		<property name="dlvDay3" column="DELIVERED_DAY_3" />
+		<property name="dlvDay4Beyond" column="DELIVERED_DAY_4_BEYOND" />
+		<property name="transactionCreateDate" column="TRANS_CREATED_DATE" />
+		
+		<many-to-one name="employeeDO" class="com.ff.domain.organization.EmployeeDO" lazy="false" fetch="join">
+			<column name="EMPLOYEE_ID" />
+		</many-to-one>
+		
+	</class>
+	
+<query name="getDlvCommCalcDtls">
+	<![CDATA[ FROM com.ff.domain.pndcommission.DeliveryCommissionCalculationDO ]]>
+</query>
+	
+</hibernate-mapping>

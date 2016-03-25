@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.capgemini.lbs.framework.domain.SmsDO" table="ff_f_sms">
+		<id name="smsId" type="java.lang.Integer" column="SMS_ID">
+			<generator class="native" />
+		</id>
+
+        <property name="moduleName" column="MODULE_NAME"/>
+        <property name="contactNumber" column="CONTACT_NUMBER"/>
+        <property name="message" column="MESSAGE"/>
+        <property name="isSmsSent" column="IS_SMS_SENT"/>
+        <property name="statusCode" column="STATUS_CODE"/>      
+		<property name="userId" column="USER_ID" type="java.lang.Integer"/>		
+		<property name="createdDate"  column="CREATED_DATE" type="java.util.Date" update="false"/>
+		<property name="updatedDate" column="UPDATE_DATE"	type="java.util.Date"/>		
+        <property name="dtToCentral" column="DT_TO_CENTRAL"/>
+	
+	</class>
+</hibernate-mapping>

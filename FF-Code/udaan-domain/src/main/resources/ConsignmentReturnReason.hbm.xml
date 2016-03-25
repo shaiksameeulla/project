@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.ff.domain.manifest.ConsignmentReturnReasonDO" table="ff_f_consignment_return_reason">
+		<id name="consignmentReturnReasonId" type="java.lang.Integer" column="CONSIGNMENT_RETURN_REASON_ID">
+			<generator class="native" />
+		</id>
+		
+        <property name="date" column="DATE" type="java.util.Date"/>
+        <property name="time" column="TIME"/>
+        <property name="remarks" column="REMARKS"/>
+        
+		<property name="createdDate"  column="CREATED_DATE" type="java.util.Date" update="false"/>
+		<property name="updatedDate" column="UPDATE_DATE"	type="java.util.Date"/>
+		<property name="createdBy" column="CREATED_BY" type="java.lang.Integer" update="false"/>
+		<property name="updatedBy" column="UPDATE_BY" type="java.lang.Integer"/>
+		
+		<many-to-one name="reasonDO"  class="com.ff.domain.serviceOffering.ReasonDO" lazy="false" fetch="join">
+			<column  name="REASON" />
+		</many-to-one>
+		
+		<many-to-one name="consignmentReturnDO" class="com.ff.domain.manifest.ConsignmentReturnDO" lazy="false" fetch="join">
+			<column name="CONSIGNMENT_RETURN" />
+		</many-to-one>
+		
+	</class>
+	
+	<query name="getConsignmentReturnReasonsByReturnTypeReasonCode">
+		<![CDATA[ FROM com.ff.domain.manifest.ConsignmentReturnReasonDO consignmentReturnReason 
+		          WHERE consignmentReturnReason.consignmentReturnDO.returnType=:returnType
+		          AND consignmentReturnReason.reasonDO.reasonCode=:reasonCode
+		          AND consignmentReturnReason.date=CURDATE()
+		          ORDER BY consignmentReturnReason.consignmentReturnDO.consignmentDO.orgOffId
+		]]>
+	</query>
+								
+	<query name="getConsignmentReturnIds">
+		<![CDATA[ 
+	          	Select consignmentReturnReason.consignmentReturnDO.consignmentReturnId
+				FROM com.ff.domain.manifest.ConsignmentReturnReasonDO consignmentReturnReason 
+	          	WHERE consignmentReturnReason.consignmentReturnDO.returnType=:returnType
+	          	AND consignmentReturnReason.reasonDO.reasonCode=:reasonCode
+	          	AND consignmentReturnReason.date=(CURDATE() - 2)           
+		]]>
+	</query>
+		
+<!-- 	<query name="getConsignmentReturnReasonsIdByConsgReturnIdReasonIdDateTime">
+		<![CDATA[ Select consignmentReturnReason.consignmentReturnReasonId
+				  FROM com.ff.domain.manifest.ConsignmentReturnReasonDO consignmentReturnReason 
+		          WHERE consignmentReturnReason.consignmentReturnDO.consignmentReturnId=:consignmentReturnId
+		          AND consignmentReturnReason.reasonDO.reasonId=:reasonId
+		          AND consignmentReturnReason.date=:date
+		          AND consignmentReturnReason.time=:time
+		]]>
+	</query> -->
+	<query name="getConsignmentReturnReason">
+		<![CDATA[ 
+	       SELECT consignmentReturnReason.reasonDO.reasonId FROM com.ff.domain.manifest.ConsignmentReturnReasonDO consignmentReturnReason 
+				WHERE consignmentReturnReason.consignmentReturnDO.consignmentReturnId IN (SELECT consignmentReturn.consignmentReturnId 
+							FROM com.ff.domain.manifest.ConsignmentReturnDO consignmentReturn
+                            WHERE consignmentReturn.consignmentDO.consgId = (SELECT consignment.consgId FROM com.ff.domain.consignment.ConsignmentDO consignment WHERE consignment.consgNo =:consignmentNo)
+                            AND consignmentReturn.officeDO.officeId =:originOffice
+                            AND consignmentReturn.returnType =:returnType)   	          
+		]]>
+	</query>
+	
+	
+			
+</hibernate-mapping>

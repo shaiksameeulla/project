@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.cash.CashRateSpecialDestinationDO" 
+		table="ff_f_rate_cash_special_destination">
+		<id name="specialDestId">
+			<column name="RATE_CASH_SPECIA_DEST" />
+			<generator class="native" />
+		</id>
+		<!-- <property name="productMapId">
+            <column name="RATE_CASH_PRODUCT_MAP" />
+        </property> -->
+		<!-- <property name="pincode">
+			<column name="PINCODE" />
+		</property> -->
+		<property name="stateId">
+			<column name="STATE_ID" />
+		</property>
+		<property name="slabRate">
+			<column name="SLAB_RATE" />
+		</property>
+		<property name="servicedOn">
+			<column name="SERVICED_ON" />
+		</property>
+		<many-to-one name="weightSlab" class="com.ff.domain.ratemanagement.masters.WeightSlabDO" lazy="false" fetch="select">
+           <column name="CASH_WEIGHT_SLAB" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="cityDO" class="com.ff.domain.geography.CityDO" lazy="false"  fetch="join">
+           <column name="CITY" />
+        </many-to-one>
+        <many-to-one name="rateHeaderProductDO" 
+        	class="com.ff.domain.ratemanagement.operations.cash.CashRateConfigHeaderProductDO" 
+        	lazy="false"  fetch="join">
+			<column name="RATE_CASH_PRODUCT_MAP" />
+		</many-to-one>
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		<property name="originSector">
+            <column name="ORIGIN_SECTOR" />
+        </property>
+	</class>
+</hibernate-mapping>
+	

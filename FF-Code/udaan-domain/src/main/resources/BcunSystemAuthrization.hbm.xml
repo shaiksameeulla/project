@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.bcun.SystemAuthDO" table="ff_d_system_auth">
+		<id name="systemId" type="java.lang.Integer">
+			<column name="SYSTEM_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name="systemCode" column="SYSTEM_CODE"/>
+		<property name="authDate" column="AUTHENTICATION_DATE"/>
+		<property name="authBranchCode" column="AUTHORIZED_BRANCH_CODE"/>
+		<property name="systemUserCode" column="SYSTEM_USER_CODE"/>
+		<property name="active" column="ACTIVE"/>
+	</class>
+	
+	<query name="getAuthSystemUserIds">
+		<![CDATA[SELECT sysAuthDO.systemId From com.ff.domain.bcun.SystemAuthDO sysAuthDO 
+					where
+					sysAuthDO.systemUserCode=:systemUserCode
+					and
+					sysAuthDO.authBranchCode=:authBranchCode
+					and
+					sysAuthDO.active='Y']]>
+	</query>
+	
+	<query name="getSystemAuthDetailsForAllUsers">
+      <![CDATA[from com.ff.domain.bcun.SystemAuthDO ]]>
+    </query>
+</hibernate-mapping>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class
+		name="com.ff.domain.ratemanagement.operations.ba.BaRateConfigHeaderDO"
+		table="ff_f_rate_ba_rate_header">
+		<id name="headerId">
+			<column name="RATE_BA_HEADER_ID" />
+			<generator class="native" />
+		</id>
+		
+		<property name="cityId">
+			<column name="CITY" />
+		</property>
+		
+		<property name="fromDate">
+			<column name="FROM_DATE" />
+		</property>
+		
+		<property name="toDate">
+			<column name="TO_DATE" />
+		</property>
+
+		<many-to-one name="rateCustomerCategory"
+			class="com.ff.domain.ratemanagement.masters.RateCustomerCategoryDO"
+			lazy="false">
+			<column name="RATE_CUSTOMER_CATEGORY" />
+		</many-to-one>
+		
+		<set name="baRateProductDO" cascade="all-delete-orphan" inverse="false"
+			table="ff_f_rate_ba_product_header" lazy="false">
+			<key column="RATE_BA_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.ba.BaRateConfigProductHeaderDO" />
+		</set>
+
+		<many-to-one name="customerTypeDO" class="com.ff.domain.business.CustomerTypeDO" lazy="false">
+  		 <column name="CUSTOMER_TYPE" />
+		</many-to-one> 
+
+		<property name="headerStatus">
+			<column name="HEADER_STATUS" />
+		</property>
+		<property name="isRenew">
+			<column name="ISRENEW" />
+		</property>
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+		
+		<set name="fixedChargeConfig"
+			table="ff_f_rate_ba_fixed_charges_config" cascade="all-delete-orphan" lazy="false" inverse="true">
+			<key column="BA_RATE_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.ratecalculation.BARateConfigurationFixedChargesConfigDO" />
+		</set>
+
+		<set name="baAdditionalChargesDO"
+			table="ff_f_rate_ba_additional_charges" cascade="all-delete-orphan" lazy="false" inverse="true">
+			<key column="BA_RATE_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.ba.BARateConfigAdditionalChargesDO" />
+		</set>
+		
+		<set name="baRateRTOChargesDO" table="ff_f_rate_ba_rto_charge"
+			lazy="false" cascade="all-delete-orphan" inverse="true">
+			<key column="BA_RATE_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.ratecalculation.BARateConfigRTOChargesDO" />
+		</set>
+		
+		<set name="baCODChargesDOs" table="ff_f_rate_ba_cod_charge"
+			lazy="false" cascade="all-delete-orphan" inverse="true">
+			<key column="BA_RATE_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.ba.BARateConfigCODChargesDO" />
+		</set>
+		
+		<property name="createdBy" column="CREATED_BY" update="false" />
+		<property name="createdDate" column="CREATED_DATE" update="false" />
+		<property name="updatedBy" column="UPDATE_BY" />
+		<property name="updatedDate" column="UPDATE_DATE" />
+		
+	</class>
+	<query name="getBARateConfigurationDetailsByHeaderId">
+		<![CDATA[ 
+			FROM  com.ff.domain.ratemanagement.operations.ba.BaRateConfigHeaderDO header 
+			WHERE header.headerId =:headerId
+		]]>
+	</query>
+	<query name="getBARateConfigurationDetails">
+		<![CDATA[ 
+			FROM  com.ff.domain.ratemanagement.operations.ba.BaRateConfigHeaderDO header 
+			WHERE ((:toDate BETWEEN header.fromDate AND header.toDate) 
+					OR ((:toDate>=header.toDate) AND (:toDate NOT BETWEEN header.fromDate AND header.toDate) )
+				  )
+			AND	  header.cityId =:cityId
+			AND	  header.customerTypeDO.customerTypeId=:baTypeId
+			ORDER BY header.fromDate DESC
+		]]>
+	</query>
+	<query name="getRenewedBARateConfigurationDetails">
+		<![CDATA[ 
+			FROM  com.ff.domain.ratemanagement.operations.ba.BaRateConfigHeaderDO header 
+			WHERE (:toDate BETWEEN header.fromDate AND header.toDate)
+			AND	  header.cityId =:cityId
+			AND	  header.customerTypeDO.customerTypeId=:baTypeId
+			ORDER BY header.fromDate DESC
+		]]>
+	</query>
+	
+	<query name="getBARateConfigurationRenewedDetails">
+		<![CDATA[ 
+			FROM  com.ff.domain.ratemanagement.operations.ba.BaRateConfigHeaderDO header 
+			WHERE header.fromDate >:fromDate
+			AND	  header.cityId =:cityId
+			AND	  header.customerTypeDO.customerTypeId=:baTypeId
+			ORDER BY header.fromDate DESC
+		]]>
+	</query>
+
+	<query name="submitBaRateConfiguration">
+		<![CDATA[ 
+			UPDATE  com.ff.domain.ratemanagement.operations.ba.BaRateConfigHeaderDO header
+			SET		header.headerStatus = 'A',
+					header.fromDate =:fromDate,
+					header.dtToBranch = 'N',
+					header.toDate =:toDate,
+					header.updatedBy =:updatedBy,
+					header.updatedDate =:updateDate
+			WHERE 	header.headerId=:headerId
+		]]>
+	</query>
+	
+	<query name="isExistsBaRateConfiguration">
+		<![CDATA[ 
+			FROM  com.ff.domain.ratemanagement.operations.ba.BaRateConfigHeaderDO header 
+			WHERE header.cityId =:cityId
+			AND	  header.customerTypeDO.customerTypeId=:baTypeId
+			AND   header.headerStatus = 'A'
+		]]>
+	</query>
+	<query name="updateBAConfgRenewStatus">
+	<![CDATA[ 
+			UPDATE  com.ff.domain.ratemanagement.operations.ba.BaRateConfigHeaderDO header
+			SET		header.isRenew = 'Y',
+					header.dtToBranch = 'N'
+			WHERE 	header.headerId=:headerId
+		]]>
+	</query>
+	<query name="updateBAConfgTODate">
+	<![CDATA[ 
+			UPDATE  com.ff.domain.ratemanagement.operations.ba.BaRateConfigHeaderDO header
+			SET		header.toDate =:toDate,
+					header.isRenew = 'Y',
+					header.dtToBranch = 'N'
+			WHERE 	header.headerId=:headerId
+		]]>
+	</query>
+	<query name="updateBAConfgFromDate">
+	<![CDATA[ 
+			UPDATE  com.ff.domain.ratemanagement.operations.ba.BaRateConfigHeaderDO header
+			SET		header.fromDate =:toDate
+			WHERE 	header.headerId=:headerId
+		]]>
+	</query>
+	<query name="getBARateConfigDetails">
+	<![CDATA[ 
+			FROM  com.ff.domain.ratemanagement.operations.ba.BaRateConfigHeaderDO header 
+			WHERE header.cityId =:cityId
+			AND	  header.customerTypeDO.customerTypeId=:baTypeId
+			ORDER BY header.fromDate DESC
+		]]>
+	</query>
+	<query name="getFromDateByBARateHeaderId">
+		<![CDATA[ 
+			SELECT header.fromDate FROM  com.ff.domain.ratemanagement.operations.ba.BaRateConfigHeaderDO header 
+			WHERE header.headerId =:headerId
+		]]>
+	</query>
+		
+</hibernate-mapping>
+	

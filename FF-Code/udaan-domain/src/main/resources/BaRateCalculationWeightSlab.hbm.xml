@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.ba.BaRateCalculationWeightSlabDO" table="ff_f_rate_ba_weight_slab">
+		<id name="baWeightSlabId">
+			<column name="BA_WEIGHT_SLAB_ID" />
+			<generator class="native" />
+		</id>
+		<property name="baRateHeaderId">
+            <column name="BA_RATE_PRODUCT_HEADER" />
+         </property>
+        <many-to-one name="startWeight" class="com.ff.domain.ratemanagement.masters.WeightSlabDO" lazy="false">
+           <column name="START_WEIGHT"/>
+        </many-to-one> 
+		<many-to-one name="endWeight" class="com.ff.domain.ratemanagement.masters.WeightSlabDO" lazy="false">
+           <column name="END_WEIGHT"/>
+        </many-to-one> 
+		<property name="slabOrder">
+			<column name="SLAB_ORDER" />
+		</property>
+	</class>
+</hibernate-mapping>
+	

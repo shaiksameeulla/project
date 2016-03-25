@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.ff.domain.ratemanagement.operations.cash.BcunCashRateConfigHeaderDO" 
+			table="ff_f_rate_cash_rate_header">
+		<id name="cashRateHeaderId">
+			<column name="RATE_CASH_HEADER_ID" />
+			<generator class="assigned" />
+		</id>
+		<property name="regionId">
+            <column name="REGION" />
+        </property>
+		<property name="fromDate">
+        	<column name="FROM_DATE" />
+        </property>
+		<property name="toDate">
+			<column name="TO_DATE" />
+		</property>
+		<property name="headerStatus">
+			<column name="HEADER_STATUS" />
+		</property>
+		
+		<set name="cashRateProductDOs" table="ff_f_rate_cash_product_map" 
+			lazy="false" cascade="all" inverse="true"  fetch="join">
+			<key column="RATE_CASH_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.cash.BcunCashRateConfigHeaderProductDO" />
+		</set>
+		<set name="cashRateConfigRtoChargesDOs" table="ff_f_rate_cash_rto_charge" 
+			lazy="false" cascade="all-delete-orphan" inverse="true"  fetch="join">
+			<key column="CASH_RATE_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.cash.BcunCashRateConfigRTOChargesDO" />
+		</set>
+		<set name="cashRateConfigFixedChargesDOs" table="ff_f_rate_cash_fixed_charges_config" 
+			lazy="false" cascade="all-delete-orphan" inverse="true"  fetch="join">
+			<key column="CASH_RATE_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.cash.BcunCashRateConfigFixedChargesDO" />
+		</set>
+		<set name="cashRateConfigAdditionalChargesDOs" table="ff_f_rate_cash_additional_charges" 
+			lazy="false" cascade="all-delete-orphan" inverse="true"  fetch="join">
+			<key column="CASH_RATE_HEADER" />
+			<one-to-many class="com.ff.domain.ratemanagement.operations.cash.BcunCashRateConfigAdditionalChargesDO" />
+		</set>
+		<property name="dtToBranch" column="DT_TO_BRANCH" />
+	</class>
+	
+	
+</hibernate-mapping>
+	
