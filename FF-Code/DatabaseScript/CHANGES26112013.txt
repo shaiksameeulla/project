@@ -1,0 +1,20 @@
+/*1. Narmdeshwar */
+alter table ff_f_consignment_return modify 
+IS_EMAIL_VALIDATED enum('N','Y') NOT NULL DEFAULT 'N'  COMMENT 'Yes-Y, No-N [Email Trigger validation after configurable hours]';
+
+
+update ff_f_consignment_return  
+set IS_EMAIL_VALIDATED = 'N' where IS_EMAIL_VALIDATED is null or IS_EMAIL_VALIDATED = '';
+
+
+/*2. Himal */
+
+alter table ff_f_expense_entries add BILLING_FLAG enum('Y','N') NOT NULL DEFAULT 'N' COMMENT 'If (customer is CREDIT CUSTOMER and octroi bourne by consignor) THEN Y- Yes ELSE N- No';
+
+
+
+
+
+
+
+

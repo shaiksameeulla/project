@@ -1,0 +1,2 @@
+use CorpUDAAN;
+insert into ff_d_app_menu (MENU_ID,EMBEDDED_IN_MENU,POSITION,MENU_TYPE,MENU_LABEL,APP_SCREEN,DT_TO_BRANCH,APP_NAME,STATUS) values (638, 7, 7, 'L', 'Bulk Pending DRS',null , 'N', 'udaan-web', 'A'),(639, 638, 1, 'A', 'Bulk pending Drs for Branch', 422, 'N', 'udaan-web', 'A'),(640, 638, 2, 'A', 'Bulk pending Drs for Hub', 423, 'N', 'udaan-web', 'A');

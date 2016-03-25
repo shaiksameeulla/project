@@ -1,0 +1,54 @@
+/* 1. Shahnaz */
+
+alter table ff_f_pickup_assignment_header add unique index ff_f_pickup_assignment_header_uniqueindex1
+(OFFICE_CREATED_AT, OFFICE_CREATED_FOR, EMPLOYEE_FIELD_STAFF, PICK_UP_ASSIGNMENT_TYPE);
+
+alter table ff_f_pickup_runsheet_header add unique index ff_f_pickup_runsheet_header_uniqueindex1(RUNSHEET_NO)
+
+
+/*alter table ff_f_rev_pickup_order_request_detail (ORDER_NUMBER)*/
+
+alter table ff_f_rev_pickup_order_to_branch add unique index rev_pickup_order_to_branch_uniqueindex1(BRANCH_ORDER_ASSIGNED_TO,REQUEST_DETAIL_ID);
+
+
+/*2. Sami */
+delete from ff_d_item_type where item_type_code=''or item_type_name ='';
+
+alter table ff_d_item_type modify ITEM_TYPE_CODE varchar(30) NOT NULL ;
+
+
+alter TABLE ff_d_item modify ITEM_CODE varchar(25) NOT NULL COMMENT 'Code for the item';
+
+alter table ff_f_delivery  
+modify DRS_NUMBER varchar(14) NOT NULL COMMENT 'Delivery Runsheet number',
+modify DRS_FOR varchar(10) NOt NULL COMMENT 'Field staff ;BUSINESS ASSOCIATE;Type of Third party agent(Get from vendor master);FRANCHISEE',
+modify CONSIGNMENT_TYPE varchar(10) NOT NULL COMMENT 'PPX/DOX',
+modify DRS_STATUS varchar(20) NOT NULL COMMENT 'DRS Status Open(DRS prepared)/updated(updated all un delivered cns)/closed (updated all delivered cns &process compltd)'; 
+
+
+alter table ff_f_delivery_dtls 
+modify ROW_NUMBER int(3) NOT NULL COMMENT 'Serial number from the screen',
+modify CONSIGNMENT_NUMBER varchar(15) NOT NULL COMMENT 'cn number', 
+modify CONSIGNMENT_ID int(11) NOT NULL COMMENT 'COMPLETE CN DETAILS',
+modify DELIVERY_ID int(11) DEFAULT NULL COMMENT 'NO OF DELIVERY ATTEMPTS';
+
+/* 3. Kaustubh */
+alter table ff_f_billing_consignment_summary add VERSION int(11);
+
+/* 4. Chandrakant */
+update ff_d_address  set ADDRESS1 = '.' where ADDRESS1 = '' or ADDRESS1 is null; 
+update ff_d_address  set ADDRESS2 = '.' where ADDRESS2 = '' or ADDRESS2 is null; 
+update ff_d_address  set ADDRESS3 = '.' where ADDRESS3 = '' or ADDRESS3  is null; 
+update ff_d_address  set NAME = '.' where NAME = '' or NAME is null; 
+
+
+update ff_d_contact  set NAME = '.' where NAME = '' or NAME is null; 
+update ff_d_contact  set CONTACT_NO = '.' where CONTACT_NO = '' or CONTACT_NO is null; 
+
+
+
+/*5. Rohini Maladi */
+alter table ff_d_customer add LEGACY_CUSTOMER_CODE varchar(20);
+
+
+

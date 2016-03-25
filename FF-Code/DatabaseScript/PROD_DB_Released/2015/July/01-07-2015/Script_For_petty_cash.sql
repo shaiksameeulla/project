@@ -1,0 +1,5 @@
+
+
+
+ALTER TABLE ff_f_booking ADD CONSIDERED_FOR_PETTY_CASH varchar(50) NOT NULL DEFAULT "N";
+

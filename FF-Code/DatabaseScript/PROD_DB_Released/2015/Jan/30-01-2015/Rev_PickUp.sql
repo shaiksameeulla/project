@@ -1,0 +1,1 @@
+ALTER TABLE CorpUDAAN.ff_f_rev_pickup_order_request_detail MODIFY ADDRESS VARCHAR(250);

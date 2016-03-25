@@ -1,0 +1,1 @@
+UPDATE ff_f_booking SET CONSIDERED_FOR_PETTY_CASH = "Y" where booking_date <= DATE_SUB(CURDATE(),INTERVAL 1 DAY);

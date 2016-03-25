@@ -1,0 +1,26 @@
+/*DB CHANGES 17/12/2013 */
+/*1.Niharika */
+
+alter table ff_f_delivery  drop FOREIGN KEY FK_ff_f_delivery_2;
+alter table ff_f_delivery  drop FOREIGN KEY FK_ff_f_delivery_4;
+
+alter table ff_f_delivery  
+add CONSTRAINT FK_ff_f_delivery_2 FOREIGN KEY (BA_ID) REFERENCES ff_d_vendor(VENDOR_ID) ON DELETE NO ACTION ON UPDATE CASCADE;
+alter table ff_f_delivery  
+add CONSTRAINT FK_ff_f_delivery_4 FOREIGN KEY (FRANCHISEE_ID) REFERENCES ff_d_vendor(VENDOR_ID) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+
+
+/*Reason Master- Punith - Data from ffcl*/
+update ff_d_reason set reason_name = concat('Hold On Consignee',"'","s Request" )
+where reason_code = 'HCD';
+
+update ff_d_reason set reason_name = concat('Hold On Consignor',"'",'s Request')
+where reason_code = 'HAD';
+  
+insert into ff_d_reason 
+values
+(186,'WPE','Wrong Pincode','P',	concat('House',"&",' Office Closed'),17,'Y','N'),
+(187,'RDT',	'Redirect',	'RH',NULL,	19,'Y','N'),
+(188,'RDP',	'Redispatch',	'RH',NULL,19,'Y','N'),
+(189,'WPE',	'Wrong Pincode','RH',NULL,19,'Y','N');

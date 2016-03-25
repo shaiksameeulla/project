@@ -1,0 +1,26 @@
+/*1.Nilesh */
+
+alter table ff_f_consignment 
+add STOP_DELIVERY enum('N','Y') DEFAULT 'N',
+add STOP_DELIVERY_REASON int(11) DEFAULT NULL,
+add STOP_DELV_DATE datetime DEFAULT NULL,
+add KEY FK_ff_f_cons12 (STOP_DELIVERY_REASON),
+add CONSTRAINT FK_ff_f_cons12 FOREIGN KEY (STOP_DELIVERY_REASON) REFERENCES ff_d_reason (REASON_ID) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+
+
+
+/*2. Kaustubh */
+
+alter table ff_f_bill add CUSTOMER int(11) COMMENT 'Bill for Customer';
+
+alter table ff_f_billing_consignment_summary add CUSTOMER int(11) COMMENT 'Summary for Customer';
+
+
+
+
+/*3.Procedures by Kaustubh and Saumya 
+sp_billing_consolidation_31Dec2013
+sp_billing_stock_consolidation_31Dec2013
+sp_sap_bill_sales_order_30Dec2013
+sp_track_consignment_31122013*/

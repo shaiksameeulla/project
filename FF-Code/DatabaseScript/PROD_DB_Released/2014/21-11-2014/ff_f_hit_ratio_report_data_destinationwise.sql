@@ -1,0 +1,32 @@
+drop table `ff_f_hit_ratio_report_data_destinationwise`;
+CREATE TABLE `ff_f_hit_ratio_report_data_destinationwise` (
+  `DATA_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `DELIVERY_OFFICE` int(11) DEFAULT NULL,
+  `CONSIGNMENT_REC_DATE` datetime DEFAULT NULL COMMENT 'Consignment In Manifested date at DELIVERY_OFFICE',
+  `LOAD_NO` int(11) DEFAULT NULL COMMENT 'Load Lot number in which Consignment is In Manifested',
+  `CONSG_TYPE` int(11) DEFAULT NULL COMMENT 'ff_d_consignment_type(CONSIGNMENT_TYPE_ID)',
+  `PRODUCT` int(11) DEFAULT NULL COMMENT 'FF_D_PRODUCT(PRODUCT_ID)',
+  `CATEGORY_ID` int(2) DEFAULT NULL COMMENT 'FF_D_CATEGORY_FOR_REPORTS(CATEGORY_ID). Local or National',
+  `CONSIGNMENTS_RECD` int(11) DEFAULT NULL COMMENT 'Count of Consignments In Manifested on CONSIGNMENT_REC_DATE',
+  `CONSIGNMENTS_RET_IN` int(11) DEFAULT NULL COMMENT 'Count of Consignments Returned To Consigner on CONSIGNMENT_REC_DATE',
+  `CONSIGNMENTS_ACTUAL` int(11) DEFAULT NULL COMMENT 'Count of Consignments which can actually be delivered by DELIVERED_OFFICE',
+  `DELIVERED_D0` int(11) DEFAULT NULL COMMENT 'Count of Consignments delivered on same day as In Manifested date',
+  `DELIVERED_D1` int(11) DEFAULT NULL COMMENT 'Count of Consignments delivered on 2nd day of In Manifested date',
+  `DELIVERED_D2` int(11) DEFAULT NULL COMMENT 'Count of Consignments delivered on 3rd day of In Manifested date',
+  `DELIVERED_D3` int(11) DEFAULT NULL COMMENT 'Count of Consignments delivered on 4th day of In Manifested date',
+  `DELIVERED_D4` int(11) DEFAULT NULL COMMENT 'Count of Consignments delivered on 5th day of In Manifested date',
+  `DELIVERED_BEYOND_D5` int(11) DEFAULT NULL COMMENT 'Count of Consignments delivered after 5th day of In Manifested date',
+  `RTO` int(11) DEFAULT NULL COMMENT 'Count of RTO Consignments',
+  `LOST` int(11) DEFAULT NULL COMMENT 'Count of Lost Consignments',
+  PRIMARY KEY (`DATA_ID`),
+  UNIQUE KEY `idx_unique` (`CONSIGNMENT_REC_DATE`,`DELIVERY_OFFICE`,`LOAD_NO`,`CONSG_TYPE`,`PRODUCT`,`CATEGORY_ID`),
+  KEY `FK_hit_ratio_report_data_destinationwise1` (`DELIVERY_OFFICE`),
+  KEY `FK_hit_ratio_report_data_destinationwise2` (`CATEGORY_ID`),
+  KEY `FK_hit_ratio_report_data_destinationwise3` (`CONSG_TYPE`),
+  KEY `FK_hit_ratio_report_data_destinationwise4` (`PRODUCT`),
+  CONSTRAINT `FK_hit_ratio_report_data_destinationwise1` FOREIGN KEY (`DELIVERY_OFFICE`) REFERENCES `ff_d_office` (`OFFICE_ID`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `FK_hit_ratio_report_data_destinationwise2` FOREIGN KEY (`CATEGORY_ID`) REFERENCES `ff_d_category_for_reports` (`CATEGORY_ID`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `FK_hit_ratio_report_data_destinationwise3` FOREIGN KEY (`CONSG_TYPE`) REFERENCES `ff_d_consignment_type` (`CONSIGNMENT_TYPE_ID`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `FK_hit_ratio_report_data_destinationwise4` FOREIGN KEY (`PRODUCT`) REFERENCES `ff_d_product` (`PRODUCT_ID`) ON DELETE NO ACTION ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+

@@ -1,0 +1,123 @@
+/* Namrdeshwar */
+
+
+alter table ff_f_load_connected 
+modify COLOADING_DISPATCHED_USING ENUM('CD','AWB','RR','Z') NOT NULL Default 'Z' COMMENT 'CD-CD, AWB-Air Waybill, RR-Rail Road, Z-NULL/Not selected',
+modify COLOADING_DISPATCHED_TYPE ENUM('CC','FF','Z')NOT NULL Default 'Z' COMMENT 'CC - Co-Loader to Co-Loader , FF - First Flight to First Flight, Z-NULL/Not selected',
+modify COLOADING_RATE_CALCULATED ENUM('Y','N')NOT NULL Default 'N' COMMENT 'Y-Yes, N-No';
+
+
+/* Sami */ 
+alter table ff_f_stock_requisition
+add IS_AUTO_REQUISITION enum('Y','N') DEFAULT NULL COMMENT 'Y- means associated requisition number is auto requisition N- not a auto requisition';
+
+/* Rohini */
+
+alter table ff_f_service_request_papers
+add COMPLAINT_FILE_NAME	varchar(50),
+add CONSIGNOR_COPY_FILE_NAME varchar(50),
+add MAIL_COPY_FILE_NAME		varchar(50),
+add UNDER_TAKING_FILE_NAME	varchar(50),
+add DEC_INVOICE_FILE_NAME	varchar(50),
+drop FILE_NAME;
+
+
+/* Kaustubh */
+
+alter table ff_f_billing_consignment 
+add BILLING_STATUS ENUM('TBB','RTB','BLD')	COMMENT 'Indicates billing status of CN before this transmission to SAP
+TBB - To be Billed, RTB - Ready To be Billed, BLD - Billed, sent for Billing to SAP',
+add CHANGED_AFTER_BILLING_WEIGHT_DEST	ENUM('Y', 'N')COMMENT 'Flag indicates if CN Weight, Destination or Contract Rates has changed before this transmission to SAP',
+add CHANGED_AFTER_NEW_RATE_COMPONENT	ENUM('Y', 'N') COMMENT 'Flag indicates if existing rate component CN has changed or new one is added before this transmission to SAP';
+
+/* Himal */
+
+alter table ff_d_service_request_query_type modify 	QUERY_TYPE_DESCRIPTION	varchar(100) DEFAULT NULL;
+alter table ff_d_service_request_complaint_type	modify 	COMPLAINT_TYPE_DESCRIPTION varchar(100) DEFAULT NULL;
+alter table ff_d_service_request_status	modify 	STATUS_DESCRIPTION varchar(100) DEFAULT NULL;
+alter table ff_d_service_request_cust_type	modify 	CUSTOMER_TYPE_DESCRIPTION varchar(100) DEFAULT NULL;
+
+
+
+
+/* Preeti Gupta */
+alter table ff_d_booking_type add unique index booking_type_unqindex1 (BOOKING_TYPE);	
+alter table ff_d_booking_type_product_map add unique index booking_type_product_type_unqindex1(BOOKING_TYPE_ID, PRODUCT_ID);	
+alter table ff_d_city add unique index city_unqindex1 (CITY_ID);
+alter table ff_d_cn_content add unique index cn_content_name_unqindex1 (CN_CONTENT_NAME);	
+alter table ff_d_pincode  add unique index pincodecityid_city_unqindex1 (PINCODE, CITY_ID, CITY	);
+
+
+/*Chandrakant */
+
+alter table ff_d_employee add EMP_STATUS enum('A','I') COMMENT 'A-Active I-Inactive';
+
+/* Himal */
+
+alter table ff_f_service_request_complaint
+modify FIR_DATE date DEFAULT NULL,
+modify TYPE_DATE date DEFAULT NULL,
+add COMPLAINT_CREATION_DATE datetime,
+add CREATED_BY int(11) DEFAULT NULL	COMMENT 'record created user',	
+add CREATED_DATE datetime DEFAULT NULL	COMMENT 'record created date and time',
+add UPDATE_BY int(11) DEFAULT NULL	COMMENT 'record updated user',
+add UPDATE_DATE datetime DEFAULT NULL	COMMENT 'record updated date and time',
+add KEY FK_service_request_complaint4 (CREATED_BY),                                                                                                                                                          
+add KEY  FK_service_request_complaint5 (UPDATE_BY),   
+add CONSTRAINT FK_service_request_complaint4 FOREIGN KEY (CREATED_BY) REFERENCES ff_d_user (USER_ID) ON DELETE NO ACTION ON UPDATE CASCADE,                                                              
+add CONSTRAINT FK_service_request_complaint5 FOREIGN KEY (UPDATE_BY) REFERENCES ff_d_user (USER_ID) ON DELETE NO ACTION ON UPDATE CASCADE;                                                               
+    
+ 
+alter table ff_f_service_request_complaint_claim
+modify SALES_MANAGER_FEEDBACK_DATE date DEFAULT NULL,
+modify CS_MANAGER_FEEDBACK_DATE date DEFAULT NULL,
+modify AGM_FEEDBACK_DATE date DEFAULT NULL,
+modify VP_FEEDBACK_DATE date DEFAULT NULL,
+add CREATED_BY int(11) DEFAULT NULL	COMMENT 'record created user',	
+add CREATED_DATE datetime DEFAULT NULL	COMMENT 'record created date and time',
+add UPDATE_BY int(11) DEFAULT NULL	COMMENT 'record updated user',
+add UPDATE_DATE datetime DEFAULT NULL	COMMENT 'record updated date and time',
+add KEY FK_service_request_complaint_claim2 (CREATED_BY),                                                                                                                                                          
+add KEY  FK_service_request_complaint_claim3 (UPDATE_BY),   
+add CONSTRAINT FK_service_request_complaint_claim2 FOREIGN KEY (CREATED_BY) REFERENCES ff_d_user (USER_ID) ON DELETE NO ACTION ON UPDATE CASCADE,                                                              
+add CONSTRAINT FK_service_request_complaint_claim3 FOREIGN KEY (UPDATE_BY) REFERENCES ff_d_user (USER_ID) ON DELETE NO ACTION ON UPDATE CASCADE;                                                               
+
+
+alter table ff_f_service_request_complaint_legal
+modify FORWARDED_TO_FFCL_LAWYER_DATE date DEFAULT NULL,
+add CREATED_BY int(11) DEFAULT NULL	COMMENT 'record created user',	
+add CREATED_DATE datetime DEFAULT NULL	COMMENT 'record created date and time',
+add UPDATE_BY int(11) DEFAULT NULL	COMMENT 'record updated user',
+add UPDATE_DATE datetime DEFAULT NULL	COMMENT 'record updated date and time',
+add KEY FK_service_request_complaint_legal2 (CREATED_BY),                                                                                                                                                          
+add KEY  FK_service_request_complaint_legal3 (UPDATE_BY),   
+add CONSTRAINT FK_service_request_complaint_legal2 FOREIGN KEY (CREATED_BY) REFERENCES ff_d_user (USER_ID) ON DELETE NO ACTION ON UPDATE CASCADE,                                                              
+add CONSTRAINT FK_service_request_complaint_legal3 FOREIGN KEY (UPDATE_BY) REFERENCES ff_d_user (USER_ID) ON DELETE NO ACTION ON UPDATE CASCADE;                                                               
+/* Narmdeshwar */
+
+
+INSERT INTO `ff_d_std_type` VALUES 
+(217 ,'N','New','COLOADING','COLOADING_CD_AWB_STATUS','A','N'),
+(218, 'U', 'Updated', 'COLOADING', 'COLOADING_CD_AWB_STATUS', 'A', 'N'),
+(219, 'AWB', 'AWB', 'COLOADING', 'COLOADING_DISPATCH_USING', 'A', 'N'),
+(220, 'CD', 'CD', 'COLOADING', 'COLOADING_DISPATCH_USING', 'A', 'N'),
+(221, 'RR', 'RR', 'COLOADING', 'COLOADING_DISPATCH_USING', 'A', 'N'),
+(222, 'FF', 'First Flight to First Flight', 'COLOADING', 'COLOADING_DISPATCHED_TYPE', 'A', 'N'),
+(223, 'CC', 'Co-Loader to Co-Loader', 'COLOADING', 'COLOADING_DISPATCHED_TYPE', 'A', 'N');
+
+
+
+
+/*Pravin Meher */
+alter table ff_f_service_request_followup
+add CREATED_BY int(11) DEFAULT NULL	COMMENT 'record created user',	
+add CREATED_DATE datetime DEFAULT NULL	COMMENT 'record created date and time',
+add UPDATE_BY int(11) DEFAULT NULL	COMMENT 'record updated user',
+add UPDATE_DATE datetime DEFAULT NULL	COMMENT 'record updated date and time',
+add KEY FK_service_request_followup2 (CREATED_BY),
+add KEY  FK_service_request_followup3 (UPDATE_BY),   
+add CONSTRAINT FK_service_request_followup2 FOREIGN KEY (CREATED_BY) REFERENCES ff_d_user (USER_ID) ON DELETE NO ACTION ON UPDATE CASCADE,                                                              
+add CONSTRAINT FK_service_request_followup3 FOREIGN KEY (UPDATE_BY) REFERENCES ff_d_user (USER_ID) ON DELETE NO ACTION ON UPDATE CASCADE;                                                               
+
+
+

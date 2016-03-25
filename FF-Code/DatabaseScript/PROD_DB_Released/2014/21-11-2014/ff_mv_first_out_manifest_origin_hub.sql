@@ -1,0 +1,32 @@
+DROP TABLE IF EXISTS ff_mv_first_out_manifest_origin_hub;
+CREATE TABLE `ff_mv_first_out_manifest_origin_hub` (
+  `CONSG_ID` int(11) NOT NULL DEFAULT '0',
+  `CONSIGNMENT_MANIFESTED_ID` int(11) DEFAULT NULL,
+  `MANIFEST_ID` int(11) DEFAULT NULL,
+  `MANIFEST_NO` varchar(12) DEFAULT NULL,
+  `MANIFEST_DATE` datetime DEFAULT NULL,
+  `MANIFEST_TYPE` char(1) DEFAULT NULL,
+  `OPERATING_OFFICE` int(11) DEFAULT NULL,
+  `MANIFEST_LOAD_CONTENT` int(11) DEFAULT NULL,
+  `MANIFEST_PROCESS_CODE` varchar(25) DEFAULT NULL,
+  `LOAD_LOT_ID` int(11) DEFAULT NULL,
+  `ORIGIN_OFFICE` int(11) DEFAULT NULL,
+  `DESTINATION_OFFICE` int(11) DEFAULT NULL,
+  PRIMARY KEY (`CONSG_ID`),
+  KEY `fk_first_out_manifest_hub_consignment_manifested` (`CONSIGNMENT_MANIFESTED_ID`),
+  KEY `fk_first_out_manifest_hub_manifest` (`MANIFEST_ID`),
+  KEY `fk_first_out_manifest_hub_office` (`OPERATING_OFFICE`),
+  KEY `fk_first_out_manifest_hub_consignment_type` (`MANIFEST_LOAD_CONTENT`),
+  KEY `fk_first_out_manifest_hub_load_lot` (`LOAD_LOT_ID`),
+  KEY `fk_first_out_manifest_hub_origin_office` (`ORIGIN_OFFICE`),
+  KEY `fk_first_out_manifest_hub_destination_office` (`DESTINATION_OFFICE`),
+  CONSTRAINT `fk_first_out_manifest_hub_consignment` FOREIGN KEY (`CONSG_ID`) REFERENCES `ff_f_consignment` (`CONSG_ID`),
+  CONSTRAINT `fk_first_out_manifest_hub_consignment_manifested` FOREIGN KEY (`CONSIGNMENT_MANIFESTED_ID`) REFERENCES `ff_f_consignment_manifested` (`CONSIGNMENT_MANIFESTED_ID`),
+  CONSTRAINT `fk_first_out_manifest_hub_consignment_type` FOREIGN KEY (`MANIFEST_LOAD_CONTENT`) REFERENCES `ff_d_consignment_type` (`CONSIGNMENT_TYPE_ID`),
+  CONSTRAINT `fk_first_out_manifest_hub_destination_office` FOREIGN KEY (`DESTINATION_OFFICE`) REFERENCES `ff_d_office` (`OFFICE_ID`),
+  CONSTRAINT `fk_first_out_manifest_hub_load_lot` FOREIGN KEY (`LOAD_LOT_ID`) REFERENCES `ff_d_load_lot` (`LOAD_LOT_ID`),
+  CONSTRAINT `fk_first_out_manifest_hub_manifest` FOREIGN KEY (`MANIFEST_ID`) REFERENCES `ff_f_manifest` (`MANIFEST_ID`),
+  CONSTRAINT `fk_first_out_manifest_hub_office` FOREIGN KEY (`OPERATING_OFFICE`) REFERENCES `ff_d_office` (`OFFICE_ID`),
+  CONSTRAINT `fk_first_out_manifest_hub_origin_office` FOREIGN KEY (`ORIGIN_OFFICE`) REFERENCES `ff_d_office` (`OFFICE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+

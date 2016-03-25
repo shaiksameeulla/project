@@ -1,0 +1,6 @@
+/*05/08/2014 - Rohini*/
+Use CorpUDAAN;
+
+UPDATE ff_d_contract_payment_billing_location SET SHIPPED_TO_CODE = '0001037283' WHERE RATE_CONTRACT = 45445 AND SHIPPED_TO_CODE = '1037283';
+
+UPDATE ff_d_rate_contract SET DT_TO_BRANCH = 'N' WHERE RATE_CONTRACT_ID = 45445;

@@ -1,0 +1,19 @@
+/*1.Change requested by Kaustubh  */
+
+alter table ff_f_bill  
+drop FOREIGN KEY  FK_PICKUP_OFFICE,
+drop KEY FK_PICKUP_OFFICE;
+
+alter table ff_f_bill CHANGE PICKUP_OFFICE_ID  BILLING_OFFICE_ID int(11) DEFAULT NULL;
+
+alter table ff_f_bill 
+add KEY FK_BILLING_OFFICE (BILLING_OFFICE_ID),
+add CONSTRAINT FK_BILLING_OFFICE FOREIGN KEY (BILLING_OFFICE_ID) REFERENCES ff_d_office(OFFICE_ID);
+
+
+
+/*2.Change requested by Pravin Meher */
+
+
+DELETE FROM ff_d_rate_component_applicable WHERE RATE_COMPONENT = 4 AND PRODUCT <> 3;
+

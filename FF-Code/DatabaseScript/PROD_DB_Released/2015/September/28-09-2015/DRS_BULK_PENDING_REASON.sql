@@ -1,0 +1,2 @@
+use CorpUDAAN;
+insert into ff_d_reason (REASON_ID,REASON_CODE,REASON_NAME,REASON_TYPE,REASON_TYPE_DESC,PROCESS,IS_PARTY_LETTER,DT_TO_BRANCH)values(227,'PDB','Political Disturbance / Bandh','BP','Bulk pending',17,'N','N'),(228,'DBW','Due To Bad Weather','BP','Bulk pending',17,'N','N'),(229,'LAL','Late Arrival Of C/Ment, Schedule For Next Day Delivery','BP','Bulk pending',17,'N','N'),(230,'WOF','Weekly Off','BP','Bulk pending',17,'N','N');

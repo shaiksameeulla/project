@@ -1,0 +1,1 @@
+INSERT INTO ff_d_configurable_params VALUES (109,'TERMINAL_PRINT_JOB_URL','printJob','N');

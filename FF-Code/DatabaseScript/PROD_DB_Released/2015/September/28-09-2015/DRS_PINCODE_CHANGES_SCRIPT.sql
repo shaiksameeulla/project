@@ -1,0 +1,2 @@
+use CorpUDAAN;
+ALTER TABLE `ff_f_delivery_dtls` ADD COLUMN `CONSIGNMENT_UPDATE_FLAG` ENUM('N','Y') NOT NULL DEFAULT 'N' COMMENT 'an identifier to identify whether it\'s eligible to update pincode in consignment table' AFTER `PRODUCT_ID`;
