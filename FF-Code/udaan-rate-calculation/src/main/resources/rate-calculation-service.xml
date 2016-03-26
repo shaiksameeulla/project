@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<bean id="rateCalcFactory" class="com.ff.rate.calculation.service.RateCalculationServiceFactory">
+			<property name="serviceImpl"> 
+				<map>   
+	                <entry key="FR">   
+	                    <ref local="ccRateCalcService" />   
+	                </entry>   
+	                <entry key="CC">   
+	                     <ref local="ccRateCalcService" />   
+	                </entry> 
+	                 <entry key="BA">   
+	                     <ref local="baRateCalcService" />   
+	                </entry>    
+	                <entry key="CH">   
+	                     <ref local="cashRateCalcService" />   
+	                </entry>   
+	            </map>   
+			</property>
+		 <property name="rateCalcDAO" ref="rateCalcDAO" />
+	</bean>
+
+	<bean id="frRateCalcService" class="com.ff.rate.calculation.service.FranchiseeRateCalculationServiceImpl">
+		<property name="rateCalcDAO" ref="rateCalcDAO" />
+	</bean>
+
+	<bean id="ccRateCalcService" class="com.ff.rate.calculation.service.CreditCustomerRateCalculationServiceImpl">
+		<property name="rateCalcDAO" ref="rateCalcDAO" />
+	</bean>
+	
+	<bean id="baRateCalcService" class="com.ff.rate.calculation.service.BARateCalculationServiceImpl">
+		<property name="rateCalcDAO" ref="rateCalcDAO" />
+	</bean>
+	
+	<bean id="cashRateCalcService" class="com.ff.rate.calculation.service.CashRateCalculationServiceImpl">
+		<property name="rateCalcDAO" ref="rateCalcDAO" />
+	</bean>
+	
+	<bean id="rateCalculationUniversalService" class="com.ff.rate.calculation.service.RateCalculationUniversalServiceImpl">
+		<property name="rateCalculationServiceFactory" ref="rateCalcFactory" />
+		<property name="rateCalcDAO" ref="rateCalcDAO" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+	</bean>
+	
+	<bean id="rateCmnService" 
+		class="com.ff.rate.configuration.common.service.RateCommonServiceImpl">
+		<property name="rateCommonDAO" ref="rateCmnDAO" />
+		<property name="rateUniversalService" ref="rateUniversalService" />
+		<property name="rateBenchMarkService" ref="rateBenchMarkService" />
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+	</bean>
+	
+	 <bean id="rateQuotationService" 
+		class="com.ff.rate.configuration.ratequotation.service.RateQuotationServiceImpl">
+		<property name="rateQuotationDAO" ref="rateQuotationDAO" />
+		<property name="rateCommonService" ref="rateCmnService" />
+		<property name="rateBenchMarkService" ref="rateBenchMarkService" />
+		<property name="regionRateBenchMarkDiscountService" ref="regionRateBenchMarkDiscountService"/>
+		<property name="jobService" ref="jobServicesUniversalService" /> 
+	</bean>
+	
+	<bean id="rateBenchMarkService" 
+		class="com.ff.rate.configuration.ratebenchmark.service.RateBenchMarkServiceImpl">
+		<property name="rateBenchMarkDAO" ref="rateBenchMarkDAO" />
+		<property name="rateCommonService" ref="rateCmnService" />
+	</bean>
+	
+	<bean id="regionRateBenchMarkDiscountService"
+		class="com.ff.rate.configuration.ratebenchmarkdiscount.service.RegionRateBenchMarkDiscountServiceImpl">
+		<property name="geographyCommonService" ref="geographyCommonService" />
+				<property name="organizationCommonService" ref="organizationCommonService" />
+				<property name="regionRateBenchMarkDiscountDAO" ref="regionRateBenchMarkDiscountDAO" />
+	</bean>
+	
+	<!-- Rate Contract START -->
+	<bean id="rateContractService" 
+		class="com.ff.rate.configuration.ratecontract.service.RateContractServiceImpl">
+		<property name="rateContractDAO" ref="rateContractDAO" />
+		<property name="rateCommonService" ref="rateCmnService" />
+		<!-- <property name="emailSenderService" ref="emailSenderService" /> -->
+		<property name="emailSenderUtil" ref="emailSenderUtil"/>
+		<property name="rateQuotationService" ref="rateQuotationService"/>
+		
+	</bean>
+	<!-- Rate Contract END -->  
+	
+	<!-- Rate Configuration Start -->  
+	<bean id="baRateConfigurationService" 
+		class="com.ff.rate.configuration.rateConfiguration.service.BARateConfigurationServiceImpl">
+		<property name="baRateConfigurationDAO" ref="baRateConfigurationDAO" />
+		<property name="rateCommonService" ref="rateCmnService" />
+	</bean>
+	<bean id="cashRateConfigurationService" 
+		class="com.ff.rate.configuration.rateConfiguration.service.CashRateConfigurationServiceImpl">
+		<property name="cashRateConfigurationDAO" ref="cashRateConfigurationDAO" />
+		<property name="rateCommonService" ref="rateCmnService" />
+		<property name="rateQuotationService" ref="rateQuotationService" />
+	</bean>
+	<bean id="baMaterialRateConfigService" 
+		class="com.ff.rate.configuration.rateConfiguration.service.BAMaterialRateConfigServiceImpl">
+		<property name="baMaterialRateConfigDAO" ref="baMaterialRateConfigDAO" />
+	</bean>
+	<!-- Rate Configuration END  -->  
+	
+	<!-- EB Rate START -->
+	<bean id="emotionalBondRateService" 
+		class="com.ff.rate.configuration.ebrate.service.EmotionalBondRateServiceImpl">
+		<property name="emotionalBondRateDAO" ref="emotionalBondRateDAO" />
+		<property name="rateCommonService" ref="rateCmnService" />
+	</bean>
+	<!-- EB Rate END -->  
+	
+</beans>
