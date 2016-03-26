@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+		 
+     <bean id="loginService" class="com.ff.umc.service.LoginServiceImpl">
+	     <property name="loginDAO" ref="loginDAO"/>
+	    <!--  <property name="emailSenderService" ref="emailSenderService" /> -->
+	     <property name="emailSenderUtil" ref="emailSenderUtil"/>
+	     <property name="jdbcOffice" value="${branch.office.code}"/>
+	     <property name="jdbcBuild" value="${udaan.web.build}"/>
+	     <property name="organizationCommonService" ref="organizationCommonService"/>
+	     <property name="globalUniversalService" ref="globalUniversalService"/>
+	     <property name="customerLoginDetailsProperties" ref="customerLoginDetailsProperties"/>
+    </bean>
+    
+    <bean id="customerLoginDetailsProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:CustomerLoginDetails.properties"></property>
+	</bean>
+    
+    
+    
+     <bean id="userRolesService" class="com.ff.umc.service.RoleManagementServiceImpl">
+     <property name="userRolesDAO" ref="userRolesDAO"/>
+      <property name="userRolesCommonService" ref="userRolesCommonService"/>
+    </bean>
+    
+    <bean id="userRolesCommonService" class="com.ff.umc.service.RoleManagementCommonServiceImpl">
+     <property name="userRolesDAO" ref="userRolesDAO"/>
+    </bean>
+    
+     <bean id="roleAssignmentSerevice" class="com.ff.umc.service.RoleAssignmentServiceImpl">
+    <property name="userRoleAssignmentDAO" ref="userRoleAssignmentDAO"/>
+      <property name="roleAssignmentCommonService" ref="roleAssignmentCommonService"/>
+       <property name="loginService" ref="loginService"/>
+    </bean>
+    
+    <bean id="roleAssignmentCommonService" class="com.ff.umc.service.RoleAssignmentCommonServiceImpl">
+      <property name="userRolesCommonService" ref="userRolesCommonService"/>
+       <property name="userRoleAssignmentDAO" ref="userRoleAssignmentDAO"/>
+      
+       
+    </bean>
+       
+       <bean id="userMgmtService" class="com.ff.umc.service.UserManagementServiceImpl">
+       <property name="umcDAO" ref="umcDAO"/>
+       <property name="loginService" ref="loginService"/>
+       <property name="loginDAO" ref="loginDAO"/>
+    </bean>
+    
+    <bean id="assignApproverService" class="com.ff.umc.service.AssignApproverServiceImpl">
+     <property name="assignApproverDAO" ref="assignApproverDAO"/>
+      <property name="assignApproverCommonService" ref="assignApproverCommonService"/>
+      <property name="loginService" ref="loginService"/>      
+    </bean>
+    
+    <bean id="assignApproverCommonService" class="com.ff.umc.service.AssignApproverCommonServiceImpl">
+      <property name="organizationCommonService" ref="organizationCommonService"/>
+      <property name="geographyCommonService" ref="geographyCommonService"/> 
+      <property name="umcCommonService" ref="umcCommonService"/>
+    </bean>   
+       
+</beans>

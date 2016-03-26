@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://cxf.apache.org/jaxws 
+		http://cxf.apache.org/schemas/jaxws.xsd">
+	
+	<import resource="classpath:universe-service.xml" />
+	<import resource="classpath:universe-dao.xml"/> 
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+	<import resource="classpath:sap-intgration-hibernate.xml" />
+	<import resource="classpath:sap-intgration-services.xml" />
+	<import resource="classpath:sap-intgration-dao.xml" />
+	<import resource="classpath:sap-integration-transactions.xml" />
+	<import resource="classpath:rate-calculation-service.xml"/>
+	<import resource="classpath:rate-calculation-dao.xml"/> 
+	
+	<!-- Consignment Rate Calculation Scheduler START -->
+	<import resource = "classpath:consignment-rate-calculation-scheduler.xml" />
+	<import resource = "classpath:consignment-RTO-rate-calculation-scheduler.xml" /> 
+	<!-- Consignment Rate Calculation Scheduler END -->
+	
+	<!-- MM interfaces   -->
+	<import resource = "classpath:csd-sap-purchase-requisition-scheduler.xml" />
+	<import resource = "classpath:csd-sap-stock-receipt-scheduler.xml" />
+	<import resource = "classpath:csd-sap-stock-transfer-scheduler.xml" />
+	<import resource = "classpath:csd-sap-stock-return-scheduler.xml" />
+	<import resource = "classpath:csd-sap-stock-return-from-BA-scheduler.xml" />  
+	<import resource = "classpath:csd-sap-coloader-Air-Train-Vehicle-scheduler.xml" />
+	<import resource = "classpath:csd-sap-stock-consumption-scheduler.xml"/> 
+	<import resource = "classpath:csd-sap-co-courier-scheduler.xml"/> 
+	<import resource = "classpath:csd-sap-stock-cancellation-scheduler.xml" />
+	
+	<!-- FI Interfaces -->
+	
+	<import resource = "classpath:csd-sap-expense-scheduler.xml" />
+	<import resource = "classpath:csd-sap-collection-scheduler.xml" />
+	<import resource = "classpath:csd-sap-collection-CR-scheduler.xml"/>
+	<import resource = "classpath:csd-sap-liability-consg-scheduler.xml" />
+ 	<import resource = "classpath:delivered-csd-sap-cod-lc-scheduler.xml"></import>
+	<import resource = "classpath:RTO-csd-sap-cod-lc-scheduler.xml"></import> 
+	<import resource = "classpath:RTO-DRS-csd-sap-cod-lc-scheduler.xml"></import>
+	<import resource = "classpath:Consignee-csd-sap-cod-lc-scheduler.xml"></import>
+	<import resource = "classpath:Staging-csd-sap-cod-lc-scheduler.xml"></import> 
+	<import resource = "classpath:csd-sap-liability-payment-scheduler.xml" />
+	<import resource = "classpath:csd-sap-codlc-consg-posting-interval-scheduler.xml"></import>
+	 
+	<!-- SD Interfaces Starts  -->
+	<import resource = "classpath:csd-sap-contract-scheduler.xml" />  
+	<!-- <import resource = "classpath:csd-sap-BCS-scheduler.xml" /> -->
+<!--	<import resource = "classpath:csd-sap-BCS-fortnightly-BA-scheduler.xml" /> -->
+	<import resource = "classpath:csd-sap-bill-sales-order-scheduler.xml" /> 
+	<import resource = "classpath:csd-sap-outstanding-payment-scheduler.xml" />
+	<import resource = "classpath:csd-billing-rate-calculation-BCS-scheduler.xml" /> 
+	 
+	<!-- <import resource="classpath:csd-sap-emp-pickup-scheduler.xml" />
+	<import resource="classpath:sap-csd-employee-scheduler.xml"/> -->
+	
+	<!-- PickUp & Delivery Interface START -->
+	<import resource = "classpath:csd-sap-pickup-commission-calculation-scheduler.xml" /> 
+	<import resource = "classpath:csd-sap-emp-delivery-commission-scheduler.xml" />
+	<!-- PickUp & Delivery Interface END -->
+
+	<!-- Scheduler used to process error records for customer master interface  -->
+	<import resource = "classpath:customer-master-error-processing-scheduler.xml" />
+
+	<!-- Scheduler used to process sales order records from the staging table  -->	
+	<import resource = "classpath:csd-sap-bill-sales-order-staging-scheduler.xml" />
+	
+	<jaxws:endpoint id="employeeIntegrationEndpoint"
+		implementor="#employeeIntegrationWebservice" address="/employeeIntegrationRequest" />
+	<bean id="employeeIntegrationWebservice"
+		class="com.ff.sap.integration.employee.webservice.EmployeeSAPIntegrationWebserviceImpl">
+		<property name="integrationService" ref="employeeSAPIntegrationService" />
+	</bean>
+	
+	<jaxws:endpoint id="materialIntegrationEndpoint" 
+			implementor="#materialIntegrationWebservice" address="/materialIntegrationRequest"/> 
+	<bean id="materialIntegrationWebservice" 
+			class="com.ff.sap.integration.material.webservice.MaterialMasterSAPIntegrationWebserviceImpl"> 
+		<property name="integrationService" ref="materialSAPIntegrationService" /> 
+	</bean>
+	
+	<jaxws:endpoint id="coloaderInvoiceEndpoint" 
+			implementor="#coloaderInvoiceIntegrationWebservice" address="/coloaderInvoiceIntegrationRequest"/> 
+	<bean id="coloaderInvoiceIntegrationWebservice" 
+			class="com.ff.sap.integration.material.webservice.ColoaderInvoicNoUpdateSAPIntegrationWebserviceImpl"> 
+		<property name="integrationService" ref="coloaderSAPIntegrationService" /> 
+	</bean>
+	
+	<!-- <jaxws:endpoint id="vendorIntegrationEndpoint" 
+			implementor="#vendorIntegrationWebservice" address="/vendorIntegrationRequest"/> 
+	<bean id="vendorIntegrationWebservice" 
+			class="com.ff.sap.integration.vendor.webservice.VendorMasterSAPIntegrationWebserviceImpl"> 
+		<property name="integrationService" ref="vendorSAPIntegrationService" /> 
+	</bean> -->
+	
+	<jaxws:endpoint id="vendorIntegrationEndpoint" 
+			implementor="#vendorIntegrationWebservice" address="/vendorIntegrationRequest"/> 
+	<bean id="vendorIntegrationWebservice" 
+			class="com.ff.sap.integration.vendor.webservice.VendorMasterSAPIntegrationWebserviceImpl"> 
+		<property name="integrationService" ref="vendorSAPIntegrationService" /> 
+	</bean>
+	
+	<jaxws:endpoint id="plantMasterIntegrationEndpoint" 
+			implementor="#plantMasterIntegrationWebservice" address="/plantMasterIntegrationRequest"/> 
+	<bean id="plantMasterIntegrationWebservice" 
+			class="com.ff.sap.integration.plantmaster.webservice.PlantMasterSAPIntegrationWebServiceImpl"> 
+		<property name="integrationService" ref="plantMasterSAPIntegrationService" /> 
+	</bean>
+	
+	<jaxws:endpoint id="customerIntegrationEndpoint" 
+			implementor="#customerIntegrationWebservice" address="/customerIntegrationRequest"/> 
+	<bean id="customerIntegrationWebservice" 
+			class="com.ff.sap.integration.sd.customer.webservice.CustomerMasterSAPIntegratinWebServiceImpl"> 
+		<property name="integrationService" ref="customerSAPIntegrationService" /> 
+		<property name="sapIntegrationMessageProperties" ref="sapIntegrationMessageProperties" />
+	</bean>
+	
+	<jaxws:endpoint id="salesOrderNumberIntegrationEndpoint" 
+			implementor="#salesOrderNumberIntegrationWebservice" address="/salesOrderNumberIntegrationRequest"/> 
+	<bean id="salesOrderNumberIntegrationWebservice" 
+			class="com.ff.sap.integration.sd.salesordernumber.webservice.SOUpdateSAPIntegrationWebserviceImpl"> 
+		<property name="integrationService" ref="salesOrderNumberSAPIntegrationService" /> 
+	</bean>
+
+	<!-- ################################# clients/consumers definitions ############################## -->
+	<!-- <bean id="proxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass"
+			value="com.firstflight.hr.csdtosap.emppickndelivercount.SICSDEmpPickNDeliverCountOut" />
+		<property name="address"
+			value="http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=BS_CSD&amp;Interface=http%3A%2F%2FFirstFlight.com%2FHR%2FCSDToSAP%2FEmpPickNDeliverCount%5ESI_CSD_EmpPickNDeliverCount_Out&amp;sap-user=cg-csd&amp;sap-password=interface&amp;qos=EO" />
+	</bean> -->
+	 <!-- <bean id="pickupAndDeliveryCountClient"
+
+	<bean id="pickupAndDeliveryCountClient"
+		class="com.firstflight.hr.csdtosap.emppickndelivercount.SICSDEmpPickNDeliverCountOut"
+		factory-bean="proxyFactory" factory-method="create" /> 
+		
+		<bean id="empPickupAndDeliveryCountClient"
+		class="com.FirstFlight.hr.csdtosap.emppickndelivercount.SICSDEmpPickNDeliverCountOut"
+		factory-bean="EmpPikNDeliverCountproxyFactory" factory-method="create" /> -->
+		
+	<!-- <jaxws:client id="employeeTestClient"
+	<jaxws:client id="employeeTestClient"
+		serviceClass="com.ff.sap.integration.employee.webservice.EmployeeSAPIntegrationWebservice"
+		address="http://10.48.144.28:8081/udaan-sap-integration/webservice/employeeIntegrationRequest" /> 
+		<jaxws:client id="materialTestClient"
+		serviceClass="com.ff.sap.integration.material.webservice.MaterialMasterSAPIntegrationWebservice"
+		address="http://10.48.144.28:8081/udaan-sap-integration/webservice/materialIntegrationRequest" />
+		 -->
+	<!-- <bean id="EmpPikNDeliverCountproxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass"
+			value="com.FirstFlight.hr.csdtosap.emppickndelivercount.SICSDEmpPickNDeliverCountOut" />
+		<property name="address"
+			value="http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=BS_CSD&amp;Interface=http%3A%2F%2FFirstFlight.com%2FHR%2FCSDToSAP%2FEmpPickNDeliverCount%5ESI_CSD_EmpPickNDeliverCount_Out&amp;sap-user=cg-csd&amp;sap-password=interface&amp;qos=EO" />
+	</bean> -->
+	
+	<!-- MM - Stock Starts -->	
+	
+	<bean id="PurchaseRequisitionProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass"
+			value="com.firstflight.mm.csdtosap.purchasereq.SICSDPurchaseRequisitionOut" />
+		<!-- <property name="address"
+			value = "http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FMM%2FCSDToSAP%2FPurchaseRequisition%5ESI_CSD_PurchaseRequisition_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface"	/> -->
+		<property name="address"
+			value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.PurchaseRequisitionProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+	</bean>
+	
+	<bean id="purchaseRequisitionClient"
+		class="com.firstflight.mm.csdtosap.purchasereq.SICSDPurchaseRequisitionOut"
+		factory-bean="PurchaseRequisitionProxyFactory" factory-method="create" />
+		
+	<bean id="stockSAPIntService"
+		class="com.ff.sap.integration.material.stock.StockSAPIntegrationServiceImpl"
+		factory-bean="PurchaseRequisitionProxyFactory" factory-method="create" />
+		
+	<bean id="StockTransferProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass"
+			value="com.firstflight.mm.csdtosap.stktransfer.SICSDStockTransferOut" />
+		<!-- <property name="address"
+			value = "http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FMM%2FCSDToSAP%2FStockTransfer%5ESI_CSD_StockTransfer_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface"	/> -->
+		<property name="address"
+			value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.StockTransferProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+	</bean>
+	
+	<bean id="stockTransferClient"
+		class="com.firstflight.mm.csdtosap.stktransfer.SICSDStockTransferOut"
+		factory-bean="StockTransferProxyFactory" factory-method="create" />
+	
+	<bean id="stockSAPIntServiceForStockIssue"
+		class="com.ff.sap.integration.material.stock.StockSAPIntegrationServiceImpl"
+		factory-bean="StockTransferProxyFactory" factory-method="create" />
+		
+	<bean id="StockReceiptProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass"
+			value="com.firstflight.mm.csdtosap.goodsreceipts.SICSDGoodsReceiptOut" />
+		<!-- <property name="address"
+			value = "http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FMM%2FCSDToSAP%2FGoodsReceipt%5ESI_CSD_GoodsReceipt_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface" /> -->
+		<property name="address"
+			value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.StockReceiptProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+	</bean>
+	
+	<bean id="stockReceiptClient"
+		class="com.firstflight.mm.csdtosap.goodsreceipts.SICSDGoodsReceiptOut"
+		factory-bean="StockReceiptProxyFactory" factory-method="create" />
+		
+	<bean id="stockSAPIntServiceForReceipt"
+		class="com.ff.sap.integration.material.stock.StockSAPIntegrationServiceImpl"
+		factory-bean="StockReceiptProxyFactory" factory-method="create" />
+		
+		<!-- Stock Cancellation Starts -->
+	
+	<bean id="StockCancellationProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass"
+			value="com.firstflight.mm.csdtosap.goodscancellation.SICSDGoodsCancellationOut" />
+		<!-- <property name="address"
+			value = "http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FMM%2FCSDToSAP%2FGoodsCancellation%5ESI_CSD_GoodsCancellation_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface"	/> -->
+		<property name="address"
+			value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.StockCancellationProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+	</bean>
+	
+	<bean id="stockCancellationClient"
+		class="com.firstflight.mm.csdtosap.goodscancellation.SICSDGoodsCancellationOut"
+		factory-bean="StockCancellationProxyFactory" factory-method="create" />
+		
+	<bean id="stockSAPIntServiceForCancellation"
+		class="com.ff.sap.integration.material.stock.StockSAPIntegrationServiceImpl"
+		factory-bean="StockCancellationProxyFactory" factory-method="create" />
+		
+		<!-- Stock Cancellation Ends -->
+		
+		<!-- Stock Return Starts -->
+	<bean id="StockReturnProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass"
+			value="com.firstflight.mm.csdtosap.stockreturn.SICSDStockReturnOut" />
+		<!-- <property name="address"
+			value = "http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FMM%2FCSDToSAP%2FStockReturn%5ESI_CSD_StockReturn_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface"	/> -->
+		<property name="address"
+			value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.StockReturnProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+	</bean>
+	
+	<bean id="stockReturnClient"
+		class="com.firstflight.mm.csdtosap.stockreturn.SICSDStockReturnOut"
+		factory-bean="StockReturnProxyFactory" factory-method="create" />
+		
+	<bean id="stockSAPIntServiceForReturn"
+		class="com.ff.sap.integration.material.stock.StockSAPIntegrationServiceImpl"
+		factory-bean="StockReturnProxyFactory" factory-method="create" />
+		<!-- Stock Return Ends -->
+		
+		<!-- Stock Return BA Starts -->
+	<bean id="StockReturnBAProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass"
+			value="com.firstflight.mm.csdtosap.stockreturnfromba.SICSDStockReturnFromBAOut" />
+		<!-- <property name="address"
+			value = "http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FMM%2FCSDToSAP%2FStockReturnFromBA%5ESI_CSD_StockReturnFromBA_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface"	/> -->
+		<property name="address"
+			value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.StockReturnBAProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />
+	</bean>
+	
+	<bean id="stockReturnBAClient"
+		class="com.firstflight.mm.csdtosap.stockreturnfromba.SICSDStockReturnFromBAOut"
+		factory-bean="StockReturnBAProxyFactory" factory-method="create" />
+		
+	<bean id="stockSAPIntServiceForReturnBA"
+		class="com.ff.sap.integration.material.stock.StockSAPIntegrationServiceImpl"
+		factory-bean="StockReturnBAProxyFactory" factory-method="create" />
+		<!-- Stock Return Ends -->
+		
+		<!-- Pick Up Commission Calculation Start -->
+	
+	<bean id="PickupCommissionFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass"
+			value="com.firstflight.hr.csdtosap.EmpPickUpCommission.SICSDEmpPickUpCommissionOut" />
+		<!-- <property name="address"
+			value = "http://172.16.10.106.firstflight.net:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FHR%2FCSDToSAP%2FEmpPickUpCommission%5ESI_CSD_EmpPickUpCommission_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface"	/> -->
+		<property name="address"
+			value = "http://172.16.10.111:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=CSD_QR&amp;Interface=${sap.pi.interface.PickupCommissionFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+	</bean>
+	
+	<bean id="pickupCommissionClient"
+		class="com.firstflight.hr.csdtosap.EmpPickUpCommission.SICSDEmpPickUpCommissionOut"
+		factory-bean="PickupCommissionFactory" factory-method="create" />
+		
+	<bean id="pickUpCommissionService"
+		class="com.ff.sap.integration.pickup.service.PickUpCalculationCommissionServiceImpl"
+		factory-bean="PickupCommissionFactory" factory-method="create" /> 
+	
+	<!-- Pick Up Commission Calculation End -->
+		
+	<!-- Delivery Commission Calculation START -->	
+	
+	<bean id="empDeliveryCommissionProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass" value="com.firstflight.hr.csdtosap.emppickupdelivery.SICSDEmpPickUpDeliveryOut" />
+		<!-- <property name="address" 
+			value="http://pidev.firstflight.net:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FHR%2FCSDToSAP%2FEmpPickUpDelivery%5ESI_CSD_EmpPickUpDelivery_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface" /> -->
+		<property name="address"
+			value = "http://172.16.10.111:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=CSD_QR&amp;Interface=${sap.pi.interface.empDeliveryCommissionProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+	</bean>
+	
+	<bean id="empDeliveryCommissionClient" class="com.firstflight.hr.csdtosap.emppickupdelivery.SICSDEmpPickUpDeliveryOut"
+		factory-bean="empDeliveryCommissionProxyFactory" factory-method="create" />
+	
+	<bean id="empDeliveryCommissionService" class="com.ff.sap.integration.material.stock.StockSAPIntegrationServiceImpl"
+		factory-bean="empDeliveryCommissionProxyFactory" factory-method="create" />
+	
+	<!-- Delivery Commission Calculation END -->	
+		
+		<!-- MM Coloader Starts -->
+		
+		<bean id="coloaderAirTrainVehicleProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+			<property name="serviceClass"
+				value="com.firstflight.mm.csdtosap.serviceentrycreation.SICSDServiceEntryCreationOut" />
+			<!-- <property name="address"
+				value = "http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FMM%2FCSDToSAP%2FServiceEntryCreation%5ESI_CSD_ServiceEntryCreation_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface"	/> -->
+			<property name="address"
+				value = "http://172.16.10.111:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=CSD_QR&amp;Interface=${sap.pi.interface.coloaderAirTrainVehicleProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+		</bean>
+		
+		<bean id="coloaderAirTrainVehicleClient"
+		class="com.firstflight.mm.csdtosap.serviceentrycreation.SICSDServiceEntryCreationOut"
+		factory-bean="coloaderAirTrainVehicleProxyFactory" factory-method="create" />
+		
+		<bean id="coloaderSAPService"
+			class="com.ff.sap.integration.material.stock.StockSAPIntegrationServiceImpl"
+			factory-bean="coloaderAirTrainVehicleProxyFactory" factory-method="create" />
+			
+		 <!-- MM Co-Courier Starts -->
+		 
+		<bean id="coCourierProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+			<property name="serviceClass"
+				value="com.firstflight.mm.csdtosap.serviceentrysheetcocourier.SICSDServiceEntrySheetCoCourierOut" />
+			<!-- <property name="address"
+				value = "http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FMM%2FCSDToSAP%2FServiceEntrySheetCoCourier%5ESI_CSD_ServiceEntrySheetCoCourier_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface"	/> -->
+			<property name="address"
+				value = "http://172.16.10.111:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=CSD_QR&amp;Interface=${sap.pi.interface.coCourierProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />
+		</bean>
+		
+		<bean id="coCourierClient"
+		class="com.firstflight.mm.csdtosap.serviceentrysheetcocourier.SICSDServiceEntrySheetCoCourierOut"
+		factory-bean="coCourierProxyFactory" factory-method="create" />
+		
+		<bean id="cocourierSAPService"
+			class="com.ff.sap.integration.material.stock.StockSAPIntegrationServiceImpl"
+			factory-bean="coCourierProxyFactory" factory-method="create" />
+		 
+		<!-- MM Co-Courier Ends -->
+	
+		<!--  MM Coloader Ends -->
+		
+		<!-- MM - CSD Stock Consumption START  -->
+			<bean id="stockConsumptionProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+				<property name="serviceClass" value="com.firstflight.mm.csdtosap.stockconsumption.SICSDStockConsumptionOut" />
+				<!-- <property name="address" value="http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FMM%2FCSDToSAP%2FStockConsumption%5ESI_CSD_StockConsumption_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface"	/> -->
+				<property name="address" value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.stockConsumptionProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />
+			</bean>
+			
+			<bean id="stockConsumptionClient" class="com.firstflight.mm.csdtosap.stockconsumption.SICSDStockConsumptionOut" 
+				factory-bean="stockConsumptionProxyFactory" factory-method="create" />
+			
+			<bean id="stockConsumptionService" class="com.ff.sap.integration.material.stock.StockSAPIntegrationServiceImpl"
+				factory-bean="stockConsumptionProxyFactory" factory-method="create" />
+		<!-- MM - CSD Stock Consumption END -->
+		
+	<!-- MM - Stock Ends -->
+			 
+	<!--FI - Miscellaneous Starts  -->
+	
+		<!-- Expense Starts -->
+		<bean id="ExpenseEntriesProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+			<property name="serviceClass"
+				value="com.firstflight.fi.csdtosap.expenseentries.SICSDExpenseEntriesOut" />
+		    <!-- <property name="address"
+				value = "http://172.16.10.111:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_QR&amp;Interface=http%3A%2F%2FFirstFlight.com%2FFI%2FCSDToSAP%2FExpenseEntries%5ESI_CSD_ExpenseEntries_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface" /> -->
+			 <property name="address" 
+				value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.ExpenseEntriesProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />
+		</bean>
+		
+		<bean id="expenseEntriesClient"
+			class="com.firstflight.fi.csdtosap.expenseentries.SICSDExpenseEntriesOut"
+			factory-bean="ExpenseEntriesProxyFactory" factory-method="create" />
+			
+		<bean id="miscellaneousSAPIntServiceForExpenseEntries"
+			class="com.ff.sap.integration.miscellaneous.service.MiscellaneousSAPIntegrationServiceImpl"
+			factory-bean="ExpenseEntriesProxyFactory" factory-method="create" /> 
+			
+		<!-- Expense Ends -->
+			
+		<!-- Collection Starts -->
+		<bean id="CollectionProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+			<property name="serviceClass"
+				value="com.firstflight.fi.csdtosap.collectionentry.SICSDCollectionEntriesOut" />
+			<!-- <property name="address"
+				value = "http://172.16.10.111:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_QR&amp;Interface=http%3A%2F%2FFirstFlight.com%2FFI%2FCSDToSAP%2FCollectionEntries%5ESI_CSD_CollectionEntries_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface" /> -->
+			<property name="address" 
+				value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.CollectionProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+		</bean>
+		
+		<bean id="collectionClient"
+			class="com.firstflight.fi.csdtosap.collectionentry.SICSDCollectionEntriesOut"
+			factory-bean="CollectionProxyFactory" factory-method="create" />
+			
+		<bean id="miscellaneousSAPIntServiceForCollection"
+			class="com.ff.sap.integration.miscellaneous.service.MiscellaneousSAPIntegrationServiceImpl"
+			factory-bean="CollectionProxyFactory" factory-method="create" /> 
+			
+		<!-- Collection Ends -->
+		
+		<!-- Liability Payment Starts -->
+		<bean id="LiabilityProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+			<property name="serviceClass"
+				value="com.firstflight.fi.csdtosap.codlcliabilityRegion.SICSDCODLCLiabilityOut" />
+			<!-- <property name="address"
+				value = "http://172.16.10.111:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_QR&amp;Interface=http%3A%2F%2FFirstFlight.com%2FFI%2FCSDToSAP%2FCODLCLiability%5ESI_CSD_CODLCLiability_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface" />  -->
+			<property name="address" 
+				value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.LiabilityProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+		</bean>
+		
+		<bean id="liabilityClient"
+			class="com.firstflight.fi.csdtosap.codlcliabilityRegion.SICSDCODLCLiabilityOut"
+			factory-bean="LiabilityProxyFactory" factory-method="create" />
+			
+		<bean id="miscellaneousSAPIntServiceForLiability"
+			class="com.ff.sap.integration.miscellaneous.service.MiscellaneousSAPIntegrationServiceImpl"
+			factory-bean="LiabilityProxyFactory" factory-method="create" /> 
+			
+		<!-- Liability Payment Ends -->	
+	
+		<!-- Liability consignment Starts -->
+		<bean id="LiabilityConsignmentProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+			<property name="serviceClass"
+				value="com.firstflight.fi.csdtosap.codlcconsignmentNew.SICSDCODLCConsignmentOut" />
+		   <!--  <property name="address"
+				value = "http://172.16.10.111:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_QR&amp;Interface=http%3A%2F%2FFirstFlight.com%2FFI%2FCSDToSAP%2FCODLCConsignment%5ESI_CSD_CODLCConsignment_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface" /> -->
+			<property name="address" 
+				value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.LiabilityConsignmentProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+		</bean>
+		
+		<bean id="liabilityConsignmentClient"
+			class="com.firstflight.fi.csdtosap.codlcconsignmentNew.SICSDCODLCConsignmentOut"
+			factory-bean="LiabilityConsignmentProxyFactory" factory-method="create" />
+			
+		<bean id="miscellaneousSAPIntServiceForLiabilityConsignment"
+			class="com.ff.sap.integration.miscellaneous.service.MiscellaneousSAPIntegrationServiceImpl"
+			factory-bean="LiabilityConsignmentProxyFactory" factory-method="create" /> 
+			
+		<!-- Liability Consignment Ends -->	
+		
+		<!-- Cust Outstanding Payment Report Interface Starts-->
+		
+		<bean id="OutStandingPaymentProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+			<property name="serviceClass"
+				value="com.firstflight.fi.csdtosap.outstandingreport.SICSDCustomerOutstandingReportOut" />
+			<!-- <property name="address"
+				value = "http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FFI%2FCSDToSAP%2FCustomerOutstandingReport%5ESI_CSD_CustomerOutstandingReport_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface" /> -->
+			<property name="address" 
+				value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.OutStandingPaymentProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+		</bean>
+		
+		<bean id="outstandingPaymentClient"
+			class="com.firstflight.fi.csdtosap.outstandingreport.SICSDCustomerOutstandingReportOut"
+			factory-bean="OutStandingPaymentProxyFactory" factory-method="create" />
+			
+		<bean id="miscellaneousSAPIntServiceForOutStandingPayment"
+			class="com.ff.sap.integration.miscellaneous.service.MiscellaneousSAPIntegrationServiceImpl"
+			factory-bean="OutStandingPaymentProxyFactory" factory-method="create" /> 
+			
+		<!-- Cust Outstanding Payment Report Interface Ends-->
+	
+	<!--FI - Miscellaneous Ends  -->	
+	
+	<!-- SD Interface Starts -->
+	
+	<!-- Contract Interface Start -->
+	
+	<bean id="ContractProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass"
+			value="com.firstflight.sd.csdtosap.contract.SICSDContractOut" />
+		<!-- <property name="address"
+			value = "http://172.16.10.106:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_DEV&amp;Interface=http%3A%2F%2FFirstFlight.com%2FSD%2FCSDToSAP%2FContract%5ESI_CSD_Contract_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface"/> -->
+		<property name="address" 
+				value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.ContractProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+	</bean>
+	
+	<bean id="contractClient"
+		class="com.firstflight.sd.csdtosap.contract.SICSDContractOut"
+		factory-bean="ContractProxyFactory" factory-method="create" />
+		
+	<bean id="sdSAPIntegrationServiceForContract"
+		class="com.ff.sap.integration.sd.service.SDSAPIntegrationServiceImpl"
+		factory-bean="ContractProxyFactory" factory-method="create" />
+		
+	<!-- Contract Interface End -->
+	
+	<!-- BCS Interface Start -->
+	
+	<bean id="BCSProxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
+		<property name="serviceClass"
+			value="com.firstflight.sd.csdtosap.salesorder.SICSDSalesOrderOut" />
+	 <!-- <property name="address"
+			value = "http://172.16.10.111:50000/sap/xi/engine?type=entry&amp;version=3.0&amp;Sender.Service=CSD_QR&amp;Interface=http%3A%2F%2FFirstFlight.com%2FSD%2FCSDToSAP%2FSalesOrder%5ESI_CSD_SalesOrder_Out&amp;QualityOfService=ExactlyOnce&amp;sap-user=cg-csd&amp;sap-password=interface"/>  -->
+		<property name="address" 
+				value = "http://${sap.pi.url}:${sap.pi.port}/sap/xi/engine?type=${sap.pi.type.entry}&amp;version=${sap.pi.version}&amp;Sender.Service=${sap.pi.sender.service}&amp;Interface=${sap.pi.interface.BCSProxyFactory}&amp;QualityOfService=${sap.pi.qtyOfservice.ExactlyOnce}&amp;sap-user=${sap.pi.username}&amp;sap-password=${sap.pi.password}" />	
+	</bean>
+	
+	<bean id="bcsClient"
+		class="com.firstflight.sd.csdtosap.salesorder.SICSDSalesOrderOut"
+		factory-bean="BCSProxyFactory" factory-method="create" />
+		
+	<bean id="sdSAPIntegrationServiceForBCS"
+		class="com.ff.sap.integration.sd.service.SDSAPIntegrationServiceImpl"
+		factory-bean="BCSProxyFactory" factory-method="create" />
+		
+	<!-- BCS Interface End -->
+	
+	<!-- SD Interface Ends -->
+
+</beans>

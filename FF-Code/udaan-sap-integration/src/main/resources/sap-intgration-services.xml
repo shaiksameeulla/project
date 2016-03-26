@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<bean id="sapConfigProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:csd-sap-config.properties" />
+	</bean>
+	
+	<bean id="sapIntegrationMessageProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:sap-integration-messages.properties" />
+	</bean>
+	    
+    <bean id="employeeSAPIntegrationService" class="com.ff.sap.integration.employee.bs.EmployeeSAPIntegrationServiceImpl">
+		<property name="integrationDAO" ref="sapIntegrationDAO" />
+		<property name="organizationCommonDAO" ref="sapOrganizationCommonDAO" />
+		<property name="geographyServiceDAO" ref="sapGeographyServiceDAO" />
+		<property name="employeeSAPTransactionService" ref="employeeSAPTransactionService" />
+	</bean>
+	
+	<bean id="employeeSAPTransactionService" class="com.ff.sap.integration.employee.bs.EmployeeMasterSAPTransactionServiceImpl">
+		<property name="integrationDAO" ref="sapIntegrationDAO" />
+		<property name="organizationCommonDAO" ref="sapOrganizationCommonDAO" />
+		<property name="geographyServiceDAO" ref="sapGeographyServiceDAO" />
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+	</bean>
+	
+	
+	<!-- <bean id="test_EmployeeSAPIntegrationService" class="com.ff.sap.integration.test_employee.bs.test_EmployeeSAPIntegrationServiceImpl">
+		<property name="integrationDAO" ref="sapIntegrationDAO" />
+	</bean> -->
+	
+	<bean id="materialSAPTransactionService" class="com.ff.sap.integration.material.bs.MaterialMasterSAPTransactionServiceImpl">
+		<property name="integrationDAO" ref="sapIntegrationDAO" />
+		<property name="stockUniversalDAO" ref="stockUniversalDAO" />
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+	</bean>
+	
+	<bean id="materialSAPIntegrationService" class="com.ff.sap.integration.material.bs.MaterialMasterSAPIntegrationServiceImpl">
+		<property name="materialSAPTransactionService" ref="materialSAPTransactionService" />
+	</bean>
+	
+	<bean id="coloaderSAPIntegrationService" class="com.ff.sap.integration.material.bs.MaterialMasterSAPIntegrationServiceImpl">
+		<property name="integrationDAO" ref="sapIntegrationDAO" />
+		<property name="stockUniversalDAO" ref="stockUniversalDAO" />
+	</bean>
+	
+	<bean id="vendorSAPTransactionService" class="com.ff.sap.integration.vendor.bs.VendorMasterSAPTransactionServiceImpl">
+		<property name="integrationDAO" ref="sapIntegrationDAO" />
+		<property name="organizationCommonDAO" ref="organizationCommonDAO" />
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+	</bean>
+	
+	<bean id="vendorSAPIntegrationService" class="com.ff.sap.integration.vendor.bs.VendorMasterSAPIntegrationServiceImpl">
+		<property name="vendorSAPTransactionService" ref="vendorSAPTransactionService" />
+	</bean>
+	
+	<bean id="customerSAPIntegrationService" class="com.ff.sap.integration.sd.customer.bs.CustomerMasterSAPIntegrationServiceImpl">
+		<property name="integrationDAO" ref="sapIntegrationDAO" />
+		<property name="customerSAPTransactionService" ref="customerSAPTransactionService" />
+	</bean>
+	
+	<bean id="customerSAPTransactionService" class="com.ff.sap.integration.sd.customer.bs.CustomerMasterSAPTransactionServiceImpl">
+		<property name="integrationDAO" ref="sapIntegrationDAO" />
+		<property name="organizationCommonDAO" ref="organizationCommonDAO" />
+		<property name="rateUniversalDAO" ref="rateUniversalDAO" />
+		<property name="geographyServiceDAO" ref="sapGeographyServiceDAO" />
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+		<property name="pickUpManagementCommnService" ref="pickupManagementCommonService" />
+	</bean>
+	
+	
+	<bean id="plantMasterSAPIntegrationService" class="com.ff.sap.integration.plantmaster.bs.PlantMasterSAPIntegrationServiceImpl">
+		<property name="integrationDAO" ref="sapIntegrationDAO" />
+		<property name="organizationCommonDAO" ref="organizationCommonDAO" />
+		<property name="geographyServiceDAO" ref="sapGeographyServiceDAO" />
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+		<property name="plantMasterTransactionService" ref="plantMasterTransactionService" />
+	</bean>
+	
+	<bean id="plantMasterTransactionService" class="com.ff.sap.integration.plantmaster.bs.PlantMasterTransactionServiceImpl">
+		<property name="integrationDAO" ref="sapIntegrationDAO" />
+	</bean>
+	
+	<bean id="salesOrderNumberSAPIntegrationService" class="com.ff.sap.integration.sd.salesordernumber.bs.SOUpdateSAPIntegrationServiceImpl">
+		<property name="integrationDAO" ref="sapIntegrationDAO" />
+		<property name="billingUniversalDAO" ref="billingUniversalDAO" />
+	</bean>
+	
+	<bean id="stockSAPIntegrationService" 
+			class="com.ff.sap.integration.material.stock.StockSAPIntegrationServiceImpl">
+			<property name="mecUniversalDAO" ref="mecUniversalDAO" />
+			<property name="integrationDAO" ref="sapIntegrationDAO" />
+			<property name="organizationCommonDAO" ref="organizationCommonDAO" />
+			<property name="businessCommonDAO" ref="businessCommonDAO" />
+			<property name="geographyServiceDAO" ref="sapGeographyServiceDAO" />
+	</bean>
+	
+	<bean id="miscellaneousSAPIntegrationService" 
+			class="com.ff.sap.integration.miscellaneous.service.MiscellaneousSAPIntegrationServiceImpl">
+			<property name="integrationDAO" ref="sapIntegrationDAO" />
+			<property name="organizationCommonDAO" ref="organizationCommonDAO" />
+			<property name="businessCommonDAO" ref="businessCommonDAO" />
+			<property name="geographyServiceDAO" ref="sapGeographyServiceDAO" />
+			<property name="mecUniversalDAO" ref="mecUniversalDAO" />
+			<property name="bookingUniversalDAO" ref="bookingUniversalDAO" />
+			<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+	</bean>
+	
+	<bean id="miscellaneousSAPIntServiceForCollection" 
+			class="com.ff.sap.integration.miscellaneous.service.MiscellaneousSAPIntegrationServiceImpl">
+			<property name="integrationDAO" ref="sapIntegrationDAO" />
+			<property name="businessCommonDAO" ref="businessCommonDAO" />
+	</bean>
+	
+	<bean id="miscellaneousSAPIntServiceForLiability" 
+			class="com.ff.sap.integration.miscellaneous.service.MiscellaneousSAPIntegrationServiceImpl">
+			<property name="integrationDAO" ref="sapIntegrationDAO" />
+			<property name="businessCommonDAO" ref="businessCommonDAO" />
+	</bean>
+	
+	<bean id="miscellaneousSAPIntServiceForLiabilityConsignment" 
+			class="com.ff.sap.integration.miscellaneous.service.MiscellaneousSAPIntegrationServiceImpl">
+			<property name="integrationDAO" ref="sapIntegrationDAO" />
+	</bean>
+	
+	<bean id="pickUpCommissionCalculationService" class="com.ff.sap.integration.pickup.service.PickUpCalculationCommissionServiceImpl">
+			<property name="pickUpCalculationCommissionDAO" ref="pickUpCalculationCommissionDAO" />
+	</bean>
+	
+	<bean id="miscellaneousSAPIntServiceForOutStandingPayment" 
+			class="com.ff.sap.integration.miscellaneous.service.MiscellaneousSAPIntegrationServiceImpl">
+			<property name="integrationDAO" ref="sapIntegrationDAO" />
+	</bean>
+	<!-- SD Interfaces Start -->
+	
+	<!-- Contract Interface Start -->
+	<bean id="sdSAPIntegrationService" 
+			class="com.ff.sap.integration.sd.service.SDSAPIntegrationServiceImpl">
+			<property name="integrationDAO" ref="sapIntegrationDAO" />
+			<property name="organizationCommonDAO" ref="organizationCommonDAO" />
+			<property name="geographyServiceDAO" ref="sapGeographyServiceDAO" />
+			<property name="rateUniversalDAO" ref="rateUniversalDAO" />
+			<property name="rateCalculationUniversalService" ref="rateCalculationUniversalService"></property>
+			<property name="mecUniversalDAO" ref="mecUniversalDAO" />
+	</bean>
+	
+	<!-- SD Interfaces End -->
+	
+	<bean id="sAPBillingConverter" class="com.ff.sap.integration.sd.service.SAPBillingConverter">
+		<property name="sdSAPIntegrationService" ref="sdSAPIntegrationService" />
+	</bean>
+	
+	<!-- Consignment Rate Calculation START -->
+	<bean id="consignmentRateCalculationService" class="com.ff.sap.integration.consignmentratecalculation.service.ConsignmentRateCalculationServiceImpl">
+		<property name="consignmentRateCalculationDAO" ref="consignmentRateCalculationDAO" />
+		<property name="rateCalculationUniversalService" ref="rateCalculationUniversalService" />
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+	</bean>
+	<!-- Consignment Rate Calculation END -->
+
+	<bean id="commonSapIntegrationService" class="com.ff.sap.integration.common.service.CommonSapIntegrationServiceImpl">
+	</bean>
+	
+</beans>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+		
+	xsi:schemaLocation="http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+<!-- For Annotation based tx START -->
+ <tx:annotation-driven/>
+ <!-- For Annotation based tx END -->
+<tx:advice id="txAdvice" transaction-manager="transactionManager">
+	    <tx:attributes>
+		 <tx:method name="getAllExpenseOffice*" propagation="REQUIRES_NEW" isolation="READ_COMMITTED" rollback-for="java.lang.Exception"/>
+		 <tx:method name="saveVendorDetails*" propagation="REQUIRES_NEW" isolation="READ_COMMITTED" rollback-for="java.lang.Exception"/>
+		 <tx:method name="saveOfficeAndEmp*" propagation="REQUIRES_NEW" isolation="READ_COMMITTED" rollback-for="java.lang.Exception"/>
+		 <tx:method name="saveCustomerDetails*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
+		</tx:attributes>
+   </tx:advice>
+<aop:config>
+	<!-- TODO 
+		if everyone followed same roll back exception and 
+		same point cut then the following commented one line tx advice is enough to configure every service layer.  
+		
+		otherwise separate service layer configuration is required. 
+		-->
+<!-- AOP point cuts and advisors of SAP - Integration ======START -->
+
+			<aop:pointcut id="getAllExpense" expression="execution(* com.ff.sap.integration.schedular.*.*(..))" />
+			<aop:pointcut id="vendor" expression="execution(* com.ff.sap.integration.vendor.bs.*.*(..))" />
+			<aop:pointcut id="saveOfficeAndEmp" expression="execution(* com.ff.sap.integration.plantmaster.bs.*.*(..))" />
+			<aop:pointcut id="saveCustomerDetails" expression="execution(* com.ff.sap.integration.sd.customer.bs.*.*(..))" />
+			
+<!-- AOP point cuts and advisors of SAP - Integration ======END -->
+		 
+<!-- ================================AOP Advisors STARTS==================================================================-->
+			
+      		<aop:advisor advice-ref="txAdvice" pointcut-ref="getAllExpense"/>
+      		<aop:advisor advice-ref="txAdvice" pointcut-ref="vendor"/>
+		    <aop:advisor advice-ref="txAdvice" pointcut-ref="saveOfficeAndEmp"/>  	
+		    <aop:advisor advice-ref="txAdvice" pointcut-ref="saveCustomerDetails"/>  	
+		
+		<!-- ================================AOP Advisors ENDS==================================================================-->	
+  
+   </aop:config>
+
+
+</beans>

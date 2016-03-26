@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<!-- ###################### CSD-SAP Employee Delivery Commission Scheduler START ###################### -->
+
+	<bean id="empDeliveryCommissionScheduler" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass" value="com.ff.sap.integration.schedular.SAPEmpPickUpDeliveryCommissionScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="integrationService" value-ref="stockSAPIntegrationService" />
+				<entry key="client" value-ref="empDeliveryCommissionClient" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="empDeliveryCommissionTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="empDeliveryCommissionScheduler" />
+		<!-- <property name="cronExpression" value="0 0/05 * * * ?" /> -->
+		<property name="cronExpression" value="0 59 21 ? * SUN" />
+	</bean>
+
+	<bean id="empDeliveryCommissionFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="schedulerName" value="empDeliveryCommissionTriggerSCH" />
+		<property name="quartzProperties">
+			<props>
+				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+				<prop key="org.quartz.threadPool.threadCount">1</prop>
+				<prop key="org.quartz.threadPool.threadPriority">5</prop>
+			</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="empDeliveryCommissionTrigger" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- ###################### CSD-SAP Employee Delivery Commission Scheduler END ###################### -->
+
+</beans>

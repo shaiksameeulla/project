@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="sapIntegrationDAO" class="com.ff.sap.integration.dao.SAPIntegrationDAOImpl">
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+		
+	</bean>
+	
+	<bean id="sapOrganizationCommonDAO" class="com.ff.universe.organization.dao.OrganizationCommonDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="sapGeographyServiceDAO" class="com.ff.universe.geography.dao.GeographyServiceDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="pickUpCalculationCommissionDAO" class="com.ff.sap.integration.pickup.dao.PickUpCalculationCommissionDaoImpl">
+	    <property name="emailSenderUtil" ref="emailSenderUtil" />
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<!-- Consignment Rate Calculation START -->
+	<bean id="consignmentRateCalculationDAO" class="com.ff.sap.integration.consignmentratecalculation.dao.ConsignmentRateCalculationDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<!-- Consignment Rate Calculation END -->
+	
+</beans>
