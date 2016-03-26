@@ -1,0 +1,733 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<import resource="classpath:universe-service.xml" />
+	<import resource="classpath:rate-calculation-service.xml" />
+	
+	
+	<!-- <bean id="bookingContextService" class="com.ff.web.booking.service.BookingContextService" scope="session">
+	 <aop:scoped-proxy/>
+	</bean> -->
+	
+	<bean id="errorBundleBean" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:UdaanWebErrorMessageResources.properties" />
+	</bean>
+	
+	<bean id="rateErrorBundleBean" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:RateCalculationMessageResources_en_US.properties" />
+	</bean>
+	
+	<bean id="pickupManagementService" class="com.ff.web.pickup.service.CreatePickupOrderServiceImpl">
+		<property name="pickupManagementServiceDAO" ref="pickupManagementDAO" />
+		<property name="pickupManagementCommonService" ref="pickupManagementCommonService" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+	</bean>
+	
+	<bean id="generateRunsheetService" class="com.ff.web.pickup.service.GenerateRunsheetServiceImpl">
+		<property name="generateRunsheetDAO" ref="generateRunsheetDAO" />
+		<property name="pickupManagementCommonService" ref="pickupManagementCommonService" />
+		<property name="pickupGatewayService" ref="pickupGatewayService" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+	</bean>
+
+	<bean id="updateRunsheetService" class="com.ff.web.pickup.service.UpdateRunsheetServiceImpl">
+		<property name="updateRunsheetDAO" ref="updateRunsheetDAO" />
+		<property name="pickupManagementCommonService" ref="pickupManagementCommonService" />
+		<property name="pickupGatewayService" ref="pickupGatewayService" />
+		<property name="bookingCommonService" ref="bookingCommonService" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+	</bean>
+
+	<bean id="confirmPickupOrderService" class="com.ff.web.pickup.service.ConfirmPickupOrderServiceImpl">
+		<property name="confirmPickupOrderDAO" ref="confirmPickupOrderDAO" />
+		<property name="pickupManagementCommonService" ref="pickupManagementCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+	</bean>
+
+	<!-- <bean id="sequenceGeneratorService" class="com.capgemini.lbs.framework.bs.sequence.SequenceGeneratorServiceImpl 
+		"> <property name="sequenceGeneratorDAO" ref="sequenceGeneratorDAO" /> </bean> -->
+
+	<bean id="pickupGatewayService" class="com.ff.web.pickup.service.PickupGatewayServiceImpl">
+		<property name="pickupGatewayDAO" ref="pickupGatewayDAO"/>
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="bookingValidator" ref="bookingValidator" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+	</bean>
+
+	<bean id="pickupAssignmentService" class="com.ff.web.pickup.service.PickupAssignmentServiceImpl">
+		<property name="pickupAssignmentDAO" ref="pickupAssignmentDAO" />
+		<property name="pickupManagementCommonService" ref="pickupManagementCommonService" />
+		<property name="pickupGatewayService" ref="pickupGatewayService" />		
+	</bean>
+
+	<bean id="loadDispatchService"
+		class="com.ff.web.loadmanagement.service.LoadDispatchServiceImpl">
+		<property name="loadManagementCommonService" ref="loadManagementCommonService" />
+		<property name="loadManagementDAO" ref="loadManagementDAO" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+	</bean>
+
+	<bean id="loadReceiveLocalService"
+		class="com.ff.web.loadmanagement.service.LoadReceiveLocalServiceImpl">
+		<property name="loadManagementCommonService" ref="loadManagementCommonService" />
+		<property name="loadManagementDAO" ref="loadManagementDAO" />
+	    <property name="inManifestCommonService" ref="inManifestCommonService"/>
+	</bean>
+
+	<bean id="loadReceiveOutstationService"
+		class="com.ff.web.loadmanagement.service.LoadReceiveOutstationServiceImpl">
+		<property name="loadManagementCommonService" ref="loadManagementCommonService" />
+		<property name="loadManagementDAO" ref="loadManagementDAO" />
+	    <property name="inManifestCommonService" ref="inManifestCommonService"/>
+	</bean>
+
+	<bean id="loadReceiveEditBagService"
+		class="com.ff.web.loadmanagement.service.LoadReceiveEditBagServiceImpl">
+		<property name="loadManagementDAO" ref="loadManagementDAO" />
+		<property name="loadManagementCommonService" ref="loadManagementCommonService" />
+	</bean>
+	
+	<bean id="loadManagementService"
+		class="com.ff.web.loadmanagement.service.LoadManagementServiceImpl">
+		<property name="loadManagementDAO" ref="loadManagementDAO" />
+		<property name="loadManagementCommonService" ref="loadManagementCommonService" />
+	</bean>
+	
+	<bean id="loadManagementUtils"
+		class="com.ff.web.loadmanagement.utils.LoadManagementUtils">
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="loadManagementCommonService" ref="loadManagementCommonService" />
+		<property name="udaanContextService" ref="udaanContextService"/>
+	</bean>
+	
+	<!-- Start.. For Booking Modules -->
+	<bean id="bookingCommonService" class="com.ff.web.booking.service.BookingCommonServiceImpl">
+		<property name="bookingValidator" ref="bookingValidator" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="consignmentService" ref="consignmentService" />
+		<property name="bookingCommonDAO" ref="bookingCommonDAO" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="businessCommonService" ref="businessCommonService" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="globalService" ref="globalService" />
+		<property name="rateCalculationUniversalService" ref="rateCalculationUniversalService" />
+		<property name="consignmentCommonDAO" ref="consignmentCommonDAO" />
+		<property name="bookingUniversalService" ref="bookingUniversalService" />
+		
+		<!-- <property name="bookingContextService" ref="bookingContextService" /> -->
+
+	</bean>
+
+	 <bean id="cashBookingService" class="com.ff.web.booking.service.CashBookingServiceImpl">
+		<property name="bookingCommonService" ref="bookingCommonService" />
+		<property name="bookingCommonDAO" ref="bookingCommonDAO" />
+		<property name="cashBookingValidator" ref="cashBookingValidator" />
+		<property name="cashBookingDAO" ref="cashBookingDAO" />
+		<!-- <property name="emailSenderService" ref="emailSenderService" /> -->
+		<property name="organizationCommonService" ref="organizationCommonService" />
+	</bean> 
+
+	<bean id="baBookingService" class="com.ff.web.booking.service.BABookingServiceImpl">
+
+		<property name="bookingCommonDAO" ref="bookingCommonDAO" />
+		<property name="bookingCommonService" ref="bookingCommonService" />
+		<property name="baBookingDAO" ref="baBookingDAO" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		
+	</bean>
+	
+
+	<bean id="creditCustomerBookingService"
+		class="com.ff.web.booking.service.CreditCustomerBookingServiceImpl">
+		<property name="bookingCommonService" ref="bookingCommonService" />
+		<property name="bookingCommonDAO" ref="bookingCommonDAO" />
+	</bean>
+
+
+
+	<bean id="emotionalBondBookingService"
+		class="com.ff.web.booking.service.EmotionalBondBookingServiceImpl">
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+		<property name="bookingCommonDAO" ref="bookingCommonDAO" />
+		<property name="bookingCommonService" ref="bookingCommonService" />
+		<property name="ebBookingDAO" ref="ebBookingDAO" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+	</bean>
+
+
+	<bean id="bookingValidator" class="com.ff.web.booking.validator.BookingValidator">
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="bookingCommonService" ref="bookingCommonService" />
+		<property name="stockUniversalService" ref="stockUniversalService" />
+		<property name="creditCustomerBookingService" ref="creditCustomerBookingService" />
+
+	</bean>
+
+	<bean id="focBookingService" class="com.ff.web.booking.service.FOCBookingServiceImpl">
+		<property name="bookingCommonService" ref="bookingCommonService" />
+		<property name="bookingCommonDAO" ref="bookingCommonDAO" />
+	</bean>
+
+	<bean id="backdatedBookingService" class="com.ff.web.booking.service.BackdatedBookingServiceImpl">
+		<property name="backDatedBookingValidator" ref="backDatedBookingValidator" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="bookingCommonDAO" ref="bookingCommonDAO" />
+		<property name="bookingCommonService" ref="bookingCommonService" />
+		<property name="consignmentCommonDAO" ref="consignmentCommonDAO" />
+		<property name="errorBundle" ref="errorBundleBean"/>
+		<property name="rateErrorBundle" ref="rateErrorBundleBean"/>
+
+	</bean>
+
+	<bean id="bulkBookingService" class="com.ff.web.booking.service.BulkBookingServiceImpl">
+		<property name="bookingCommonService" ref="bookingCommonService" />
+		<property name="bookingCommonDAO" ref="bookingCommonDAO" />
+		<property name="bulkBookingValidator" ref="bulkBookingValidator" />
+		<property name="consignmentCommonDAO" ref="consignmentCommonDAO" />
+		<property name="jobService" ref="jobServicesUniversalService" />
+		<property name="errorBundle" ref="errorBundleBean"/>
+		<property name="rateErrorBundle" ref="rateErrorBundleBean"/>
+		
+	</bean>
+
+	<bean id="bulkBookingValidator" class="com.ff.web.booking.validator.BulkBookingValidator">
+	<property name="bookingValidator" ref="bookingValidator" />
+	<property name="bookingCommonService" ref="bookingCommonService" />
+	</bean>
+
+	<bean id="backDatedBookingValidator" class="com.ff.web.booking.validator.BackDatedBookingValidator">
+		<property name="bookingCommonService" ref="bookingCommonService" />
+		<property name="bookingValidator" ref="bookingValidator" />
+	</bean>
+	
+	<!-- <bean id="bulkBookingHandlingService" class="com.ff.web.booking.service.BulkBookingHandlingServiceImpl">
+		<property name="bulkBookingService" ref="bulkBookingService" />
+	</bean>
+ -->
+	<!-- End.. For Booking Modules -->
+
+	<bean id="consignmentService" class="com.ff.web.consignment.service.ConsignmentServiceImpl">
+		<property name="consignmentDAO" ref="consignmentDAO" />
+		<property name="consignmentCommonDAO" ref="consignmentCommonDAO" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+	</bean>
+
+	<bean id="cashBookingValidator" class="com.ff.web.booking.validator.CashBookingValidator">
+		<property name="bookingCommonService" ref="bookingCommonService" />
+	</bean>
+
+	<!-- START OUT MANIFEST -->
+
+	<bean id="outManifestCommonService"
+		class="com.ff.web.manifest.service.OutManifestCommonServiceImpl">
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="businessCommonService" ref="businessCommonService" />
+		<property name="globalService" ref="globalService" />
+		<property name="outManifestCommonDAO" ref="outManifestCommonDAO" />
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="outManifestUniversalDAO" ref="outManifestUniversalDAO" />
+		<property name="manifestValidator" ref="manifestValidator" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		<property name="bookingValidator" ref="bookingValidator" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="creditCustomerBookingService" ref="creditCustomerBookingService" />
+		<property name="consignmentService" ref="consignmentService" />	
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="bookingCommonService" ref="bookingCommonService" />
+		<property name="bookingCommonDAO" ref="bookingCommonDAO" />
+		<property name="consignmentDAO" ref="consignmentDAO" />	
+		<property name="manifestCommonService" ref="manifestCommonService" />
+		<property name="rateCalculationUniversalService" ref="rateCalculationUniversalService" />
+		<property name="manifestUniversalService" ref="manifestUniversalService" />
+	</bean>
+
+	<bean id="outManifestDoxService" class="com.ff.web.manifest.service.OutManifestDoxServiceImpl">
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+	</bean>
+	<bean id="manifestValidator" class="com.ff.web.manifest.validator.ManifestValidator">
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="bookingValidator" ref="bookingValidator" />
+		<property name="stockUniversalService" ref="stockUniversalService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="manifestUniversalService" ref="manifestUniversalService" />
+		<property name="rthRtoManifestCommonService" ref="rthRtoManifestCommonService" />
+		<property name="deliveryUniversalService" ref="deliveryUniversalService" />
+		<property name="routeServicedCommonService" ref="routeServicedCommonService" />
+	</bean>
+	<bean id="globalService" class="com.ff.web.global.service.GlobalServiceImpl">
+		<property name="globalServiceDAO" ref="globalServiceDAO" />
+	</bean>
+
+	<bean id="thirdPartyManifestDoxService"
+		class="com.ff.web.manifest.service.ThirdPartyManifestDoxServiceImpl">
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+	</bean>
+
+	<bean id="bplOutManifestDoxService"
+		class="com.ff.web.manifest.service.BPLOutManifestDoxServiceImpl">
+		<property name="bPLOutManifestDoxDAO" ref="bPLOutManifestDoxDAOImpl" />
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="routeServicedCommonService" ref="routeServicedCommonService" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+	</bean>
+	
+	<bean id="mbplOutManifestConverter" class="com.ff.web.manifest.converter.BPLOutManifestDoxConverter">
+	<property name="outManifestCommonService" ref="outManifestCommonService" />
+	</bean>
+
+<bean id="bplOutManifestDoxConverter"
+		class="com.ff.web.manifest.converter.BPLOutManifestDoxConverter">
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+</bean>
+		
+	<bean id="mbplOutManifestService" class="com.ff.web.manifest.service.MBPLOutManifestServiceImpl">
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="routeServicedCommonService" ref="routeServicedCommonService" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		
+	</bean>
+	
+	<bean id="bplOutManifestConverter" class="com.ff.web.manifest.converter.MBPLOutManifestConverter">
+	<property name="outManifestCommonService" ref="outManifestCommonService" />
+	</bean>
+	
+	<bean id="bplBranchOutManifestConverter" class="com.ff.web.manifest.converter.BPLBranchOutManifestConverter">
+	<property name="outManifestCommonService" ref="outManifestCommonService" />
+	</bean>
+
+	<bean id="thirdPartyBPLService" class="com.ff.web.manifest.service.ThirdPartyBPLServiceImpl">
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		<property name="deliveryUniversalDAO" ref="deliveryUniversalDAO"/>
+		<property name="manifestCommonService" ref="manifestCommonService" />
+	</bean>
+
+	<bean id="thirdPartyBPLConverter" class="com.ff.web.manifest.converter.ThirdPartyBPLConverter">
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+	</bean>
+
+    	<bean id="thirdPartyOutManifestDoxConverter" class="com.ff.web.manifest.converter.ThirdPartyOutManifestDoxConverter">
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		</bean>
+
+	<bean id="branchOutManifestDoxService"
+		class="com.ff.web.manifest.service.BranchOutManifestDoxServiceImpl">
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+	</bean>
+	
+	<bean id="branchOutManifestDoxConverter" class="com.ff.web.manifest.converter.BranchOutManifestDoxConverter">
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+	</bean>
+
+	<bean id="outManifestDoxConverter" class="com.ff.web.manifest.converter.OutManifestDoxConverter">
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+	</bean>
+	<bean id="outManifestParcelConverter" class="com.ff.web.manifest.converter.OutManifestParcelConverter">
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+	</bean>
+
+	<bean id="branchOutManifestParcelService"
+		class="com.ff.web.manifest.service.BranchOutManifestParcelServiceImpl">
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+	</bean>
+
+	<bean id="branchOutManifestParcelConverter" 
+		class="com.ff.web.manifest.converter.BranchOutManifestParcelConverter">
+		<property name="consignmentService" ref="consignmentService" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+	</bean>
+
+	<bean id="bplBranchOutManifestService"
+		class="com.ff.web.manifest.service.BPLBranchOutManifestServiceImpl">
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name = "outManifestUniversalDAO" ref = "outManifestUniversalDAO"/> 	
+		<property name = "outManifestCommonService" ref = "outManifestCommonService"/>
+		<property name="manifestUniversalService" ref="manifestUniversalService" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+	</bean>
+	
+	<bean id="outManifestParcelService"
+		class="com.ff.web.manifest.service.OutManifestParcelServiceImpl">
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />	
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		<property name="outManifestCommonService" ref="outManifestCommonService"/>
+		<property name="manifestCommonService" ref="manifestCommonService" />
+	</bean>
+	
+	<bean id="misrouteConverter" class="com.ff.web.manifest.misroute.converter.MisrouteConverter">
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		</bean>
+
+ 	<bean id="misrouteService" class="com.ff.web.manifest.misroute.service.MisrouteServiceImpl">
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="outManifestUniversalDAO" ref="outManifestUniversalDAO" />
+		<property name="misrouteDAO" ref="misrouteDAO" />
+			<property name="trackingUniversalService" ref="trackingUniversalService" />
+				<property name="manifestCommonService" ref="manifestCommonService" />
+					<property name="deliveryUniversalService" ref="deliveryUniversalService" />
+		
+		
+	</bean> 
+				
+	<!-- END OUT MANIFEST -->
+	
+	<!-- START IN MANIFEST -->
+	
+	<bean id="inManifestCommonService"
+		class="com.ff.web.manifest.inmanifest.service.InManifestCommonServiceImpl">
+		<property name="inManifestCommonDAO" ref="inManifestCommonDAO" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="bookingValidator" ref="bookingValidator" />
+		<property name="outManifestParcelService" ref="outManifestParcelService" />		
+		<property name="bookingUniversalService" ref="bookingUniversalService" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />	
+		<property name="outManifestUniversalDAO" ref="outManifestUniversalDAO" />
+		<property name="outManifestUniversalService" ref="outManifestUniversalService"/>
+		<property name="udaanContextService" ref="udaanContextService"/>
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+	</bean>
+	
+	<bean id="inMasterBagManifestService"
+		class="com.ff.web.manifest.inmanifest.service.InMasterBagManifestServiceImpl">
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO"/>
+		<property name="outManifestUniversalService" ref="outManifestUniversalService"/>
+		<property name="inManifestCommonDAO" ref="inManifestCommonDAO"/>
+	    <property name="inManifestCommonService" ref="inManifestCommonService"/>
+	    <property name="inMasterBagManifestDAO" ref="inMasterBagManifestDAO"/>
+	     <property name="outManifestCommonService" ref="outManifestCommonService"/>
+	    <!-- <property name="trackingUniversalService" ref="trackingUniversalService"/> -->
+	</bean>
+	
+	<bean id="inMasterBagManifestConverter" class="com.ff.web.manifest.inmanifest.converter.InMasterBagManifestConverter">
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+	    <property name="inManifestCommonService" ref="inManifestCommonService"/>
+	</bean>
+	 
+	 <bean id="inBPLManifestConverter"
+		class="com.ff.web.manifest.inmanifest.converter.InBPLManifestConverter">
+		<property name="inManifestCommonService" ref="inManifestCommonService" />
+		<property name="consignmentCommonDAO" ref="consignmentCommonDAO" />
+		<property name="consignmentDAO" ref="consignmentDAO" />
+		<property name="consignmentService" ref="consignmentService" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+	</bean>
+
+	 <bean id="inBagManifestService"
+		class="com.ff.web.manifest.inmanifest.service.InBagManifestServiceImpl">
+		<property name="inManifestCommonDAO" ref="inManifestCommonDAO" />
+		<property name="inManifestCommonService" ref="inManifestCommonService" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+	</bean>
+	
+	 <bean id="inOgmDoxService"
+		class="com.ff.web.manifest.inmanifest.service.InOGMDoxServiceImpl">
+		<property name="inOgmDoxDAO" ref="inOgmDoxDAO" />
+		<property name="outManifestUniversalService" ref="outManifestUniversalService" />
+		<property name="inManifestCommonDAO" ref="inManifestCommonDAO" />
+		<property name="inManifestCommonService" ref="inManifestCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+	</bean>
+	
+	<bean id="inOGMDoxConverter"
+		class="com.ff.web.manifest.inmanifest.converter.InOGMDoxConverter">
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="inOgmDoxService" ref="inOgmDoxService" />	
+		<property name="trackingUniversalService" ref="trackingUniversalService" />	
+	    <property name="inManifestCommonService" ref="inManifestCommonService"/>
+		<property name="consignmentService" ref="consignmentService" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+	</bean>
+			
+	<bean id="inManifestBaseConverter"
+		class="com.ff.web.manifest.inmanifest.converter.InManifestBaseConverter">
+		<property name="geographyCommonService" ref="geographyCommonService" />
+	</bean>
+	
+	 <bean id="inManifestUtils"
+		class="com.ff.web.manifest.inmanifest.utils.InManifestUtils">
+		<property name="udaanContextService" ref="udaanContextService"/> 
+	</bean>
+	
+	<!-- END IN MANIFEST -->
+	
+	<!-- START RTH/RTO MANIFEST -->
+	<bean id="rthRtoManifestCommonService"
+		class="com.ff.web.manifest.rthrto.service.RthRtoManifestCommonServiceImpl">
+		<property name="organizationCommonService" ref="organizationCommonService" />	
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO"/>
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="rthRtoManifestCommonDAO" ref="rthRtoManifestCommonDAO"/>
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="globalUniversalService" ref="globalUniversalService" />
+		<property name="deliveryUniversalService" ref="deliveryUniversalService"/>
+	    <property name="inManifestCommonService" ref="inManifestCommonService"/>
+	   <property name="rateCalculationUniversalService" ref="rateCalculationUniversalService"/>
+	    <property name="consignmentCommonDAO" ref="consignmentCommonDAO"/>
+	</bean>
+	
+	<bean id="rthRtoValidationService"
+		class="com.ff.web.manifest.rthrto.service.RthRtoValidationServiceImpl">
+		<property name="rthRtoManifestCommonService" ref="rthRtoManifestCommonService"/>
+		<property name="rthRtoValidationDAO" ref="rthRtoValidationDAO"/>
+		<property name="emailSenderUtil" ref="emailSenderUtil" />
+		<property name="udaanContextService" ref="udaanContextService"/> 
+	</bean>
+	<bean id="rthRtoValidationConverter"
+		class="com.ff.web.manifest.rthrto.converter.RthRtoValidationConverter">
+		<property name="rthRtoManifestCommonService" ref="rthRtoManifestCommonService"/>
+	</bean>
+	
+	<bean id="rthRtoManifestParcelService"
+		class="com.ff.web.manifest.rthrto.service.RthRtoManifestParcelServiceImpl">
+		<property name="rthRtoManifestCommonService" ref="rthRtoManifestCommonService"/>
+		<property name="rthRtoManifestCommonDAO" ref="rthRtoManifestCommonDAO"/>
+		<property name="udaanContextService" ref="udaanContextService"/>
+	</bean>
+	
+	<bean id="rthRtoManifestParcelConverter"
+		class="com.ff.web.manifest.rthrto.converter.RthRtoManifestParcelConverter">
+		<property name="rthRtoManifestCommonService" ref="rthRtoManifestCommonService"/>
+		<property name="consignmentCommonDAO" ref="consignmentCommonDAO" />
+	</bean>
+	
+	<bean id="rthRtoManifestDoxService"
+		class="com.ff.web.manifest.rthrto.service.RthRtoManifestDoxServiceImpl">
+		<property name="rthRtoManifestCommonDAO" ref="rthRtoManifestCommonDAO"/>
+		<property name="rthRtoManifestCommonService" ref="rthRtoManifestCommonService"/>
+		<property name="udaanContextService" ref="udaanContextService"/>
+	</bean>
+	
+	<bean id="rthRtoManifestDoxConverter"
+		class="com.ff.web.manifest.rthrto.converter.RthRtoManifestDoxConverter">
+		<property name="rthRtoManifestCommonService" ref="rthRtoManifestCommonService"/>
+		<property name="consignmentCommonDAO" ref="consignmentCommonDAO" />
+	</bean>
+	<bean id="rthRtoManifestUtils" class="com.ff.web.manifest.rthrto.utils.RthRtoManifestUtils">
+		<property name="rthRtoManifestCommonService" ref="rthRtoManifestCommonService" />
+	</bean>
+	<!-- END RTH/RTO MANIFEST -->
+
+<!-- DRS Module  START-->
+ <bean id="deliveryCommonService"
+		class="com.ff.web.drs.common.service.DeliveryCommonServiceImpl">
+		<property name="deliveryCommonDAO" ref="deliveryCommonDAO" />
+		<property name="deliveryUniversalService" ref="deliveryUniversalService" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+		
+	</bean>
+	
+	<bean id="prepareNormDoxDrsService"
+		class="com.ff.web.drs.preparation.service.PrepareNormDoxDrsServiceImpl">
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="deliveryCommonDAO" ref="deliveryCommonDAO" />
+		<property name="normalPriorityDrsDAO" ref="normalPriorityDrsDAO" />
+	</bean>
+	<bean id="prepareNormPpxDrsService"
+		class="com.ff.web.drs.preparation.service.PrepareNormPpxDrsServiceImpl">
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="deliveryCommonDAO" ref="deliveryCommonDAO" />
+		<property name="normalPriorityDrsDAO" ref="normalPriorityDrsDAO" />
+	</bean>
+	
+	<bean id="listDrsService"
+		class="com.ff.web.drs.list.service.ListDrsServiceImpl">
+		<property name="listDrsDAO" ref="listDrsDAO" />
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+	</bean>
+	<bean id="pendingDrsService"
+		class="com.ff.web.drs.updation.service.PendingDrsServiceImpl">
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="pendingDrsDAO" ref="pendingDrsDAO" />
+	</bean>
+	
+	<bean id="manualDrsService"
+		class="com.ff.web.drs.manualdrs.service.ManualDrsServiceImpl">
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="manualDrsDAO" ref="manualDrsDAO" />
+		<property name="deliveryCommonDAO" ref="deliveryCommonDAO" />
+	</bean>
+	<bean id="prepareCreditCardService"
+		class="com.ff.web.drs.preparation.service.PrepareCreditCardDrsServiceImpl">
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="deliveryCommonDAO" ref="deliveryCommonDAO" />
+	</bean> 
+	<bean id="updateNpDrsService"
+		class="com.ff.web.drs.updation.service.UpdateNormalPriorityDrsServiceImpl">
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="normalPriorityDrsDAO" ref="normalPriorityDrsDAO" />
+	</bean>
+	<bean id="updateCCDrsService"
+		class="com.ff.web.drs.updation.service.UpdateCreditCardDrsServiceImpl">
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="ccDrsDAO" ref="ccDrsDAO" />
+	</bean>
+	<bean id="prepareCodDoxDrsService"
+		class="com.ff.web.drs.preparation.service.PrepareCodDoxDrsServiceImpl">
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="deliveryCommonDAO" ref="deliveryCommonDAO" />
+	</bean> 
+	<bean id="updateCoDLcDrsService"
+		class="com.ff.web.drs.updation.service.UpdateCodLcDrsServiceImpl">
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="codLcDao" ref="codLcDao" />
+	</bean>
+	<bean id="prepareCodPpxDrsService"
+		class="com.ff.web.drs.preparation.service.PrepareCodPpxDrsServiceImpl">
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="deliveryCommonDAO" ref="deliveryCommonDAO" />
+	</bean> 
+	<bean id="prepRtoCodDrsService"
+		class="com.ff.web.drs.preparation.service.PrepareRtoCodDrsServiceImpl">
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="deliveryCommonDAO" ref="deliveryCommonDAO" />
+		<property name="rtoCodDrsDAO" ref="rtoCodDrsDAO" />
+	</bean>
+	
+	<bean id="updateRtoCodDrsService"
+		class="com.ff.web.drs.updation.service.UpdateRtoDrsServiceImpl">
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="rtoCodDrsDAO" ref="rtoCodDrsDAO" />
+	</bean> 
+	
+	<bean id="drsConsignmentUpdateService"
+		class="com.ff.web.drs.scheduler.service.DrsConsignmentUpdateServiceImpl">
+		<property name="drsConsignmentUpdateDAO" ref="drsConsignmentUpdateDAO" />
+	</bean>
+	<bean id="drsSchedulerForConsgStatus"
+		class="com.ff.web.drs.scheduler.DrsSchedulerForConsgStatus">
+		<property name="drsConsignmentUpdateService" ref="drsConsignmentUpdateService" />
+	</bean>
+	<bean id="bulkPendingDrsService"
+		class="com.ff.web.drs.blkpending.service.BulkCnPendingDrsServiceImpl">
+		<property name="bulkCnPendingDrsDAO" ref="bulkCnPendingDrsDAO" />
+		<property name="deliveryCommonService" ref="deliveryCommonService" />
+		<property name="deliveryCommonDAO" ref="deliveryCommonDAO" />
+	</bean>
+<!-- DRS Module END-->
+
+	<!-- POD Module Start-->
+	 <bean id="podManifestCommonService"
+		class="com.ff.web.manifest.pod.service.PODManifestCommonServiceImpl">
+		<property name="podManifestCommonDAO" ref="podManifestCommonDAO" />
+		<property name="deliveryUniversalService" ref="deliveryUniversalService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="manifestUniversalService" ref="manifestUniversalService" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+	</bean>	
+	 <bean id="outgoingPODManifestService"
+		class="com.ff.web.manifest.pod.service.OutgoingPODManifestServiceImpl">
+		<property name="podManifestCommonDAO" ref="podManifestCommonDAO" />
+		<property name="consignmentCommonDAO" ref="consignmentCommonDAO" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+	</bean>	
+	<bean id="incomingPODManifestService"
+		class="com.ff.web.manifest.pod.service.IncomingPODManifestServiceImpl">
+		<property name="incomingPODManifestDAO" ref="incomingPODManifestDAO" />
+		<property name="podManifestCommonDAO" ref="podManifestCommonDAO" />
+		<property name="consignmentCommonDAO" ref="consignmentCommonDAO" />
+		<property name="manifestUniversalDAO" ref="manifestUniversalDAO" />
+		<property name="trackingUniversalService" ref="trackingUniversalService" />
+		<property name="manifestCommonService" ref="manifestCommonService" />
+		
+	</bean>	
+	<!-- POD Module End-->
+	
+	<!--Utilities Module Start  -->
+	<bean id="serviceOfferingCommonService" class="com.ff.universe.serviceOffering.service.ServiceOfferingCommonServiceImpl">
+	<property name="ServiceOfferingServiceDAO" ref="ServiceOfferingServiceDAO" />
+	</bean>
+	<!-- Utilities Module Start  -->
+
+
+<!--  Start Rate Calculator -->
+<bean id="rateCalculatorService" class="com.ff.web.ratecalculator.service.RateCalculatorServiceImpl">
+	<property name="rateCalculatorDAO" ref="rateCalculatorDAO" />
+	<property name="geographyCommonService" ref="geographyCommonService" />
+</bean>
+<!--  End Rate Calculator -->
+	
+	<bean id="manifestCommonService" class="com.ff.web.manifest.service.ManifestCommonServiceImpl">
+		<property name="manifestCommonDAO" ref="manifestCommonDAO" />
+		<property name="outManifestCommonService" ref="outManifestCommonService" />
+		<property name="consignmentCommonService" ref="consignmentCommonService" />
+	</bean>
+	
+	<bean id="codReceiptService" class="com.ff.web.codReceipt.service.CodReceiptServiceImpl">
+		<property name="codReceiptDAO" ref="codReceiptDAO" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+	</bean>
+	
+	<bean id="jobServicesService" class="com.ff.web.jobservice.service.JobServicesServiceImpl">
+		<property name="jobServicesUniversalService" ref="jobServicesUniversalService" />
+	</bean>
+	<!-- Released scripts Run starts -->
+	<bean id="releasedScriptsHandlerService" class="com.ff.web.releasedscripts.service.ReleasedScriptsHandlerService">
+		<property name="bcunReleasedScriptsService" ref="releasedScriptsService" />
+	</bean>
+	<!-- Released scripts Run ends -->
+</beans>

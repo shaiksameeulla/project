@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+
+	xsi:schemaLocation="http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<!-- For Annotation based tx START -->
+	<!-- Add this tag to enable annotations transactions -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<!-- For Annotation based tx END -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="gxet*" read-only="true" />
+			<tx:method name="validateStock*" propagation="REQUIRED"
+				read-only="true" />
+			<tx:method name="saveOrUpdateBooking*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="batchBookingUpdate*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="createBookingAndConsignment" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateLoad*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateOutManifest*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateInBagManifest*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateInMBPL*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateInOGMDox*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateRthRto*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="savePrepareDrs*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" isolation="SERIALIZABLE"/>
+				<tx:method name="saveBulkPendingDrs*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" isolation="SERIALIZABLE"/>
+			<tx:method name="updateDeliveredChildConsg*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="updateDeliveredParentConsg*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateOutMisrouteManifest*"
+				propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateOutManifestMBPL*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="savePickup*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="updatePickup*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateBplBranchOutManifest"
+				propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateBranchOutManifestDox"
+				propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateBranchOutManifestParcel"
+				propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateOutManifestBPL*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdatePOD*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="saveSelectedUsers" propagation="REQUIRES_NEW"
+				isolation="READ_COMMITTED" rollback-for="java.lang.Exception" />
+			<tx:method name="saveUserForCust*" propagation="REQUIRES_NEW"
+				isolation="READ_COMMITTED" rollback-for="java.lang.Exception" />
+			<tx:method name="handleBulkBooking" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="handleBackDatedBooking" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="saveOrUpdateConsignments" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="saveBookingAndConsignment" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+				 <tx:method name="processDeliveryDetailsForCollection*" propagation="REQUIRES_NEW" isolation="READ_COMMITTED" rollback-for="java.lang.Exception"/> 
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<!-- AOP point cuts and advisors for Udaan Web ======START -->
+		<aop:pointcut id="stockService"
+			expression="execution(* com.ff.universe.stockmanagement.service.*.*(..))" />
+		<aop:pointcut id="saveBooking"
+			expression="execution(* com.ff.web.booking.service.*.*(..))" />
+		<aop:pointcut id="batchBookingUpdate"
+			expression="execution(* com.ff.web.booking.dao.*.*(..))" />
+		<aop:pointcut id="createBookingAndConsignment"
+			expression="execution(* com.ff.web.booking.service.*.*(..))" />
+		<aop:pointcut id="saveLoad"
+			expression="execution(* com.ff.web.loadmanagement.service.*.*(..))" />
+		<aop:pointcut id="saveOutManifest"
+			expression="execution(* com.ff.web.manifest.service.*.*(..))" />
+		<aop:pointcut id="saveInManifest"
+			expression="execution(* com.ff.web.manifest.inmanifest.service.*.*(..))" />
+		<aop:pointcut id="saveRthRtoManifest"
+			expression="execution(* com.ff.web.manifest.rthrto.service.*.*(..))" />
+		<aop:pointcut id="saveDrs"
+			expression="execution(* com.ff.web.drs.*.service.*.*(..))" />
+
+		<aop:pointcut id="drsConsgTx"
+			expression="execution(* com.ff.web.drs.scheduler.service.*.*(..))" />
+
+		<aop:pointcut id="savePickup"
+			expression="execution(* com.ff.web.pickup.service.*.*(..))" />
+		<aop:pointcut id="updatePickup"
+			expression="execution(* com.ff.web.pickup.service.*.*(..))" />
+		<aop:pointcut id="saveMisroute"
+			expression="execution(* com.ff.web.manifest.misroute.service.*.*(..))" />
+		<aop:pointcut id="podManifest"
+			expression="execution(* com.ff.web.manifest.pod.service.*.*(..))" />
+		<aop:pointcut id="saveUserForCust"
+			expression="execution(* com.ff.umc.service.*.*(..))" />
+		<aop:pointcut id="saveSelectedUsers"
+			expression="execution(* com.ff.umc.service.*.*(..))" />
+		<aop:pointcut id="handleBulkBooking"
+			expression="execution(* com.ff.web.booking.service.*.*(..))" />
+		<aop:pointcut id="handleBackDatedBooking"
+			expression="execution(* com.ff.web.booking.service.*.*(..))" />
+		<aop:pointcut id="saveOrUpdateConsignments"
+			expression="execution(* com.ff.universe.consignment.dao.*.*(..))" />
+		<aop:pointcut id="saveBookingAndConsignment"
+			expression="execution(* com.ff.web.booking.service.*.*(..))" />
+			<aop:pointcut id="drsCollectionIntegrator" expression="execution(* com.ff.universe.drs.service.DeliveryUniversalServiceImpl.*(..))" />
+
+		<!-- AOP point cuts and advisors for central server ======END -->
+
+		<!-- ================================AOP Advisors STARTS================================================================== -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="stockService" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="saveBooking" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="batchBookingUpdate" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="createBookingAndConsignment" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="saveLoad" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="saveOutManifest" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="saveInManifest" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="saveDrs" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="drsConsgTx" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="saveRthRtoManifest" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="savePickup" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="updatePickup" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="saveMisroute" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="podManifest" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="saveUserForCust" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="handleBulkBooking" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="handleBackDatedBooking" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="saveOrUpdateConsignments" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="saveBookingAndConsignment" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="drsCollectionIntegrator"/>
+		<!-- ================================AOP Advisors ENDS================================================================== -->
+
+	</aop:config>
+
+
+
+</beans>

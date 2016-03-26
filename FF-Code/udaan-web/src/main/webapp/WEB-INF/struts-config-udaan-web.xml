@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE struts-config PUBLIC
+          "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN"
+          "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+
+<struts-config>
+
+
+	<!-- ================================================ Form Bean Definitions -->
+
+	<form-beans>
+		<!-- sample form bean descriptor for an ActionForm <form-bean name="inputForm" 
+			type="app.InputForm"/> end sample -->
+
+		<!-- sample form bean descriptor for a DynaActionForm <form-bean name="logonForm" 
+			type="org.apache.struts.action.DynaActionForm"> <form-property name="username" 
+			type="java.lang.String"/> <form-property name="password" type="java.lang.String"/> 
+			</form-bean> end sample -->
+		<!-- Start Pickup Management -->
+		<form-bean name="createPickupOrderForm"
+			type="com.ff.web.pickup.form.CreatePickupOrderForm" />
+		<form-bean name="confirmPickupOrderForm"
+			type="com.ff.web.pickup.form.ConfirmPickupOrderForm" />
+		<form-bean name="pickupRunsheetForm" type="com.ff.web.pickup.form.PickupRunsheetForm" />
+		<form-bean name="createRunsheetAssignmentForm" type="com.ff.web.pickup.form.CreateRunsheetForm" />
+		<!-- End Pickup Management -->
+		<!-- <form-bean name="loadDispatchForm" type="com.ff.web.loadmanagement.form.LoadDispatchForm" 
+			/> -->
+		<form-bean name="loadManagementForm"
+			type="com.ff.web.loadmanagement.form.LoadManagementForm" />
+		<form-bean name="loadReceiveLocalForm"
+			type="com.ff.web.loadmanagement.form.LoadReceiveLocalForm" />
+		<form-bean name="loadReceiveEditBagForm"
+			type="com.ff.web.loadmanagement.form.LoadReceiveEditBagForm" />
+		<form-bean name="loadReceiveOutstationForm"
+			type="com.ff.web.loadmanagement.form.LoadReceiveOutstationForm" />
+
+		<!-- Start Booking Management -->
+		<form-bean name="cashBookingDoxForm" type="com.ff.web.booking.form.CashBookingDoxForm" />
+		<form-bean name="cashBookingParcelForm"
+			type="com.ff.web.booking.form.CashBookingParcelForm" />
+		<form-bean name="consignmentModificationForm"
+			type="com.ff.web.booking.form.ConsignmentModificatonForm" />
+		<form-bean name="baBookingDoxForm" type="com.ff.web.booking.form.BABookingDoxForm" />
+		<form-bean name="baBookingParcelForm"
+			type="com.ff.web.booking.form.BABookingParcelForm" />
+		<form-bean name="creditCustomerBookingDoxForm"
+			type="com.ff.web.booking.form.CreditCustomerBookingDoxForm" />
+		<form-bean name="creditCustomerBookingParcelForm"
+			type="com.ff.web.booking.form.CreditCustomerBookingParcelForm" />
+		<form-bean name="emotionalBondBookingForm"
+			type="com.ff.web.booking.form.EmotionalBondBookingForm" />
+
+		<form-bean name="fOCBookingDoxForm" type="com.ff.web.booking.form.FOCBookingDoxForm" />
+		<form-bean name="fOCBookingParcelForm"
+			type="com.ff.web.booking.form.FOCBookingParcelForm" />
+		<form-bean name="backdatedBookingForm"
+			type="com.ff.web.booking.form.BackdatedBookingForm" />
+		<!-- <form-bean name="bulkBookingForm" type="com.ff.web.booking.form.BulkBookingForm"/> -->
+
+		<!-- End Booking Management -->
+
+		<!-- Start Manifest -->
+		<form-bean name="outManifestDoxForm"
+			type="com.ff.web.manifest.form.OutManifestDoxForm" />
+		<form-bean name="bplOutManifestDoxForm"
+			type="com.ff.web.manifest.form.BPLOutManifestDoxForm" />
+		<form-bean name="outManifestParcelForm"
+			type="com.ff.web.manifest.form.OutManifestParcelForm" />
+		<form-bean name="branchOutManifestDoxForm"
+			type="com.ff.web.manifest.form.BranchOutManifestDoxForm" />
+		<form-bean name="branchOutManifestParcelForm"
+			type="com.ff.web.manifest.form.BranchOutManifestParcelForm" />
+		<form-bean name="bplBranchOutManifestForm"
+			type="com.ff.web.manifest.form.BplBranchOutManifestForm" />
+		<form-bean name="thirdPartyOutManifestDoxForm"
+			type="com.ff.web.manifest.form.ThirdPartyOutManifestDoxForm" />
+		<form-bean name="thirdPartyBPLOutManifestForm"
+			type="com.ff.web.manifest.form.ThirdPartyBPLOutManifestForm" />
+		<form-bean name="mbplOutManifestForm"
+			type="com.ff.web.manifest.form.MBPLOutManifestForm" />
+		<!-- End Manifest -->
+
+		<!-- Start In Manifest -->
+		<form-bean name="inMasterBagManifestForm"
+			type="com.ff.web.manifest.inmanifest.form.InMasterBagManifestForm" />
+		<form-bean name="inOGMDoxManifestForm"
+			type="com.ff.web.manifest.inmanifest.form.InOGMDoxManifestForm" />
+		<form-bean name="inBagManifestForm"
+			type="com.ff.web.manifest.inmanifest.form.InBagManifestForm" />
+		<form-bean name="inBagManifestParcelForm"
+			type="com.ff.web.manifest.inmanifest.form.InBagManifestParcelForm" />
+		<!-- End In Manifest -->
+
+		<!-- Start In Manifest -->
+		<form-bean name="misrouteForm"
+			type="com.ff.web.manifest.misroute.form.MisrouteForm" />
+		<!-- End In Manifest -->
+		<!-- DRS Module START -->
+		<form-bean name="npDrsForm"
+			type="com.ff.web.drs.common.form.NormalPriorityDrsForm" />
+		<form-bean name="listDrsForm" type="com.ff.web.drs.list.form.ListDrsForm" />
+		<form-bean name="creditCardDrsForm"
+			type="com.ff.web.drs.common.form.CreditCardDrsForm" />
+		<form-bean name="pendingDrsForm"
+			type="com.ff.web.drs.updation.form.PendingDrsForm" />
+		<form-bean name="codLcDoxDrsForm"
+			type="com.ff.web.drs.common.form.CodLcToPayDrsForm" />
+		<form-bean name="rtoCodDrsForm" type="com.ff.web.drs.common.form.RtoCodDrsForm" />
+		<form-bean name="deliveryDrsForm" type="com.ff.web.drs.common.form.DeliveryDrsForm" />
+		<form-bean name="manualDrsForm" type="com.ff.web.drs.common.form.ManualDrsForm" />
+		<form-bean name="bulkCnPendingDrsForm"
+			type="com.ff.web.drs.blkpending.form.BulkCnPendingDrsForm" />
+		<!-- DRS Module END -->
+
+		<!-- Start POD -->
+		<form-bean name="outgoingPODManifestForm"
+			type="com.ff.web.manifest.pod.form.OutgoingPODManifestForm" />
+		<form-bean name="incomingPODManifestForm"
+			type="com.ff.web.manifest.pod.form.IncomingPODManifestForm" />
+		<!-- End POD -->
+
+		<!-- Start RTH/RTO -->
+		<form-bean name="rthRtoManifestForm"
+			type="com.ff.web.manifest.rthrto.form.RthRtoManifestForm" />
+		<form-bean name="rthRtoValidationForm"
+			type="com.ff.web.manifest.rthrto.form.RthRtoValidationForm" />
+		<form-bean name="rthRtoManifestDoxForm"
+			type="com.ff.web.manifest.rthrto.form.RthRtoManifestDoxForm" />
+		<!-- End RTH/RTO -->
+
+		<!-- Start Rate Calculator -->
+		<form-bean name="rateCalculatorForm"
+			type="com.ff.web.ratecalculator.form.RateCalculatorForm" />
+		<!-- End Rate Calculator -->
+
+		<!-- Start Rate Configuration -->
+		<form-bean name="cashRateConfigurationForm"
+			type="com.ff.rate.configuration.rateConfiguration.form.CashRateConfigurationForm" />
+		<form-bean name="baRateConfigurationForm"
+			type="com.ff.rate.configuration.rateConfiguration.form.BARateConfigurationForm" />
+		<!-- End Rate Configuration -->
+
+		<form-bean name="codReceiptForm" type="com.ff.web.codReceipt.form.CodReceiptForm" />
+
+		<!-- Job Service Start -->
+		<form-bean name="jobServiceForm" type="com.ff.web.jobservice.form.JobServiceForm" />
+		
+		<form-bean name="cnPrintingForm" type="com.ff.universe.stickerprinting.StickerPrintingForm"/>
+		<form-bean name="locationSearchForm" type="com.ff.web.locationsearch.form.LocationSearchForm"/>
+		<!-- Job Service End -->
+	</form-beans>
+
+
+	<!-- ========================================= Global Exception Definitions -->
+
+	<global-exceptions>
+		<!-- sample exception handler <exception key="expired.password" type="app.ExpiredPasswordException" 
+			path="/changePassword.jsp"/> end sample -->
+		<exception key="CGS000" type="java.lang.Exception" path="/pages/snippets/error.jsp" />
+	</global-exceptions>
+
+
+	<!-- =========================================== Global Forward Definitions -->
+
+	<global-forwards>
+
+	</global-forwards>
+
+	<!-- =========================================== Action Mappings -->
+
+	<action-mappings>
+		<!-- This action will return weighting machine reading on the response. 
+			Reading will depends on the configuration of terminal setting in configuration 
+			params setting -->
+		<action path="/weightReader" type="com.ff.universe.terminal.WeightReaderAction" />
+		<!-- This action will return terminal MAC address reading on the response. 
+			Reading will depends on the configuration of terminal setting in configuration 
+			params setting -->
+		<action path="/macAddressReader" type="com.ff.universe.terminal.MacReaderAction" />
+		<!-- Start Pickup Management -->
+		<action path="/createPickupOrder" type="com.ff.web.pickup.action.CreatePickupOrderAction"
+			name="createPickupOrderForm" scope="request" parameter="method">
+			<forward name="Success" path="createOrderRequest" />
+			<!-- <forward name="Success" path="/pages/pickupmanagement/CreatePickupOrderRequest.jsp" 
+				/> -->
+		</action>
+
+		<action path="/confirmPickupOrder"
+			type="com.ff.web.pickup.action.ConfirmPickupOrderAction" name="confirmPickupOrderForm"
+			scope="request" parameter="method">
+			<forward name="Success" path="confirmOrderRequest" />
+			<forward name="Accept" path="/confirmPickupOrder.do?method=preparePage" />
+			<forward name="Decline" path="/confirmPickupOrder.do?method=preparePage" />
+		</action>
+		<action path="/pickupAssignmentAction" type="com.ff.web.pickup.action.PickupAssignmentAction"
+			scope="request" name="createRunsheetAssignmentForm" parameter="method">
+			<forward name="branch" path="viewPickupRunsheetAssignmentBranch" />
+			<forward name="hub" path="viewPickupRunsheetAssignmentHUB" />
+		</action>
+
+
+		<action path="/generatePickupRunsheet" type="com.ff.web.pickup.action.GenerateRunsheetAction"
+			scope="request" name="pickupRunsheetForm" parameter="submitName">
+			<forward name="viewGeneratePickupRunSheet" path="viewGeneratePickupRunSheet" />
+			<forward name="printGeneratePickupRunSheet"
+				path="/pages/pickupmanagement/generatePickupRunsheetPrint.jsp" />
+
+		</action>
+		<action path="/updatePickupRunsheet" type="com.ff.web.pickup.action.UpdateRunsheetAction"
+			scope="request" name="pickupRunsheetForm" parameter="submitName">
+			<forward name="viewUpdatePickupRunSheet" path="viewUpdatePickupRunSheet" />
+		</action>
+		<!-- End Pickup Management -->
+
+		<!-- Start Load Management -->
+		<action path="/loadDispatch"
+			type="com.ff.web.loadmanagement.action.LoadDispatchAction" name="loadManagementForm"
+			scope="request" parameter="submitName">
+			<forward name="viewLoadDispatch" path="showLoadDispatch" />
+			<forward name="printPage" path="/pages/loadmanagement/loadDispatchPrint.jsp" />
+		</action>
+
+		<action path="/loadReceiveLocal"
+			type="com.ff.web.loadmanagement.action.LoadReceiveLocalAction" name="loadReceiveLocalForm"
+			scope="request" parameter="submitName">
+			<forward name="viewLoadReceiveLocal" path="viewLoadReceiveLocal" />
+			<forward name="loadReceiveLocalPrint"
+				path="/pages/loadmanagement/loadReceiveLocalPrint.jsp" />
+		</action>
+
+		<action path="/loadReceiveEditBag"
+			type="com.ff.web.loadmanagement.action.LoadReceiveEditBagAction"
+			name="loadReceiveEditBagForm" scope="request" parameter="submitName">
+			<forward name="viewLoadReceiveEditBag" path="viewLoadReceiveEditBag" />
+		</action>
+
+
+		<action path="/loadReceiveOutstation"
+			type="com.ff.web.loadmanagement.action.LoadReceiveOutstationAction"
+			name="loadReceiveOutstationForm" scope="request" parameter="submitName">
+			<forward name="viewLoadReceiveOutstation" path="viewLoadReceiveOutstation" />
+		</action>
+
+
+		<!-- End Load Management -->
+
+		<!-- Start Bookiong Management -->
+		<action path="/cashBooking" type="com.ff.web.booking.action.CashBookingAction"
+			name="cashBookingDoxForm" scope="request" parameter="submitName">
+			<forward name="createCashBookingDox" path="cashBooking" />
+			<forward name="createCashBookingParcel" path="cashBookingParcel" />
+			<forward name="printCashBooking" path="/pages/booking/cashBookingPrint.jsp" />
+		</action>
+
+		<action path="/cashBookingParcel" type="com.ff.web.booking.action.CashBookingAction"
+			name="cashBookingParcelForm" scope="request" parameter="submitName">
+			<forward name="createCashBookingDox" path="cashBooking" />
+			<forward name="createCashBookingParcel" path="cashBookingParcel" />
+		</action>
+
+		<!-- BA Cash Booking Dox -->
+
+		<action path="/baBookingDox" type="com.ff.web.booking.action.BABookingAction"
+			name="baBookingDoxForm" scope="request" parameter="submitName">
+			<forward name="viewBABookingDox" path="baBookingDox" />
+
+		</action>
+		<!-- View BA Booking -->
+		<action path="/viewBaBooking" type="com.ff.web.booking.action.BABookingAction"
+			name="baBookingParcelForm" scope="request" parameter="submitName">
+			<forward name="viewBABookingParcel" path="viewBaBooking" />
+
+		</action>
+
+		<action path="/baBookingParcel" type="com.ff.web.booking.action.BABookingAction"
+			name="baBookingParcelForm" scope="request" parameter="submitName">
+			<forward name="viewBABookingParcel" path="baBookingParcel" />
+			<forward name="viewBABookings" path="viewBABookings" />
+			<forward name="printBABooking" path="/pages/booking/BABookingPrint.jsp" />
+
+		</action>
+
+		<action path="/creditCustomerBookingDox"
+			type="com.ff.web.booking.action.CreditCustomerBookingAction" name="creditCustomerBookingDoxForm"
+			scope="request" parameter="submitName">
+			<forward name="viewCreditCustomerBookingDox" path="creditCustBookingDox" />
+		</action>
+
+		<action path="/creditCustomerBookingParcel"
+			type="com.ff.web.booking.action.CreditCustomerBookingAction" name="creditCustomerBookingParcelForm"
+			scope="request" parameter="submitName">
+			<forward name="viewCreditCustomerBookingParcel" path="creditCustBookingParcel" />
+		</action>
+
+
+		<action path="/emotionalBondBooking"
+			type="com.ff.web.booking.action.EmotionalBondBookingAction" name="emotionalBondBookingForm"
+			scope="request" parameter="submitName">
+			<forward name="emotionalBondBooking" path="emotionalBondBooking" />
+			<forward name="viewEBBookings" path="viewEBBookings" />
+
+		</action>
+
+		<action path="/updateEBBooking"
+			type="com.ff.web.booking.action.EmotionalBondBookingAction" name="emotionalBondBookingForm"
+			scope="request" parameter="submitName">
+			<forward name="emotionalBondBooking" path="emotionalBondBooking" />
+			<forward name="viewEBBookings" path="viewEBBookings" />
+		</action>
+
+
+
+		<!-- FOC Booking -->
+		<action path="/focBookingDox" type="com.ff.web.booking.action.FOCBookingAction"
+			name="fOCBookingDoxForm" scope="request" parameter="submitName">
+			<forward name="viewFOCBookingDox" path="focBookingDox" />
+			<forward name="printFOCBooking" path="/pages/booking/focBookingPrint.jsp" />
+		</action>
+
+		<action path="/focBookingParcel" type="com.ff.web.booking.action.FOCBookingAction"
+			name="fOCBookingParcelForm" scope="request" parameter="submitName">
+			<forward name="viewFOCBookingParcel" path="focBookingParcel" />
+		</action>
+
+		<action path="/childCNPopup" forward="/pages/booking/childCNPopup.jsp" />
+		<action path="/volumetricWeight" forward="/pages/booking/volumetricWeight.jsp" />
+		<action path="/consignerConsignee" forward="/pages/booking/consignerConsignee.jsp" />
+
+
+		<!-- View & Edit Book -->
+		<action path="/consignmentModifcation"
+			type="com.ff.web.booking.action.ConsignmentModificationAction" name="consignmentModificationForm"
+			scope="request" parameter="submitName">
+			<forward name="viewConsignmentBooking" path="viewConsignmentBooking" />
+			<forward name="printViewEditConsignmentBooking" path="/pages/booking/consignmentModificationPrint.jsp" />
+		</action>
+
+		<!-- BackDated Booking -->
+		<action path="/backdatedBooking" type="com.ff.web.booking.action.BackdatedBookingAction"
+			name="backdatedBookingForm" scope="request" parameter="submitName">
+			<forward name="viewBackdatedBooking" path="viewBackdatedBooking" />
+		</action>
+
+		<action path="/bulkBooking" type="com.ff.web.booking.action.BulkBookingAction"
+			name="creditCustomerBookingParcelForm" scope="request" parameter="submitName">
+			<forward name="bulkBookingView" path="viewBulkBooking" />
+			<forward name="bulkBookingStatusView" path="/jobService.do?submitName=jobServiceView" />
+			<forward name="printBulkBooking" path="/pages/booking/bulkBookingPrint.jsp" />
+			<forward name="loginPage" path="/welcome.do" />
+		</action>
+
+
+		<!-- End Booking Management -->
+		<!-- Start Out Manifest -->
+
+		<action path="/outManifestDox" type="com.ff.web.manifest.action.OutManifestDoxAction"
+			name="outManifestDoxForm" scope="request" parameter="submitName">
+			<forward name="Success" path="outManifestDox" />
+			<forward name="printOutManifestDox" path="/pages/manifest/outManifestDoxPrint.jsp" />
+		</action>
+
+		<action path="/bplOutManifestDox"
+			type="com.ff.web.manifest.action.BPLOutManifestDoxAction" name="bplOutManifestDoxForm"
+			scope="request" parameter="submitName">
+			<forward name="Success" path="bplOutManifestDox" />
+			<forward name="printBplOutManifestDox" path="/pages/manifest/bplOutManifestDoxPrint.jsp" />
+		</action>
+
+		<action path="/outManifestParcel"
+			type="com.ff.web.manifest.action.OutManifestParcelAction" name="outManifestParcelForm"
+			scope="request" parameter="submitName">
+			<forward name="Success" path="outManifestParcel" />
+			<forward name="printOutManifestParcel" path="/pages/manifest/outManifestParcelPrint.jsp" />
+		</action>
+
+		<action path="/branchOutManifestDox"
+			type="com.ff.web.manifest.action.BranchOutManifestDoxAction" name="branchOutManifestDoxForm"
+			scope="request" parameter="submitName">
+			<forward name="Success" path="branchOutManifestDox" />
+			<forward name="printBranchOutManifestDox" path="/pages/manifest/branchOutManifestDoxPrint.jsp" />
+		</action>
+
+		<action path="/branchOutManifestParcel"
+			type="com.ff.web.manifest.action.BranchOutManifestParcelAction" name="branchOutManifestParcelForm"
+			scope="request" parameter="submitName">
+			<forward name="Success" path="branchOutManifestParcel" />
+			<forward name="printBranchOutManifestParcel"
+				path="/pages/manifest/branchOutManifestParcelPrint.jsp" />
+		</action>
+
+		<action path="/bplBranchOutManifest"
+			type="com.ff.web.manifest.action.BPLBranchOutManifestAction" name="bplBranchOutManifestForm"
+			scope="request" parameter="submitName">
+			<forward name="Success" path="bplBranchOutManifest" />
+			<forward name="printBplBranchOutManifest" path="/pages/manifest/bplBranchOutManifestPrint.jsp" />
+		</action>
+
+		<action path="/thirdPartyOutManifestDox"
+			type="com.ff.web.manifest.action.ThirdPartyOutManifestDoxAction"
+			name="thirdPartyOutManifestDoxForm" scope="request" parameter="submitName">
+			<forward name="Success" path="thirdPartyOutManifestDox" />
+			<forward name="printThirdPartyDox"
+				path="/pages/manifest/thirdPartyOutManifestDoxPrint.jsp" />
+		</action>
+
+		<action path="/thirdPartyBPLOutManifest"
+			type="com.ff.web.manifest.action.ThirdPartyBPLOutManifestAction"
+			name="thirdPartyBPLOutManifestForm" scope="request" parameter="submitName">
+			<forward name="Success" path="thirdPartyBPLOutManifest" />
+			<forward name="printThirdPartyBpl"
+				path="/pages/manifest/thirdPartyBPLOutManifestPrint.jsp" />
+		</action>
+
+		<action path="/mbplOutManifest" type="com.ff.web.manifest.action.MBPLOutManifestAction"
+			name="mbplOutManifestForm" scope="request" parameter="submitName">
+			<forward name="Success" path="mbplOutManifest" />
+			<forward name="printMbplOutManifest" path="/pages/manifest/mbplOutManifestPrint.jsp" />
+		</action>
+
+		<!-- End Out Manifest -->
+
+		<!-- Start In Manifest -->
+		<action path="/inMasterBagManifest"
+			type="com.ff.web.manifest.inmanifest.action.InMasterBagManifestAction"
+			name="inMasterBagManifestForm" scope="request" parameter="submitName">
+			<forward name="Success" path="inMasterBagManifest" />
+			<forward name="printInMbpl"
+				path="/pages/manifest/inmanifest/createInComingMBPLPrint.jsp" />
+		</action>
+
+
+		<action path="/inBagManifest"
+			type="com.ff.web.manifest.inmanifest.action.InBagManifestAction"
+			name="inBagManifestForm" scope="request" parameter="submitName">
+			<forward name="viewInBagManifestDox" path="viewInBagManifestDox" />
+			<forward name="printInBagManifestDox"
+				path="/pages/manifest/inmanifest/inBagManifestDoxPrint.jsp" />
+		</action>
+
+		<action path="/inBagManifestParcel"
+			type="com.ff.web.manifest.inmanifest.action.InBagManifestParcelAction"
+			name="inBagManifestParcelForm" scope="request" parameter="submitName">
+			<forward name="viewInBagManifestParcel" path="viewInBagManifestParcel" />
+			<forward name="PrintInBagManifestParcel"
+				path="/pages/manifest/inmanifest/inBagManifestParcelPrint.jsp" />
+		</action>
+
+		<action path="/lcDetails" forward="/pages/manifest/LCDetails.jsp" />
+
+		<action path="/codDetails" forward="/pages/manifest/codDetails.jsp" />
+
+		<action path="/inOGMDoxManifest"
+			type="com.ff.web.manifest.inmanifest.action.InOGMDoxAction" name="inOGMDoxManifestForm"
+			scope="request" parameter="submitName">
+			<forward name="Success" path="inOGMDoxManifest" />
+			<forward name="printOgmDox" path="/pages/manifest/inmanifest/inOGMPrint.jsp" />
+		</action>
+
+
+
+		<!-- End In Manifest -->
+
+		<!-- Start In Manifest -->
+		<action path="/misroute"
+			type="com.ff.web.manifest.misroute.action.MisrouteAction" name="misrouteForm"
+			scope="request" parameter="submitName">
+			<forward name="Success" path="misroute" />
+			<forward name="printMisroute" path="/pages/manifest/misroute/misroutePrint.jsp" />
+		</action>
+
+		<!-- End In Manifest -->
+
+		<!--DRS module Action mappings START -->
+		<action path="/prepNormDoxDrs"
+			type="com.ff.web.drs.preparation.action.PrepareNormDoxDrsAction"
+			name="npDrsForm" scope="request" parameter="submitName">
+			<forward name="success" path="prepNormDoxDrs" />
+			<!-- <forward name="printDrsNormdox" path="/pages/drs/preparation/drsPrepNormPriorityDoxPrint.jsp"/> -->
+		</action>
+		<action path="/prepNormPpxDrs"
+			type="com.ff.web.drs.preparation.action.PrepareNormPpxDrsAction"
+			name="npDrsForm" scope="request" parameter="submitName">
+			<forward name="success" path="prepNormPpxDrs" />
+			<!-- <forward name="printDrsNormPpx" path="/pages/drs/preparation/drsPrepNormPriorityPpxPrint.jsp" 
+				/> -->
+		</action>
+		<action path="/listDrs" type="com.ff.web.drs.list.action.ListDrsAction"
+			name="listDrsForm" scope="request" parameter="submitName">
+			<forward name="success" path="listDrs" />
+		</action>
+
+		<action path="/pendingDrs" type="com.ff.web.drs.updation.action.PendingDrsAction"
+			name="pendingDrsForm" scope="request" parameter="submitName">
+			<forward name="success" path="pendingDrs" />
+		</action>
+		<action path="/pendingManualDrs"
+			type="com.ff.web.drs.manualdrs.action.PendingManualDrsAction" name="pendingDrsForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="pendingManualDrs" />
+		</action>
+		<action path="/prepCcqDoxDrs"
+			type="com.ff.web.drs.preparation.action.PrepareCreditCardDrsAction"
+			name="creditCardDrsForm" scope="request" parameter="submitName">
+			<forward name="success" path="drsPrepCcq" />
+		</action>
+
+		<action path="/updateNormDoxDrs"
+			type="com.ff.web.drs.updation.action.UpdateNormDoxDrsAction" name="npDrsForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="updateNormDoxDrs" />
+		</action>
+
+		<action path="/updateNormPpxDrs"
+			type="com.ff.web.drs.updation.action.UpdateNormPpxDrsAction" name="npDrsForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="updateNormPpxDrs" />
+		</action>
+
+		<action path="/updateCcqDoxDrs"
+			type="com.ff.web.drs.updation.action.UpdateCreditCardDrsAction" name="creditCardDrsForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="updateCcQDoxDrs" />
+		</action>
+
+		<action path="/prepCodLcDoxDrs"
+			type="com.ff.web.drs.preparation.action.PrepareCodDoxDrsAction" name="codLcDoxDrsForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="drsPrepCodLcDox" />
+		</action>
+
+		<action path="/updateCodLcDrs"
+			type="com.ff.web.drs.updation.action.UpdateCodLcDrsAction" name="codLcDoxDrsForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="updateCodLcDrs" />
+		</action>
+
+		<action path="/prepCodLcPpxDrs"
+			type="com.ff.web.drs.preparation.action.PrepareCodPpxDrsAction" name="codLcDoxDrsForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="drsPrepCodLcPpx" />
+		</action>
+
+		<action path="/prepRtoCodDrs"
+			type="com.ff.web.drs.preparation.action.PrepareRtoCodDrsAction" name="rtoCodDrsForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="prepRtoCodDrs" />
+		</action>
+
+		<action path="/updateRtoCodDrs"
+			type="com.ff.web.drs.updation.action.UpdateRtoDrsAction" name="rtoCodDrsForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="updateRtoCodDrs" />
+		</action>
+		<action path="/updateManualDrs"
+			type="com.ff.web.drs.manualdrs.action.UpdateManualDrsAction" name="manualDrsForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="updateManualDrs" />
+		</action>
+		<action path="/bulkCnPendingDrs"
+			type="com.ff.web.drs.blkpending.action.BulkCnPendingDrsAction" name="bulkCnPendingDrsForm"
+			scope="request" parameter="submitName">
+			<forward name="bulkCnPendingDrsHub" path="bulkCnPendingDrsHub" />
+			<forward name="bulkCnPendingDrsBranch" path="bulkCnPendingDrsBranch" />
+		</action>
+
+		<action path="/deliveryPrintDrs" type="com.ff.web.drs.common.action.DeliveryPrintAction"
+			name="deliveryDrsForm" scope="request" parameter="submitName">
+			<forward name="printDrsNormdox"
+				path="/pages/drs/preparation/drsNormPriorityDoxPrint.jsp" />
+			<forward name="printDrsCreditdox"
+				path="/pages/drs/preparation/drsForCcQSeriesPrint.jsp" />
+			<forward name="printDrsCodLcdox"
+				path="/pages/drs/preparation/drsForCodLcDoxPrint.jsp" />
+			<forward name="printDrsNormPpx"
+				path="/pages/drs/preparation/drsNormPriorityPpxPrint.jsp" />
+			<forward name="printDrsCodLcPpx"
+				path="/pages/drs/preparation/drsForCodLcPpxPrint.jsp" />
+		</action>
+
+		<!--DRS module Action mappings END -->
+
+		<!-- Start POD -->
+		<action path="/outgoingPODManifest"
+			type="com.ff.web.manifest.pod.action.OutgoingPODManifestAction" name="outgoingPODManifestForm"
+			scope="request" parameter="submitName">
+			<forward name="Success" path="viewOutgoingPODManifest" />
+			<forward name="viewPODManifestDetails" path="viewPODManifestDetails" />
+			<forward name="printOutPODManifestDetails"
+				path="/pages/manifest/pod/outgoingPODManifestPrint.jsp" />
+		</action>
+
+		<action path="/incomingPODManifest"
+			type="com.ff.web.manifest.pod.action.IncomingPODManifestAction" name="incomingPODManifestForm"
+			scope="request" parameter="submitName">
+			<forward name="Success" path="viewIncomingPODManifest" />
+			<forward name="viewPODManifestDetails" path="viewIncomingPODManifestDetails" />
+			<forward name="printInPODManifestDetails"
+				path="/pages/manifest/pod/incomingPODManifestPrint.jsp" />
+		</action>
+		<!-- End POD -->
+
+		<!-- <action path="/weightReader" type="com.ff.universe.weigingmachine.WeightReaderAction" 
+			parameter="submitName" scope="request" /> -->
+
+		<!-- Start Location Search -->
+		
+		<action path="/locationSearch"
+			type="com.ff.web.locationsearch.action.LocationSearchAction" name="locationSearchForm"
+			scope="request" input="/pages/utilities/locationSearch.jsp"
+			parameter="submitName">
+			<forward name="location" path="locationSearch" />
+		</action>
+		
+		<!-- End Location Search -->
+
+
+		<!-- Start RTH/RTO -->
+		<action path="/rthRtoManifestParcel"
+			type="com.ff.web.manifest.rthrto.action.RthManifestParcelAction"
+			name="rthRtoManifestForm" scope="request" parameter="submitName">
+			<forward name="viewRthManifestParcel" path="viewRthManifestParcel" />
+			<forward name="viewRtoManifestParcel" path="viewRtoManifestParcel" />
+			<forward name="printRthRtoPPX"
+				path="/pages/manifest/rthrto/rthRtoManifestParcelPrint.jsp" />
+		</action>
+
+		<action path="/rthRtoValidation"
+			type="com.ff.web.manifest.rthrto.action.RthRtoValidationAction" name="rthRtoValidationForm"
+			scope="request" parameter="submitName">
+			<forward name="viewRthValidation" path="viewRthValidation" />
+			<forward name="viewRtoValidation" path="viewRtoValidation" />
+		</action>
+
+		<action path="/rthRtoManifestDox"
+			type="com.ff.web.manifest.rthrto.action.RthRtoManifestDoxAction"
+			name="rthRtoManifestDoxForm" scope="request" parameter="submitName">
+			<forward name="viewRthManifestDox" path="viewRthManifestDox" />
+			<forward name="viewRtoManifestDox" path="viewRtoManifestDox" />
+			<forward name="printRthRtoDOX"
+				path="/pages/manifest/rthrto/rthRtoManifestDoxPrint.jsp" />
+		</action>
+		<!-- End RTH/RTO -->
+
+
+		<!-- <action path="/weightReader" type="com.ff.universe.weigingmachine.WeightReaderAction" 
+			parameter="submitName" scope="request" /> -->
+
+		<!-- Start Rate Calculator -->
+		<action path="/rateCalculator"
+			type="com.ff.web.ratecalculator.action.RateCalculatorAction" name="rateCalculatorForm"
+			scope="request" parameter="submitName">
+			<forward name="viewRateCalculator" path="viewRateCalculator" />
+		</action>
+		<!-- End Rate Calculator -->
+
+		<!-- Start Rate Configuration -->
+		<action path="/cashRateConfiguration"
+			type="com.ff.rate.configuration.rateConfiguration.action.CashRateConfigurationAction"
+			name="cashRateConfigurationForm" scope="request" parameter="submitName">
+			<forward name="viewCashRateConfigAtRHO" path="viewCashRateConfigAtRHO" />
+			<forward name="viewRenewCashRateConfiguration"
+				path="/pages/rate/jsp/rateconfiguration/viewCashRateConfiguration.jsp" />
+		</action>
+		<action path="/baRateConfiguration"
+			type="com.ff.rate.configuration.rateConfiguration.action.BARateConfigurationAction"
+			name="baRateConfigurationForm" scope="request" parameter="submitName">
+			<forward name="viewBARateConfigAtRHO" path="viewBARateConfigAtRHO" />
+		</action>
+		<!-- End Rate Configuration -->
+
+		<action path="/codReceipt" type="com.ff.web.codReceipt.action.CodReceiptAction"
+			name="codReceiptForm" scope="request" parameter="submitName">
+			<forward name="Success" path="viewCodReceipt" />
+			<forward name="printCodReceipt" path="/pages/codreceipt/codReceiptPrint.jsp" />
+		</action>
+
+		<!-- Job Service Start -->
+		<action path="/jobService" type="com.ff.web.jobservice.action.JobServiceAction"
+			name="jobServiceForm" scope="request" parameter="submitName">
+			<forward name="success" path="jobService" />
+			<forward name="jobServiceView" path="jobServiceView" />
+		</action>
+		<action path="/inboundUtility" type="com.ff.web.inbound.action.InboundServiceAction"
+			name="jobServiceForm" scope="request" parameter="submitName">
+			<forward name="success" path="viewInboundUtility" />
+		</action>
+		<action path="/downloadfile"
+    type="com.ff.web.inbound.action.InboundDownloadServiceAction"
+            scope="request"/>
+		<!-- Job Service End -->
+		
+		 <action path="/cnPrinting" 
+            type="com.ff.universe.stickerprinting.StickerPrintingAction" 
+            name="cnPrintingForm" 
+            scope="request"
+            input="viewCNPrintingPage"
+            parameter="submitName">
+		     <forward name ="viewCnPrintingPage" path="viewCnPrintingPage"/>
+		     <forward name ="printCnSeriesPage" path="/pages/cnprinting/cnPrintingLayout.jsp"/>
+	     </action>
+	</action-mappings>
+
+	<controller processorClass="org.apache.struts.action.RequestProcessor" />
+
+
+
+	<message-resources parameter="UdaanWebMessageResources_en_US" />
+
+	<message-resources parameter="UdaanWebErrorMessageResources"
+		key="errorBundle" />
+
+	<message-resources parameter="UniversalMessageResources"
+		key="universalResourceBundle" />
+
+	<message-resources parameter="frameworkErrorMessages"
+		key="frameworkResourceBundle" />
+	<message-resources parameter="RateCalculationMessageResources_en_US"
+		key="rateResourceBundle" />
+
+
+	<plug-in className="org.apache.struts.tiles.TilesPlugin">
+		<set-property property="definitions-config"
+			value="/WEB-INF/tiles-def-udaan-web.xml,/WEB-INF/login-tiles-defs.xml" />
+		<set-property property="moduleAware" value="true" />
+		<set-property property="definitions-parser-validate"
+			value="true" />
+	</plug-in>
+
+</struts-config>

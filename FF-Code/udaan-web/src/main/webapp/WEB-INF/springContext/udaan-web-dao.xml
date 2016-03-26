@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<import resource="classpath:universe-dao.xml" />
+	<import resource="classpath:rate-calculation-dao.xml" />
+
+	<bean id="pickupManagementDAO" class="com.ff.web.pickup.dao.CreatePickupOrderDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+
+	<bean id="generateRunsheetDAO" class="com.ff.web.pickup.dao.GenerateRunsheetDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+
+	<bean id="updateRunsheetDAO" class="com.ff.web.pickup.dao.UpdateRunsheetDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+
+	<!-- <bean id="sequenceGeneratorDAO" class="com.capgemini.lbs.framework.dao.sequence.SequenceGeneratorDAOImpl"> 
+		<property name="sessionFactory" ref="hibernateSessionFactory" /> </bean> -->
+
+
+	<bean id="confirmPickupOrderDAO" class="com.ff.web.pickup.dao.ConfirmPickupOrderDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="pickupAssignmentDAO" class="com.ff.web.pickup.dao.PickupAssignmentDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>	
+	<bean id="pickupGatewayDAO" class="com.ff.web.pickup.dao.PickupGatewayDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="loadManagementDAO" class="com.ff.web.loadmanagement.dao.LoadManagementDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+
+	<bean id="consignmentDAO" class="com.ff.web.consignment.dao.ConsignmentDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+
+	<bean id="bookingCommonDAO" class="com.ff.web.booking.dao.BookingCommonDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+		<bean id="baBookingDAO" class="com.ff.web.booking.dao.BABookingDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="cashBookingDAO" class="com.ff.web.booking.dao.CashBookingDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<!-- START OUT MANIFEST -->
+	<bean id="outManifestCommonDAO" class="com.ff.web.manifest.dao.OutManifestCommonDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+
+	<bean id="creditCustomerBookingDAO" class="com.ff.web.booking.dao.CreditCustomerBookingDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="globalServiceDAO" class="com.ff.web.global.dao.GlobalServiceDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="ebBookingDAO" class="com.ff.web.booking.dao.EBBookingDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="outManifestDoxDAO" class="com.ff.web.manifest.dao.OutManifestDoxDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="bPLOutManifestDoxDAOImpl" class="com.ff.web.manifest.dao.BPLOutManifestDoxDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="manifestUniversalDAO" class="com.ff.universe.manifest.dao.ManifestUniversalDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="outManifestUniversalDAO" class="com.ff.universe.manifest.dao.OutManifestUniversalDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="misrouteDAO" class="com.ff.web.manifest.misroute.dao.MisrouteDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<!-- END OUT MANIFEST -->
+
+    <bean id="inManifestCommonDAO" class="com.ff.web.manifest.inmanifest.dao.InManifestCommonDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="inMasterBagManifestDAO" class="com.ff.web.manifest.inmanifest.dao.InMasterBagManifestDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="inOgmDoxDAO" class="com.ff.web.manifest.inmanifest.dao.InOGMDoxDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<!--  DRS Module START-->
+	
+	<bean id="deliveryCommonDAO" class="com.ff.web.drs.common.dao.DeliveryCommonDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="normalPriorityDrsDAO" class="com.ff.web.drs.updation.dao.NormalPriorityDrsDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="listDrsDAO" class="com.ff.web.drs.list.dao.ListDrsDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="pendingDrsDAO" class="com.ff.web.drs.updation.dao.PendingDrsDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="manualDrsDAO" class="com.ff.web.drs.manualdrs.dao.ManualDrsDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="ccDrsDAO" class="com.ff.web.drs.updation.dao.CreditCardDrsDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="codLcDao" class="com.ff.web.drs.updation.dao.CodLcDrsDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="rtoCodDrsDAO" class="com.ff.web.drs.updation.dao.RtoCodDrsDAOImpl">
+	<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<bean id="drsConsignmentUpdateDAO" class="com.ff.web.drs.scheduler.dao.DrsConsignmentUpdateDAOImpl" >
+	 <property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="bulkCnPendingDrsDAO" class="com.ff.web.drs.blkpending.dao.BulkCnPendingDrsDAOImpl" >
+	 <property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<!--  DRS Module END -->
+
+	<!--  POD Module START-->
+	<bean id="podManifestCommonDAO" class="com.ff.web.manifest.pod.dao.PODManifestCommonDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="incomingPODManifestDAO" class="com.ff.web.manifest.pod.dao.IncomingPODManifestDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<!--  POD Module END-->
+	
+		
+	<!-- START RTH/RTO MANIFEST -->	
+	<bean id="rthRtoValidationDAO" class="com.ff.web.manifest.rthrto.dao.RthRtoValidationDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<bean id="rthRtoManifestCommonDAO" class="com.ff.web.manifest.rthrto.dao.RthRtoManifestCommonDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<!-- END RTH/RTO MANIFEST -->	 
+	
+	<!-- Start Rate Calculator	  -->
+	 	<bean id="rateCalculatorDAO" class="com.ff.web.ratecalculator.dao.RateCalculatorDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<!-- END Rate Calculator -->
+	
+	<bean id="manifestCommonDAO" class="com.ff.web.manifest.dao.ManifestCommonDAOImpl">
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+		<bean id="codReceiptDAO" class="com.ff.web.codReceipt.dao.CodReceiptDAOImpl">  
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	
+	<!--Utilities Module Start  -->
+	
+	<bean id="ServiceOfferingServiceDAO" class="com.ff.universe.serviceOffering.dao.ServiceOfferingServiceDAOImpl">  
+		<property name="sessionFactory" ref="hibernateSessionFactory" />
+	</bean>
+	<!-- Utilities Module End -->
+</beans>	
+	

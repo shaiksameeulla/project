@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app 
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+
+  <display-name>udaan-web</display-name>
+  
+<context-param>
+  <param-name>contextConfigLocation</param-name> 
+  <param-value>/WEB-INF/springContext/udaan-web-applicationContext.xml</param-value> 
+</context-param>
+<listener>
+  <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class> 
+ </listener>
+<listener>
+  <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class> 
+</listener>
+
+	<filter>
+        <filter-name>filter</filter-name>
+        <filter-class>com.ff.umc.filter.CGFilter</filter-class>
+        <init-param>
+            <param-name>avoid-urls</param-name>
+            <param-value>index.jsp,/welcome.do,/login.do,/retailInt.do,/changePassword.do,/tempPassword.do,/forgotPassword.do</param-value>
+       </init-param>
+   </filter><!--
+
+
+
+   --><filter-mapping>
+        <filter-name>filter</filter-name>
+        <url-pattern>*.do</url-pattern>
+   </filter-mapping>
+	
+  <!-- Standard Action Servlet Configuration -->
+  <servlet>
+    <servlet-name>actionServlet</servlet-name>
+    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+    <init-param>
+      <param-name>config</param-name>
+      <param-value>/WEB-INF/struts-config-udaan-web.xml,/WEB-INF/login-struts-config.xml</param-value>
+    </init-param>
+     
+    <load-on-startup>1</load-on-startup>
+ </servlet>
+
+
+  <!-- Standard Action Servlet Mapping -->
+  <servlet-mapping>
+    <servlet-name>actionServlet</servlet-name>
+    <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+
+
+
+  <!-- The Usual Welcome File List -->
+ <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+ </welcome-file-list>
+
+<!-- Session time out in minute60*12-->
+<session-config>
+	<session-timeout>20</session-timeout>
+</session-config>		
+
+</web-app>

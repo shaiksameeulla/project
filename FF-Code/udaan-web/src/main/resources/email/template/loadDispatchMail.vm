@@ -1,0 +1,73 @@
+To, 
+<br>
+$loadMovementTO.destOfficeTO.officeName Office
+
+<br/><br/>
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+ <tr>
+	 <th width="12%" class="lable" align="right">Dispatch Date </th> <th width="2%">:</th> <td width="12%" class="lable"> $loadMovementTO.dispatchDateTime</td>
+	 <th width="20%" class="lable" align="right">Gate Pass No </th> <th width="2%">:</th>  <td width="12%" class="lable"> $loadMovementTO.gatePassNumber</td>
+	 <th width="15%" class="lable" align="right">Origin Region </th> <th width="2%">:</th>  <td width="25%" class="lable"> $loadMovementTO.regionalOffice</td>
+ </tr>
+ 
+ <tr>
+	 <th class="lable" align="right">Origin Office </th> <th>:</th>  <td class="lable"> $loadMovementTO.originOffice</td>
+	 <th class="lable" align="right">Destination Office Type </th> <th>:</th>  <td class="lable"> $loadMovementTO.emailDstnOffcType</td>
+	 <th class="lable" align="right">Destination Office </th> <th>:</th>  <td class="lable"> $loadMovementTO.emailDestOffice</td>
+ </tr>
+ 
+  <tr>
+	 <th class="lable" align="right">Mode </th> <th>:</th>  <td class="lable"> $loadMovementTO.emailTransportMode</td>
+	 <th class="lable" align="right">Type </th> <th>:</th>  <td class="lable"> $loadMovementTO.emailServiceByType</td>
+	 <th class="lable" align="right">$loadMovementTO.emailServiceByType </th> <th>:</th>  <td class="lable"> $loadMovementTO.emailVendor</td>
+ </tr>
+ 
+   <tr>
+	 <th class="lable" align="right">$loadMovementTO.emailTransportLabel </th> <th>:</th>  <td class="lable"> $loadMovementTO.emailTransportNumber</td>
+	 <th class="lable" align="right">Expected Time of Departure </th> <th>:</th>  <td class="lable"> $loadMovementTO.expectedDeparture</td>
+	 <th class="lable" align="right">Expected Time of Arrival </th> <th>:</th>  <td class="lable"> $loadMovementTO.expectedArrival</td>
+ </tr>
+ 
+   <tr>
+	 <th class="lable" align="right">Vehicle Number </th> <th>:</th>  <td class="lable"> $loadMovementTO.emailVehicleNumber</td>
+	 <th class="lable" align="right">Driver Name </th> <th>:</th>  <td class="lable"> $loadMovementTO.driverName</td>
+	 <th class="lable" align="right">Departure Time </th> <th>:</th>  <td class="lable"> $loadMovementTO.loadingTime</td>
+ </tr>
+
+</table>
+
+<br><br>
+Details
+<table width="100%" cellpadding="0" cellspacing="0" border="1">
+		<thead>
+			<th width="5%" align="center">Sr. No.</th>
+			<th width="12%" align="center">BPL / MBPL No.</th>
+			<th width="12%" align="center">Document Type</th>
+			<th width="12%" align="center">Destination City</th>
+			<th width="7%" align="center">Weight</th>
+			<th width="7%" align="center">CD Weight</th>
+			<th width="12%" align="center">Lock No</th>
+			<th width="12%" align="center">CD/AWB/RR No</th>
+			<th width="12%" align="center">Remarks</th>
+			
+		
+		</thead>
+		#foreach($loadDispDtlsTo in $loadMovementTO.loadDispatchDetailsTOs)
+			<tr>
+				<td class="lable" align="center">$velocityCount</td>
+				<td class="lable" align="center">$loadDispDtlsTo.loadNumber</td>
+				<td class="lable" align="center">$loadDispDtlsTo.docType</td>
+				<td class="lable" align="center">$loadDispDtlsTo.manifestDestCity</td>
+				<td class="lable" align="center">$loadDispDtlsTo.weight</td>
+				<td class="lable" align="center">$loadDispDtlsTo.cdWeight</td>
+				<td class="lable" align="center">$loadDispDtlsTo.lockNumber</td>
+				<td class="lable" align="center">$loadDispDtlsTo.tokenNumber</td>
+				<td class="lable" align="center">$loadDispDtlsTo.remarks</td>
+			</tr>
+		#end
+	</table>
+	
+<br><br><br/>
+
+From, <br>
+$loadMovementTO.loggedInOfficeTO.officeName Office

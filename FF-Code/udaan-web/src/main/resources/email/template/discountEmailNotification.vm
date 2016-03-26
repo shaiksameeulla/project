@@ -1,0 +1,28 @@
+#parse("header.vm")
+<br/>
+
+<table width="80%" cellpadding="0" cellspacing="0" border="1">
+		<thead>
+			<th>Sr. No.</th>
+			<th>Consisgnment No</th>
+			<th>Booked Date</th>
+			<th>Discount Amount (%)</th>
+			<th>Price (Rs)</th>
+		
+		</thead>
+		#foreach($bookingTO in $bookingDtls)
+			<tr>
+				<td>$velocityCount</td>
+				<td>$bookingTO.consgNumber</td>
+				<td>$bookingTO.bookingDate</td>
+				<td>$bookingTO.discount</td>
+				<td>$bookingTO.price</td>
+			</tr>
+		#end
+	</table><br><br>
+
+
+<br/>
+
+
+#parse("footer.vm")

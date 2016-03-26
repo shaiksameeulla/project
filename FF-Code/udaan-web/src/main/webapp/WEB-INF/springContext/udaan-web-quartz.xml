@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	
+	<bean id="cashDiscountEmailScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.web.scheduler.CashDiscountEmailSenderScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="cashBookingService" value-ref="cashBookingService"/>				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="cashDiscountEmailTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<!-- see the example of method invoking job above -->
+	 	<property name="jobDetail" ref="cashDiscountEmailScheduler"/>
+		<!-- End of the day -->
+	  	       <!-- <property name="cronExpression" value="0 */5 * * * ?" />  -->
+	  	       <property name="cronExpression" value="0 30 7 * * ?" />
+	</bean>
+	
+	
+	<bean id="cashDiscountTriggerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="cashDiscountEmailScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="cashDiscountEmailTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	
+	<!-- In Manifest Less Excess Report Scheduler Start-->
+		
+	<!-- <bean id="inManifestLessExcessScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.web.scheduler.InManifestLessExcessReportScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="inManifestCommonService" value-ref="inManifestCommonService"/>				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="inManifestLessExcessTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	see the example of method invoking job above
+	 	<property name="jobDetail" ref="inManifestLessExcessScheduler"/>
+	 	
+	 	<property name="cronExpression" value="0 49 23 * * ?" />
+		Fire at 11:59pm, once every day
+		
+		<property name="cronExpression" value="0 15 10 ? * MON-FRI" />	  	       	 	
+		Fire at 10:15am every Monday, Tuesday, Wednesday, Thursday and Friday	  	       
+		
+		<property name="cronExpression" value="0 */2 * * * ?" />
+		Fire at every 2 min
+	</bean>	
+	
+	<bean id="inManifestLessExcessTriggerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="inManifestLessExcessScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			ThreadPool
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="inManifestLessExcessTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	 -->
+	<!-- In Manifest Less Excess Report Scheduler End-->
+	
+	<!-- DRS Scheduler START -->
+	
+	 <bean name="drsSchedulerForDlvConsg" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+    <property name="targetObject" ref="drsSchedulerForConsgStatus" />
+        <property name="targetMethod" value="updateConsignmentStatus" />
+    </bean>
+    
+    
+    <bean id="drsTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="drsSchedulerForDlvConsg" />
+          <!-- run every afternoon at 12 pm   -->
+        <property name="cronExpression" value="0 1/10 * * * ?" />
+    </bean>
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="schedulerName" value="drsUpdateForDlvrdConsgTriggers"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="drsTrigger" />
+			</list>
+			
+		</property>
+    </bean>
+	<!-- DRS Scheduler END -->
+	
+	<!-- RTO RTH Module Scheduler Start-->
+		
+	<bean id="rtoValidationEmailSenderScheduler" class="org.springframework.scheduling.quartz.JobDetailBean" >
+		<property name="jobClass" value="com.ff.web.scheduler.RTOValidationEmailSenderScheduler" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="rthRtoValidationService" value-ref="rthRtoValidationService"/>				
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="rtoValidationEmailSenderTriger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+	 	<!-- see the example of method invoking job above -->
+	 	<property name="jobDetail" ref="rtoValidationEmailSenderScheduler"/>
+	 	
+	 	<property name="cronExpression" value="0 0 16 * * ?" />
+		<!-- Fire at 11:59pm, once every day -->
+		
+		<!-- <property name="cronExpression" value="0 15 10 ? * MON-FRI" />	  	       	 	
+		Fire at 10:15am every Monday, Tuesday, Wednesday, Thursday and Friday -->	  	       
+		
+		<!-- <property name="cronExpression" value="0 */3 * * * ?" /> -->
+		<!-- Fire at every 2 min -->
+	</bean>	
+	
+	<bean id="rtoValidationEmailSenderFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">		
+		<property name="schedulerName" value="rtoValidationEmailSenderScheduler"/>
+		<property name="quartzProperties">
+		<props>
+			<!-- ThreadPool -->
+			<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+			<prop key="org.quartz.threadPool.threadCount">1</prop>
+			<prop key="org.quartz.threadPool.threadPriority">5</prop>
+		</props>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="rtoValidationEmailSenderTriger"/> 
+			</list>
+		</property>
+	</bean>
+	
+	<!-- RTO RTH Module Scheduler End-->
+	
+	
+	
+	</beans>
