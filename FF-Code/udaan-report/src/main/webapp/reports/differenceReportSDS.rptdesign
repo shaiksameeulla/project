@@ -1,0 +1,2680 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.2.2.v201301221637 Build &lt;4.2.2.v20130206-1509></property>
+    <list-property name="includeScripts">
+        <property>src/main/webapp/scriptlib/debugWindow.js</property>
+    </list-property>
+    <property name="units">cm</property>
+    <method name="initialize"><![CDATA[var a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
+var b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
+
+function inWords (num) {
+	var rupees = "";
+	var paise = "";
+	var strRupees = '';
+	var strPaise = '';
+	var str = '';
+	var amount = new java.lang.String(num);
+	var len = BirtStr.charLength(amount);
+    if(BirtStr.indexOf('.', amount)!=-1) {
+		rupees = amount.substring(0, BirtStr.indexOf('.', amount));
+		paise = amount.substring(BirtStr.indexOf('.', amount)+1,len);
+	} else {
+		rupees = amount;
+	}
+    if (BirtStr.charLength(rupees) > 9) return 'rupees overflow';
+	if (BirtStr.charLength(paise) > 2) return 'paise overflow';
+    
+	//convert rupees
+	n = ('000000000' + rupees ).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+    if (!n) return; 
+    strRupees += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+    strRupees += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+    strRupees += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+    strRupees += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+    strRupees += (n[5] != 0) ? ((strRupees != '') ? '' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + 'Rupees ' : '';
+
+	if(BirtStr.charLength(paise) > 0) {
+		//convert paise
+		n = ('000000000' + paise ).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+		if (!n) return; 
+		strPaise = "and ";
+		strPaise += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+		strPaise += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+		strPaise += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+		strPaise += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+		strPaise += (n[5] != 0) ? ((strPaise != '') ? '' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + 'Paise ' : '';
+	}
+
+	str = strRupees+strPaise+"only";
+	return str;
+}]]></method>
+    <property name="iconFile">/templates/grouped_listing.gif</property>
+    <property name="cheatSheet">org.eclipse.birt.report.designer.ui.cheatsheet.groupedlisting</property>
+    <property name="layoutPreference">fixed layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="ReBillingID" id="1116">
+            <text-property name="promptText">Re-Billing Identifier</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">3</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <script-data-source name="Hibernate" id="1043"/>
+        <script-data-source name="Hibernate_DS" id="1046"/>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="udaan_gold_bcun" id="1117">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">com.mysql.jdbc.Driver</property>
+            <property name="odaURL">jdbc:mysql://10.48.144.28:3306/udaan_gold_bcun</property>
+            <property name="odaUser">UdaanCA</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">Z3VydQ==</encrypted-property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <script-data-set name="dsReBilling" id="1259">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">RE_BILLING_ID</property>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">INVOICE_NUMBER</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">BUSINESS_NAME</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">OFFICE_NAME</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">BookingDate</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">CONSG_NO</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">consignmentType</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">CITY_NAME</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">FINAL_WEIGHT</property>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">CONTRACT_FOR</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">RATE_CALCULATED_FOR</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">FreightCharges</property>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">RiskSurcharge</property>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">DocumentHandlingCharge</property>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">ParcelHandlingCharge</property>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">AirportHandlingCharge</property>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">OtherCharges</property>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">TotalCharges</property>
+                    <property name="dataType">float</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">RE_BILLING_ID</property>
+                </structure>
+                <structure>
+                    <property name="columnName">INVOICE_NUMBER</property>
+                </structure>
+                <structure>
+                    <property name="columnName">BUSINESS_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OFFICE_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">BookingDate</property>
+                </structure>
+                <structure>
+                    <property name="columnName">CONSG_NO</property>
+                </structure>
+                <structure>
+                    <property name="columnName">consignmentType</property>
+                </structure>
+                <structure>
+                    <property name="columnName">CITY_NAME</property>
+                </structure>
+                <structure>
+                    <property name="columnName">FINAL_WEIGHT</property>
+                </structure>
+                <structure>
+                    <property name="columnName">CONTRACT_FOR</property>
+                </structure>
+                <structure>
+                    <property name="columnName">RATE_CALCULATED_FOR</property>
+                </structure>
+                <structure>
+                    <property name="columnName">FreightCharges</property>
+                </structure>
+                <structure>
+                    <property name="columnName">RiskSurcharge</property>
+                </structure>
+                <structure>
+                    <property name="columnName">DocumentHandlingCharge</property>
+                </structure>
+                <structure>
+                    <property name="columnName">ParcelHandlingCharge</property>
+                </structure>
+                <structure>
+                    <property name="columnName">AirportHandlingCharge</property>
+                </structure>
+                <structure>
+                    <property name="columnName">OtherCharges</property>
+                </structure>
+                <structure>
+                    <property name="columnName">TotalCharges</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">RE_BILLING_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">INVOICE_NUMBER</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">BUSINESS_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">OFFICE_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">BookingDate</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">CONSG_NO</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">consignmentType</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">CITY_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">FINAL_WEIGHT</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">CONTRACT_FOR</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">RATE_CALCULATED_FOR</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">FreightCharges</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">RiskSurcharge</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">DocumentHandlingCharge</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">ParcelHandlingCharge</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">AirportHandlingCharge</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">OtherCharges</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">TotalCharges</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <method name="beforeOpen"><![CDATA[reBillingId = "";
+if ( params["ReBillingID"] != null &amp;&amp; params["ReBillingID"].length > 0 ){
+	reBillingId = params["ReBillingID"];
+}]]></method>
+            <property name="dataSource">Hibernate_DS</property>
+            <method name="open"><![CDATA[importPackage(Packages.org.springframework.context);
+importPackage(Packages.org.springframework.web.context.support);
+importPackage(Packages.com.ff.report.common.service);
+importPackage(Packages.org.eclipse.birt.core.exception);
+
+sc = reportContext.getHttpServletRequest().getSession().getServletContext();
+// get application context
+spring = WebApplicationContextUtils.getWebApplicationContext(sc);
+reBillingService = spring.getBean("billPrintingService");
+birtUtil=spring.getBean("birtUtil");
+
+// call re-billing service
+reBillingConsignments = null;
+reBillingConsignmentsIterator = null;
+
+reBillingConsignments = reBillingService.getRebillingGDRDetails(reBillingId);
+if(reBillingConsignments != null &amp;&amp; reBillingConsignments.size() > 0)
+{
+	reBillingConsignmentsIterator = reBillingConsignments.iterator ();
+} else {
+	birtUtil.addBirtException(reportContext, "Re-Billing Consignments not found for selected Re-Billing Number.", BirtException.WARNING);
+	return false;
+}
+]]></method>
+            <method name="fetch"><![CDATA[if(reBillingConsignmentsIterator == null || reBillingConsignmentsIterator.hasNext() == false) {
+	return false;
+} else {
+}
+
+var billingConsignment = reBillingConsignmentsIterator.next();
+
+row["RE_BILLING_ID"] = billingConsignment.getReBillingID();
+row["INVOICE_NUMBER"] = billingConsignment.getInvoiceNumber();
+row["BUSINESS_NAME"] = billingConsignment.getBusinessName();
+row["OFFICE_NAME"] = billingConsignment.getOfficeName();
+row["BookingDate"] = billingConsignment.getBookingDate();
+row["CONSG_NO"] = billingConsignment.getConsignmentNumber();
+row["consignmentType"] = billingConsignment.getConsignmentType();
+row["CITY_NAME"] = billingConsignment.getCityName();
+row["FINAL_WEIGHT"] = billingConsignment.getFinalWeight();
+row["CONTRACT_FOR"] = billingConsignment.getContractFor();
+row["RATE_CALCULATED_FOR"] = billingConsignment.getRateCalculatedFor();
+row["FreightCharges"] = billingConsignment.getFreightCharges();
+row["RishSurcharge"] = billingConsignment.getRiskSurcharge();
+row["DocumentHandlingCharge"] = billingConsignment.getDocumentHandlingCharge();
+row["ParcelHandlingCharge"] = billingConsignment.getParcelHandlingCharge();
+row["AirportHandlingCharge"] = billingConsignment.getAirportHandlingCharge();
+row["OtherCharges"] = billingConsignment.getOtherCharges();
+row["TotalCharges"] = billingConsignment.getTotalCharges();
+
+return true;]]></method>
+            <method name="close"><![CDATA[reBillingService = null;
+reBillingConsignments = null;
+reBillingConsignmentsIterator = null;
+birtUtil = null;
+sc = null;
+spring = null;]]></method>
+        </script-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="38">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="41">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="42">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="NewStyle" id="73">
+            <property name="verticalAlign">bottom</property>
+        </style>
+        <style name="NewStyle1" id="74">
+            <property name="textAlign">right</property>
+        </style>
+        <style name="OldContractInformation" id="1176">
+            <property name="backgroundColor">#FFFFFF</property>
+        </style>
+        <style name="NewContractInformation" id="1177">
+            <property name="backgroundColor">#D8D8D8</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">custom</property>
+            <property name="height">30.5cm</property>
+            <property name="width">23cm</property>
+            <property name="orientation">portrait</property>
+            <page-header>
+                <grid id="776">
+                    <column id="777"/>
+                    <row id="778">
+                        <cell id="779"/>
+                    </row>
+                </grid>
+            </page-header>
+            <page-footer>
+                <grid id="793">
+                    <property name="width">7.84375in</property>
+                    <column id="794">
+                        <property name="width">0.9375in</property>
+                    </column>
+                    <column id="795">
+                        <property name="width">0.14583333333333334in</property>
+                    </column>
+                    <column id="796">
+                        <property name="width">6.760416666666667in</property>
+                    </column>
+                    <row id="797">
+                        <cell id="798">
+                            <auto-text id="799">
+                                <property name="type">page-number</property>
+                            </auto-text>
+                        </cell>
+                        <cell id="800">
+                            <text id="801">
+                                <property name="contentType">plain</property>
+                                <text-property name="content"><![CDATA[/]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="802">
+                            <auto-text id="803">
+                                <property name="type">total-page</property>
+                            </auto-text>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <table id="614">
+            <property name="style">OldContractInformation</property>
+            <property name="fontFamily">"Calibri"</property>
+            <property name="display">inline</property>
+            <property name="pageBreakAfter">always</property>
+            <property name="width">98%</property>
+            <property name="dataSet">dsReBilling</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">RE_BILLING_ID</property>
+                    <text-property name="displayName">RE_BILLING_ID</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["RE_BILLING_ID"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">INVOICE_NUMBER</property>
+                    <text-property name="displayName">INVOICE_NUMBER</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["INVOICE_NUMBER"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BUSINESS_NAME</property>
+                    <text-property name="displayName">BUSINESS_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["BUSINESS_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">OFFICE_NAME</property>
+                    <text-property name="displayName">OFFICE_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["OFFICE_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BookingDate</property>
+                    <text-property name="displayName">BookingDate</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["BookingDate"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">CONSG_NO</property>
+                    <text-property name="displayName">CONSG_NO</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CONSG_NO"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">consignmentType</property>
+                    <text-property name="displayName">consignmentType</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["consignmentType"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">CITY_NAME</property>
+                    <text-property name="displayName">CITY_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CITY_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FINAL_WEIGHT</property>
+                    <text-property name="displayName">FINAL_WEIGHT</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["FINAL_WEIGHT"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">CONTRACT_FOR</property>
+                    <text-property name="displayName">CONTRACT_FOR</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CONTRACT_FOR"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">RATE_CALCULATED_FOR</property>
+                    <text-property name="displayName">RATE_CALCULATED_FOR</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["RATE_CALCULATED_FOR"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FreightCharges</property>
+                    <text-property name="displayName">FreightCharges</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["FreightCharges"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">RiskSurcharge</property>
+                    <text-property name="displayName">RiskSurcharge</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["RiskSurcharge"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">DocumentHandlingCharge</property>
+                    <text-property name="displayName">DocumentHandlingCharge</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["DocumentHandlingCharge"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">ParcelHandlingCharge</property>
+                    <text-property name="displayName">ParcelHandlingCharge</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["ParcelHandlingCharge"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">AirportHandlingCharge</property>
+                    <text-property name="displayName">AirportHandlingCharge</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["AirportHandlingCharge"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">OtherCharges</property>
+                    <text-property name="displayName">OtherCharges</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["OtherCharges"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">Column Binding</property>
+                    <expression name="expression" type="javascript">row["TotalPickups"]</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">Number_Of_Pickups</property>
+                    <text-property name="displayName">Number Of Pickups</text-property>
+                    <expression name="expression" type="javascript">row["TotalPickups"]</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">SerialNumber</property>
+                    <text-property name="displayName">SerialNumber</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">RUNNINGSUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">1</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(dataSetRow["CONTRACT_FOR"],'O')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalWeightOldContract</property>
+                    <text-property name="displayName">TotalWeightOldContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["FINAL_WEIGHT"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'O')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalFreightChargesOldContract</property>
+                    <text-property name="displayName">TotalFreightChargesOldContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["FreightCharges"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'O')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalCharges</property>
+                    <text-property name="displayName">TotalCharges</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["TotalCharges"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalPickups</property>
+                    <text-property name="displayName">TotalPickups</text-property>
+                    <property name="dataType">integer</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">COUNTDISTINCT</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["CONSG_NO"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalRiskSurchargeOldContract</property>
+                    <text-property name="displayName">TotalRiskSurchargeOldContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["RiskSurcharge"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'O')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalDocumentHandlingChargeOldContract</property>
+                    <text-property name="displayName">TotalDocumentHandlingChargeOldContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["DocumentHandlingCharge"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'O')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalParcelHandlingChargeOldContract</property>
+                    <text-property name="displayName">TotalParcelHandlingChargeOldContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["ParcelHandlingCharge"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'O')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalAirportHandlingChargeOldContract</property>
+                    <text-property name="displayName">TotalAirportHandlingChargeOldContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["AirportHandlingCharge"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'O')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalOtherChargesOldContract</property>
+                    <text-property name="displayName">TotalOtherChargesOldContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["OtherCharges"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'O')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalTotalChargeOldContract</property>
+                    <text-property name="displayName">TotalTotalChargeOldContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["TotalCharges"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'O')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalWeightNewContract</property>
+                    <text-property name="displayName">TotalWeightNewContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["FINAL_WEIGHT"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'N')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalFreightChargeNewContract</property>
+                    <text-property name="displayName">TotalFreightChargeNewContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["FreightCharges"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'N')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalRiskSurchargeNewContract</property>
+                    <text-property name="displayName">TotalRiskSurchargeNewContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["RiskSurcharge"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'N')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalDocumentHandlingChargeNewContract</property>
+                    <text-property name="displayName">TotalDocumentHandlingChargeNewContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["DocumentHandlingCharge"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'N')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalParcelHandlingChargeNewContract</property>
+                    <text-property name="displayName">TotalParcelHandlingChargeNewContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["ParcelHandlingCharge"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'N')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalAirportHandlingChargeNewContract</property>
+                    <text-property name="displayName">TotalAirportHandlingChargeNewContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["AirportHandlingCharge"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'N')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalOtherChargesNewContract</property>
+                    <text-property name="displayName">TotalOtherChargesNewContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["OtherCharges"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'N')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalTotalChargesNewContract</property>
+                    <text-property name="displayName">TotalTotalChargesNewContract</text-property>
+                    <property name="dataType">float</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>InvoiceNumberGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["TotalCharges"]</expression>
+                        </structure>
+                    </list-property>
+                    <expression name="filterExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'N')</expression>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalWeightDifference</property>
+                    <text-property name="displayName">TotalWeightDifference</text-property>
+                    <expression name="expression" type="javascript">BirtMath.subtract(row["TotalWeightNewContract"],row["TotalWeightOldContract"])</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalFreightChargesDifference</property>
+                    <text-property name="displayName">TotalFreightChargesDifference</text-property>
+                    <expression name="expression" type="javascript">BirtMath.subtract(row["TotalFreightChargeNewContract"],row["TotalFreightChargesOldContract"])</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalRiskSurchargeDifference</property>
+                    <text-property name="displayName">TotalRiskSurchargeDifference</text-property>
+                    <expression name="expression" type="javascript">BirtMath.subtract(row["TotalRiskSurchargeNewContract"],row["TotalRiskSurchargeOldContract"])</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalDocumentHandlingChargeDifference</property>
+                    <text-property name="displayName">TotalDocumentHandlingChargeDifference</text-property>
+                    <expression name="expression" type="javascript">BirtMath.subtract(row["TotalDocumentHandlingChargeNewContract"],row["TotalDocumentHandlingChargeOldContract"])</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalParcelHandlingChargeDifference</property>
+                    <text-property name="displayName">TotalParcelHandlingChargeDifference</text-property>
+                    <expression name="expression" type="javascript">BirtMath.subtract(row["TotalParcelHandlingChargeNewContract"],row["TotalParcelHandlingChargeOldContract"])</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalAirportHandlingChargeDifference</property>
+                    <text-property name="displayName">TotalAirportHandlingChargeDifference</text-property>
+                    <expression name="expression" type="javascript">BirtMath.subtract(row["TotalAirportHandlingChargeNewContract"],row["TotalAirportHandlingChargeOldContract"])</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalOtherChargesDifference</property>
+                    <text-property name="displayName">TotalOtherChargesDifference</text-property>
+                    <expression name="expression" type="javascript">BirtMath.subtract(row["TotalOtherChargesNewContract"],row["TotalOtherChargesOldContract"])</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalTotalChargesDifference</property>
+                    <text-property name="displayName">TotalTotalChargesDifference</text-property>
+                    <expression name="expression" type="javascript">BirtMath.subtract(row["TotalTotalChargesNewContract"],row["TotalTotalChargeOldContract"])</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">RTORecordIndicator</property>
+                    <text-property name="displayName">RTORecordIndicator</text-property>
+                    <expression name="expression" type="javascript">if(BirtComp.equalTo(row["RATE_CALCULATED_FOR"],'R')) {&#13;
+	'*';&#13;
+} else {&#13;
+	'';&#13;
+}</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+            </list-property>
+            <column id="693">
+                <property name="width">0.22916666666666666in</property>
+            </column>
+            <column id="678">
+                <property name="width">0.71875in</property>
+            </column>
+            <column id="1256">
+                <property name="width">0.17708333333333334in</property>
+            </column>
+            <column id="679">
+                <property name="width">0.9583333333333334in</property>
+            </column>
+            <column id="680">
+                <property name="width">0.3854166666666667in</property>
+            </column>
+            <column id="681">
+                <property name="width">0.9270833333333334in</property>
+            </column>
+            <column id="682">
+                <property name="width">0.46875in</property>
+            </column>
+            <column id="683">
+                <property name="width">0.4583333333333333in</property>
+            </column>
+            <column id="684">
+                <property name="width">0.5104166666666666in</property>
+            </column>
+            <column id="685">
+                <property name="width">0.5729166666666666in</property>
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">&#13;
+&#13;
+if( BirtComp.equalTo( row._outer["CUSTOMER_TYPE_CODE"], "RL") ) {&#13;
+	&#13;
+	false;&#13;
+} else {&#13;
+	if( BirtComp.equalTo( row._outer['PRODUCT_SERIES'], "D") || BirtComp.equalTo( row._outer['PRODUCT_SERIES'], "L") ) {&#13;
+		&#13;
+		true;&#13;
+	} else {&#13;
+		&#13;
+		false;&#13;
+	}&#13;
+}</expression>
+                    </structure>
+                </list-property>
+            </column>
+            <column id="686">
+                <property name="width">0.53125in</property>
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">&#13;
+&#13;
+if( BirtComp.equalTo( row._outer["CUSTOMER_TYPE_CODE"], "RL") ) {&#13;
+	&#13;
+	false;&#13;
+} else {&#13;
+	if( BirtComp.equalTo( row._outer['PRODUCT_SERIES'], "D") || BirtComp.equalTo( row._outer['PRODUCT_SERIES'], "L") ) {&#13;
+		&#13;
+		true;&#13;
+	} else {&#13;
+		&#13;
+		false;&#13;
+	}&#13;
+}</expression>
+                    </structure>
+                </list-property>
+            </column>
+            <column id="687">
+                <property name="width">0.5520833333333334in</property>
+                <list-property name="visibility">
+                    <structure>
+                        <property name="format">all</property>
+                        <expression name="valueExpr" type="javascript">&#13;
+&#13;
+if( BirtComp.notEqual( row._outer["CUSTOMER_TYPE_CODE"], "RL") ) {&#13;
+	&#13;
+	false;&#13;
+} else {&#13;
+	if( BirtComp.notBetween( row._outer['PRODUCT_SERIES'], "D", "L")) {&#13;
+		&#13;
+		false;&#13;
+	} else {&#13;
+		&#13;
+		true;&#13;
+	}&#13;
+}</expression>
+                    </structure>
+                </list-property>
+            </column>
+            <column id="688">
+                <property name="width">0.5104166666666666in</property>
+            </column>
+            <column id="689">
+                <property name="width">0.6354166666666666in</property>
+            </column>
+            <group id="1146">
+                <property name="groupName">InvoiceNumberGroup</property>
+                <expression name="keyExpr" type="javascript">row["INVOICE_NUMBER"]</expression>
+                <structure name="toc">
+                    <expression name="expressionValue" type="javascript">"Bill number - " + row["INVOICE_NUMBER"]</expression>
+                </structure>
+                <property name="hideDetail">false</property>
+                <header>
+                    <row id="1147">
+                        <cell id="1148">
+                            <property name="colSpan">5</property>
+                            <property name="rowSpan">1</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">left</property>
+                            <grid id="729">
+                                <property name="width">2.34375in</property>
+                                <column id="730">
+                                    <property name="width">0.96875in</property>
+                                </column>
+                                <column id="731">
+                                    <property name="width">1.375in</property>
+                                </column>
+                                <row id="732">
+                                    <cell id="733">
+                                        <label id="736">
+                                            <property name="fontWeight">bold</property>
+                                            <property name="textAlign">left</property>
+                                            <text-property name="text">Billing Office :</text-property>
+                                        </label>
+                                    </cell>
+                                    <cell id="734">
+                                        <property name="textAlign">left</property>
+                                        <data id="1143">
+                                            <property name="resultSetColumn">OFFICE_NAME</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                        <cell id="1152">
+                            <property name="colSpan">4</property>
+                            <property name="rowSpan">1</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">left</property>
+                            <grid id="739">
+                                <property name="width">2.9479166666666665in</property>
+                                <column id="740">
+                                    <property name="width">0.71875in</property>
+                                </column>
+                                <column id="741">
+                                    <property name="width">2.2291666666666665in</property>
+                                </column>
+                                <row id="742">
+                                    <cell id="743">
+                                        <label id="746">
+                                            <property name="fontWeight">bold</property>
+                                            <property name="textAlign">left</property>
+                                            <text-property name="text">Customer:</text-property>
+                                        </label>
+                                    </cell>
+                                    <cell id="744">
+                                        <data id="1144">
+                                            <property name="resultSetColumn">BUSINESS_NAME</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                        <cell id="1156">
+                            <property name="colSpan">5</property>
+                            <property name="rowSpan">1</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">left</property>
+                            <grid id="749">
+                                <property name="width">2.3125in</property>
+                                <column id="750">
+                                    <property name="width">0.8020833333333334in</property>
+                                </column>
+                                <column id="751">
+                                    <property name="width">1.5104166666666667in</property>
+                                </column>
+                                <row id="752">
+                                    <cell id="753">
+                                        <label id="755">
+                                            <property name="fontWeight">bold</property>
+                                            <property name="textAlign">left</property>
+                                            <text-property name="text">Invoice No.:</text-property>
+                                        </label>
+                                    </cell>
+                                    <cell id="754">
+                                        <data id="1145">
+                                            <property name="textAlign">left</property>
+                                            <property name="resultSetColumn">INVOICE_NUMBER</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                    <row id="1260">
+                        <cell id="1261">
+                            <property name="colSpan">1</property>
+                            <property name="rowSpan">2</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="468">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <text-property name="text">Sr. No.</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1262">
+                            <property name="colSpan">1</property>
+                            <property name="rowSpan">2</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="469">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <text-property name="text">Book-Dt</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1263">
+                            <property name="colSpan">2</property>
+                            <property name="rowSpan">2</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="470">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <text-property name="text">C/N No.</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1265">
+                            <property name="colSpan">1</property>
+                            <property name="rowSpan">2</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="856">
+                                <property name="fontWeight">bold</property>
+                                <text-property name="text">Type</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1266">
+                            <property name="colSpan">1</property>
+                            <property name="rowSpan">2</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="472">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <text-property name="text">Destination</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1267">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="480">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Weight</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1268">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="482">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Freight  Charges</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1269">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="484">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Risk Sur Charge</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1270">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <label id="486">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Doc. Handling Charge</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1271">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <label id="488">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Parcel Handling Charge</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1272">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <label id="490">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Airport Handling Charge</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1273">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <label id="492">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Other Charge</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1274">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <label id="494">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Total</text-property>
+                            </label>
+                        </cell>
+                    </row>
+                    <row id="1275">
+                        <cell id="1282">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="1290">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">K.G.</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1283">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="483">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Rs.</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1284">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="485">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Rs.</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1285">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <label id="487">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Rs.</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1286">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <label id="489">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Rs.</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1287">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <label id="491">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Rs.</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1288">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <label id="493">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Rs.</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1289">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <label id="832">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">9pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">Rs.</text-property>
+                            </label>
+                        </cell>
+                    </row>
+                </header>
+                <footer>
+                    <row id="1202">
+                        <property name="pageBreakAfter">auto</property>
+                        <cell id="1203">
+                            <property name="colSpan">5</property>
+                            <property name="rowSpan">3</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <grid id="757">
+                                <property name="width">2.5833333333333335in</property>
+                                <column id="758">
+                                    <property name="width">0.9270833333333334in</property>
+                                </column>
+                                <column id="759">
+                                    <property name="width">1.65625in</property>
+                                </column>
+                                <row id="760">
+                                    <cell id="761">
+                                        <label id="763">
+                                            <property name="fontWeight">bold</property>
+                                            <text-property name="text">Total Pickups :</text-property>
+                                        </label>
+                                    </cell>
+                                    <cell id="762">
+                                        <data id="1139">
+                                            <property name="resultSetColumn">Number_Of_Pickups</property>
+                                        </data>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                        <cell id="1207">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="766">
+                                <property name="fontWeight">bold</property>
+                                <text-property name="text">Actual Value:</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1208">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1216">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.000{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalWeightOldContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1209">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1220">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalFreightChargesOldContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1210">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1222">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalRiskSurchargeOldContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1211">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1223">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalDocumentHandlingChargeOldContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1212">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1224">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalParcelHandlingChargeOldContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1213">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1225">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalAirportHandlingChargeOldContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1214">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1226">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalOtherChargesOldContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1215">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1227">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalTotalChargeOldContract</property>
+                            </data>
+                        </cell>
+                    </row>
+                    <row id="1188">
+                        <property name="pageBreakAfter">auto</property>
+                        <cell id="1193">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="1217">
+                                <property name="fontWeight">normal</property>
+                                <text-property name="text">Revised Value:</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1194">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1229">
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.000{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalWeightNewContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1195">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1231">
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalFreightChargeNewContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1196">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1233">
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalRiskSurchargeNewContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1197">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1234">
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalDocumentHandlingChargeNewContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1198">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1235">
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalParcelHandlingChargeNewContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1199">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1236">
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalAirportHandlingChargeNewContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1200">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1237">
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalOtherChargesNewContract</property>
+                            </data>
+                        </cell>
+                        <cell id="1201">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1238">
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalTotalChargesNewContract</property>
+                            </data>
+                        </cell>
+                    </row>
+                    <row id="1161">
+                        <property name="pageBreakAfter">always</property>
+                        <cell id="1166">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <label id="1218">
+                                <property name="fontWeight">bold</property>
+                                <text-property name="text">Difference:</text-property>
+                            </label>
+                        </cell>
+                        <cell id="1167">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1240">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalWeightDifference</property>
+                            </data>
+                        </cell>
+                        <cell id="1168">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1241">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalFreightChargesDifference</property>
+                            </data>
+                        </cell>
+                        <cell id="1169">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1242">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalRiskSurchargeDifference</property>
+                            </data>
+                        </cell>
+                        <cell id="1170">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1243">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalDocumentHandlingChargeDifference</property>
+                            </data>
+                        </cell>
+                        <cell id="1171">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1244">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalParcelHandlingChargeDifference</property>
+                            </data>
+                        </cell>
+                        <cell id="1172">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1245">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalAirportHandlingChargeDifference</property>
+                            </data>
+                        </cell>
+                        <cell id="1173">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1246">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalOtherChargesDifference</property>
+                            </data>
+                        </cell>
+                        <cell id="1174">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <property name="textAlign">right</property>
+                            <data id="1247">
+                                <property name="fontWeight">bold</property>
+                                <structure name="numberFormat">
+                                    <property name="category">Fixed</property>
+                                    <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                </structure>
+                                <property name="resultSetColumn">TotalTotalChargesDifference</property>
+                            </data>
+                        </cell>
+                    </row>
+                </footer>
+            </group>
+            <detail>
+                <row id="640">
+                    <property name="style">OldContractInformation</property>
+                    <cell id="691">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">left</property>
+                        <data id="1142">
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'N')</expression>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">SerialNumber</property>
+                        </data>
+                    </cell>
+                    <cell id="641">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">left</property>
+                        <data id="1126">
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'N')</expression>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">BookingDate</property>
+                        </data>
+                    </cell>
+                    <cell id="1252">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">left</property>
+                        <data id="1258">
+                            <property name="resultSetColumn">RTORecordIndicator</property>
+                        </data>
+                    </cell>
+                    <cell id="643">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">left</property>
+                        <data id="1127">
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"],'N')</expression>
+                                </structure>
+                            </list-property>
+                            <property name="resultSetColumn">CONSG_NO</property>
+                        </data>
+                    </cell>
+                    <cell id="645">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">center</property>
+                        <list-property name="highlightRules">
+                            <structure>
+                                <property name="operator">is-true</property>
+                                <property name="backgroundColor">#D8D8D8</property>
+                                <expression name="testExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"], 'N')</expression>
+                            </structure>
+                        </list-property>
+                        <data id="1128">
+                            <property name="resultSetColumn">consignmentType</property>
+                        </data>
+                    </cell>
+                    <cell id="647">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <list-property name="highlightRules">
+                            <structure>
+                                <property name="operator">is-true</property>
+                                <property name="backgroundColor">#D8D8D8</property>
+                                <expression name="testExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"], 'N')</expression>
+                            </structure>
+                        </list-property>
+                        <data id="1129">
+                            <property name="resultSetColumn">CITY_NAME</property>
+                        </data>
+                    </cell>
+                    <cell id="649">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">right</property>
+                        <list-property name="highlightRules">
+                            <structure>
+                                <property name="operator">is-true</property>
+                                <property name="backgroundColor">#D8D8D8</property>
+                                <expression name="testExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"], 'N')</expression>
+                            </structure>
+                        </list-property>
+                        <data id="1130">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.000{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="resultSetColumn">FINAL_WEIGHT</property>
+                        </data>
+                    </cell>
+                    <cell id="651">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">right</property>
+                        <list-property name="highlightRules">
+                            <structure>
+                                <property name="operator">is-true</property>
+                                <property name="backgroundColor">#D8D8D8</property>
+                                <expression name="testExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"], 'N')</expression>
+                            </structure>
+                        </list-property>
+                        <data id="1131">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="resultSetColumn">FreightCharges</property>
+                        </data>
+                    </cell>
+                    <cell id="653">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">right</property>
+                        <list-property name="highlightRules">
+                            <structure>
+                                <property name="operator">is-true</property>
+                                <property name="backgroundColor">#D8D8D8</property>
+                                <expression name="testExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"], 'N')</expression>
+                            </structure>
+                        </list-property>
+                        <data id="1132">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="resultSetColumn">RiskSurcharge</property>
+                        </data>
+                    </cell>
+                    <cell id="655">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">right</property>
+                        <list-property name="highlightRules">
+                            <structure>
+                                <property name="operator">is-true</property>
+                                <property name="backgroundColor">#D8D8D8</property>
+                                <expression name="testExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"], 'N')</expression>
+                            </structure>
+                        </list-property>
+                        <data id="1133">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="resultSetColumn">DocumentHandlingCharge</property>
+                        </data>
+                    </cell>
+                    <cell id="657">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">right</property>
+                        <list-property name="highlightRules">
+                            <structure>
+                                <property name="operator">is-true</property>
+                                <property name="backgroundColor">#D8D8D8</property>
+                                <expression name="testExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"], 'N')</expression>
+                            </structure>
+                        </list-property>
+                        <data id="1134">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="resultSetColumn">ParcelHandlingCharge</property>
+                        </data>
+                    </cell>
+                    <cell id="659">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">right</property>
+                        <list-property name="highlightRules">
+                            <structure>
+                                <property name="operator">is-true</property>
+                                <property name="backgroundColor">#D8D8D8</property>
+                                <expression name="testExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"], 'N')</expression>
+                            </structure>
+                        </list-property>
+                        <data id="1135">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="resultSetColumn">AirportHandlingCharge</property>
+                        </data>
+                    </cell>
+                    <cell id="661">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">right</property>
+                        <list-property name="highlightRules">
+                            <structure>
+                                <property name="operator">is-true</property>
+                                <property name="backgroundColor">#D8D8D8</property>
+                                <expression name="testExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"], 'N')</expression>
+                            </structure>
+                        </list-property>
+                        <data id="1136">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="resultSetColumn">OtherCharges</property>
+                        </data>
+                    </cell>
+                    <cell id="663">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">0pt</property>
+                        <property name="paddingBottom">0pt</property>
+                        <property name="paddingRight">0pt</property>
+                        <property name="textAlign">right</property>
+                        <list-property name="highlightRules">
+                            <structure>
+                                <property name="operator">is-true</property>
+                                <property name="backgroundColor">#D8D8D8</property>
+                                <expression name="testExpr" type="javascript">BirtComp.equalTo(row["CONTRACT_FOR"], 'N')</expression>
+                            </structure>
+                        </list-property>
+                        <data id="1221">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="resultSetColumn">TotalCharges</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+        </table>
+    </body>
+    <list-property name="images">
+        <structure>
+            <property name="name">FF_Logo.jpg</property>
+            <property name="data">
+                /9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcI
+                CQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwM
+                DAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCABXAMEDASIAAhEBAxEB/8QA
+                HwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIh
+                MUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVW
+                V1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXG
+                x8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQF
+                BgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAV
+                YnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOE
+                hYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq
+                8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9+ycZ9qzNY8YadoNysNzcETMN3lxxtK4HqQoJA9zUfivxN/YX
+                2WCEQvfahJ5NvHI21cgFmdsc7VAyceoHek8OWMWiabslu4bi8lPm3M+QpmkPU4zwB0AzwABR5ibNDT9V
+                g1ezS4tZ47iCXlXQ5HuPqD1HUVOZB0yM1yutasngzV7jUwEk0q5iDXmyVd0EinAkCk/NlTghfmO1cAmv
+                mn/gov8Atg6/8P8AQLXQfCdrq2nw6xH/AKTr72kkMaof+WMDsoG8jq3YdOenj5/nNHKsDPH103GK2Su2
+                +3l6vRHrZHk9bNMbDA0GlKT3bsl/XZas9M/aN/4KA+CP2e7iXTWnk8QeII+G0/T2VvIPpLIflT6cn2r5
+                W8bf8Fa/iLr1w/8AYum+H9Bts/JmJruXHuzELn/gNfLLuWkd2LOzZZnYkkk9ST3P+NeSfFf9szwt8Hdd
+                1HTtS0/xJNPpxCNLDpzfZJJCu5UExIXvjPPfriv5vfG/F3E+MeEyWMo9oU97Xtdy3e/Sx/RdHgXhbh7C
+                LE5u1N9ZT2va9lFaL53Z9E/tM/8ABeX4nfszaFC76po2ta/qKsbLTZdNiVMDgyyFAGEYPocseB3Id/wT
+                6/4ON/i58YfGcGl/ED4YaHrugrKEvtf0BpNPbT1J5Zo5WdJSB/ArKxr8mbjxLdftCfGuTX/FSa1PYXVy
+                Hvjpdo91JawDO2GNQPl4GAT6k191fCj4u+C9G+D1xqOnaffeEPCXh8/Z86lZm0DEDPyqTudjxz1YnvX7
+                txDWxvBHD9LAKlPG4+tbnnKUpRpylooRV7t9FFb7voj8myfAZfxdnVTF80cJg6d+WMUoymlq5PSyVtW3
+                tstbs/eX4T/Gjw58b/DKav4Y1a21SzJw+w4kgb+7Ih+ZG9iK6oNluvFfzEXP/BYD4jfDX4kxXvwdnfw0
+                IpFUTS24up9VUHOySE5XY2Pu4LY7g1++3/BNf9txv28/2YdM8Z3vhy/8J+IoXNjrWlXMTosF0igl4SwB
+                aFwwZT1GSp5U19Tl2Dzell1HEZ5SjRrT+wpJv1tuvNa26s+IzZZcsdVpZRVlWow+3y2XpfZ+ul+x9BHO
+                DQWxik3Zz2FIT+gxXRc88ViV96RnwOvNfB//AAcH/tNaV8C/2EtU0y3+IuveAvH2uyxy+G00S5kgvdSa
+                KRfNidkwUgKMQzErztxk8H4Z/ZA/4KW/t8fEv9mK28KeDPAi6xHo8L5+JXie0aD7PaKC26a4unS3couf
+                3rbjtXkEgk+5g8hrYjC/WoyUVe3vO3zu9/kcFbMIU6vsmm3a+mp+kP7dn/BXvwl/wTt+KWk6N8Q/AvxG
+                Tw1rUSm18VadYQ3OmTTYJaAfvA5kQckbQccgEV83ftY/8HSXwr+GtpaWfwm8Pat8TtYvYkfzp1fTLG1Z
+                wCIzuQyySDOCqJjPG41+ZHgn9nr9ov8A4KyfHWae817xZ8XdE0jXLfSda8TWV8l3p2kLIwDyW8crxRlU
+                Qlh5agFRxwRn9xf2Gv8Agif8CP2GLm01fRfDzeKfGNoAR4i8QFbu6ifu0KYEUHPQooYf3jXtYrL8qy6E
+                Fir1KttYxej9b6r+tDho4nF4mT9l7se73+Xc9X/YP+NPxE/aE/Zo0Hxh8TfBFr8PPEuu77hdDiuHle3t
+                Sf3Lyb1DJI6/MUPKgjPOQPYwSWpoTa3LU4cNXxtSSlNyirJ9Ox7cU1FJu4KcilpE+6KDxioKDOR+NDHA
+                oxz+NDfdNABnilHSkPC0tABRRRQBT1TQbLWtn2yztLwRnKCaFZNueuMjis3VvCnh7SdOuLqfSNKWG2ia
+                WQizjJCqCTxjngVut0pHXdjjNF7aiaPN9D1PwtBq663ev4V0aKCMLZIbiBWiLctI7DADkbQACcAHnmj4
+                r678P/i78O9Y8N6r4k8K3Vnqtq8BV9SgOxiDtcfNwytgg9iK8K/4K9auunfBLw7pcccSpqmsB5AFA3CK
+                NmH6kV+egsoWwBBEf+2Y4r8e438UY5RmE8r+re1XKr3lb4ltaz6H63wV4ZzzfARzL6x7N8ztaN/he97r
+                qb3j34f6n8LvEr6RqzWMl7FGsnmWd3HdwTKcgMrxsQRkdOoPUV8Zf8FR/iLs0fwx4ThkYtLI+qXCKSfl
+                AKRAj3Jcj6V9AeKfjRpXh65uLDR7O68S6tbAma00xVMdtgZJnnOI4h3O459jXyl8Kvh7qf7ePx/1Xxfr
+                yXGm+G7BljzbSnKlBiK3ifHJH3mYDv7ivmPCTJ6GAzirxhmUPYYPCJzSk7ycpK0IpaN3d2tFe2nc+38R
+                szr4zLKfDOCn7bFYlqLcVZcqs5tvVLZJq+lz0Hwf43f9hj4CeG7BNDbW/EfiAtqGpW0d2sMsBZQVBXl2
+                KrtGAuBhiSK8E+PX7Q3ir9sDxpZWVpp14lpFhbDRrQtcFnx80jYHzN7kAKPxNfS37V1z4a/Zi+A2pRaD
+                p9taa74pzp0Vy5Mt5MGH72R5Xy7YTPfGWFed/sJ6r4T+CHg678Q6zfLceJfER8ix02xia7v0tVPURoCV
+                8xweuOFHrX6jwhmuCo5TiuPfqDr4yVWUaUpXvUlJ3bUE5RhGC05lraL1R8FxLgMXVzHD8HfXFRwsacXU
+                irWhGOycmk5Sk9bbXa0Zo/sreEPFnwKS0g/4UzqNzrN7OEutcu72JfIjZgMqMEoiryccnBr9Nf8Agnj+
+                0GPgd8eILfU9Qis/DfiVfsd9LczCOCCQAmKVmYgLhsrknox9K+LtR8ffETxfp9xdaX4fsPBGkwRPM9/r
+                7faLwIoLMy2sRwDgZw7fhXjui/Hf4OazqttqPjLxH4x+IE1tKkzR6lp0i6cuGzj7LHiPafRs8V+dOOb5
+                /nceIpU7VaUk5xoc9eTv9mTc3TgrXSipKyv7p9jUjleU5NLIlO9OpFqDrclGKsvij7qnN3s78r1tqfup
+                4z/4Kz/DqfxDc+HPhbpniv47+K7djE9j4G083tnbuDjE+oMVtIh6kykj0rL/AOEM/ay/ahVjrniLwj+z
+                n4YuMj7B4eVfEfiZkPZ7uULawN7xRyEetdd+yF+3R8CPit8E/Bd/4E1jw94U0DxZfTaP4d0m5t49Fkv7
+                mBtksVvbHaWwwx8oOeK+ilwccfpX9F1KqoPljS5X/e1f3bfg/U/nGMHU1c7ry2+/c+dfg3/wSw+EPwp8
+                VjxPqOj3/wARvG5O5/Evje+fXtSLdcoZsxxc9BEigV3X7TP7JPhr9rbw/pWgeMrrW5/CVjcC5vfD9neG
+                1sNe242RXgQB5YVIz5QZUY43BgAK9SDcCoL3UINOtHnuZoreCJdzySOERB6kngCud4qtKaqOTutvL07G
+                iowUeVLQyPAfwu8N/C7SzZeGvD+ieHrNtoaDTLGK0jbYu1ciNQDhQAM9BW6vFIrho8qQQehB4NfKX7W3
+                /BaH4E/sUfGqX4feOta1+HxTBawXkltYaJcXgVJgTGNyDBYgZwM0UcPWrzcaUXKW+mrCdSFON5OyPq5j
+                z6/jQTg/U18XfCz/AIL6fs1/FzVdctbTxRruljw1pM+t6lNqmg3NpHa20LIrkkrndukQBQMksAK9U/Zh
+                /wCCknwt/ar/AGf9e+KWiare6D4B8O6hLp9zrPiOAaXbO0SoXkVpG/1eZFXJwd2RjNa1cuxVJXqU2tt1
+                32+8UcTSlpGSZ78vShulUPC/ijTfGfhyx1fSL+01TS9SgS5tLu1lWWG5icAq6OpIZSCCCKuzSKkRLHCg
+                ZJPYVx+TNhQ2Hx6+9KTxXzT+yr/wVY+Ev7aX7Q/ib4dfDe617xBe+ErJr2/1Yaa0OlACUQ7ElchmYsTj
+                5MEK2CcV9JXN3HawPLK6xRxqXd2YKqKBkkk9AK0rUKlKfJVi099fMiFSM1zRd0SEdKFOT7V5x+0Z8bf+
+                FQfCzXPEFqq3UWi6PPrUjJIo8yGMDCoxBUFiw+YggAE4PArnv2Yf2kJPjQuoE+TPBYaw+hvNb3sd9bvO
+                tqtzuiuEjj3rsJVg0alXXGSDmhUZuPOloDqR5uXqe00UUVmWB6Uwk5AFPNNVcHr0oA+Q/wDgsNo4b4E6
+                DrUjJFa6LqpNzM5wkMbxMCzHsPlGa/K/RJNS/aChN/JNeaL4Fkz9kt4XMN5rqdPNlcYaKBuoRcMw5JAO
+                K/bv9tT9nO0/ax/Zc8bfD27kkgHiXTJbaGaMgPBNjMbAnp8wH4E1+G3xI+F8/wAPdJFh478R+JvEJtJR
+                pVv4ctII9POoXCfKLdkhwzn5TnLBAASeBX4X4hZJQpZosbGdq1a0YvlcmuVa8n2ed6aylFRWqfVfunhz
+                nNWplksDKN6dFuTXMop8z05vtcq10ind2TXR5vjGX/hcOnTfD74frb6T4YiJg1/XLSMJa2sQ+/a25HEk
+                rdGYEhRnJya3PDHjTw18O/C0fhrwBpba5Do0TI5tZFjsbUgZeS4u2+QHqWxub2qPRvgveeLtMhPjKW10
+                3QbSPNt4W0mT7PplnGOcXEi4M5HccR9eD1rzb4neMdT/AGobxvhx8MIo9P8AB9mwh1vXYYvKs1QHmCHa
+                AGHHO373suSfmMDgsNmbWXRqf7LSfPVm5P2cXs51Z6OrUa0hCFlsot6t/X4zFV8AnjpQ/wBoqLkpxS99
+                rpCnDanBPWUpXfWSVkl5VBZ+Jf8AgoF+0QovJLaLw7oGY5p7MN9mtrYOeELctJIRwTg4GcADFfangT4a
+                eHvhfpi2vh/R7DSYgApMEIV392fqx+pqj8H/AIQ6L8EfBFtoOiW/lwQ/PNM2PNu5O8kh9T+QGAK6kDPQ
+                ZPp614XiN4hf2zVp5ZlKdHAUFy06a05u85LrKT1trb1uevwPwV/ZlOePzJqrjKz5pzetu0Yt9I7aWv8A
+                ceQftw/F7/hUnwG1D7PL5eqa+Dplpg/Mu8fvHH+6mfxIrzD9gz4g+FP7J8MfC7TdG1XV/FXjnURbagJL
+                QRwr5x2E72+8iJgcDkk9KzPivqEf7Vf7dOieFYpo5vDvhRj5wVwUlMZEk5Hrlgqfga+vtY8aad+zv8O/
+                FPxiubTT0u/AGmtHosskaiSTVLn93Z26HGTh/wB8yj+GAk8V+mZVl+GyvJ8u4Pq0JzxeOary5Z8nI3dU
+                ubS7UVebV42Z+f5nj6+PzHG8T060IYfBp0Y80ebmtrU5dbJydop2dzrfgk/7K/j79qS41XQfht8ULXw3
+                +w94Xurg3ct4n2C4uLS7lkz9lw0stw8/nyB2kQPsBZcKK90/Zk/4OQvBX7S3jjRtKh+GPjHQNPk+33ni
+                DWr24jfTvDGn20Jl+1zSquG3AYKDBUsoBYsBXw3c65F+wJ/wQZ+wm6WX4v8A7Xd+bqRTJm7GlM2PMbnO
+                Gj4yeC143XBr65/aG+B/wx+Af/BP34YfsQX/AIwj+HnjL4raJ/aH9uzRKNOa9t3jurhr6QsuUnnUwqAS
+                eFHQAH+psVg8M0o1VKfvOMXduyivfl56tv5H8y0q9W7lGy0u9Or+Ffcdt4Z/4Lp+L/iBL4Q8X+HP2d/E
+                mpfBfx14wi8HaP4mbW4l1C6nkmMQm+wqjMseVc/M4/1bAkEV4F/wWI/4Kf6z+0f+0Av7MPhH4dfEa80b
+                w94mgbx3Dptpv1PxNY20sbm3tYlyRbycMZJCA4KdFJz5j/wQC8P+Mf2df2qPjLrU3jQ6r8DvhDpOpJ4g
+                1CxupJfD+r3UR3RyWofClwscj7lAbbgE/MM/RH/BuRoDftFfFX47/tM+JLuzuPFnxB1uSxs7Xz0e40+y
+                3+axaPO5FJ8qNcgAi3OOKK+DwmBq1K8YKSppW1espbXv1S1fy0QU61bEQjBys5PXbZb28mz9RIfENpoH
+                gJdW1CMaHYWVgLy5juCqnT4kj3urkEgbFBBwSPlNfz7fs6f8FMvhd4k/4K3eP/2mfjPF4mutFsFmi8HW
+                en6QdQS3QDyIGkOQqeXbgsM/xzk8Yr9EP+Dkj9tdP2af2FbnwVpV8sHir4rSHSY0jkAmg05Ruu5eDkBl
+                2xA9/NPpXrX/AASn/YX8Pfs5f8E1/B/gXxBo+jaw/ibTP7Y8SxXUEdzbXk14oldHDAqyIhSPuMR15uXO
+                lg8DLFV4t+1fIrOzstZO9n5I6sTz1q6pU38Gr9eh8Hf8FmPi/wCE/E37NfhPxr4J8C3vhr40fteaZYaH
+                LZ3Lq19FoUM4lVGjT5Ve5d7RWYclcLn5K7T9q/wv8JPgn8BPgR+wDr/hX4g+JfEfiZtKv7ifw5dQadEL
+                mS4kM1w80gYSL5v2hmXYcKinIIFY37Neqab/AMFN/wDgvF4x+KN1NZn4T/s2WH2bRpC4WyRoC8cMgP3V
+                Qyi5uAemIk9Kzv2AfHN1+2v/AMFDv2lf2w7iyk1jRfhNpF5Z+CrJhv8AMZLaUQBR6/Z4mY4/ius9a9Xk
+                dKkoSuvZrnev25WVON/7qscd1KTlG3vPl26L4n82fYX7UP8AwU9+C3/BJTw74Y+EGiaJr3izXPD2jxpa
+                +FvDiC5uNK06CLPnXMjkCMeWpf5iWIBYgDmuL1T/AIL9+D/if+wl8WPij4R8JeONB/4Q7TY7XTL3XbKK
+                Gz1DVromGC3t5FdhK6OQ7gDhVycZr8o/2d/2i7DWP2cfjJ4lGoXHj79qf9pPVm8H6XpttG897p1hclHu
+                7jphfP3eSgByFjA4UNXtX7QHwJvPEur/ALLf7AGj6rbPf6FP/bfxEnspd8VrqN0XuZoyQcMbe2aY8d5E
+                qv7AwtOShWTck7yk3uoq83btf3U+r1D+0K0k3DRW0SXV6JX79Wa3/BEX9uzT/wBgCbwp4a8SfCrxxq/i
+                v9pPxFDOnih3iggubNphbwSW8bAvOiyvK7nKjLnGcCvcv+C7P/BUfxB4s8Xa1+yn4B8FePDq+pz28XiW
+                +srQtearpbIJZoNPiTLuJEyDIcDCuOhJHG/scWujft0f8Fx9b8b6etvafBb9lnRhpvh/Df6JawWUb21s
+                UPo0guJ8+ka13n/BDe9tv26P+Cj3x/8A2nNZu7Sa4a6bRfC1jJOrXNrZMQvmiPO5UW3SCPdjBMrj1qsZ
+                ChHEyzCtTu4QUmm38Un7i+S36E0XUdJYeEtG7J+S3f3n6P6D8LNJ+K37N3hzSZdAvvDWn3fh23sf7F1A
+                YnsrVoY/9Dn8tgQyhVUlWBDLweuej8G/CqDQPGGra9Ktul/rVyt7cpb7xE86wLbCU7ifm8lFTgKMZ4JO
+                a69e1Or4F1JO/Zn0SigoooqCjM1eDVJrkfYruygi28rNbNIxP1Dj+VVRYa/x/wATLSif+vF//jlef/te
+                /tr+Bv2IfCOj6145n1hYPEOppo+nW2laZNqN5eXLIzhEhiBdvlRug9PWuQ8Df8FOvh78Qfhw3iiz0j4l
+                WunnxFZ+F44b7wdf2t3NeXWPL2QyRhzEM5eXGxMHJFV/Z1acfaqMrPrrYl4mEXyNq57cbHxA3XUtK/8A
+                AF//AI5Xx7+3T/wSQ1L9qL4s6P8AELwv430rwl4s0wTJNDc6K11puoeagR5XQSq6S7VADKeecjmvtM6x
+                afaktzdW32h2ZVi81d7FRkgDOSQME+lYni74v+FvAvgXWfE+r+IdHsPD3h6GS41LUJLpPIsY4wWdnYHj
+                AB461wVcroYi0a8Oda6S1WqcXv3TaO7DZliMNLnw8+R91ps0/wAGk/kfn6f+DfGX4l2Ma/En4z63rcH3
+                pNI0bSY9M02Q+jgSNLIPZnx7V6ToH/BE3wx4S0a307SvF17p2n2qhIbeDS4Y44x7AN+tfZXgrxppfxF8
+                JadruiXsOo6Tq9tHeWdzETsnikUMjDOCMqQcHB5r5q+LP/BYf4QfCD4w+JfAtzB8Rdd1/wAIXMdnqo8P
+                +Dr/AFa3tJnjWRY2lgjZN21hxn19K8zE8C5ZmFNYSWGvCGqhG8Yrpfli0r9LtXPVocbZthajxMcS1OW8
+                nZyflzNN28r28jlx/wAEb9I24/4TvV+f+odF/wDFUkv/AARt0aVCh8davtcEMP7Pi5GMY+9Xs2sft+/D
+                3RNZ+Junyy+IJrv4RaPZ614lit9Hnna1juoTNDCgQEyXBQZMSZYZANeoaX8Q9JvvBula5PcrpdjrFtFc
+                wDUSLSQCRA6qyuQVfBGVPIORXkS8LeHoWbwaXzl2v37anp/8RJ4ilp9bb+Uf8j4Z8Gf8G93wx+HfiD+1
+                dD1V9M1JVZBcQ6anmKrfe5Lnr3r2W6/4JXfDLxX8KtG8I+LvDXhfxvp+iXUt9DJrFhK0jXEqhXlOyVRk
+                oAoHYDjvXrPxc/ai8H/BTxf4C0LXL6ddS+JWpvpOhx20DXCzyxwtNI7svEcSRqSztwOPWtv4gfGvwl8K
+                vhjqXjPxF4i0nSvCmjwNdXmqzXC/ZYIl6sWGQeeMDJzXv4XhrDYfFxzGlGXtmuVTcpylbsnJtpdNPQ8L
+                F8R4zE4Z4GtNeyvzOKjGMb92kkm/U8Q8cf8ABKP4LfEu/wBGutf+Gfw81Wfw9p1tpGmGfS5yLKzt8+RA
+                gE+AiZOBjvznNdl+0F+xT4K/aw0nTrH4l+EvAfjW20hibFdT0ZpWtM4yEYSBlU4GRnBwMjivWPDviSy8
+                WeH7LVNNuY7uw1CFLi3mT7skbqGVh35BB5rwD48f8FSPhZ8CPiRqPg4jxj438V6Iiyatpfg3w5da7No6
+                sMr9pMClImI5Cs27Havdo08VVmo05Tbjt70tPx0PFnOlCLclGz8lqds/7Jnhlvgdd/DNPDngi1+H1/bN
+                Z3Hh+10Y21jLC2NyFI5F64GT1Pesz9nL9hzwP+yG2r/8Kx8J+CfBT66YzqL6dpciveeXkRh2aUkhdzYG
+                cfMa9F8GfFfRvGHw60LxR5s2k6b4htIby1TVo/sFwqyoHRJI5MMkmDyh5B4IroJb2GGaNJJYkeU4RWYA
+                v9B3rGUatnBzlZ7rmer+/UtShdSUVp5I8C/aB/4Jw/C/9qvxvF4k+I/gXwN4x1yG1WxS81DTp2kSBWZh
+                GMTAbQWY9O9eoXnwxn1LwFL4WlGgnw7NYHS309bB0h+ymPy/JAWUELs+XjoK6ptVtkEmbmAeUwV/3i/I
+                xxgHngnPQ1xvjj9onw74C+IXgvwzcNqd7qfjy8ubHTTp9jJd28T28RklM8qApAqgYy5GW+Uc8UOnVqJQ
+                5pNLbV6ddNdA54xbdkr+SPMPh3/wTO+FHwj8BeK/C3hjwB4D0Pw/44tks/EFlaaZMkeqwpuCxyHzslRu
+                bgEdTXzF/wAFItE8X/8ABLP4B+F9M/ZN+EUuk2ni/wARJceMb7wlorX1xbwwrHhFiYS7WmXcgkZWCBSO
+                rZr9HE1q0n1SWyW7tWvYUEkluJVMsanoxXOQPcikTW7Jrgot5amXY0hUTLkKpwzYz0B4J7Gu3CYupSqq
+                pVvNbtSbafa+v3GFalGcOWFovo0krH5J/Bn9l/xf/wAFCf8AgoN8KfippX7Ox/Zn+Gnwsvn1u7ur2yi0
+                /V/FN4XDhPKjRCV3oBkrgK0nJLBa+8X/AOCZ/wAJk+MWsePovh/4Gj8Ya7JdyXmr/wBnz/a52ukeOcs/
+                n/edHZSQBwxxive9J1mz162FxZXdtewElfMgmWVCR2yCRmuE1D9qXwlp/wC1Fp/weNzfS+OdR0GTxKtt
+                FaO8EFikvleZLKPlQl+FUnJrXGY7EYlpQvFRVrRctt3d3u9e5nQw9Okrys231S38jhPg/wD8E4/hh8Af
+                DXifR/BfgbwL4a0zxrZf2drlvZ6bMq6nbbXXypCZidu2RxgEfeNW/wBnP/gn78Ov2Rde1DU/hn4K8C+D
+                NS1a3W0vLrT9KlE08KtuWMs0xO0NzgcZxXpF/wDHfwhpfxisfh9P4i02PxrqWnyatb6MZc3UlqjhGm2g
+                cLuYDkjJ6ZrH/ab/AGqfBn7JHw1u/FnjTUpLTTLSe2tTFawm5u5ZbiZYYUSFPnYs7gcD19K4uXETfI5T
+                fP5y17ep03pR97lireS0PRYAwQb8FwOcDAJqSo7ZzJGDhgCAcMMEfWpKzRSCiiigD4A/b/8AhBr/AO25
+                /wAFPfhL8ONG8S+KfAmn/C7wzf8Ajm58SaNboZbS+nkSztoo3mRot+wSEjBIVu3Wj4yeA9Y0D9sr9l/4
+                X6x4r8beONN+GNrrfxJ8TeJtVTdNfG3jaKzWZoUWIsJJWxGBnEanHevv7bzmjb+tejHMpxjGCWkU0vV3
+                u7/PY5XhU23fVu/5afgfk/8As9fA74eaV+wR46/aE+L914t8GeMfj3qeuKnia2tL251LwhZarPJBAIrd
+                ATCPKjjLsEBIIBYDGPEvFPhLw/4e/wCCHlhp+s/Diy8MJ40+Jel+H7/xHpejX0MevabZXGB4ha2YGWNp
+                LaOUYZfmZiQPmGP3MaIMpBAIbqCM5oaFXXDAMPQjIrrhnclPnlFv3lLfZLZLTp815GMsAmrJ9Lbd9zz7
+                4JeBfAn7PPwA0+z8D6ND4d8D6ZYvqVrZ20Mi+VC6mdm2P8+45JIb5snHXivhr/glB+yH40+Ifh9v2hdU
+                +KvxI8Fr8TPGOo+NdT8GW8MEFhfwfapEgS5EkRnG6GOPIDLwAAB3/SfbijYM/WvOp42pCE4redrt66a6
+                a93rfyOmWHjKUZPofjzPYa78d/2atXuItN8QafrP7X37QccEpFrNFLaeHbG5VQ0hwGjj8izIBbA/fe9c
+                b/wUF+J/gXxP8YP2qr344+F/FniXxj4LEfhn4SeG7mwvv7G0+0kgWOHUY3QCAPJcyBy8jZwqqoJOB+3G
+                3mvl7xR/wSk8J/EPx3b6h4s+Ivxm8X+GrPXF8QweDtX8SrP4fju0mM0Z8oQrM0ccnKRtMUGB8vFexhM4
+                pqpzVFypdt91onbtFL0vqcVbAy5bR19duv6u58r+EP2KND+KP7U3wT+D3jTS9S1L4efs0fCBNU1yK4WZ
+                bTU9Xv8AZG0TuuPMASKSRkBOcgMMcH598XfD7w74U/4JEfDbSvEnh/VtE8HfFz46S66sDWF3MvhPQ/ts
+                vyiJQXUNbQhFUjJ84kDNfuVsz3JoaJX+8A31FYU88qRcbrRNPfqrv723f5WNZYBO+u//AAP0VjjvhL8M
+                vD3wZ+Dml+HfAOjWmheH9MsyNJ06NGjitw2XVSG+YZZsnPIya/On/gj7+3d4I/Zu+H3/AAqP4j6H468O
+                /HrxB41v21+2n8M3k0ut6hd3rlLj7QkZQx7GRdzsAqpn7uDX6kFcimmBDIH2rvAxuwM49M159HFRjTnT
+                qx5uazvezur+TutdV+JvOjJyjKLtY/Hz9uLxT4T+Kv7XP7SeifGzwf4y8aeMNP0220D4K+EoNMvbi1uh
+                NaE/bbUxDyRM906l5XYFFQjoMV1EfjST9jL9rf8AZS8OfGy68UXn/CpfhDdXEd1baZdap/a/iG58u2a2
+                jMKv5kscMbqpPqORnNfq4YgWBwMgYB7ijy1JBIBK8gkdK7v7XXIqbholbf8Au8ummnW/dvcw+pNNyUtb
+                9vO+vc/Grw78OvEH7UX7Nfw70TWNJ8T6Rq37X3xwvPGHiPbHNDc6XoNhI8ixSMB+5xHbwquccvkV7f4h
+                +HVx8Jv23/iFb/CDwhqFhov7Nfwbvh4X0u2jma1vPEGrSS3TFC5PnybI13ZLEs+Opr9JynP1oK5qZ5vK
+                Tdo2Wul9NX/8j7voOOCSW+un4f8AB1Pxf/4JifD/AMPWsFt+0T/wsXW/EXjb4S+E9V1zxhp7eA77T9T1
+                W+vLaTda31/LK32x45VPloicBRgKCK6fT/2Rfhr+z7/wSEs7/wCJGu+JPh98T/j/AKMw1XxfHZX2oz2U
+                91KdTWxmjiDNDakqqOgVd5LAnc1frwsSrnAAycnA6n1oeJZFwwBB7EZq6mdzlU5kmldPdbK7S2ta7vqu
+                xMMAoxtfo/xtrv2R8t/8EbvDMOi/sB+DdQPw2034Wan4hWXUNR0ext5LaCeff5QvFhk+eITxxRyBGwVD
+                181/A39t/wAD+E/+Cv8A8f8AxF4yt/GUOsareaR8OfB8dr4Yv7yG5trYkTyCaOIxoj3bnlmAwu7OK/Tn
+                aKNv5elckcdHnqznC/P2e2qfVO+1vQ2lh3ywin8PlvpbyPyl0Ww8IeLv+Cnn7YfxGh8Ez6r8Vfhbo8Nz
+                4GsJ9MumM1zZaewkvo3I8tmknaKNVySyoNo6mvEf2ZvhZ8Nv2rPip+ylBpmgeNPGHxV1nxEfGfxR8b+I
+                dP1BCstlC1zLp5kmAh2/aTGqpGNqrGmDk4r9xxEoYnAyepxyaBGAuAMD2rsjnUop8sXeySd+0eXtqtb2
+                7mDwF3q+t9vO/wB/S5wH7PP7RuhftK6Hrup+HrXXbey0HXLvQJZNT097P7VPbPskkhD8vCW4V8ANg4r0
+                Gk285pa8WTTd4qyPQje2oUUUVIwooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA
+                KKKKACiiigAooooA/9k=
+            </property>
+        </structure>
+    </list-property>
+</report>

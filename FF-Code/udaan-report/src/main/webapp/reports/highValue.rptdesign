@@ -1,0 +1,1284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.2.2.v201301221637 Build &lt;4.2.2.v20130206-1509></property>
+    <property name="units">in</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="branchID" id="100">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="region" id="101">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="station" id="102">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="fromDate" id="103">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">date</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Custom</property>
+                <property name="pattern">dd/MM/yyyy</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="toDate" id="104">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">date</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Custom</property>
+                <property name="pattern">dd/MM/yyyy</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="highValueDataSrc" id="86">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">org.gjt.mm.mysql.Driver</property>
+            <property name="odaURL">jdbc:mysql://10.48.144.28:3306/udaan_gold</property>
+            <property name="odaUser">UdaanSap</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">Z3VydQ==</encrypted-property>
+            <property name="odaJndiName">java:/comp/env/jdbc/UdaanGoldDB</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="highValue_DataSet" id="87">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">BOOKING_TYPE_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">BOOKING_TYPE_ID</text-property>
+                    <text-property name="heading">BOOKING_TYPE_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CONSG_NUMBER</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CONSG_NUMBER</text-property>
+                    <text-property name="heading">CONSG_NUMBER</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">DECLARED_VALUE</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">DECLARED_VALUE</text-property>
+                    <text-property name="heading">DECLARED_VALUE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">BOOKING_TYPE_DESC</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">BOOKING_TYPE_DESC</text-property>
+                    <text-property name="heading">BOOKING_TYPE_DESC</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CITY_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">DESTINATION</text-property>
+                    <text-property name="heading">DESTINATION</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">FINAL_WEIGHT</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">FINAL_WEIGHT</text-property>
+                    <text-property name="heading">FINAL_WEIGHT</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">BUSINESS_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">BUSINESS_NAME</text-property>
+                    <text-property name="heading">BUSINESS_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CONSIGNMENT_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CONSIGNMENT_NAME</text-property>
+                    <text-property name="heading">CONSIGNMENT_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CN_PAPER_WORK_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CN_PAPER_WORK_NAME</text-property>
+                    <text-property name="heading">CN_PAPER_WORK_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">REGION_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">REGION_ID</text-property>
+                    <text-property name="heading">REGION_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CITY_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">CITY_ID</text-property>
+                    <text-property name="heading">CITY_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">OFFICE_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">OFFICE_ID</text-property>
+                    <text-property name="heading">OFFICE_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">BOOKING_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">booking_date</text-property>
+                    <text-property name="heading">booking_date</text-property>
+                </structure>
+            </list-property>
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">in</property>
+                    <expression name="expr" type="javascript">params["region"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>""</value>
+                        <value>row["REGION_ID"]</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">in</property>
+                    <expression name="expr" type="javascript">params["station"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>""</value>
+                        <value>row["CITY_ID"]</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">in</property>
+                    <expression name="expr" type="javascript">params["branchID"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>""</value>
+                        <value>row["OFFICE_ID"]</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">le</property>
+                    <expression name="expr" type="javascript">params["fromDate"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>row["BOOKING_DATE"]</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">ge</property>
+                    <expression name="expr" type="javascript">params["toDate"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>row["BOOKING_DATE"]</value>
+                    </simple-property-list>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">BOOKING_TYPE_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">CONSG_NUMBER</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">DECLARED_VALUE</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">BOOKING_TYPE_DESC</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">CITY_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">FINAL_WEIGHT</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">BUSINESS_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">CONSIGNMENT_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">CN_PAPER_WORK_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">REGION_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">CITY_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">OFFICE_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">BOOKING_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">highValueDataSrc</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">BOOKING_TYPE_ID</property>
+                    <property name="nativeName">BOOKING_TYPE_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">CONSG_NUMBER</property>
+                    <property name="nativeName">CONSG_NUMBER</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">DECLARED_VALUE</property>
+                    <property name="nativeName">DECLARED_VALUE</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">BOOKING_TYPE_DESC</property>
+                    <property name="nativeName">BOOKING_TYPE_DESC</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">CITY_NAME</property>
+                    <property name="nativeName">CITY_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">FINAL_WEIGHT</property>
+                    <property name="nativeName">FINAL_WEIGHT</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">BUSINESS_NAME</property>
+                    <property name="nativeName">BUSINESS_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">CONSIGNMENT_NAME</property>
+                    <property name="nativeName">CONSIGNMENT_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">CN_PAPER_WORK_NAME</property>
+                    <property name="nativeName">CN_PAPER_WORK_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">REGION_ID</property>
+                    <property name="nativeName">REGION_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">CITY_ID</property>
+                    <property name="nativeName">CITY_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">OFFICE_ID</property>
+                    <property name="nativeName">OFFICE_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">BOOKING_DATE</property>
+                    <property name="nativeName">BOOKING_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select 
+ff_d_booking_type.BOOKING_TYPE_ID,
+CONSG_NUMBER,
+DECLARED_VALUE,                              
+ff_d_booking_type.BOOKING_TYPE_DESC,
+destcity.CITY_NAME as DESTINATION,
+FINAL_WEIGHT,
+ff_d_customer.BUSINESS_NAME,
+ff_d_consignment_type.CONSIGNMENT_NAME,
+ff_d_cn_paper_works.CN_PAPER_WORK_NAME,
+ff_d_region.REGION_ID,
+ff_d_city.CITY_ID,
+ff_d_office.OFFICE_ID,
+ff_f_booking.booking_date                           
+from 
+ff_f_booking
+LEFT JOIN 
+ff_d_pincode ON ff_f_booking.DEST_PINCODE = ff_d_pincode.PINCODE_ID
+LEFT JOIN 
+ff_d_city destcity ON ff_d_pincode.CITY_ID = destcity.CITY_ID
+LEFT JOIN 
+ff_d_customer ON ff_f_booking.CUSTOMER=ff_d_customer.CUSTOMER_ID
+LEFT JOIN
+ff_d_consignment_type ON ff_f_booking.CONSG_TYPE = ff_d_consignment_type.CONSIGNMENT_TYPE_ID
+LEFT JOIN
+ff_d_booking_type ON ff_f_booking.BOOKING_TYPE = ff_d_booking_type.BOOKING_TYPE_ID
+LEFT JOIN 
+ff_d_cn_paper_works ON ff_f_booking.PAPER_WORK = ff_d_cn_paper_works.CN_PAPER_WORK_ID
+LEFT JOIN 
+ff_d_office ON ff_f_booking.BOOKING_OFF = ff_d_office.OFFICE_ID
+LEFT JOIN
+ff_d_city ON ff_d_office.CITY_ID = ff_d_city.CITY_ID
+LEFT JOIN
+ff_d_region ON ff_d_office.MAPPED_TO_REGION =ff_d_region.REGION_ID
+WHERE DECLARED_VALUE IS NOT NULL AND
+ff_d_booking_type.BOOKING_TYPE IN('CS','CR')]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSG_NUMBER</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>25</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSG_NUMBER</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSG_NUMBER</design:label>
+            <design:formattingHints>
+              <design:displaySize>25</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>DECLARED_VALUE</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>8</design:nativeDataTypeCode>
+            <design:precision>10</design:precision>
+            <design:scale>2</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>DECLARED_VALUE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>DECLARED_VALUE</design:label>
+            <design:formattingHints>
+              <design:displaySize>10</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>BOOKING_TYPE_DESC</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>25</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>BOOKING_TYPE_DESC</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>BOOKING_TYPE_DESC</design:label>
+            <design:formattingHints>
+              <design:displaySize>25</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CITY_NAME</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>150</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>DESTINATION</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>DESTINATION</design:label>
+            <design:formattingHints>
+              <design:displaySize>150</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>FINAL_WEIGHT</design:name>
+              <design:position>5</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>8</design:nativeDataTypeCode>
+            <design:precision>10</design:precision>
+            <design:scale>3</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>FINAL_WEIGHT</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>FINAL_WEIGHT</design:label>
+            <design:formattingHints>
+              <design:displaySize>10</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>BUSINESS_NAME</design:name>
+              <design:position>6</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>50</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>BUSINESS_NAME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>BUSINESS_NAME</design:label>
+            <design:formattingHints>
+              <design:displaySize>50</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSIGNMENT_NAME</design:name>
+              <design:position>7</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>50</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSIGNMENT_NAME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSIGNMENT_NAME</design:label>
+            <design:formattingHints>
+              <design:displaySize>50</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CN_PAPER_WORK_NAME</design:name>
+              <design:position>8</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>50</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CN_PAPER_WORK_NAME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CN_PAPER_WORK_NAME</design:label>
+            <design:formattingHints>
+              <design:displaySize>50</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>REGION_ID</design:name>
+              <design:position>9</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>REGION_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>REGION_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CITY_ID</design:name>
+              <design:position>10</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CITY_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CITY_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>OFFICE_ID</design:name>
+              <design:position>11</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>OFFICE_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>OFFICE_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>BOOKING_DATE</design:name>
+              <design:position>12</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>booking_date</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>booking_date</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2"/>
+    </page-setup>
+    <body>
+        <list id="7">
+            <property name="dataSet">highValue_DataSet</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">CONSG_NUMBER</property>
+                    <text-property name="displayName">CONSG_NUMBER</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CONSG_NUMBER"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">DECLARED_VALUE</property>
+                    <text-property name="displayName">DECLARED_VALUE</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["DECLARED_VALUE"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">BOOKING_TYPE_DESC</property>
+                    <text-property name="displayName">BOOKING_TYPE_DESC</text-property>
+                    <expression name="expression" type="javascript">if(dataSetRow["BOOKING_TYPE_ID"] == 1) {&#13;
+"Cash"&#13;
+} else if(dataSetRow["BOOKING_TYPE_ID"] == 2){&#13;
+"Credit"&#13;
+}</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">CITY_NAME</property>
+                    <text-property name="displayName">DESTINATION</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CITY_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">FINAL_WEIGHT</property>
+                    <text-property name="displayName">FINAL_WEIGHT</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["FINAL_WEIGHT"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">BUSINESS_NAME</property>
+                    <text-property name="displayName">BUSINESS_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["BUSINESS_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">CN_PAPER_WORK_NAME</property>
+                    <text-property name="displayName">CN_PAPER_WORK_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CN_PAPER_WORK_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">REGION_ID</property>
+                    <text-property name="displayName">REGION_ID</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["REGION_ID"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">CITY_ID</property>
+                    <text-property name="displayName">CITY_ID</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CITY_ID"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">CONSIGNMENT_NAME</property>
+                    <text-property name="displayName">CONSIGNMENT_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CONSIGNMENT_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <header>
+                <image id="94">
+                    <property name="height">65px</property>
+                    <property name="width">150px</property>
+                    <property name="source">embed</property>
+                    <property name="imageName">ff_logo_report.jpg</property>
+                </image>
+                <label id="8">
+                    <property name="fontFamily">"Calibri"</property>
+                    <property name="fontSize">16pt</property>
+                    <property name="fontWeight">bold</property>
+                    <property name="paddingLeft">370pt</property>
+                    <property name="textAlign">left</property>
+                    <text-property name="text">HIGH VALUE C\MENT  QUALITY REPORT</text-property>
+                </label>
+                <table id="9">
+                    <property name="width">13.9375in</property>
+                    <column id="40">
+                        <property name="width">0.875in</property>
+                    </column>
+                    <column id="41">
+                        <property name="width">0.8645833333333334in</property>
+                    </column>
+                    <column id="42">
+                        <property name="width">0.9375in</property>
+                    </column>
+                    <column id="43">
+                        <property name="width">1.5in</property>
+                    </column>
+                    <column id="44">
+                        <property name="width">0.8125in</property>
+                    </column>
+                    <column id="45">
+                        <property name="width">2.8645833333333335in</property>
+                    </column>
+                    <column id="46">
+                        <property name="width">2.5in</property>
+                    </column>
+                    <column id="47">
+                        <property name="width">1.7083333333333333in</property>
+                    </column>
+                    <column id="48">
+                        <property name="width">1.875in</property>
+                    </column>
+                    <header>
+                        <row id="10">
+                            <cell id="11">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="49">
+                                    <property name="fontFamily">"Calibri"</property>
+                                    <property name="fontWeight">bold</property>
+                                    <text-property name="text">CMENT NO</text-property>
+                                </label>
+                            </cell>
+                            <cell id="12">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="50">
+                                    <property name="fontFamily">"Calibri"</property>
+                                    <property name="fontWeight">bold</property>
+                                    <text-property name="text">VALUE</text-property>
+                                </label>
+                            </cell>
+                            <cell id="13">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="51">
+                                    <property name="fontFamily">"Calibri"</property>
+                                    <property name="fontWeight">bold</property>
+                                    <text-property name="text">TYPE</text-property>
+                                </label>
+                            </cell>
+                            <cell id="14">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="52">
+                                    <property name="fontFamily">"Calibri"</property>
+                                    <property name="fontWeight">bold</property>
+                                    <text-property name="text">DESTINATION</text-property>
+                                </label>
+                            </cell>
+                            <cell id="15">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="53">
+                                    <property name="fontFamily">"Calibri"</property>
+                                    <property name="fontWeight">bold</property>
+                                    <text-property name="text">WEIGHT</text-property>
+                                </label>
+                            </cell>
+                            <cell id="16">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="54">
+                                    <property name="fontFamily">"Calibri"</property>
+                                    <property name="fontWeight">bold</property>
+                                    <text-property name="text">CLIENT </text-property>
+                                </label>
+                            </cell>
+                            <cell id="17">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="55">
+                                    <property name="fontFamily">"Calibri"</property>
+                                    <property name="fontWeight">bold</property>
+                                    <text-property name="text">CASH\CREDIT</text-property>
+                                </label>
+                            </cell>
+                            <cell id="18">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="56">
+                                    <property name="fontFamily">"Calibri"</property>
+                                    <property name="fontWeight">bold</property>
+                                    <text-property name="text">ENCLOSED</text-property>
+                                </label>
+                            </cell>
+                            <cell id="19">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <label id="57">
+                                    <property name="fontFamily">"Calibri"</property>
+                                    <property name="fontWeight">bold</property>
+                                    <text-property name="text">REMARKS</text-property>
+                                </label>
+                            </cell>
+                        </row>
+                    </header>
+                    <detail>
+                        <row id="20">
+                            <cell id="21">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="88">
+                                    <property name="textAlign">center</property>
+                                    <property name="resultSetColumn">CONSG_NUMBER</property>
+                                </data>
+                            </cell>
+                            <cell id="22">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="89">
+                                    <property name="textAlign">center</property>
+                                    <property name="resultSetColumn">DECLARED_VALUE</property>
+                                </data>
+                            </cell>
+                            <cell id="23">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="96">
+                                    <property name="textAlign">center</property>
+                                    <property name="resultSetColumn">CONSIGNMENT_NAME</property>
+                                </data>
+                            </cell>
+                            <cell id="24">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="91">
+                                    <property name="textAlign">center</property>
+                                    <property name="resultSetColumn">CITY_NAME</property>
+                                </data>
+                            </cell>
+                            <cell id="25">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="92">
+                                    <property name="textAlign">center</property>
+                                    <property name="resultSetColumn">FINAL_WEIGHT</property>
+                                </data>
+                            </cell>
+                            <cell id="26">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="93">
+                                    <property name="textAlign">center</property>
+                                    <property name="resultSetColumn">BUSINESS_NAME</property>
+                                </data>
+                            </cell>
+                            <cell id="27">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="90">
+                                    <property name="textAlign">center</property>
+                                    <property name="resultSetColumn">BOOKING_TYPE_DESC</property>
+                                </data>
+                            </cell>
+                            <cell id="28">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                                <data id="99">
+                                    <property name="textAlign">center</property>
+                                    <property name="resultSetColumn">CN_PAPER_WORK_NAME</property>
+                                </data>
+                            </cell>
+                            <cell id="29">
+                                <property name="borderBottomStyle">solid</property>
+                                <property name="borderBottomWidth">thin</property>
+                                <property name="borderLeftStyle">solid</property>
+                                <property name="borderLeftWidth">thin</property>
+                                <property name="borderRightStyle">solid</property>
+                                <property name="borderRightWidth">thin</property>
+                                <property name="borderTopStyle">solid</property>
+                                <property name="borderTopWidth">thin</property>
+                            </cell>
+                        </row>
+                    </detail>
+                </table>
+            </header>
+        </list>
+    </body>
+    <list-property name="images">
+        <structure>
+            <property name="name">ff_logo_report.jpg</property>
+            <property name="data">
+                /9j/4AAQSkZJRgABAQEAYABgAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD/7AARRHVja3kAAQAEAAAA
+                ZAAA/+EDOmh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8APD94cGFja2V0IGJlZ2luPSLvu78iIGlk
+                PSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4NCjx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6
+                bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8x
+                Mi0xNzozMjowMCAgICAgICAgIj4NCgk8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3Jn
+                LzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPg0KCQk8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0i
+                IiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRw
+                Oi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNv
+                bS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3No
+                b3AgQ1M1IFdpbmRvd3MiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MzkxNEI1QjQwNzA2MTFFMjg3
+                NEFBQkY5QzA3RjdCNzEiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MzkxNEI1QjUwNzA2MTFFMjg3
+                NEFBQkY5QzA3RjdCNzEiPg0KCQkJPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9Inht
+                cC5paWQ6MzkxNEI1QjIwNzA2MTFFMjg3NEFBQkY5QzA3RjdCNzEiIHN0UmVmOmRvY3VtZW50SUQ9Inht
+                cC5kaWQ6MzkxNEI1QjMwNzA2MTFFMjg3NEFBQkY5QzA3RjdCNzEiLz4NCgkJPC9yZGY6RGVzY3JpcHRp
+                b24+DQoJPC9yZGY6UkRGPg0KPC94OnhtcG1ldGE+DQo8P3hwYWNrZXQgZW5kPSd3Jz8+/+IMWElDQ19Q
+                Uk9GSUxFAAEBAAAMSExpbm8CEAAAbW50clJHQiBYWVogB84AAgAJAAYAMQAAYWNzcE1TRlQAAAAASUVD
+                IHNSR0IAAAAAAAAAAAAAAAAAAPbWAAEAAAAA0y1IUCAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                AAAAAAAAAAAAAAAAAAAAAAAAAAARY3BydAAAAVAAAAAzZGVzYwAAAYQAAABsd3RwdAAAAfAAAAAUYmtw
+                dAAAAgQAAAAUclhZWgAAAhgAAAAUZ1hZWgAAAiwAAAAUYlhZWgAAAkAAAAAUZG1uZAAAAlQAAABwZG1k
+                ZAAAAsQAAACIdnVlZAAAA0wAAACGdmlldwAAA9QAAAAkbHVtaQAAA/gAAAAUbWVhcwAABAwAAAAkdGVj
+                aAAABDAAAAAMclRSQwAABDwAAAgMZ1RSQwAABDwAAAgMYlRSQwAABDwAAAgMdGV4dAAAAABDb3B5cmln
+                aHQgKGMpIDE5OTggSGV3bGV0dC1QYWNrYXJkIENvbXBhbnkAAGRlc2MAAAAAAAAAEnNSR0IgSUVDNjE5
+                NjYtMi4xAAAAAAAAAAAAAAASc1JHQiBJRUM2MTk2Ni0yLjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFhZWiAAAAAAAADzUQABAAAAARbMWFlaIAAAAAAAAAAAAAAA
+                AAAAAABYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAP
+                hAAAts9kZXNjAAAAAAAAABZJRUMgaHR0cDovL3d3dy5pZWMuY2gAAAAAAAAAAAAAABZJRUMgaHR0cDov
+                L3d3dy5pZWMuY2gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZGVz
+                YwAAAAAAAAAuSUVDIDYxOTY2LTIuMSBEZWZhdWx0IFJHQiBjb2xvdXIgc3BhY2UgLSBzUkdCAAAAAAAA
+                AAAAAAAuSUVDIDYxOTY2LTIuMSBEZWZhdWx0IFJHQiBjb2xvdXIgc3BhY2UgLSBzUkdCAAAAAAAAAAAA
+                AAAAAAAAAAAAAAAAAGRlc2MAAAAAAAAALFJlZmVyZW5jZSBWaWV3aW5nIENvbmRpdGlvbiBpbiBJRUM2
+                MTk2Ni0yLjEAAAAAAAAAAAAAACxSZWZlcmVuY2UgVmlld2luZyBDb25kaXRpb24gaW4gSUVDNjE5NjYt
+                Mi4xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB2aWV3AAAAAAATpP4AFF8uABDPFAAD7cwABBMLAANc
+                ngAAAAFYWVogAAAAAABMCVYAUAAAAFcf521lYXMAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAKPAAAA
+                AnNpZyAAAAAAQ1JUIGN1cnYAAAAAAAAEAAAAAAUACgAPABQAGQAeACMAKAAtADIANwA7AEAARQBKAE8A
+                VABZAF4AYwBoAG0AcgB3AHwAgQCGAIsAkACVAJoAnwCkAKkArgCyALcAvADBAMYAywDQANUA2wDgAOUA
+                6wDwAPYA+wEBAQcBDQETARkBHwElASsBMgE4AT4BRQFMAVIBWQFgAWcBbgF1AXwBgwGLAZIBmgGhAakB
+                sQG5AcEByQHRAdkB4QHpAfIB+gIDAgwCFAIdAiYCLwI4AkECSwJUAl0CZwJxAnoChAKOApgCogKsArYC
+                wQLLAtUC4ALrAvUDAAMLAxYDIQMtAzgDQwNPA1oDZgNyA34DigOWA6IDrgO6A8cD0wPgA+wD+QQGBBME
+                IAQtBDsESARVBGMEcQR+BIwEmgSoBLYExATTBOEE8AT+BQ0FHAUrBToFSQVYBWcFdwWGBZYFpgW1BcUF
+                1QXlBfYGBgYWBicGNwZIBlkGagZ7BowGnQavBsAG0QbjBvUHBwcZBysHPQdPB2EHdAeGB5kHrAe/B9IH
+                5Qf4CAsIHwgyCEYIWghuCIIIlgiqCL4I0gjnCPsJEAklCToJTwlkCXkJjwmkCboJzwnlCfsKEQonCj0K
+                VApqCoEKmAquCsUK3ArzCwsLIgs5C1ELaQuAC5gLsAvIC+EL+QwSDCoMQwxcDHUMjgynDMAM2QzzDQ0N
+                Jg1ADVoNdA2ODakNww3eDfgOEw4uDkkOZA5/DpsOtg7SDu4PCQ8lD0EPXg96D5YPsw/PD+wQCRAmEEMQ
+                YRB+EJsQuRDXEPURExExEU8RbRGMEaoRyRHoEgcSJhJFEmQShBKjEsMS4xMDEyMTQxNjE4MTpBPFE+UU
+                BhQnFEkUahSLFK0UzhTwFRIVNBVWFXgVmxW9FeAWAxYmFkkWbBaPFrIW1hb6Fx0XQRdlF4kXrhfSF/cY
+                GxhAGGUYihivGNUY+hkgGUUZaxmRGbcZ3RoEGioaURp3Gp4axRrsGxQbOxtjG4obshvaHAIcKhxSHHsc
+                oxzMHPUdHh1HHXAdmR3DHeweFh5AHmoelB6+HukfEx8+H2kflB+/H+ogFSBBIGwgmCDEIPAhHCFIIXUh
+                oSHOIfsiJyJVIoIiryLdIwojOCNmI5QjwiPwJB8kTSR8JKsk2iUJJTglaCWXJccl9yYnJlcmhya3Jugn
+                GCdJJ3onqyfcKA0oPyhxKKIo1CkGKTgpaymdKdAqAio1KmgqmyrPKwIrNitpK50r0SwFLDksbiyiLNct
+                DC1BLXYtqy3hLhYuTC6CLrcu7i8kL1ovkS/HL/4wNTBsMKQw2zESMUoxgjG6MfIyKjJjMpsy1DMNM0Yz
+                fzO4M/E0KzRlNJ402DUTNU01hzXCNf02NzZyNq426TckN2A3nDfXOBQ4UDiMOMg5BTlCOX85vDn5OjY6
+                dDqyOu87LTtrO6o76DwnPGU8pDzjPSI9YT2hPeA+ID5gPqA+4D8hP2E/oj/iQCNAZECmQOdBKUFqQaxB
+                7kIwQnJCtUL3QzpDfUPARANER0SKRM5FEkVVRZpF3kYiRmdGq0bwRzVHe0fASAVIS0iRSNdJHUljSalJ
+                8Eo3Sn1KxEsMS1NLmkviTCpMcky6TQJNSk2TTdxOJU5uTrdPAE9JT5NP3VAnUHFQu1EGUVBRm1HmUjFS
+                fFLHUxNTX1OqU/ZUQlSPVNtVKFV1VcJWD1ZcVqlW91dEV5JX4FgvWH1Yy1kaWWlZuFoHWlZaplr1W0Vb
+                lVvlXDVchlzWXSddeF3JXhpebF69Xw9fYV+zYAVgV2CqYPxhT2GiYfViSWKcYvBjQ2OXY+tkQGSUZOll
+                PWWSZedmPWaSZuhnPWeTZ+loP2iWaOxpQ2maafFqSGqfavdrT2una/9sV2yvbQhtYG25bhJua27Ebx5v
+                eG/RcCtwhnDgcTpxlXHwcktypnMBc11zuHQUdHB0zHUodYV14XY+dpt2+HdWd7N4EXhueMx5KnmJeed6
+                RnqlewR7Y3vCfCF8gXzhfUF9oX4BfmJ+wn8jf4R/5YBHgKiBCoFrgc2CMIKSgvSDV4O6hB2EgITjhUeF
+                q4YOhnKG14c7h5+IBIhpiM6JM4mZif6KZIrKizCLlov8jGOMyo0xjZiN/45mjs6PNo+ekAaQbpDWkT+R
+                qJIRknqS45NNk7aUIJSKlPSVX5XJljSWn5cKl3WX4JhMmLiZJJmQmfyaaJrVm0Kbr5wcnImc951kndKe
+                QJ6unx2fi5/6oGmg2KFHobaiJqKWowajdqPmpFakx6U4pammGqaLpv2nbqfgqFKoxKk3qamqHKqPqwKr
+                davprFys0K1ErbiuLa6hrxavi7AAsHWw6rFgsdayS7LCszizrrQltJy1E7WKtgG2ebbwt2i34LhZuNG5
+                SrnCuju6tbsuu6e8IbybvRW9j74KvoS+/796v/XAcMDswWfB48JfwtvDWMPUxFHEzsVLxcjGRsbDx0HH
+                v8g9yLzJOsm5yjjKt8s2y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW
+                2Ndc1+DYZNjo2WzZ8dp22vvbgNwF3IrdEN2W3hzeot8p36/gNuC94UThzOJT4tvjY+Pr5HPk/OWE5g3m
+                lucf56noMui86Ubp0Opb6uXrcOv77IbtEe2c7ijutO9A78zwWPDl8XLx//KM8xnzp/Q09ML1UPXe9m32
+                +/eK+Bn4qPk4+cf6V/rn+3f8B/yY/Sn9uv5L/tz/bf///9sAQwACAQECAQECAgICAgICAgMFAwMDAwMG
+                BAQDBQcGBwcHBgcHCAkLCQgICggHBwoNCgoLDAwMDAcJDg8NDA4LDAwM/9sAQwECAgIDAwMGAwMGDAgH
+                CAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM/8AAEQgAQQCW
+                AwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQE
+                AAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5
+                OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqy
+                s7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEB
+                AQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKB
+                CBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdo
+                aWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW
+                19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/eXI9KSm7qN1VuBIDRnJFeW/G79oK88E
+                6p/wi3hHw7qfjHx5fWhuLaxtUAtdPQsES4vJmKrFDuPTJdgrbVbBxx3j/wCBHi74S/C2+8cS/F/xJJ4x
+                0W2Oo3I1K4ii8PXbr8zWhttn7uFz+7VgxkUspyx+U9VPC8yTnLlvt5/dsvP7ieY+hd1Y/i74g6N4CsTc
+                axqFvYxdcuSSfwAJ/SvmvXP+ClOn698OtJ/svQvEfh3xb4ggLxWHiHSprFoSAfMKFhsmIxkBGOQQfUV8
+                /wDiXxPqPjXVnvdUvLjULuZsl5WzyfQdB9AK/FfEjxUp8NYl5ZRoueISTfNdRins77yv/d0/vX0P0PhL
+                gOpm9L63WnyUr2VtZO2/kvn9x9xR/ti/DmSURr4j3MewsLn/AON1j/Bz/goZ8Fv2gPiLqXhLwh8RNB1n
+                xJpMnk3NgrPFKr/3V8xVDn/cJr8Pf+Cmn7ZnijxR8QbX9nf4Li4vPHPiFlg1u9tGw1jGwz9nV/4DtO6R
+                8/KOOta37J3/AASe+G/7Emir8QviJry6v4k0FRf3OqTXT2um6Q6ndlNpDyMD0JPzHote1k/Gk8t4fp5z
+                xrJU62LSeEw1CnKVepFuyqTUptRhN6QTs5bq/wAJpjuDaGIxssJkrk40napUqSXJF9Yq0U2117bPuf0I
+                hs0obmvyZ/4J4f8ABzF4Q/aQ/bBtPg7rOm3lvo+rsun+HvFEx2tqF3kgJNEB+7WTgI2euAwGa/WNTX6Z
+                VwOOw9KlLMKEqM6kVPknbmSl0dm0mtmr3T0ep+fVowhVlThNTUW1zLZ26ryJBS7q4D48/tP/AA9/Ze0P
+                T9S+IXi7RfCFhql2tjaT6lOIknmbog98ck9AOTivEv8Agpd/wVC8E/sL/s2a94ksvF3gO78ZRWP2vQ9E
+                vtU+bVjwQqrCHfDDO1sBSccjrW2Fy3E4mpCnRg25uy0dm/Xy69upjKcUrs+rgeKA1fin+z9/wX9/ao/4
+                KXw6J4X+APwN0XSvECyY17xLq00l1omnru6g4THy9tzP6Ka/ZXwPFrFv4M0mPxBPZXOvJZxLqM1mhS3k
+                uAg8wxq3IQtnAPOMV25xkGKyuSp4zlU3f3VJNq3V2vZPprfyJp1Yz1ibAelz8tR5pRXiGhIDSg1HmlB6
+                0AW6KKKAMLP1/KlzUe6jdVAeZfED9j/wV8SviDe+KL6HWrfWtSt4rW6uNP1e5svtEcWfLVhE6g7dzYz0
+                3H1r5pk+Dvhv4cfHfVfFni3wr8aNU0nwTqLrpGlR3cmoaFPDGgC3s4llJnkZyWVTgIVXgnmvuQNn/wDV
+                XlX7ZurTab8A9VWFmX7S8ULkf3S65/PpXLnXElfKcqxOO+L2dOTSbdvdWi06O1tOh25Vl6xmNo4Vu3PJ
+                K/q7HhP7SX7Z/wAI/wBqT4djw74h8J/FK1WC4jvLK+sNK8m806eNgySRPk7TkYI6MMg1+fv7efxs8dfB
+                T9lrVPG+geNZvCLeHbya1tm1DR0a98TqzFLbdHuxC5XBbGecmveviX8Y9A+ENlaya7qDw3GoN5djY28b
+                XF9qD/3YYVy7/UDA718R/ta6L48/4KQ/tZ+GPhLHpc/gPwn4LgTxHrFxdSLc3UIk5jM8SkqkrKAFibn5
+                snFfgPCvElfjDNcLjuIcHh6OCwrlWq1pw5r0aafPTjGq5+0U5SULRhNxnKMlaVr/ALLi8jo5FhauHy2t
+                UnVq2hGClopytaT5UuVpJu7avFNPQ8r/AGNfhVqX7OFl/wALM8YfHnw78M/HHj21/te9sdT00XuqS2Du
+                ZA6liCjzA5wOcFa4X9ob9sO9/wCCpf7Qll4Nm8YWPw3+EelS5SXUpvK+1BSFM8ij/WTv/DH0XP411H/B
+                Y74c+FtB+J/gnwHa6nqfib4jasY5NU13Vrjc9jbNhIIFjXiNAAX2jouPWvrv9mv4Vab8Jfg1ofgv4afC
+                m18S/wBmor3XivxTarYWd5dHBknUSDzpF3fd2rjaor9tzLivLMBgcN4i4ui6+PxkZrDuUMPQhhqavFVY
+                TnBcySUY0FW56jjdxgk5p/L4fLMTWr1MipS5KNJpzSc5yqS35Wk9Orny2V93sewfswfsifD39mDwTYaf
+                4D8PWsbrEk/9rzQCXULtyARO0hGVJ4IAxgYr7n8P/wDBTT4deEfh7pdtruv/ANseNvKEEuhaFbSapqc0
+                oH/PGBXZM+r7Vz3FfnD8edJ/4V18Mbrxd8a/iFr194dtZYoJ9I8L2z2dkGkbaiEJ+8mBOByBX1J/wSk/
+                a8+Bvg2DUvCNnYx/D3UbjUrO00+11zS20u51Ge4RzFHEZQGldgrNxk4r8Y8IVmdfPKua4utWx0cRzqpU
+                jGbp88LSu6tRKTlHmSsqSilNWlZpHt8f08KsshQp04UXScXGN0pWldWUVdJO19ZX93bc5f8A4KI/sIfH
+                L/gt/f8Ah3QtVhtPgn8FNBnGopDq8cd14i1W6wV8wwxlkhRUZgFaQEk8jtXlvhT/AINUfBfin406Smv6
+                lr//AAgnhOVUvLzUb/7Rq/jRgvIUKSlnbKchVBZ2HJC5r9jgciq8+vWVrqtvYyXdvHeXSs0Nu0gEkoXl
+                iq9TgdcdK/qzD8ZZnh6Kw2Dl7OEU7KK2vu76tvzd7dLNK34k8PBu8tWc38BPgB4Q/Zj+FmkeDPA+h2Ph
+                /wAPaLbpbW1tbRhchRjc56sx6ljySa7IH/OK+ff2vf8Ago74F/Yv8feEfCviOx8W6x4i8cJM+j6foOjT
+                alcXXkjMmEiBPA5+lcZ8N/8AgtD8F/iX4s8NaPDc+IdKuvEWmahrLtq2lS2MWk2djI0VxNdPIAIlV1Ze
+                e4ryHlmYV4fWvZykpXfNZu+93f5PXyZpzxXu3PrfPFANY3gLx5o/xQ8F6X4i8P6jbaromtWyXljeW774
+                rmFxuV1PcEHIrzr4F/tqeD/2ifjl8SfAXhpdXn1T4V3cGn65cTWTw2qXEqFxEjsMOwUZOOORXBHDVZKT
+                UX7nxeWqWvzaXqVzI9gDUZz/APrri/iF8dfD/wAN9D+33l2s9uLsWTm3YP5UpONrEHgg8EdRXW2F6uoW
+                MNxHnbOiyLnrgjNRKnJLma0KuatFFFQBzfmD1pQ3NN3CkzjtiqC48mvNf2xLK5uv2ZPGtxY6bNrGoaXp
+                U+o2ljCuZLyWBDKkSj1coF/Guo8QeJNS0nUWjjt9P+z4HlvPdCNn454PvUQ13xFcBvK0vTpl6H/SwQK8
+                XMauFxNGpgsVSnKE04yXJOzT0aTS6rqn6HpYOFajVhiaMoqUWpL3o6NarRv8GfiF4b+Otv4B8Laj41sN
+                L1DxR8RNahU6t4u1+xks9J0Nn+5ZwBwGZUJCrBF8zkDOc1zV/rfif9l39n/xD4y1jV7nwBY+Irlr/UNV
+                vIFm8ZeO9RkHyJFEfltI+gRMBkTHSv0W/aU/4JrfEb4ofHbT/F3hjUPBdrY6TFM+m6Zrsc91DpV5Iebt
+                FjZQzhchd33c8YrifCn/AARZ1YfFC08dfFLxxp3xC8bWeTpn9oKINL0bJ/5dbQEIG/22Bb3r8nw+S4ij
+                TdbEYJyhJqU4JOpUqKnJ+zowUoRo06cUk1KUFCmmnToTqQjUP1CWdYOo1COISa2bfLGN0uaTs3Jye1k7
+                ytrNRbR8U/8ABL/9hrWPCWrah8avist3qXxE8V5l02DVXNxcaTbN92SQtk+cy4Az91QO5NfajyNIfmO4
+                17c37C/iaeYj+2NGkmbJwWOW9e9B/YN8UqQralo6u33V3N81fk3HGU8c8V5vUzjMsFNSdoxhFJQpwjpC
+                nBX0jFfe7yerZ9fkudcOZZhY4XD4mPdtvWUnvJu27f8Akfnd/wAFFF1z4sfEH4Q/Cfwu2ltq+uay3ia6
+                XUQzWa21gu5PPC/MUaRx07gVv+LPjT8QPhX4mvte8Xf8K81DVvgz4CvvHd3OmirPHYa1M32LSoIXYZ+d
+                5iVHUlDX1xY/8EfLyD9pkfFifWpLrxGNP/slbZ7tzZwWpYMyRx4wMkZz6mu88W/8Erfhr8SfEHjC81bQ
+                tT1C78YX2k3mtQDxHMsTjTnEtrb+WrgLF5g8wrj5iT9K/d/CnDxyergoZlhZxpYWjLX2N6kq9ecvbWkm
+                7U40uWC25pQg9kfnfGmZUcbTq/Va0ZSqTX2tFCCXLo7auV35JtHxf+0x/wAFCP2qP2Rvhz8L7b4s+NbX
+                Q7X4siK8vfF3h3wytwvgsmHNvYyxspVnkleNpCediuFr6D/YbHxA/ab/AOCqXxG8ceIvHVtrHh/4K6Tb
+                eCLe3s7BI7TUNQnhE17LHn5kCvjkc/wnivZ/ih/wTf8ACnxi+Nlx4017Sdcuo9QuNPvdS8O/8JDL/Yeq
+                XNgQbKeW2ztLREAgABWwNwatf9lj9hXwv+xf4i8Za94R0C6/trx5qEup65qWo67LcPM7sWwqs2xFGcDa
+                FOAMk1+6YjjDK5YOUaNCcasotO1Fpe9JN9Lq0U43V7qzsm5H5tHLavNrKNv8a/zPkb4z/wDC5P2tv+C0
+                vjTXPgrdeCI2/Z58LweGEuPE0Es1sl9f/vrkwhOk6RnBLcYAFeG/tKePNW+J/wAdfjp408O/2BqF54m8
+                T6R+z/4YhvNOWa01GJR9o1yZIsbRlzIxIHBFfpr+yr+xZpX7H1x47uvCun6tqF58S9XfXNdu9V12S6mu
+                bhl2llZicDB4x7egrxbxp/wSj8O/BD4U6frvw68E6hr3jb4Y6jqnjLwvpuoeJJmttY127X55LrLYbOAo
+                HAx1zk13Zdxhl7xEaEac0lGEIN03G9rSk5t2STmur0jKRlVy+pGDk5R76ST+5JnhWn/t+fExdd+GuqeE
+                fGGneB/hbca3q+kab4bttFt5wPDOhW22fU5nYFk86eMogGFVXA65rxn9h39rD4s/s0a14u8cXfiLR7fR
+                viX4J8TfGfxBYyaYr3WkCSZbbRWllYZaSUqoSM8bfrXvv7HX/BLbV/i74w+JOv8AjT4bap8I/Bnj7wdH
+                4bu/Bz+I2ubyW6luTc3s9rIpzY2rv8oijKh9xJ6AV9E/E/8A4JE/DT4oaf4yt77w7q9lB440bSvDmoC0
+                8QzRLBpmmlGt7SIbsJGWQFuMkk813Y7iLJ8BUlgqlOUlJK7hTU1a97OUbpyV73u9YJ395pZUcHVqx54y
+                S9ZJfgzT/wCCQH7OviDwF+wP4Xb4ia9N4o8SeNHk8WahLLEsLW018BK8WVwWwCBk88kdK+uLO2jsbWKC
+                JdkUKCNAP4QOAK474B/C/Svgn8KNH8KaFpKaLoehwi1sbUXb3ZSIdMyOzOxPqzE12INfF4zHfXK08Srp
+                TbaTXLa/93p6G3s/Z+5287/ia1FFFcoHK7vanbs1pf8ACL/9PH/kP/69H/CMf9PH/jn/ANeq0Fqfmb8b
+                /wBmf4g/tXf8FRfiVrGoWFo3w1+GGn6NYWlvrZ1BINR86CK9upbIW08StIuDGWcMAxxjqDzPwK+Lf7QU
+                XhnxJq1j9t8AaHovh+68V30M/hyS/k1LUrmfZaW+133iOOJC0ixkHHNfqx/wjH/Tb/xz/wCvR/wi4/57
+                Dnr8nX9a+iXELdNUp04tRUUk+llZuzTV5bt9H6GXsdb3Pyn+B/x3+On7QGqfs7WnifXvHmg2uoeP7+TW
+                9Qj0hY7PVILOF5IYd6op+yzSKoUuoODgk9a6b4r/ALPfjj9qT/gol8VvHN9pdrcfDv4b29ho1hZa3/aM
+                bXkkUIuLiawW3niQsXJTc6uCRjFfphH4RjijRFaNVj+4BEAF+nPFP/4Rn/pt/wCOf/XolxBy1HUoU1C6
+                cVbpeXM2tFrb3fQPY6WbPx0+C/xm+I3wRsdJ1rxNca14KsZ4LX+0PEWswPcXmkHWLy5vp/JikYpM0Nu0
+                EWzY3lkHg4xTtZ+P3x8/aEtfDPxN8O+IPEd0vgvRNV1jQ7+y0MfZvEIutYWxsYJIB8jMbe2aVzjKiQ4x
+                mv1o+I37PvhL4w6Zb2Xi7w74d8U2drL58MGr6XDfRQyYxvVZQwVsZGQM4NaPhH4VaP8AD/wzZ6LoOn6b
+                omj6bGIbSw0+zS2trVB0WONMKqjPQACuqXEdC/tVQXPfrZqzTTWqvrf0Xa5PsXtc+Gv2VvEHxm8Sj9qr
+                xJdaz4g1DxpZynS/Cvh7ULP7PZafNBpiPG9tkYdJbmSTnJzsGa+fv2c/Eknw++FMnjb4b+GvjZd/GLSd
+                Cij8d+INf+1yaeb25vIUuzNaSOVuJrWMzSxrCqqEiA5yQf13Xw0qMxEijd1ITr+tCeGVjDbZFXcctiP7
+                x9+a4459GPN+7VpcuidlaKSs0lqnvbvq7ley8z8y/FH/AAUF+Mvwct9LvGt/FnjDwV9r12TSNbPhYrqH
+                iqO3092tIWgRV8nfeFQrFV3IpyO5x/FnxS/aa+L/AMNfEFvrzX/2T7doPgyLRodB8o6teXez+0L2SVSH
+                S3iDMBsIAK8mv1MPhlML8y/J935Pu/TmnDw8o/5af+Of/XpxzyhCzhh4376d79tH0bXytoHsn3Pys0r9
+                tr9p7xDpXiTTdB0O90fxDNqCeHYLG70sXFv4XuJL0w28iDYpeNLcBpDI8mchgVzivS/gh+0P8bE/4KZQ
+                /DfWtc8QeKPBem200E17D4dSzhR4Y1LSXbFcfvJC3lSROAVABTjNfoQvhxEZmVlVmOSRH1NCeHVSVpNy
+                +YwwW2ckfXNTUzqhKMorDxV015pu2t2r6W09dQ9m+5+evwr/AGnJtA/4KC/tHSaxb+OrfXL9bfQvBtm2
+                l3EthPFZ2DTmaJjmIF55XXJxuKAelfO+jfFb48eIf2PZPBV94z+Iv/CQeMtGhnspn8Nu95rd7qOqSQXl
+                vJNtP2WOzt0XBBQjzSQSABX7Jf8ACPKH3bk3DofL5H605NAWMDa6rj0T161dPPqUHdUVf3N7PWCtpeOi
+                fVfrZo9k317/AInB/sx6tpnij4NaLHpLal9h0e3TS1e/geOeVoFETMQ/zHJUncevWvQBpWD/AKz/AMdq
+                SxsRYhgGBDY4AxirFfP1Jc03JGyCiiiswCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKK
+                ACiiigD/2Q==
+            </property>
+        </structure>
+    </list-property>
+</report>

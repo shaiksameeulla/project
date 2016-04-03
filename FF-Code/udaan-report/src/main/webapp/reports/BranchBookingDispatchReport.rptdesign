@@ -1,0 +1,2066 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.2.2.v201301221637 Build &lt;4.2.2.v20130206-1509></property>
+    <property name="units">in</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="Region" id="11">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Station" id="12">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Branch" id="13">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Client" id="14">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="FromDate" id="15">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Custom</property>
+                <property name="pattern">dd/MM/yyyy</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="ToDate" id="16">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Custom</property>
+                <property name="pattern">dd/MM/yyyy</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="7">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">com.mysql.jdbc.Driver</property>
+            <property name="odaURL">jdbc:mysql://10.48.144.28:3306/udaan_gold</property>
+            <property name="odaUser">UdaanSap</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">Z3VydQ==</encrypted-property>
+            <property name="odaJndiName">java:/comp/env/jdbc/UdaanGoldDB</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ConsgCancel" id="8">
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">CANCEL_COUNT</property>
+                    <property name="dataType">integer</property>
+                    <property name="aggregateFunction">COUNT</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value">row["STOCK_CANCELLED_ID"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">STOCK_CANCELLED_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">STOCK_CANCELLED_ID</text-property>
+                    <text-property name="heading">STOCK_CANCELLED_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CANCELLATION_OFFICE_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">CANCELLATION_OFFICE_ID</text-property>
+                    <text-property name="heading">CANCELLATION_OFFICE_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CANCELLED_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CANCELLED_DATE</text-property>
+                    <text-property name="heading">CANCELLED_DATE</text-property>
+                </structure>
+            </list-property>
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">eq</property>
+                    <expression name="expr" type="javascript">row["CANCELLATION_OFFICE_ID"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["Branch"].value</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">between</property>
+                    <expression name="expr" type="javascript">row["CANCELLED_DATE"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["FromDate"].value</value>
+                    </simple-property-list>
+                    <expression name="value2">params["ToDate"].value</expression>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">STOCK_CANCELLED_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">CANCELLATION_OFFICE_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">CANCELLED_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">CANCEL_COUNT</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">STOCK_CANCELLED_ID</property>
+                    <property name="nativeName">STOCK_CANCELLED_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">CANCELLATION_OFFICE_ID</property>
+                    <property name="nativeName">CANCELLATION_OFFICE_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">CANCELLED_DATE</property>
+                    <property name="nativeName">CANCELLED_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT STOCK_CANCELLED_ID, CANCELLATION_OFFICE_ID,CANCELLED_DATE
+  FROM `ff_f_stock_cancellation`
+]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>COUNT(ITEM_ID)</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>-5</design:nativeDataTypeCode>
+            <design:precision>21</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>COUNT(ITEM_ID)</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>COUNT(ITEM_ID)</design:label>
+            <design:formattingHints>
+              <design:displaySize>21</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CANCELLATION_OFFICE_ID</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CANCELLATION_OFFICE_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CANCELLATION_OFFICE_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ConsgBooked" id="9">
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">BOOKING_COUNT</property>
+                    <property name="dataType">integer</property>
+                    <property name="aggregateFunction">COUNT</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value">row["CONSG_NUMBER"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">CONSG_NUMBER</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CONSG_NUMBER</text-property>
+                    <text-property name="heading">CONSG_NUMBER</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">BOOKING_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">BOOKING_DATE</text-property>
+                    <text-property name="heading">BOOKING_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">BOOKING_OFF</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">BOOKING_OFF</text-property>
+                    <text-property name="heading">BOOKING_OFF</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CUSTOMER</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">CUSTOMER</text-property>
+                    <text-property name="heading">CUSTOMER</text-property>
+                </structure>
+            </list-property>
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">eq</property>
+                    <expression name="expr" type="javascript">params["Branch"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>row["BOOKING_OFF"]</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">between</property>
+                    <expression name="expr" type="javascript">row["BOOKING_DATE"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["FromDate"].value</value>
+                    </simple-property-list>
+                    <expression name="value2">params["ToDate"].value</expression>
+                </structure>
+                <structure>
+                    <property name="operator">in</property>
+                    <expression name="expr" type="javascript">params["Client"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>""</value>
+                        <value>row["CUSTOMER"]</value>
+                    </simple-property-list>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">CONSG_NUMBER</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">BOOKING_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">BOOKING_OFF</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">CUSTOMER</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">BOOKING_COUNT</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">CONSG_NUMBER</property>
+                    <property name="nativeName">CONSG_NUMBER</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">BOOKING_DATE</property>
+                    <property name="nativeName">BOOKING_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">BOOKING_OFF</property>
+                    <property name="nativeName">BOOKING_OFF</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">CUSTOMER</property>
+                    <property name="nativeName">CUSTOMER</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT distinct CONSG_NUMBER,BOOKING_DATE,BOOKING_OFF,CUSTOMER
+  FROM `ff_f_booking`]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>COUNT(CONSG_ID)</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>-5</design:nativeDataTypeCode>
+            <design:precision>21</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>COUNT(CONSG_ID)</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>COUNT(CONSG_ID)</design:label>
+            <design:formattingHints>
+              <design:displaySize>21</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>ORG_OFF</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ORG_OFF</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ORG_OFF</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ConsgDispatch" id="10">
+            <list-property name="computedColumns">
+                <structure>
+                    <property name="name">DISPATCH_COUNT</property>
+                    <property name="dataType">integer</property>
+                    <property name="aggregateFunction">COUNT</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">CONSG_NUMBER</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CONSG_NUMBER</text-property>
+                    <text-property name="heading">CONSG_NUMBER</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">BOOKING_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">BOOKING_DATE</text-property>
+                    <text-property name="heading">BOOKING_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">BOOKING_OFF</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">BOOKING_OFF</text-property>
+                    <text-property name="heading">BOOKING_OFF</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CONSIGNMENT_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CONSIGNMENT_NAME</text-property>
+                    <text-property name="heading">CONSIGNMENT_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">FINAL_WEIGHT</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">FINAL_WEIGHT</text-property>
+                    <text-property name="heading">FINAL_WEIGHT</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ORIGIN_OFFICE</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">ORIGIN_OFFICE</text-property>
+                    <text-property name="heading">ORIGIN_OFFICE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">NO_OF_PIECES</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">NO_OF_PIECES</text-property>
+                    <text-property name="heading">NO_OF_PIECES</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CN_CONTENT_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CN_CONTENT_NAME</text-property>
+                    <text-property name="heading">CN_CONTENT_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CUSTOMER</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">CUSTOMER</text-property>
+                    <text-property name="heading">CUSTOMER</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CONSG_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">CONSG_ID</text-property>
+                    <text-property name="heading">CONSG_ID</text-property>
+                </structure>
+            </list-property>
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">eq</property>
+                    <expression name="expr" type="javascript">row["BOOKING_OFF"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["Branch"].value</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">between</property>
+                    <expression name="expr" type="javascript">row["BOOKING_DATE"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["FromDate"].value</value>
+                    </simple-property-list>
+                    <expression name="value2">params["ToDate"].value</expression>
+                </structure>
+                <structure>
+                    <property name="operator">in</property>
+                    <expression name="expr" type="javascript">params["Client"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>""</value>
+                        <value>row["CUSTOMER"]</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">eq</property>
+                    <expression name="expr" type="javascript">row["ORIGIN_OFFICE"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["Branch"].value</value>
+                    </simple-property-list>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">CONSG_NUMBER</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">BOOKING_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">BOOKING_OFF</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">CONSIGNMENT_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">FINAL_WEIGHT</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">ORIGIN_OFFICE</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">NO_OF_PIECES</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">CN_CONTENT_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">CUSTOMER</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">CONSG_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">DISPATCH_COUNT</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">CONSG_NUMBER</property>
+                    <property name="nativeName">CONSG_NUMBER</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">BOOKING_DATE</property>
+                    <property name="nativeName">BOOKING_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">BOOKING_OFF</property>
+                    <property name="nativeName">BOOKING_OFF</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">CONSIGNMENT_NAME</property>
+                    <property name="nativeName">CONSIGNMENT_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">FINAL_WEIGHT</property>
+                    <property name="nativeName">FINAL_WEIGHT</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">ORIGIN_OFFICE</property>
+                    <property name="nativeName">ORIGIN_OFFICE</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">NO_OF_PIECES</property>
+                    <property name="nativeName">NO_OF_PIECES</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">CN_CONTENT_NAME</property>
+                    <property name="nativeName">CN_CONTENT_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">CUSTOMER</property>
+                    <property name="nativeName">CUSTOMER</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">CONSG_ID</property>
+                    <property name="nativeName">CONSG_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[ SELECT distinct ff_f_booking.CONSG_NUMBER,ff_f_booking.BOOKING_DATE,ff_f_booking.BOOKING_OFF,
+  ff_d_consignment_type.CONSIGNMENT_NAME,ff_f_booking.FINAL_WEIGHT,ff_f_manifest.ORIGIN_OFFICE,
+  ff_f_booking.NO_OF_PIECES,ff_d_cn_content.CN_CONTENT_NAME,ff_f_booking.CUSTOMER,ff_f_consignment.CONSG_ID 
+  FROM
+       ff_f_booking 
+       LEFT OUTER JOIN ff_f_consignment on ff_f_booking.CONSG_NUMBER=ff_f_consignment.CONSG_NO
+       LEFT OUTER JOIN ff_f_consignment_manifested ON ff_f_consignment.CONSG_ID = ff_f_consignment_manifested.CONSIGNMENT_ID
+       LEFT OUTER JOIN ff_d_consignment_type ON ff_f_booking.CONSG_TYPE = ff_d_consignment_type.CONSIGNMENT_TYPE_ID 
+       LEFT OUTER JOIN ff_d_cn_content ON ff_f_booking.CONTENT = ff_d_cn_content.CN_CONTENT_ID 
+       LEFT OUTER JOIN ff_f_load_connected ON ff_f_consignment_manifested.MANIFEST_ID = ff_f_load_connected.MANIFEST 
+       LEFT OUTER JOIN ff_f_manifest ON ff_f_manifest.MANIFEST_ID = ff_f_load_connected.MANIFEST 
+    WHERE ff_f_load_connected.MANIFEST IS NOT NULL
+    group by ff_f_booking.CONSG_NUMBER]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>COUNT(`udaan_gold`.`ff_f_consignment_manifested`.CONSIGNMENT_ID)</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>-5</design:nativeDataTypeCode>
+            <design:precision>21</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>COUNT(`udaan_gold`.`ff_f_consignment_manifested`.CONSIGNMENT_ID)</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>COUNT(`udaan_gold`.`ff_f_consignment_manifested`.CONSIGNMENT_ID)</design:label>
+            <design:formattingHints>
+              <design:displaySize>21</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>ORG_OFF</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ORG_OFF</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ORG_OFF</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Customers" id="108">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">BUSINESS_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">BUSINESS_NAME</text-property>
+                    <text-property name="heading">BUSINESS_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">OFFICE_MAPPED_TO</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">OFFICE_MAPPED_TO</text-property>
+                    <text-property name="heading">OFFICE_MAPPED_TO</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CUSTOMER_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">CUSTOMER_ID</text-property>
+                    <text-property name="heading">CUSTOMER_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">EMP_CODE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">EMP_CODE</text-property>
+                    <text-property name="heading">EMP_CODE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">FIRST_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">FIRST_NAME</text-property>
+                    <text-property name="heading">FIRST_NAME</text-property>
+                </structure>
+            </list-property>
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">eq</property>
+                    <expression name="expr" type="javascript">row["OFFICE_MAPPED_TO"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["Branch"].value</value>
+                    </simple-property-list>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">BUSINESS_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">OFFICE_MAPPED_TO</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">CUSTOMER_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">EMP_CODE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">FIRST_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">BUSINESS_NAME</property>
+                    <property name="nativeName">BUSINESS_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">OFFICE_MAPPED_TO</property>
+                    <property name="nativeName">OFFICE_MAPPED_TO</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">CUSTOMER_ID</property>
+                    <property name="nativeName">CUSTOMER_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">EMP_CODE</property>
+                    <property name="nativeName">EMP_CODE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">FIRST_NAME</property>
+                    <property name="nativeName">FIRST_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT distinct ff_d_customer.BUSINESS_NAME,ff_d_customer.OFFICE_MAPPED_TO,ff_d_customer.CUSTOMER_ID,
+ff_d_employee.EMP_CODE,ff_d_employee.FIRST_NAME
+FROM 
+  ff_d_customer 
+    LEFT OUTER JOIN ff_f_booking ON ff_d_customer.CUSTOMER_ID = ff_f_booking.CUSTOMER
+    LEFT OUTER JOIN ff_f_pickup_assignment_detail ON ff_d_customer.CUSTOMER_ID = ff_f_pickup_assignment_detail.CUSTOMER
+    LEFT OUTER JOIN ff_f_pickup_assignment_header ON ff_f_pickup_assignment_detail.PICKUP_ASSIGNMENT_HEADER_ID = ff_f_pickup_assignment_header.PICKUP_ASSIGNMENT_HEADER_ID
+    LEFT OUTER JOIN ff_d_employee ON ff_f_pickup_assignment_header.EMPLOYEE_FIELD_STAFF = ff_d_employee.EMPLOYEE_ID
+WHERE DATE(ff_f_booking.BOOKING_DATE)!=DATE(NOW())
+]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>EVENT_DATE</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>EVENT_DATE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>EVENT_DATE</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>BUSINESS_NAME</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>BUSINESS_NAME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>BUSINESS_NAME</design:label>
+            <design:formattingHints>
+              <design:displaySize>50</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>OFFICE_MAPPED_TO</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>OFFICE_MAPPED_TO</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>OFFICE_MAPPED_TO</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSG_ID</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSG_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSG_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CUSTOMER_ID</design:name>
+              <design:position>5</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CUSTOMER_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CUSTOMER_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="ConsgNoDispatch" id="112">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">CONSG_NUMBER</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CONSG_NUMBER</text-property>
+                    <text-property name="heading">CONSG_NUMBER</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">BOOKING_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">BOOKING_DATE</text-property>
+                    <text-property name="heading">BOOKING_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">BOOKING_OFF</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">BOOKING_OFF</text-property>
+                    <text-property name="heading">BOOKING_OFF</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CONSIGNMENT_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CONSIGNMENT_NAME</text-property>
+                    <text-property name="heading">CONSIGNMENT_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">FINAL_WEIGHT</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">FINAL_WEIGHT</text-property>
+                    <text-property name="heading">FINAL_WEIGHT</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">NO_OF_PIECES</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">NO_OF_PIECES</text-property>
+                    <text-property name="heading">NO_OF_PIECES</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CN_CONTENT_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CN_CONTENT_NAME</text-property>
+                    <text-property name="heading">CN_CONTENT_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CUSTOMER</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">CUSTOMER</text-property>
+                    <text-property name="heading">CUSTOMER</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CONSG_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">CONSG_ID</text-property>
+                    <text-property name="heading">CONSG_ID</text-property>
+                </structure>
+            </list-property>
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">eq</property>
+                    <expression name="expr" type="javascript">row["BOOKING_OFF"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["Branch"].value</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">between</property>
+                    <expression name="expr" type="javascript">row["BOOKING_DATE"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["FromDate"].value</value>
+                    </simple-property-list>
+                    <expression name="value2">params["ToDate"].value</expression>
+                </structure>
+                <structure>
+                    <property name="operator">in</property>
+                    <expression name="expr" type="javascript">params["Client"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>row["CUSTOMER"]</value>
+                        <value>""</value>
+                    </simple-property-list>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">CONSG_NUMBER</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">BOOKING_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">BOOKING_OFF</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">CONSIGNMENT_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">FINAL_WEIGHT</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">NO_OF_PIECES</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">CN_CONTENT_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">CUSTOMER</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">CONSG_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">CONSG_NUMBER</property>
+                    <property name="nativeName">CONSG_NUMBER</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">BOOKING_DATE</property>
+                    <property name="nativeName">BOOKING_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">BOOKING_OFF</property>
+                    <property name="nativeName">BOOKING_OFF</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">CONSIGNMENT_NAME</property>
+                    <property name="nativeName">CONSIGNMENT_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">FINAL_WEIGHT</property>
+                    <property name="nativeName">FINAL_WEIGHT</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">NO_OF_PIECES</property>
+                    <property name="nativeName">NO_OF_PIECES</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">CN_CONTENT_NAME</property>
+                    <property name="nativeName">CN_CONTENT_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">CUSTOMER</property>
+                    <property name="nativeName">CUSTOMER</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">CONSG_ID</property>
+                    <property name="nativeName">CONSG_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[ SELECT distinct ff_f_booking.CONSG_NUMBER,ff_f_booking.BOOKING_DATE,ff_f_booking.BOOKING_OFF,
+  ff_d_consignment_type.CONSIGNMENT_NAME,ff_f_booking.FINAL_WEIGHT,
+  ff_f_booking.NO_OF_PIECES,ff_d_cn_content.CN_CONTENT_NAME,ff_f_booking.CUSTOMER,ff_f_consignment.CONSG_ID 
+  FROM
+       ff_f_booking 
+       LEFT OUTER JOIN ff_f_consignment on ff_f_booking.CONSG_NUMBER=ff_f_consignment.CONSG_NO
+       LEFT OUTER JOIN ff_f_consignment_manifested ON ff_f_consignment.CONSG_ID = ff_f_consignment_manifested.CONSIGNMENT_ID
+       LEFT OUTER JOIN ff_d_consignment_type ON ff_f_booking.CONSG_TYPE = ff_d_consignment_type.CONSIGNMENT_TYPE_ID 
+       LEFT OUTER JOIN ff_d_cn_content ON ff_f_booking.CONTENT = ff_d_cn_content.CN_CONTENT_ID 
+       LEFT OUTER JOIN ff_f_load_connected ON ff_f_consignment_manifested.MANIFEST_ID = ff_f_load_connected.MANIFEST 
+       WHERE ff_f_load_connected.MANIFEST IS NULL
+       group by ff_f_booking.CONSG_NUMBER]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSG_ID</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSG_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSG_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>EVENT_DATE</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>EVENT_DATE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>EVENT_DATE</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSIGNMENT_NAME</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSIGNMENT_NAME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSIGNMENT_NAME</design:label>
+            <design:formattingHints>
+              <design:displaySize>50</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>NO_OF_PCS</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>NO_OF_PCS</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>NO_OF_PCS</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CN_CONTENT_NAME</design:name>
+              <design:position>5</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CN_CONTENT_NAME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CN_CONTENT_NAME</design:label>
+            <design:formattingHints>
+              <design:displaySize>50</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>FINAL_WEIGHT</design:name>
+              <design:position>6</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>8</design:nativeDataTypeCode>
+            <design:precision>10</design:precision>
+            <design:scale>3</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>FINAL_WEIGHT</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>FINAL_WEIGHT</design:label>
+            <design:formattingHints>
+              <design:displaySize>10</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>OFFICE_ID</design:name>
+              <design:position>7</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>OFFICE_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>OFFICE_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <page-footer>
+                <text id="3">
+                    <property name="contentType">html</property>
+                    <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                </text>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <label id="17">
+            <property name="fontSize">12pt</property>
+            <property name="fontWeight">bold</property>
+            <property name="textAlign">center</property>
+            <text-property name="text">Branch Tally Details</text-property>
+        </label>
+        <grid id="18">
+            <column id="19">
+                <property name="width">4.1875in</property>
+            </column>
+            <column id="20">
+                <property name="width">3.7604166666666665in</property>
+            </column>
+            <row id="21">
+                <cell id="22">
+                    <label id="36">
+                        <property name="fontWeight">normal</property>
+                        <property name="textAlign">left</property>
+                        <text-property name="text">Total Number Of Consignments Booking  :</text-property>
+                    </label>
+                </cell>
+                <cell id="23">
+                    <data id="37">
+                        <property name="fontWeight">normal</property>
+                        <property name="textAlign">left</property>
+                        <property name="dataSet">ConsgBooked</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">COUNT(CONSG_ID)</property>
+                                <text-property name="displayName">BOOK_COUNT</text-property>
+                                <expression name="expression" type="javascript">if(dataSetRow["BOOKING_COUNT"]){&#13;
+	dataSetRow["BOOKING_COUNT"]&#13;
+}else{&#13;
+	0&#13;
+}</expression>
+                                <property name="dataType">decimal</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">COUNT(CONSG_ID)</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="24">
+                <cell id="25">
+                    <label id="40">
+                        <property name="fontWeight">normal</property>
+                        <property name="textAlign">left</property>
+                        <text-property name="text">Total Number Of Dispatched :</text-property>
+                    </label>
+                </cell>
+                <cell id="26">
+                    <data id="119">
+                        <property name="fontWeight">normal</property>
+                        <property name="textAlign">left</property>
+                        <property name="dataSet">ConsgDispatch</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">COUNT(`ff_f_consignment_manifested`.CONSIGNMENT_ID)</property>
+                                <text-property name="displayName">DISPATCH_COUNT</text-property>
+                                <expression name="expression" type="javascript">if(dataSetRow["DISPATCH_COUNT"]){&#13;
+	dataSetRow["DISPATCH_COUNT"]&#13;
+}else{&#13;
+	0&#13;
+}</expression>
+                                <property name="dataType">decimal</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">COUNT(`ff_f_consignment_manifested`.CONSIGNMENT_ID)</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="27">
+                <cell id="28">
+                    <label id="38">
+                        <property name="fontWeight">normal</property>
+                        <text-property name="text">Total Number Of  Cancelled :</text-property>
+                    </label>
+                </cell>
+                <cell id="29">
+                    <data id="39">
+                        <property name="fontWeight">normal</property>
+                        <property name="textAlign">left</property>
+                        <property name="dataSet">ConsgCancel</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">COUNT(ITEM_ID)</property>
+                                <text-property name="displayName">COUNT(ITEM_ID)</text-property>
+                                <expression name="expression" type="javascript">if(dataSetRow["CANCEL_COUNT"]){&#13;
+0&#13;
+}else{&#13;
+	0&#13;
+}</expression>
+                                <property name="dataType">decimal</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">COUNT(ITEM_ID)</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="30">
+                <cell id="31">
+                    <label id="42">
+                        <property name="fontWeight">normal</property>
+                        <property name="textAlign">left</property>
+                        <text-property name="text">Total Number Of Co-Courier :</text-property>
+                    </label>
+                </cell>
+                <cell id="32">
+                    <label id="122">
+                        <property name="fontWeight">normal</property>
+                        <property name="textAlign">left</property>
+                        <text-property name="text">0</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="33">
+                <cell id="34"/>
+                <cell id="35"/>
+            </row>
+        </grid>
+        <label id="43">
+            <property name="fontWeight">bold</property>
+            <property name="textAlign">center</property>
+            <text-property name="text">The Following C/ments are not having the Dispatch Information</text-property>
+        </label>
+        <table id="44">
+            <property name="dataSet">ConsgNoDispatch</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">CONSG_ID</property>
+                    <text-property name="displayName">CONSG_ID</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CONSG_ID"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">FINAL_WEIGHT</property>
+                    <text-property name="displayName">FINAL_WEIGHT</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["FINAL_WEIGHT"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">CN_CONTENT_NAME</property>
+                    <text-property name="displayName">CN_CONTENT_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CN_CONTENT_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">CONSIGNMENT_NAME</property>
+                    <text-property name="displayName">CONSIGNMENT_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CONSIGNMENT_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Aggregation</property>
+                    <text-property name="displayName">Sr.No</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">RUNNINGSUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">1</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">CONSG_NUMBER</property>
+                    <text-property name="displayName">CONSG_NUMBER</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CONSG_NUMBER"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BOOKING_DATE</property>
+                    <text-property name="displayName">BOOKING_DATE</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["BOOKING_DATE"]</expression>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="name">NO_OF_PIECES</property>
+                    <text-property name="displayName">NO_OF_PIECES</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["NO_OF_PIECES"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+            </list-property>
+            <column id="69"/>
+            <column id="70"/>
+            <column id="71"/>
+            <column id="72"/>
+            <column id="73"/>
+            <column id="74"/>
+            <column id="75"/>
+            <header>
+                <row id="45">
+                    <cell id="46">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="76">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Sr. No</text-property>
+                        </label>
+                    </cell>
+                    <cell id="47">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="77">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Consignment No</text-property>
+                        </label>
+                    </cell>
+                    <cell id="48">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="78">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text"> Booking Date</text-property>
+                        </label>
+                    </cell>
+                    <cell id="49">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="79">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text"> Type</text-property>
+                        </label>
+                    </cell>
+                    <cell id="50">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="80">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Weight</text-property>
+                        </label>
+                    </cell>
+                    <cell id="51">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="81">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text"> Pieces</text-property>
+                        </label>
+                    </cell>
+                    <cell id="52">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="82">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Contents</text-property>
+                        </label>
+                    </cell>
+                </row>
+            </header>
+            <detail>
+                <row id="53">
+                    <cell id="54">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="120">
+                            <property name="resultSetColumn">Aggregation</property>
+                        </data>
+                    </cell>
+                    <cell id="55">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="123">
+                            <property name="resultSetColumn">CONSG_NUMBER</property>
+                        </data>
+                    </cell>
+                    <cell id="56">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="124">
+                            <structure name="dateTimeFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">dd/MM/yyyy</property>
+                            </structure>
+                            <property name="resultSetColumn">BOOKING_DATE</property>
+                        </data>
+                    </cell>
+                    <cell id="57">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="125">
+                            <property name="resultSetColumn">CONSIGNMENT_NAME</property>
+                        </data>
+                    </cell>
+                    <cell id="58">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="126">
+                            <property name="resultSetColumn">FINAL_WEIGHT</property>
+                        </data>
+                    </cell>
+                    <cell id="59">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="127">
+                            <property name="resultSetColumn">NO_OF_PIECES</property>
+                        </data>
+                    </cell>
+                    <cell id="60">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="128">
+                            <property name="resultSetColumn">CN_CONTENT_NAME</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+            <footer>
+                <row id="61">
+                    <cell id="62"/>
+                    <cell id="63"/>
+                    <cell id="64"/>
+                    <cell id="65"/>
+                    <cell id="66"/>
+                    <cell id="67"/>
+                    <cell id="68"/>
+                </row>
+            </footer>
+        </table>
+        <label id="83">
+            <property name="fontWeight">bold</property>
+            <property name="textAlign">center</property>
+            <text-property name="text">The Following Are - Today, Nil Pickup Customers</text-property>
+        </label>
+        <table id="84">
+            <property name="dataSet">Customers</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">BUSINESS_NAME</property>
+                    <text-property name="displayName">BUSINESS_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["BUSINESS_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">CUSTOMER_ID</property>
+                    <text-property name="displayName">CUSTOMER_ID</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CUSTOMER_ID"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">Aggregation</property>
+                    <text-property name="displayName">Sr.NO</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">RUNNINGSUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">1</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">EMP_CODE</property>
+                    <text-property name="displayName">EMP_CODE</text-property>
+                    <expression name="expression" type="javascript">if(dataSetRow["EMP_CODE"]){&#13;
+	dataSetRow["EMP_CODE"]&#13;
+}else{&#13;
+"N/A"&#13;
+}</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">FIRST_NAME</property>
+                    <text-property name="displayName">FIRST_NAME</text-property>
+                    <expression name="expression" type="javascript">if(dataSetRow["FIRST_NAME"]){&#13;
+dataSetRow["FIRST_NAME"]&#13;
+}else{&#13;
+"N/A"&#13;
+}</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+            </list-property>
+            <column id="100"/>
+            <column id="101"/>
+            <column id="102"/>
+            <column id="103"/>
+            <header>
+                <row id="129">
+                    <cell id="130">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="134">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Csa Code :</text-property>
+                        </label>
+                    </cell>
+                    <cell id="131">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="135">
+                            <property name="fontWeight">normal</property>
+                            <property name="resultSetColumn">EMP_CODE</property>
+                        </data>
+                    </cell>
+                    <cell id="132">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="136">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text"> Csa Name :</text-property>
+                        </label>
+                    </cell>
+                    <cell id="133">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="137">
+                            <property name="fontWeight">normal</property>
+                            <property name="resultSetColumn">FIRST_NAME</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="85">
+                    <cell id="86">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="104">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Sr.no</text-property>
+                        </label>
+                    </cell>
+                    <cell id="87">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="105">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Client-Cd</text-property>
+                        </label>
+                    </cell>
+                    <cell id="88">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="106">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Client Name   </text-property>
+                        </label>
+                    </cell>
+                    <cell id="89">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="107">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Remarks</text-property>
+                        </label>
+                    </cell>
+                </row>
+            </header>
+            <detail>
+                <row id="90">
+                    <property name="suppressDuplicates">true</property>
+                    <cell id="91">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="121">
+                            <property name="textAlign">center</property>
+                            <property name="resultSetColumn">Aggregation</property>
+                        </data>
+                    </cell>
+                    <cell id="92">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="110">
+                            <property name="textAlign">center</property>
+                            <property name="resultSetColumn">CUSTOMER_ID</property>
+                        </data>
+                    </cell>
+                    <cell id="93">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="109">
+                            <property name="textAlign">center</property>
+                            <property name="resultSetColumn">BUSINESS_NAME</property>
+                        </data>
+                    </cell>
+                    <cell id="94">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="111">
+                            <property name="textAlign">center</property>
+                            <text-property name="text">N/A</text-property>
+                        </label>
+                    </cell>
+                </row>
+            </detail>
+            <footer>
+                <row id="95">
+                    <cell id="96"/>
+                    <cell id="97"/>
+                    <cell id="98"/>
+                    <cell id="99"/>
+                </row>
+            </footer>
+        </table>
+    </body>
+</report>

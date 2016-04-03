@@ -1,0 +1,2087 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.2.2.v201301221637 Build &lt;4.2.2.v20130206-1509></property>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[importPackage(Packages.java.util.logging);  
+
+importPackage(Packages.javax.swing);  
+
+   
+
+/****************************************************  
+
+ * Set "blnDisplayDebugWindow" to true/false  
+
+ * to enable/disable the debug window  
+
+ ***************************************************/ 
+
+blnDisplayDebugWindow = true;  
+
+   
+
+/*****************************************************  
+
+ * Name:        logToDebugWindow  
+
+ * Description: Quick and dirty way of displaying a debug  
+
+ *              messages to a Window in eclipse using Swing.  
+
+ *              Uses global variable so all function calls  
+
+ *              print to same window  
+
+ * Parameters:  strMessage - message to display  
+
+ * Returns:     void  
+
+ ****************************************************/ 
+
+function logToDebugWindow(strMessage) {  
+
+   
+
+    // can turn on/off using this variable  
+
+    if(!blnDisplayDebugWindow) { return; }  
+
+   
+
+    // current JTextArea - global parameter  
+
+    var currJTextArea = reportContext.getGlobalVariable("jfDebugWindow");  
+
+   
+
+    // if null, then create and store as global variable  
+
+    if(currJTextArea == null) {  
+
+   
+
+        // Create JFrame  
+
+        var jFrame = new JFrame("Debug Window");  
+
+   
+
+        // Create JTextArea - append message and new-line  
+
+        var jTextArea = new JTextArea(20, 100);  
+
+        jTextArea.append(strMessage);  
+
+        jTextArea.append("\n");  
+
+   
+
+        //Create a JPanel  
+
+        var jPanel = new JPanel();  
+
+        // add text area to scroll pane  
+
+        jPanel.add(jTextArea);  
+
+   
+
+        //Create a vert and horiz scroll bar using JScrollPane  
+
+        var jScrollPane = new JScrollPane(jPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  
+
+        jScrollPane.getHorizontalScrollBar().setUnitIncrement(5);  
+
+        jScrollPane.getVerticalScrollBar().setUnitIncrement(5);  
+
+   
+
+        //Add JScrollPane into JFrame  
+
+        jFrame.add(jScrollPane);  
+
+        jFrame.setSize(400, 400);  
+
+        jFrame.show();  
+
+   
+
+        // set JTextArea as a Global Parameter for future reference  
+
+        reportContext.setGlobalVariable("jfDebugWindow", jTextArea);  
+
+    } else {  
+
+        // Print to Global Reference of the JTextArea  
+
+        currJTextArea.append(strMessage);  
+
+        currJTextArea.append("\n");  
+
+    }  
+
+} 
+]]></method>
+    <property name="iconFile">/templates/simple_listing.gif</property>
+    <property name="cheatSheet">org.eclipse.birt.report.designer.ui.cheatsheet.simplelisting</property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="Region" id="396">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Station" id="397">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Office" id="398">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="month1" id="399">
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="month2" id="400">
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="product" id="401">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="P1" id="699">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="originRegionName" id="706">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="originStationName" id="707">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="originBranchName" id="708">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="productName" id="709">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="StartDateFilter" id="710">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="EndDateFilter" id="711">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="144">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">org.gjt.mm.mysql.Driver</property>
+            <property name="odaURL">jdbc:mysql://172.16.10.128:3306/CorpUDAAN</property>
+            <property name="odaUser">UdaanReport</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">cGFzc3dvcmQxMjM=</encrypted-property>
+            <property name="odaJndiName">java:/comp/env/jdbc/UdaanGoldDB</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Data Set" id="145">
+            <list-property name="columnHints"/>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">TotalPickup</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">Delivered</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">Delivered_Pec</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">Pending</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">Pending_Pec</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">NO_INFO</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">No_Info_Pec</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">RTO</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">RTO_Pec</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">LOST</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">LOST_Pec</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">Pilferage</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">Pilferage_Pec</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">Damage</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">Damage_pec</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">Total Complaints Received</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">Solved</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">Solved_Pec</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">Unsolved</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">Unsolved_pec</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">BUSINESS_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <method name="beforeOpen"><![CDATA[var whereclouse = " ";
+var groupbyclause = "";
+
+if(params["month1"] != null &amp;&amp; params["month2"] !=null)
+{
+whereclouse = " WHERE month(ffbtb.BOOKING_DATE) between month(STR_TO_DATE('01/" + params["month1"] + "', '%d/%m/%Y')) AND month(STR_TO_DATE('01/" + params["month2"] + "', '%d/%m/%Y')) " ;
+}
+
+if(params["Region"] != null &amp;&amp; params["Region"] !="" &amp;&amp; params["Region"] !="Select" )
+{
+whereclouse = whereclouse + " AND dg.REGION_ID IN (" + params["Region"] + ")";
+}
+
+if(params["product"] != null &amp;&amp; params["product"] !="")
+{
+whereclouse = whereclouse + " AND  ffbtb.PRODUCT IN (" + params["product"].value + ")  ";
+}
+
+if(params["Station"] != null &amp;&amp; params["Region"] !="" &amp;&amp; params["Region"] !="Select" &amp;&amp; params["Station"] !="" &amp;&amp; params["Station"] !="Select" )
+{
+whereclouse = whereclouse + " AND dg.CITY_ID IN (" + params["Station"] + ")";
+}
+
+if(params["Office"] != null &amp;&amp; params["Office"] !="" &amp;&amp; params["Office"] !="Select")
+{
+whereclouse = whereclouse + " AND ffbtb.BOOKING_OFF IN (" + params["Office"] + ")";
+}
+ whereclouse = whereclouse + " AND ffbtb.RATE_CALCULATED_FOR = 'B'";
+ 
+ //whereclouse = whereclouse + " ffdd1.TRANS_MODIFIED_DATE_TIME IS NULL";
+
+groupbyclause = " GROUP BY dc.BUSINESS_NAME "
+
+//logToDebugWindow(this.queryText  + whereclouse + groupbyclause);
+this.queryText = this.queryText  + whereclouse + groupbyclause;]]></method>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">TotalPickup</property>
+                    <property name="nativeName">TotalPickup</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Delivered</property>
+                    <property name="nativeName">Delivered</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Delivered_Pec</property>
+                    <property name="nativeName">Delivered_Pec</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">Pending</property>
+                    <property name="nativeName">Pending</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Pending_Pec</property>
+                    <property name="nativeName">Pending_Pec</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">NO_INFO</property>
+                    <property name="nativeName">NO_INFO</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">No_Info_Pec</property>
+                    <property name="nativeName">No_Info_Pec</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">RTO</property>
+                    <property name="nativeName">RTO</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">RTO_Pec</property>
+                    <property name="nativeName">RTO_Pec</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">LOST</property>
+                    <property name="nativeName">LOST</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">LOST_Pec</property>
+                    <property name="nativeName">LOST_Pec</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">Pilferage</property>
+                    <property name="nativeName">Pilferage</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">Pilferage_Pec</property>
+                    <property name="nativeName">Pilferage_Pec</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">Damage</property>
+                    <property name="nativeName">Damage</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">Damage_pec</property>
+                    <property name="nativeName">Damage_pec</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">Total Complaints Received</property>
+                    <property name="nativeName">Total Complaints Received</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">Solved</property>
+                    <property name="nativeName">Solved</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">Solved_Pec</property>
+                    <property name="nativeName">Solved_Pec</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">19</property>
+                    <property name="name">Unsolved</property>
+                    <property name="nativeName">Unsolved</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">20</property>
+                    <property name="name">Unsolved_pec</property>
+                    <property name="nativeName">Unsolved_pec</property>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="position">21</property>
+                    <property name="name">BUSINESS_NAME</property>
+                    <property name="nativeName">BUSINESS_NAME</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT count(ffbtb.CONSG_NO) AS TotalPickup,
+       count(
+          CASE
+             WHEN ffbtb.CONSG_STATUS = 'D' 
+             THEN
+                ffbtb.CONSG_NO
+          END)
+          AS Delivered,
+         (  count(
+               CASE
+                  WHEN ffbtb.CONSG_STATUS = 'D' 
+                  THEN
+                     ffbtb.CONSG_NO
+               END)
+          / count(ffbtb.CONSG_NO))
+       * 100
+          AS Delivered_Pec,
+       count(
+          CASE
+             WHEN (    ffdd1.RECORD_STATUS = 'A' AND
+                       ffdd1.DELIVERY_STATUS = 'P'
+                     AND ffdd1.REASON_ID IS NOT NULL
+                   )
+             THEN
+                ffbtb.CONSG_NO
+          END)
+          AS Pending,
+      
+        (count(
+          CASE
+             WHEN (   ffdd1.RECORD_STATUS = 'A' AND
+                      ffdd1.DELIVERY_STATUS = 'P'
+                     AND ffdd1.REASON_ID IS NOT NULL
+                  )
+             THEN
+                ffbtb.CONSG_NO
+          END)/count(ffbtb.CONSG_NO) ) * 100 as Pending_Pec,
+
+       count(
+          CASE
+             WHEN     ffbtb.CONSG_STATUS != 'D'
+                  AND ffdd1.CONSG_ID IS NULL
+                  AND ffbtb.CONSG_STATUS != 'R'
+                  AND fdh.TRANSACTION_NUMBER IS NULL
+             THEN
+                ffbtb.CONSG_NO -- Pending without reason (is this equivalent to "No Info" of "Customer Wise MIS Report" ?)
+          END)
+          AS "NO_INFO",
+         (  count(
+               CASE
+                  WHEN     ffbtb.CONSG_STATUS != 'D'
+                       AND ffdd1.CONSG_ID IS NULL
+                       AND ffbtb.CONSG_STATUS != 'R'
+                       AND fdh.TRANSACTION_NUMBER IS NULL
+                  THEN
+                     ffbtb.CONSG_NO -- Pending without reason (is this equivalent to "No Info" of "Customer Wise MIS Report" ?)
+               END)
+          / count(ffbtb.CONSG_NO))
+       * 100
+          AS No_Info_Pec,
+       count(CASE WHEN ffbtb.CONSG_STATUS = 'R' THEN ffbtb.CONSG_NO END)
+          AS RTO,
+         (  count(CASE WHEN ffbtb.CONSG_STATUS = 'R' THEN ffbtb.CONSG_NO END)
+          / count(ffbtb.CONSG_NO))
+       * 100
+          AS RTO_Pec,
+       count(
+          CASE
+             WHEN    fdr.reason_id IS NOT NULL
+                  OR fdh.TRANSACTION_NUMBER IS NOT NULL
+             THEN
+                ffbtb.CONSG_NO
+          END)
+          LOST,
+         (  count(
+               CASE
+                  WHEN    fdr.reason_id IS NOT NULL
+                       OR fdh.TRANSACTION_NUMBER IS NOT NULL
+                  THEN
+                     ffbtb.CONSG_NO
+               END)
+          / count(ffbtb.CONSG_NO))
+       * 100
+          AS LOST_Pec,
+       count(
+          CASE WHEN srvrq.Complaint_Category = '47' THEN srvrq.booking_no END)
+          AS Pilferage,
+         (  count(
+               CASE
+                  WHEN srvrq.Complaint_Category = '47' THEN srvrq.booking_no
+               END)
+          / count(srvrq.booking_no))
+       * 100
+          AS Pilferage_Pec,
+       count(
+          CASE
+             WHEN    srvrq.Complaint_Category = '9'
+                  OR srvrq.Complaint_Category = '10'
+             THEN
+                srvrq.booking_no
+          END)
+          AS Damage,
+         (  count(
+               CASE
+                  WHEN    srvrq.Complaint_Category = '9'
+                       OR srvrq.Complaint_Category = '10'
+                  THEN
+                     srvrq.booking_no
+               END)
+          / count(srvrq.booking_no))
+       * 100
+          AS Damage_pec,
+       count(srvrq.booking_no) AS "Total Complaints Received",
+       count(CASE WHEN srvrq.Status = 3 THEN srvrq.booking_no END) AS Solved,
+         (  count(CASE WHEN srvrq.Status = 3 THEN srvrq.booking_no END)
+          / count(srvrq.booking_no))
+       * 100
+          AS Solved_Pec,
+         count(srvrq.booking_no)
+       - count(CASE WHEN srvrq.Status = 3 THEN srvrq.booking_no END)
+          AS Unsolved,
+         (  count(srvrq.booking_no)
+          -   count(CASE WHEN srvrq.Status = 3 THEN srvrq.booking_no END)
+            / count(srvrq.booking_no))
+       * 100
+          AS Unsolved_pec,
+       dc.BUSINESS_NAME AS 'CUSTOMER'
+
+  FROM ff_fct_book_to_bill ffbtb
+       LEFT JOIN ff_mv_latest_delivery ffdd1
+          ON ffdd1.CONSG_ID = ffbtb.CONSG_ID
+       LEFT JOIN ff_f_service_request srvrq
+          ON srvrq.booking_no = ffbtb.CONSG_ID
+       JOIN ff_dim_customer dc ON ffbtb.CUSTOMER_C = dc.CUSTOMER_ID
+       LEFT JOIN ff_dim_geography dg ON ffbtb.BOOKING_OFF = dg.OFFICE_ID
+       LEFT JOIN ff_f_heldup fdh
+          ON (    ffbtb.CONSG_NO = fdh.TRANSACTION_NUMBER
+              AND TRANSACTION_TYPE = 'CONG')
+       LEFT JOIN ff_d_reason fdr
+          ON (fdr.reason_id = ffdd1.reason_id AND reason_code = 'MIT')
+]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSG_NO</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>25</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSG_NO</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSG_NO</design:label>
+            <design:formattingHints>
+              <design:displaySize>25</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSG_ID</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSG_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSG_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CUSTOMER</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CUSTOMER</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CUSTOMER</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>BOOKING_DATE</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>BOOKING_DATE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>BOOKING_DATE</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>BOOKING_OFF</design:name>
+              <design:position>5</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>BOOKING_OFF</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>BOOKING_OFF</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>EVENT_DATE</design:name>
+              <design:position>6</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>91</design:nativeDataTypeCode>
+            <design:precision>10</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>EVENT_DATE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>EVENT_DATE</design:label>
+            <design:formattingHints>
+              <design:displaySize>10</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSG_STATUS_ID</design:name>
+              <design:position>7</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSG_STATUS_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSG_STATUS_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>DAMAGED</design:name>
+              <design:position>10</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>1</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>DAMAGED</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>DAMAGED</design:label>
+            <design:formattingHints>
+              <design:displaySize>1</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>REGION_ID</design:name>
+              <design:position>11</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>REGION_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>REGION_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CITY_ID</design:name>
+              <design:position>12</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CITY_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CITY_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>OFFICE_ID</design:name>
+              <design:position>13</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>OFFICE_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>OFFICE_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSG_STATUS_DESC</design:name>
+              <design:position>14</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>50</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSG_STATUS_DESC</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSG_STATUS_DESC</design:label>
+            <design:formattingHints>
+              <design:displaySize>50</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="24">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="25">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="26">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <page-footer>
+                <grid id="2528">
+                    <column id="2529"/>
+                    <column id="2530"/>
+                    <column id="2531"/>
+                    <row id="2532">
+                        <cell id="2533"/>
+                        <cell id="2535">
+                            <auto-text id="2534">
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">center</property>
+                                <property name="type">page-number</property>
+                            </auto-text>
+                        </cell>
+                        <cell id="2537"/>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="2522">
+            <property name="fontSize">10px</property>
+            <property name="borderBottomColor">#808080</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">thin</property>
+            <property name="borderLeftColor">#808080</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">thin</property>
+            <property name="borderRightColor">#808080</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">thin</property>
+            <property name="borderTopColor">#808080</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">thin</property>
+            <property name="width">14.125in</property>
+            <column id="2523">
+                <property name="width">7.96875in</property>
+            </column>
+            <row id="2526">
+                <cell id="2527">
+                    <property name="borderBottomColor">#808080</property>
+                    <property name="borderBottomStyle">solid</property>
+                    <property name="borderBottomWidth">thin</property>
+                    <property name="borderLeftColor">#808080</property>
+                    <property name="borderLeftStyle">solid</property>
+                    <property name="borderLeftWidth">thin</property>
+                    <property name="borderRightColor">#808080</property>
+                    <property name="borderRightStyle">solid</property>
+                    <property name="borderRightWidth">thin</property>
+                    <property name="borderTopColor">#808080</property>
+                    <property name="borderTopStyle">solid</property>
+                    <property name="borderTopWidth">thin</property>
+                    <label id="743">
+                        <property name="fontSize">16pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text">First Flight Couriers Ltd.</text-property>
+                    </label>
+                    <label id="2491">
+                        <property name="fontSize">12pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text">Customer Wise MIS Report</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="2673">
+                <cell id="2674">
+                    <property name="borderBottomColor">#808080</property>
+                    <property name="borderBottomStyle">solid</property>
+                    <property name="borderBottomWidth">thin</property>
+                    <property name="borderLeftColor">#808080</property>
+                    <property name="borderLeftStyle">solid</property>
+                    <property name="borderLeftWidth">thin</property>
+                    <property name="borderRightColor">#808080</property>
+                    <property name="borderRightStyle">solid</property>
+                    <property name="borderRightWidth">thin</property>
+                    <property name="borderTopColor">#808080</property>
+                    <property name="borderTopStyle">solid</property>
+                    <property name="borderTopWidth">thin</property>
+                    <text-data id="2676">
+                        <property name="fontSize">12px</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">center</property>
+                        <expression name="valueExpr">var filtercriteria = "";&#13;
+filtercriteria = filtercriteria + "Origin Region: " + params["originRegionName"].value&#13;
+if(params["originStationName"].value ){&#13;
+filtercriteria = filtercriteria + ",   Origin Station: " + params["originStationName"].value &#13;
+}&#13;
+if(params["originBranchName"].value ){&#13;
+filtercriteria = filtercriteria + ",   Origin Branch: " + params["originBranchName"].value&#13;
+}&#13;
+filtercriteria = filtercriteria +  ",   Period From: " + params["month1"].value&#13;
+filtercriteria = filtercriteria + ",   Period To: " + params["month2"].value&#13;
+if(params["productName"].value ){&#13;
+filtercriteria = filtercriteria + ",   Product: " + params["productName"].value &#13;
+}</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+        </grid>
+        <table id="27">
+            <property name="marginTop">0pt</property>
+            <property name="marginLeft">0pt</property>
+            <property name="marginBottom">0pt</property>
+            <property name="marginRight">0pt</property>
+            <property name="width">100%</property>
+            <property name="dataSet">Data Set</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">TotalPickup</property>
+                    <text-property name="displayName">TotalPickup</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["TotalPickup"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Delivered</property>
+                    <text-property name="displayName">Delivered</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Delivered"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Delivered_Pec</property>
+                    <text-property name="displayName">Delivered_Pec</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Delivered_Pec"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Pending</property>
+                    <text-property name="displayName">Pending</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Pending"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Pending_Pec</property>
+                    <text-property name="displayName">Pending_Pec</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Pending_Pec"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">NO_INFO</property>
+                    <text-property name="displayName">NO_INFO</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["NO_INFO"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">No_Info_Pec</property>
+                    <text-property name="displayName">No_Info_Pec</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["No_Info_Pec"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">RTO</property>
+                    <text-property name="displayName">RTO</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["RTO"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">RTO_Pec</property>
+                    <text-property name="displayName">RTO_Pec</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["RTO_Pec"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">LOST</property>
+                    <text-property name="displayName">LOST</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["LOST"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">LOST_Pec</property>
+                    <text-property name="displayName">LOST_Pec</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["LOST_Pec"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Pilferage</property>
+                    <text-property name="displayName">Pilferage</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Pilferage"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Pilferage_Pec</property>
+                    <text-property name="displayName">Pilferage_Pec</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Pilferage_Pec"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Damage</property>
+                    <text-property name="displayName">Damage</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Damage"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Damage_pec</property>
+                    <text-property name="displayName">Damage_pec</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Damage_pec"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Total Complaints Received</property>
+                    <text-property name="displayName">Total Complaints Received</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Total Complaints Received"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Solved</property>
+                    <text-property name="displayName">Solved</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Solved"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Solved_Pec</property>
+                    <text-property name="displayName">Solved_Pec</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Solved_Pec"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Unsolved</property>
+                    <text-property name="displayName">Unsolved</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Unsolved"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Unsolved_pec</property>
+                    <text-property name="displayName">Unsolved_pec</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Unsolved_pec"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">BUSINESS_NAME</property>
+                    <text-property name="displayName">BUSINESS_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["BUSINESS_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <column id="4342">
+                <property name="width">1.3541666666666667in</property>
+            </column>
+            <column id="95">
+                <property name="width">1.3541666666666667in</property>
+            </column>
+            <column id="96">
+                <property name="width">0.8541666666666666in</property>
+            </column>
+            <column id="97">
+                <property name="width">1in</property>
+            </column>
+            <column id="98">
+                <property name="width">0.8125in</property>
+            </column>
+            <column id="99">
+                <property name="width">0.84375in</property>
+            </column>
+            <column id="100">
+                <property name="width">0.6979166666666666in</property>
+            </column>
+            <column id="101">
+                <property name="width">0.5208333333333334in</property>
+            </column>
+            <column id="102">
+                <property name="width">0.6979166666666666in</property>
+            </column>
+            <column id="103">
+                <property name="width">0.53125in</property>
+            </column>
+            <column id="104">
+                <property name="width">0.5208333333333334in</property>
+            </column>
+            <column id="105">
+                <property name="width">0.5208333333333334in</property>
+            </column>
+            <column id="2691">
+                <property name="width">0.5208333333333334in</property>
+            </column>
+            <column id="2695">
+                <property name="width">0.5208333333333334in</property>
+            </column>
+            <column id="108">
+                <property name="width">0.7083333333333334in</property>
+            </column>
+            <column id="109">
+                <property name="width">0.5625in</property>
+            </column>
+            <column id="110">
+                <property name="width">0.8125in</property>
+            </column>
+            <column id="111">
+                <property name="width">0.5833333333333334in</property>
+            </column>
+            <column id="112">
+                <property name="width">0.5416666666666666in</property>
+            </column>
+            <column id="113">
+                <property name="width">0.6770833333333334in</property>
+            </column>
+            <column id="114">
+                <property name="width">0.6666666666666666in</property>
+            </column>
+            <header>
+                <row id="4186">
+                    <property name="height">0.6875in</property>
+                    <cell id="4337">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4344">
+                            <text-property name="text">Customer Name</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4187">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4345">
+                            <text-property name="text">Total Pickup</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4188">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4346">
+                            <text-property name="text">Delivered</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4189">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4347">
+                            <text-property name="text">%</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4190">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4348">
+                            <text-property name="text">Pending</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4191">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4349">
+                            <text-property name="text">%</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4192">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4350">
+                            <text-property name="text">No Info</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4193">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4351">
+                            <text-property name="text">%</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4194">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4352">
+                            <text-property name="text">RTO</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4195">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4353">
+                            <text-property name="text">%</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4196">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4354">
+                            <text-property name="text">Lost</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4197">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4355">
+                            <text-property name="text">%</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4198">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4356">
+                            <text-property name="text">Pilferage</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4199">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4357">
+                            <text-property name="text">%</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4200">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4358">
+                            <text-property name="text">Damage</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4201">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4359">
+                            <text-property name="text">%</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4202">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4360">
+                            <text-property name="text">Total Complaints</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4203">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4361">
+                            <text-property name="text">Solved</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4204">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4362">
+                            <text-property name="text">%</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4205">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4363">
+                            <text-property name="text">Unsolved</text-property>
+                        </label>
+                    </cell>
+                    <cell id="4206">
+                        <property name="backgroundColor">#FAE280</property>
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="4364">
+                            <text-property name="text">%</text-property>
+                        </label>
+                    </cell>
+                </row>
+            </header>
+            <detail>
+                <row id="4012">
+                    <cell id="4340">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="4295">
+                            <property name="resultSetColumn">BUSINESS_NAME</property>
+                        </data>
+                    </cell>
+                    <cell id="4013">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3647">
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalPickup</property>
+                        </data>
+                    </cell>
+                    <cell id="4014">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3648">
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Delivered</property>
+                        </data>
+                    </cell>
+                    <cell id="4015">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3649">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Delivered_Pec</property>
+                        </data>
+                    </cell>
+                    <cell id="4016">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3650">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Pending</property>
+                        </data>
+                    </cell>
+                    <cell id="4017">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3651">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Pending_Pec</property>
+                        </data>
+                    </cell>
+                    <cell id="4018">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3652">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">NO_INFO</property>
+                        </data>
+                    </cell>
+                    <cell id="4019">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3654">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">No_Info_Pec</property>
+                        </data>
+                    </cell>
+                    <cell id="4020">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3655">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">RTO</property>
+                        </data>
+                    </cell>
+                    <cell id="4021">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3656">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">RTO_Pec</property>
+                        </data>
+                    </cell>
+                    <cell id="4022">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3657">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">LOST</property>
+                        </data>
+                    </cell>
+                    <cell id="4023">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3658">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">LOST_Pec</property>
+                        </data>
+                    </cell>
+                    <cell id="4024">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3660">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Pilferage</property>
+                        </data>
+                    </cell>
+                    <cell id="4025">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3659">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Pilferage_Pec</property>
+                        </data>
+                    </cell>
+                    <cell id="4026">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3661">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Damage</property>
+                        </data>
+                    </cell>
+                    <cell id="4027">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3662">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Damage_pec</property>
+                        </data>
+                    </cell>
+                    <cell id="4028">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3663">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Total Complaints Received</property>
+                        </data>
+                    </cell>
+                    <cell id="4029">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3664">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Solved</property>
+                        </data>
+                    </cell>
+                    <cell id="4030">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3665">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Solved_Pec</property>
+                        </data>
+                    </cell>
+                    <cell id="4031">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3667">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Unsolved</property>
+                        </data>
+                    </cell>
+                    <cell id="4032">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="3666">
+                            <structure name="numberFormat">
+                                <property name="category">Fixed</property>
+                                <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Unsolved_pec</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+        </table>
+    </body>
+</report>

@@ -1,0 +1,1766 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.2.2.v201301221637 Build &lt;4.2.2.v20130206-1509></property>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[importPackage(Packages.java.util.logging);  
+
+importPackage(Packages.javax.swing);  
+
+   
+
+/****************************************************  
+
+ * Set "blnDisplayDebugWindow" to true/false  
+
+ * to enable/disable the debug window  
+
+ ***************************************************/ 
+rowcount=0;
+blnDisplayDebugWindow = true;  
+
+   
+
+/*****************************************************  
+
+ * Name:        logToDebugWindow  
+
+ * Description: Quick and dirty way of displaying a debug  
+
+ *              messages to a Window in eclipse using Swing.  
+
+ *              Uses global variable so all function calls  
+
+ *              print to same window  
+
+ * Parameters:  strMessage - message to display  
+
+ * Returns:     void  
+
+ ****************************************************/ 
+
+function logToDebugWindow(strMessage) {  
+
+   
+
+    // can turn on/off using this variable  
+
+    if(!blnDisplayDebugWindow) { return; }  
+
+   
+
+    // current JTextArea - global parameter  
+
+    var currJTextArea = reportContext.getGlobalVariable("jfDebugWindow");  
+
+   
+
+    // if null, then create and store as global variable  
+
+    if(currJTextArea == null) {  
+
+   
+
+        // Create JFrame  
+
+        var jFrame = new JFrame("Debug Window");  
+
+   
+
+        // Create JTextArea - append message and new-line  
+
+        var jTextArea = new JTextArea(20, 100);  
+
+        jTextArea.append(strMessage);  
+
+        jTextArea.append("\n");  
+
+   
+
+        //Create a JPanel  
+
+        var jPanel = new JPanel();  
+
+        // add text area to scroll pane  
+
+        jPanel.add(jTextArea);  
+
+   
+
+        //Create a vert and horiz scroll bar using JScrollPane  
+
+        var jScrollPane = new JScrollPane(jPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  
+
+        jScrollPane.getHorizontalScrollBar().setUnitIncrement(5);  
+
+        jScrollPane.getVerticalScrollBar().setUnitIncrement(5);  
+
+   
+
+        //Add JScrollPane into JFrame  
+
+        jFrame.add(jScrollPane);  
+
+        jFrame.setSize(400, 400);  
+
+        jFrame.show();  
+
+   
+
+        // set JTextArea as a Global Parameter for future reference  
+
+        reportContext.setGlobalVariable("jfDebugWindow", jTextArea);  
+
+    } else {  
+
+        // Print to Global Reference of the JTextArea  
+
+        currJTextArea.append(strMessage);  
+
+        currJTextArea.append("\n");  
+
+    }  
+
+} 
+
+var a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
+var b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
+
+function inWords (num) {
+	var rupees = "";
+	var paise = "";
+	var strRupees = '';
+	var strPaise = '';
+	var str = '';
+	var amount = new java.lang.String(num);
+	var len = BirtStr.charLength(amount);
+    if(BirtStr.indexOf('.', amount)!=-1) {
+		rupees = amount.substring(0, BirtStr.indexOf('.', amount));
+		paise = amount.substring(BirtStr.indexOf('.', amount)+1,len);
+	} else {
+		rupees = amount;
+	}
+    if (BirtStr.charLength(rupees) > 9) return 'rupees overflow';
+	if (BirtStr.charLength(paise) > 2) return 'paise overflow';
+    
+	//convert rupees
+	n = ('000000000' + rupees ).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+	//logToDebugWindow(n);
+    if (!n) return; 
+    strRupees += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+    strRupees += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+    strRupees += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+    strRupees += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+    strRupees += (n[5] != 0) ? ((strRupees != '') ? '' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + 'Rupees ' : '';
+
+	if(BirtStr.charLength(paise) > 0) {
+		//convert paise
+		n = ('000000000' + paise ).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+		if (!n) return; 
+		strPaise = "and ";
+		strPaise += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+		strPaise += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+		strPaise += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+		strPaise += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+		strPaise += (n[5] != 0) ? ((strPaise != '') ? '' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + 'Paise ' : '';
+	}
+
+	str = strRupees+strPaise+"only";
+	return str;
+}
+]]></method>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="RegionName" id="1543">
+            <text-property name="promptText">Region Name</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="PartyName" id="1545">
+            <text-property name="promptText">Party Name</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="CustomerId" id="1547">
+            <text-property name="promptText">Customer ID</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="PaymentAdviceTypeName" id="1548">
+            <text-property name="promptText">Paymnent Advice Type</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="ChequeNumber" id="1550">
+            <text-property name="promptText">Cheque Number</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="PaymentAdviceTypeCode" id="1552">
+            <text-property name="promptText">Payment Advice Type Code</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="FromDate" id="1638">
+            <text-property name="promptText">From Date</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">date</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Custom</property>
+                <property name="pattern">yyyy/MM/dd</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="ToDate" id="1639">
+            <text-property name="promptText">To Date</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">date</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Custom</property>
+                <property name="pattern">yyyy/MM/dd</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="CustomerCode" id="1641">
+            <text-property name="promptText">Customer Code</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="regionId" id="1776">
+            <text-property name="promptText">regionId</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="ffdev" id="1646">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">com.mysql.jdbc.Driver</property>
+            <property name="odaURL">jdbc:mysql://172.16.10.128:3306/CorpUDAAN</property>
+            <property name="odaUser">UdaanReport</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">cGFzc3dvcmQxMjM=</encrypted-property>
+            <property name="odaJndiName">java:/comp/env/jdbc/UdaanGoldDB</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsPaymentAdvice" id="1647">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">BOOKING_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Booking date</text-property>
+                    <text-property name="heading">Booking date</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CONSG_NO</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Consignment Number</text-property>
+                    <text-property name="heading">Consignment Number</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CITY_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Origin</text-property>
+                    <text-property name="heading">Origin</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CITY_NAME_4</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Destination</text-property>
+                    <text-property name="heading">Destination</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Amount</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Amount</text-property>
+                    <text-property name="heading">Amount</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">PAID_AMT</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Paid Amount</text-property>
+                    <text-property name="heading">Paid Amount</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CUST_REF_NO</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Referance Number</text-property>
+                    <text-property name="heading">Referance Number</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CHEQUE_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Cheque Date</text-property>
+                    <text-property name="heading">Cheque Date</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">GL_DESC</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Bank Name</text-property>
+                    <text-property name="heading">Bank Name</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CHEQUE_NO</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CHEQUE_NO</text-property>
+                    <text-property name="heading">CHEQUE_NO</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CUSTOMER_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">CUSTOMER_ID</text-property>
+                    <text-property name="heading">CUSTOMER_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">PAYMENT_MODE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">PAYMENT_MODE</text-property>
+                    <text-property name="heading">PAYMENT_MODE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CUSTOMER_CODE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CUSTOMER_CODE</text-property>
+                    <text-property name="heading">CUSTOMER_CODE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">BUSINESS_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">BUSINESS_NAME</text-property>
+                    <text-property name="heading">BUSINESS_NAME</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">BOOKING_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">CONSG_NO</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">CITY_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">CITY_NAME_4</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">Amount</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">PAID_AMT</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">CUST_REF_NO</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">CHEQUE_DATE</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">GL_DESC</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">CHEQUE_NO</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">CUSTOMER_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">PAYMENT_MODE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">CUSTOMER_CODE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">BUSINESS_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <method name="beforeOpen"><![CDATA[var query = this.queryText;
+
+
+query = query.replaceAll("@CustomerId","'"+params["CustomerId"]+"'");
+query = query.replaceAll("@PaymentAdviceTypeCode","'"+params["PaymentAdviceTypeCode"]+"'");
+query = query.replaceAll("@FromDate","'"+params["FromDate"]+"'");
+query = query.replaceAll("@ToDate","'"+params["ToDate"]+"'");
+
+query = query.replaceAll("@ChequeNumber","'"+params["ChequeNumber"]+"'");
+
+query = query.replaceAll("@regionId","'"+params["regionId"]+"'");
+
+
+
+//logToDebugWindow(query);
+
+this.queryText = query;
+
+
+]]></method>
+            <method name="onFetch"><![CDATA[rowcount=rowcount+1;]]></method>
+            <property name="dataSource">ffdev</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">BOOKING_DATE</property>
+                    <property name="nativeName">BOOKING_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">CONSG_NO</property>
+                    <property name="nativeName">CONSG_NO</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">CITY_NAME</property>
+                    <property name="nativeName">CITY_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">CITY_NAME_4</property>
+                    <property name="nativeName">CITY_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Amount</property>
+                    <property name="nativeName">Amount</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">PAID_AMT</property>
+                    <property name="nativeName">PAID_AMT</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">CUST_REF_NO</property>
+                    <property name="nativeName">CUST_REF_NO</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">CHEQUE_DATE</property>
+                    <property name="nativeName">CHEQUE_DATE</property>
+                    <property name="dataType">date</property>
+                    <property name="nativeDataType">91</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">GL_DESC</property>
+                    <property name="nativeName">GL_DESC</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">CHEQUE_NO</property>
+                    <property name="nativeName">CHEQUE_NO</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">CUSTOMER_ID</property>
+                    <property name="nativeName">CUSTOMER_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">PAYMENT_MODE</property>
+                    <property name="nativeName">PAYMENT_MODE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">CUSTOMER_CODE</property>
+                    <property name="nativeName">CUSTOMER_CODE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">BUSINESS_NAME</property>
+                    <property name="nativeName">BUSINESS_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT
+  ffb.BOOKING_DATE AS 'Booking date'
+ ,ffc.CONSG_NO AS 'Consignment Number'
+ ,fdc_org.CITY_NAME AS 'Origin'
+ ,fdc_fdp.CITY_NAME AS 'Destination'
+ ,case WHEN ffc.COD_AMT is null 
+  THEN ffc.LC_AMT 
+  when ffc.LC_AMT is null and ffc.COD_AMT is null
+  then ffc.TOPAY_AMT
+  ELSE ffc.COD_AMT 
+END AS 'Amount'
+,ffle.PAID_AMT as 'Paid Amount'
+ ,ffb.CUST_REF_NO AS 'Referance Number'
+ ,fflp.CHEQUE_DATE AS 'Cheque Date'
+ ,fdgm.GL_DESC AS 'Bank Name'
+ ,fflp.CHEQUE_NO
+ ,fflp.CUSTOMER_ID
+ ,fflp.PAYMENT_MODE
+ ,c.CUSTOMER_CODE
+ ,c.BUSINESS_NAME
+FROM
+  ff_f_consignment ffc
+ left JOIN ff_f_booking ffb ON ffb.consg_number = ffc.CONSG_NO
+ left JOIN ff_f_liability_entries ffle ON ffle.CONSIGNMENT_ID = ffc.CONSG_ID
+ left JOIN ff_f_liability_payment fflp ON fflp.LIABILITY_ID = ffle.LIABILITY_ID
+ left JOIN ff_d_office fdo_org ON fdo_org.OFFICE_ID = ffc.ORG_OFF
+ left JOIN ff_d_city fdc_org ON fdc_org.CITY_ID = fdo_org.CITY_ID
+ left JOIN ff_d_pincode fdp ON fdp.PINCODE_ID = ffc.DEST_PINCODE
+ left JOIN ff_d_city fdc_fdp ON fdc_fdp.CITY_ID = fdp.CITY_ID
+ left JOIN ff_d_product fdprd ON fdprd.product_id = ffc.PRODUCT
+ left JOIN ff_d_gl_master fdgm ON fdgm.GL_ID = fflp.BANK_ID
+ JOIN ff_d_customer c ON fflp.CUSTOMER_ID = c.CUSTOMER_ID
+WHERE
+  fflp.LIABILITY_STATUS = 'S' AND
+  CASE
+    WHEN upper(@CustomerId) = 'All' THEN TRUE
+    ELSE fflp.CUSTOMER_ID = @CustomerId
+  END AND -- DOX,PPX or ALL
+  fflp.PAYMENT_MODE = @PaymentAdviceTypeCode AND
+  date( fflp.`DATE` ) BETWEEN date(
+                                     str_to_date(
+                                       @FromDate
+                                      ,'%Y-%m-%d'))
+                               AND date(
+                                     str_to_date(
+                                       @ToDate
+                                      ,'%Y-%m-%d')) AND
+  CASE
+    WHEN upper(@ChequeNumber) = 'All' THEN TRUE ELSE fflp.CHEQUE_NO = @ChequeNumber END
+  AND fflp.REGION_ID = @regionId
+  ORDER BY ffb.BOOKING_DATE ASC;]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>BOOKING_DATE</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Booking date</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Booking date</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSG_NO</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>25</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Consignment Number</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Consignment Number</design:label>
+            <design:formattingHints>
+              <design:displaySize>25</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CITY_NAME</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>150</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Orogon</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Orogon</design:label>
+            <design:formattingHints>
+              <design:displaySize>150</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CITY_NAME</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>150</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Destination</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Destination</design:label>
+            <design:formattingHints>
+              <design:displaySize>150</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>Amount</design:name>
+              <design:position>5</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Amount</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Amount</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CUST_REF_NO</design:name>
+              <design:position>6</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>50</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>Referance Number</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>Referance Number</design:label>
+            <design:formattingHints>
+              <design:displaySize>50</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2"/>
+    </page-setup>
+    <body>
+        <grid id="279">
+            <column id="280">
+                <property name="width">0.75in</property>
+            </column>
+            <column id="312">
+                <property name="width">0.9583333333333334in</property>
+            </column>
+            <column id="281"/>
+            <column id="317"/>
+            <column id="282"/>
+            <column id="336"/>
+            <column id="331"/>
+            <column id="283"/>
+            <column id="1534"/>
+            <column id="1539"/>
+            <row id="284">
+                <cell id="285">
+                    <property name="colSpan">10</property>
+                    <property name="rowSpan">1</property>
+                    <label id="304">
+                        <property name="fontSize">16pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text">First Flight Couriers Ltd.</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="289">
+                <cell id="290">
+                    <property name="colSpan">10</property>
+                    <property name="rowSpan">1</property>
+                    <label id="305">
+                        <property name="fontSize">11pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text">Payment Advice</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="294">
+                <cell id="295">
+                    <property name="colSpan">10</property>
+                    <property name="rowSpan">1</property>
+                    <text-data id="1770">
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">center</property>
+                        <expression name="valueExpr">BirtStr.concat(params["PartyName"].value, " (",params["CustomerCode"].value,")");</expression>
+                        <property name="contentType">html</property>
+                    </text-data>
+                </cell>
+            </row>
+            <row id="1755">
+                <cell id="1756">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <label id="1772">
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">right</property>
+                        <text-property name="text">REGION:</text-property>
+                    </label>
+                </cell>
+                <cell id="1758">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="1802">
+                        <property name="fontWeight">bold</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">RegionName</property>
+                                <expression name="expression" type="javascript">params["RegionName"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">RegionName</property>
+                    </data>
+                </cell>
+                <cell id="1760">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+                <cell id="1762">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <label id="1768">
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">right</property>
+                        <text-property name="text">CHEQUE NUMBER:</text-property>
+                    </label>
+                </cell>
+                <cell id="1764">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="1801">
+                        <property name="fontWeight">bold</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">ChequeNumber</property>
+                                <expression name="expression" type="javascript">params["ChequeNumber"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">ChequeNumber</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="1744">
+                <cell id="1745">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <label id="1803">
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">right</property>
+                        <text-property name="text">FROM DATE:</text-property>
+                    </label>
+                </cell>
+                <cell id="1747">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="1804">
+                        <property name="fontWeight">bold</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">FromDate</property>
+                                <expression name="expression" type="javascript">params["FromDate"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">FromDate</property>
+                    </data>
+                </cell>
+                <cell id="1749">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+                <cell id="1751">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <label id="1805">
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">right</property>
+                        <text-property name="text">TO DATE:</text-property>
+                    </label>
+                </cell>
+                <cell id="1753">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="1806">
+                        <property name="fontWeight">bold</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">ToDate</property>
+                                <expression name="expression" type="javascript">params["ToDate"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">ToDate</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="1553">
+                <cell id="1554">
+                    <property name="colSpan">10</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+        </grid>
+        <table id="1648">
+            <property name="dataSet">dsPaymentAdvice</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr" type="javascript">if( rowcount == 0 ){&#13;
+true;&#13;
+}else{&#13;
+false;&#13;
+}</expression>
+                </structure>
+            </list-property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">BOOKING_DATE</property>
+                    <text-property name="displayName">Booking date</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["BOOKING_DATE"]</expression>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="name">CONSG_NO</property>
+                    <text-property name="displayName">Consignment Number</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CONSG_NO"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">CITY_NAME</property>
+                    <text-property name="displayName">Origin</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CITY_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">CITY_NAME_4</property>
+                    <text-property name="displayName">Destination</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CITY_NAME_4"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Amount</property>
+                    <text-property name="displayName">Amount</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Amount"]</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">CUST_REF_NO</property>
+                    <text-property name="displayName">Referance Number</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CUST_REF_NO"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">SerialNumber</property>
+                    <text-property name="displayName">Sr. No.</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">RUNNINGSUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">1</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalAmount</property>
+                    <text-property name="displayName">TotalAmount</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["Amount"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">ChequeDate</property>
+                    <text-property name="displayName">Cheque Date</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CHEQUE_DATE"]</expression>
+                    <property name="dataType">date</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">BankName</property>
+                    <text-property name="displayName">Bank Name</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["GL_DESC"]</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">ChequeDate1</property>
+                    <text-property name="displayName">ChequeDate1</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">MIN</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["ChequeDate"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">BankName1</property>
+                    <text-property name="displayName">BankName1</text-property>
+                    <property name="dataType">string</property>
+                    <property name="aggregateFunction">FIRST</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["BankName"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">CHEQUE_NO</property>
+                    <text-property name="displayName">CHEQUE_NO</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CHEQUE_NO"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">BUSINESS_NAME</property>
+                    <text-property name="displayName">BUSINESS_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["BUSINESS_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">CUSTOMER_CODE</property>
+                    <text-property name="displayName">CUSTOMER_CODE</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CUSTOMER_CODE"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Column Binding</property>
+                    <expression name="expression" type="javascript">dataSetRow["CHEQUE_DATE"]</expression>
+                    <property name="dataType">date</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">PAID_AMT</property>
+                    <text-property name="displayName">Paid Amount</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["PAID_AMT"]</expression>
+                    <property name="dataType">float</property>
+                </structure>
+                <structure>
+                    <property name="name">Aggregation</property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["PAID_AMT"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+            </list-property>
+            <column id="1691"/>
+            <column id="1682"/>
+            <column id="1683"/>
+            <column id="1684"/>
+            <column id="1794">
+                <property name="width">0.8020833333333334in</property>
+            </column>
+            <column id="1788">
+                <property name="width">0.6041666666666666in</property>
+            </column>
+            <column id="1782"/>
+            <column id="1812"/>
+            <column id="1685"/>
+            <column id="1686"/>
+            <column id="1823"/>
+            <column id="1687"/>
+            <header>
+                <row id="1709">
+                    <cell id="1710">
+                        <property name="colSpan">12</property>
+                        <property name="rowSpan">1</property>
+                        <property name="borderBottomStyle">none</property>
+                        <property name="borderLeftStyle">none</property>
+                        <property name="borderRightStyle">none</property>
+                        <property name="borderTopStyle">none</property>
+                        <grid id="1632">
+                            <list-property name="visibility">
+                                <structure>
+                                    <property name="format">all</property>
+                                    <expression name="valueExpr" type="javascript">true</expression>
+                                </structure>
+                            </list-property>
+                            <column id="1633"/>
+                            <row id="1634">
+                                <cell id="1635"/>
+                            </row>
+                            <row id="1636">
+                                <cell id="1637">
+                                    <label id="1718"/>
+                                </cell>
+                            </row>
+                        </grid>
+                    </cell>
+                </row>
+                <row id="1701">
+                    <cell id="1702">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1719"/>
+                    </cell>
+                    <cell id="1703">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                    </cell>
+                    <cell id="1704">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                    </cell>
+                    <cell id="1705">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                    </cell>
+                    <cell id="1790">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                    </cell>
+                    <cell id="1784">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                    </cell>
+                    <cell id="1778">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                    </cell>
+                    <cell id="1808">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                    </cell>
+                    <cell id="1706">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                    </cell>
+                    <cell id="1707">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                    </cell>
+                    <cell id="1819">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                    </cell>
+                    <cell id="1708">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                    </cell>
+                </row>
+                <row id="1649">
+                    <cell id="1688">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1692">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Sr. No.</text-property>
+                        </label>
+                    </cell>
+                    <cell id="1650">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1651">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Booking date</text-property>
+                        </label>
+                    </cell>
+                    <cell id="1652">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1653">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Consignment Number</text-property>
+                        </label>
+                    </cell>
+                    <cell id="1654">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1655">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Origin</text-property>
+                        </label>
+                    </cell>
+                    <cell id="1791">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1795">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Customer Name</text-property>
+                        </label>
+                    </cell>
+                    <cell id="1785">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1796">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Customer Code</text-property>
+                        </label>
+                    </cell>
+                    <cell id="1779">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1797">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Cheque Number</text-property>
+                        </label>
+                    </cell>
+                    <cell id="1809">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1813">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Cheque Date</text-property>
+                        </label>
+                    </cell>
+                    <cell id="1656">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1657">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Destination</text-property>
+                        </label>
+                    </cell>
+                    <cell id="1658">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1659">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Amount</text-property>
+                        </label>
+                    </cell>
+                    <cell id="1820">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1824">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Paid Amount</text-property>
+                        </label>
+                    </cell>
+                    <cell id="1660">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1661">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Referance Number</text-property>
+                        </label>
+                    </cell>
+                </row>
+            </header>
+            <detail>
+                <row id="1662">
+                    <cell id="1689">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1698">
+                            <property name="textAlign">center</property>
+                            <property name="resultSetColumn">SerialNumber</property>
+                        </data>
+                    </cell>
+                    <cell id="1663">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1664">
+                            <structure name="dateTimeFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">dd/MM/yyyy</property>
+                            </structure>
+                            <property name="textAlign">center</property>
+                            <property name="resultSetColumn">BOOKING_DATE</property>
+                        </data>
+                    </cell>
+                    <cell id="1665">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1666">
+                            <property name="textAlign">left</property>
+                            <property name="resultSetColumn">CONSG_NO</property>
+                        </data>
+                    </cell>
+                    <cell id="1667">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1668">
+                            <property name="textAlign">left</property>
+                            <property name="resultSetColumn">CITY_NAME</property>
+                        </data>
+                    </cell>
+                    <cell id="1792">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1799">
+                            <property name="resultSetColumn">BUSINESS_NAME</property>
+                        </data>
+                    </cell>
+                    <cell id="1786">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1800">
+                            <property name="resultSetColumn">CUSTOMER_CODE</property>
+                        </data>
+                    </cell>
+                    <cell id="1780">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1817">
+                            <property name="resultSetColumn">CHEQUE_NO</property>
+                        </data>
+                    </cell>
+                    <cell id="1810">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1815">
+                            <property name="resultSetColumn">Column Binding</property>
+                        </data>
+                    </cell>
+                    <cell id="1669">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1670">
+                            <property name="textAlign">left</property>
+                            <property name="resultSetColumn">CITY_NAME_4</property>
+                        </data>
+                    </cell>
+                    <cell id="1671">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1672">
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">#0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Amount</property>
+                        </data>
+                    </cell>
+                    <cell id="1821">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1825">
+                            <structure name="numberFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">#0.00</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">PAID_AMT</property>
+                        </data>
+                    </cell>
+                    <cell id="1673">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1674">
+                            <property name="textAlign">left</property>
+                            <property name="resultSetColumn">CUST_REF_NO</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+            <footer>
+                <row id="1675">
+                    <cell id="1690"/>
+                    <cell id="1676"/>
+                    <cell id="1677"/>
+                    <cell id="1678"/>
+                    <cell id="1793"/>
+                    <cell id="1787"/>
+                    <cell id="1781"/>
+                    <cell id="1811"/>
+                    <cell id="1679">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="1699">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Total	</text-property>
+                        </label>
+                    </cell>
+                    <cell id="1680">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1700">
+                            <property name="fontWeight">bold</property>
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalAmount</property>
+                        </data>
+                    </cell>
+                    <cell id="1822">
+                        <property name="fontWeight">bold</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="1826">
+                            <structure name="numberFormat">
+                                <property name="category">Currency</property>
+                                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Aggregation</property>
+                        </data>
+                    </cell>
+                    <cell id="1681"/>
+                </row>
+            </footer>
+        </table>
+        <label id="1721">
+            <property name="backgroundColor">#FFFFFF</property>
+            <property name="fontSize">14pt</property>
+            <property name="fontWeight">bold</property>
+            <property name="color">#FF0000</property>
+            <property name="textAlign">center</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr" type="javascript">if( rowcount == 0 ){&#13;
+false;&#13;
+}else{&#13;
+true;&#13;
+}</expression>
+                </structure>
+            </list-property>
+            <text-property name="text">No Data Available</text-property>
+        </label>
+    </body>
+</report>

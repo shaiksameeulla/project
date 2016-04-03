@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+	<import resource="classpath:universe-service.xml" />
+	<import resource="classpath:rate-calculation-service.xml" />
+
+
+	<bean id="commonReportService" class="com.ff.report.common.service.CommonReportServiceImpl">
+		<property name="commonReportDAO" ref="commonReportDAO" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="globalUniversalService" ref="globalUniversalService" />
+		<property name="mecUniversalService" ref="mecUniversalService" />
+		<property name="stockUniversalService" ref="stockUniversalService" />
+
+	</bean>
+	<bean id="billingCommonService" class="com.ff.report.billing.service.BillingCommonServiceImpl">
+		<property name="billingCommonDAO" ref="billingCommonDAO" />
+		<property name="billingUniversalService" ref="billingUniversalService" />
+		<property name="serviceOfferingCommonService" ref="serviceOfferingCommonService" />
+		<property name="organizationCommonService" ref="organizationCommonService" />
+		<property name="geographyCommonService" ref="geographyCommonService" />
+		<property name="globalUniversalService" ref="globalUniversalService" />
+		<property name="businessCommonService" ref="businessCommonService" />
+		<property name="sequenceGeneratorService" ref="sequenceGeneratorService" />
+		<property name="pickupManagementCommonService" ref="pickupManagementCommonService" />
+		<!-- <property name="rateCalcFactory" ref="rateCalcFactory" /> -->
+		<property name="rateCalculationUniversalService" ref="rateCalculationUniversalService" />
+	</bean>
+
+
+	<bean id="billPrintingService" class="com.ff.report.common.service.BillPrintingServiceImpl">
+		<property name="billPrintingDAO" ref="billPrintingDAO" />
+		<property name="billingCommonService" ref="billingCommonService" />
+		<property name="billingUniversalService" ref="billingUniversalService" />
+	</bean>
+
+	<bean id="customerReportService"
+		class="com.ff.report.customer.service.CustomerReportServiceImpl">
+		<property name="customerReportServiceDAO" ref="customerReportServiceDAO" />
+	</bean>
+
+	<bean id="birtUtil" class="com.ff.report.common.service.BirtUtil">
+	</bean>
+
+</beans>

@@ -1,0 +1,1789 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.2.2.v201301221637 Build &lt;4.2.2.v20130206-1509></property>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[importPackage(Packages.java.util.logging);  
+
+importPackage(Packages.javax.swing);  
+
+   
+
+/****************************************************  
+
+ * Set "blnDisplayDebugWindow" to true/false  
+
+ * to enable/disable the debug window  
+
+ ***************************************************/ 
+
+blnDisplayDebugWindow = true;  
+
+   
+
+/*****************************************************  
+
+ * Name:        logToDebugWindow  
+
+ * Description: Quick and dirty way of displaying a debug  
+
+ *              messages to a Window in eclipse using Swing.  
+
+ *              Uses global variable so all function calls  
+
+ *              print to same window  
+
+ * Parameters:  strMessage - message to display  
+
+ * Returns:     void  
+
+ ****************************************************/ 
+
+function logToDebugWindow(strMessage) {  
+
+   
+
+    // can turn on/off using this variable  
+
+    if(!blnDisplayDebugWindow) { return; }  
+
+   
+
+    // current JTextArea - global parameter  
+
+    var currJTextArea = reportContext.getGlobalVariable("jfDebugWindow");  
+
+   
+
+    // if null, then create and store as global variable  
+
+    if(currJTextArea == null) {  
+
+   
+
+        // Create JFrame  
+
+        var jFrame = new JFrame("Debug Window");  
+
+   
+
+        // Create JTextArea - append message and new-line  
+
+        var jTextArea = new JTextArea(20, 100);  
+
+        jTextArea.append(strMessage);  
+
+        jTextArea.append("\n");  
+
+   
+
+        //Create a JPanel  
+
+        var jPanel = new JPanel();  
+
+        // add text area to scroll pane  
+
+        jPanel.add(jTextArea);  
+
+   
+
+        //Create a vert and horiz scroll bar using JScrollPane  
+
+        var jScrollPane = new JScrollPane(jPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  
+
+        jScrollPane.getHorizontalScrollBar().setUnitIncrement(5);  
+
+        jScrollPane.getVerticalScrollBar().setUnitIncrement(5);  
+
+   
+
+        //Add JScrollPane into JFrame  
+
+        jFrame.add(jScrollPane);  
+
+        jFrame.setSize(400, 400);  
+
+        jFrame.show();  
+
+   
+
+        // set JTextArea as a Global Parameter for future reference  
+
+        reportContext.setGlobalVariable("jfDebugWindow", jTextArea);  
+
+    } else {  
+
+        // Print to Global Reference of the JTextArea  
+
+        currJTextArea.append(strMessage);  
+
+        currJTextArea.append("\n");  
+
+    }  
+
+} 
+]]></method>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="region" id="147">
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">Select</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="city" id="148">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">Select</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="branch" id="149">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">Select</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="fromDate" id="150">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="toDate" id="151">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="product" id="152">
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">Select</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="slabList" id="154">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="upperlimit" id="155">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="lowerlimit" id="156">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="originRegionName" id="2203">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="originStationName" id="2204">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="originBranchName" id="2205">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="productName" id="2206">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="fuelSlabValue" id="2207">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="ffdev" id="129">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">org.gjt.mm.mysql.Driver</property>
+            <property name="odaURL">jdbc:mysql://172.16.10.128:3306/CorpUDAAN</property>
+            <property name="odaUser">UdaanReport</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">cGFzc3dvcmQxMjM=</encrypted-property>
+            <property name="odaJndiName">java:/comp/env/jdbc/UdaanGoldDB</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Data Set" id="130">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">REGION_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">REGION_NAME</text-property>
+                    <text-property name="heading">REGION_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CITY_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CITY_NAME</text-property>
+                    <text-property name="heading">CITY_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">OFFICE_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">OFFICE_NAME</text-property>
+                    <text-property name="heading">OFFICE_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CUSTOMER_CODE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CUSTOMER_CODE</text-property>
+                    <text-property name="heading">CUSTOMER_CODE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">BUSINESS_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">BUSINESS_NAME</text-property>
+                    <text-property name="heading">BUSINESS_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">FuelSurchargePercentage</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">FuelSurchargePercentage</text-property>
+                    <text-property name="heading">FuelSurchargePercentage</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">NO_OF_DOX</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">NO_OF_DOX</text-property>
+                    <text-property name="heading">NO_OF_DOX</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">tot_weight_dox</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">tot_weight_dox</text-property>
+                    <text-property name="heading">tot_weight_dox</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">UPPER_LIMIT</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Committed_Revenue</text-property>
+                    <text-property name="heading">Committed_Revenue</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Actual_Revenue_DOX</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Actual_Revenue_DOX</text-property>
+                    <text-property name="heading">Actual_Revenue_DOX</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">NO_OF_PPX</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">NO_OF_PPX</text-property>
+                    <text-property name="heading">NO_OF_PPX</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">tot_weight_PPX</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">tot_weight_PPX</text-property>
+                    <text-property name="heading">tot_weight_PPX</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Actual_Revenue_PPX</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Actual_Revenue_PPX</text-property>
+                    <text-property name="heading">Actual_Revenue_PPX</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">REGION_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">CITY_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">OFFICE_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">CUSTOMER_CODE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">BUSINESS_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">FuelSurchargePercentage</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">NO_OF_DOX</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">tot_weight_dox</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">UPPER_LIMIT</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">Actual_Revenue_DOX</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">NO_OF_PPX</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">tot_weight_PPX</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">Actual_Revenue_PPX</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <method name="beforeOpen"><![CDATA[var whereclouse = " where ";
+
+whereclouse = whereclouse + " (date(ff_fct_bb.booking_date) between " + " str_to_date('" + params["fromDate"] +"', '%d/%m/%Y') ";
+whereclouse = whereclouse + " AND str_to_date('" + params["toDate"] +"', '%d/%m/%Y'))";
+
+whereclouse = whereclouse + " AND bill_consg.invoice is not null ";
+whereclouse = whereclouse + " AND ff_fct_bb.RATE_CALCULATED_FOR='B'";
+
+
+if(params["region"] != null  &amp;&amp; params["region"] !="Select"){
+whereclouse = whereclouse + " AND ffd_ge.REGION_ID in (" + params["region"] + ")";
+}
+
+if(params["city"] != null &amp;&amp; params["city"] != "Select"  &amp;&amp; params["region"] !="Select"){
+whereclouse = whereclouse + " AND ffd_ge.CITY_ID in (" + params["city"] + ")";
+}
+
+if(params["branch"] != null  &amp;&amp; params["branch"] !="Select"){
+whereclouse = whereclouse + " AND ff_fct_bb.BOOKING_OFF in (" + params["branch"] + ")";
+}
+
+if(params["product"] != null &amp;&amp; params["product"] !="Select" &amp;&amp; params["product"] !="All" ){
+whereclouse = whereclouse + " AND dim_prod.rate_product_category_id in (" + params["product"] + ")";
+}
+
+if(params["slabList"] == 20 )
+{
+whereclouse =whereclouse + " AND lc.COMPONENT_VALUE > 20";
+}
+else if(params["lowerlimit"] != 0 &amp;&amp; params["upperlimit"] != 0)
+{
+whereclouse =whereclouse + " AND lc.COMPONENT_VALUE BETWEEN (" + params["lowerlimit"]  + ")  AND  (" +  params["upperlimit"] + ")";
+}    
+
+whereclouse = whereclouse +" group by ffd_ge.REGION_ID, ffd_ge.CITY_ID, ffd_ge.OFFICE_ID, ffd_cust.CUSTOMER_CODE";
+
+this.queryText = this.queryText + whereclouse;
+
+//logToDebugWindow(this.queryText);
+
+
+]]></method>
+            <property name="dataSource">ffdev</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">REGION_NAME</property>
+                    <property name="nativeName">REGION_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">CITY_NAME</property>
+                    <property name="nativeName">CITY_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">OFFICE_NAME</property>
+                    <property name="nativeName">OFFICE_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">CUSTOMER_CODE</property>
+                    <property name="nativeName">CUSTOMER_CODE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">BUSINESS_NAME</property>
+                    <property name="nativeName">BUSINESS_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">FuelSurchargePercentage</property>
+                    <property name="nativeName">FuelSurchargePercentage</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">NO_OF_DOX</property>
+                    <property name="nativeName">NO_OF_DOX</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">tot_weight_dox</property>
+                    <property name="nativeName">tot_weight_dox</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">UPPER_LIMIT</property>
+                    <property name="nativeName">UPPER_LIMIT</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">7</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">Actual_Revenue_DOX</property>
+                    <property name="nativeName">Actual_Revenue_DOX</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">NO_OF_PPX</property>
+                    <property name="nativeName">NO_OF_PPX</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">tot_weight_PPX</property>
+                    <property name="nativeName">tot_weight_PPX</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">Actual_Revenue_PPX</property>
+                    <property name="nativeName">Actual_Revenue_PPX</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT ffd_ge.REGION_NAME,
+       ffd_ge.CITY_NAME,
+       ffd_ge.OFFICE_NAME,
+       ffd_cust.CUSTOMER_CODE,
+       ffd_cust.BUSINESS_NAME,
+       getFuelSurchargePercentage(
+          fdrcc.CUSTOMER_CATEGORY_CODE,
+          fdct.CUSTOMER_TYPE_CODE,
+          max(ff_fct_bb.BOOKING_DATE),
+          ffd_cust.CUSTOMER_ID,
+          ffd_ge.REGION_ID,
+          ffd_ge.CITY_ID ,
+          CASE WHEN dim_prod.CONSG_SERIES = 'P' THEN 'Y' ELSE 'N' END)
+          AS FuelSurchargePercentage,
+       count(
+          DISTINCT CASE
+                      WHEN ff_fct_bb.CONSG_TYPE = 1 THEN ff_fct_bb.CONSG_ID
+                   END)
+          AS NO_OF_DOX,
+       sum(
+          CASE WHEN ff_fct_bb.CONSG_TYPE = 1 THEN ff_fct_bb.FINAL_WEIGHT END)
+          AS tot_weight_dox,
+       ffd_v_slab.UPPER_LIMIT AS Committed_Revenue,
+       sum(
+          CASE
+             WHEN ff_fct_bb.CONSG_TYPE = 1 THEN ff_fct_bb.TOTAL_WITHOUT_TAX
+          END)
+          AS Actual_Revenue_DOX,
+       count(
+          DISTINCT CASE
+                      WHEN ff_fct_bb.CONSG_TYPE = 2 THEN ff_fct_bb.CONSG_ID
+                   END)
+          AS NO_OF_PPX,
+       sum(
+          CASE WHEN ff_fct_bb.CONSG_TYPE = 2 THEN ff_fct_bb.FINAL_WEIGHT END)
+          AS tot_weight_PPX,
+       sum(
+          CASE
+             WHEN ff_fct_bb.CONSG_TYPE = 2 THEN ff_fct_bb.TOTAL_WITHOUT_TAX
+          END)
+          AS Actual_Revenue_PPX
+  FROM ff_fct_book_to_bill ff_fct_bb ignore index (fk_fct_book_to_bill_product,idx_ffb4)                                  -- 27758
+       JOIN ff_f_billing_consignment bill_consg
+          ON ff_fct_bb.consg_id = bill_consg.consg_id
+       LEFT JOIN ff_dim_geography ffd_ge
+          ON ffd_ge.OFFICE_ID = ff_fct_bb.BOOKING_OFF                 -- 27758
+       LEFT JOIN ff_dim_customer ffdim_cust
+          ON ffdim_cust.CUSTOMER_ID = ff_fct_bb.CUSTOMER_C            -- 27758
+       LEFT JOIN ff_d_customer ffd_cust
+          ON ffd_cust.CUSTOMER_ID = ff_fct_bb.CUSTOMER_C
+       LEFT JOIN ff_d_rate_customer_category fdrcc
+          ON fdrcc.RATE_CUSTOMER_CATEGORY_ID = ffd_cust.CUSTOMER_CATEGORY
+       LEFT JOIN ff_d_customer_type fdct
+          ON fdct.CUSTOMER_TYPE_ID = ffd_cust.CUSTOMER_TYPE
+       LEFT JOIN ff_dim_product dim_prod force index for join (idx_dp2)
+          ON dim_prod.PRODUCT_ID = ff_fct_bb.PRODUCT                  -- 27758
+       LEFT JOIN ff_fct_lead_to_contract lc
+          ON  lc.n_cust_skey = ffdim_cust.n_cust_skey                -- 1007637
+              AND lc.N_PROD_SKEY = dim_prod.n_prod_skey
+              AND lc.n_geo_skey = ffd_ge.n_geo_skey
+       LEFT JOIN ff_f_rate_quotation_fixed_charges rqfc
+          ON     lc.RATE_QUOTATION_FIXED_CHARGES_ID =
+                    rqfc.RATE_QUOTATION_FIXED_CHARGES_ID
+             AND rqfc.RATE_COMPONENT_CODE = 'FSCHG'
+       LEFT JOIN ff_d_vob_slab ffd_v_slab
+          ON ffd_v_slab.VOB_SLAB_ID = lc.VOB_SLAB]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <page-footer>
+                <grid id="2208">
+                    <column id="2209"/>
+                    <column id="2210"/>
+                    <column id="2211"/>
+                    <row id="2212">
+                        <cell id="2213"/>
+                        <cell id="2215">
+                            <auto-text id="2214">
+                                <property name="textAlign">center</property>
+                                <property name="type">page-number</property>
+                            </auto-text>
+                        </cell>
+                        <cell id="2217"/>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="157">
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">Column Binding</property>
+                    <text-property name="displayName">fromDate</text-property>
+                    <expression name="expression" type="javascript">params["fromDate"].value</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">Column Binding_1</property>
+                    <text-property name="displayName">toDate</text-property>
+                    <expression name="expression" type="javascript">params["toDate"].value</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">Column Binding_2</property>
+                    <text-property name="displayName">fuelSlabValue</text-property>
+                    <expression name="expression" type="javascript">params["fuelSlabValue"].value</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">Column Binding_3</property>
+                    <text-property name="displayName">originRegionName</text-property>
+                    <expression name="expression" type="javascript">params["originRegionName"].value</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">Column Binding_4</property>
+                    <text-property name="displayName">originBranchName</text-property>
+                    <expression name="expression" type="javascript">params["originBranchName"].value</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">Column Binding_5</property>
+                    <text-property name="displayName">originStation</text-property>
+                    <expression name="expression" type="javascript">params["originStationName"].value</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">Column Binding_6</property>
+                    <text-property name="displayName">productName</text-property>
+                    <expression name="expression" type="javascript">params["productName"].value</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+            </list-property>
+            <column id="158"/>
+            <row id="167">
+                <cell id="168">
+                    <label id="743">
+                        <property name="fontSize">16pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text">First Flight Couriers Ltd.</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="163">
+                <cell id="164">
+                    <label id="166">
+                        <property name="fontSize">12pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text">Customer wise Quality Analysis</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="159">
+                <cell id="160">
+                    <grid id="2163">
+                        <column id="2164"/>
+                        <column id="2165"/>
+                        <column id="2166"/>
+                        <column id="2167"/>
+                        <row id="2168">
+                            <cell id="2169">
+                                <label id="2183">
+                                    <property name="fontWeight">bold</property>
+                                    <property name="textAlign">right</property>
+                                    <text-property name="text">Origin Region :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="2170">
+                                <data id="2196">
+                                    <property name="resultSetColumn">Column Binding_3</property>
+                                </data>
+                            </cell>
+                            <cell id="2171">
+                                <label id="2184">
+                                    <property name="fontWeight">bold</property>
+                                    <property name="textAlign">right</property>
+                                    <text-property name="text">Origin Station :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="2172">
+                                <data id="2199">
+                                    <property name="resultSetColumn">Column Binding_5</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="2173">
+                            <cell id="2174">
+                                <label id="2185">
+                                    <property name="fontWeight">bold</property>
+                                    <property name="textAlign">right</property>
+                                    <text-property name="text">Origin Branch :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="2175">
+                                <data id="2197">
+                                    <property name="resultSetColumn">Column Binding_4</property>
+                                </data>
+                            </cell>
+                            <cell id="2176">
+                                <label id="2186">
+                                    <property name="fontWeight">bold</property>
+                                    <property name="textAlign">right</property>
+                                    <text-property name="text">Product :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="2177">
+                                <data id="2200">
+                                    <property name="resultSetColumn">Column Binding_6</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="2178">
+                            <cell id="2179">
+                                <label id="2187">
+                                    <property name="fontWeight">bold</property>
+                                    <property name="textAlign">right</property>
+                                    <text-property name="text">From Date :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="2180">
+                                <data id="2198">
+                                    <property name="resultSetColumn">Column Binding</property>
+                                </data>
+                            </cell>
+                            <cell id="2181">
+                                <label id="2188">
+                                    <property name="fontWeight">bold</property>
+                                    <property name="textAlign">right</property>
+                                    <text-property name="text">To Date :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="2182">
+                                <data id="2201">
+                                    <property name="resultSetColumn">Column Binding_1</property>
+                                </data>
+                            </cell>
+                        </row>
+                        <row id="2189">
+                            <cell id="2190">
+                                <label id="2194">
+                                    <property name="fontWeight">bold</property>
+                                    <property name="textAlign">right</property>
+                                    <text-property name="text">Fuel % :</text-property>
+                                </label>
+                            </cell>
+                            <cell id="2191">
+                                <data id="2202">
+                                    <property name="resultSetColumn">Column Binding_2</property>
+                                </data>
+                            </cell>
+                            <cell id="2192"/>
+                            <cell id="2193"/>
+                        </row>
+                    </grid>
+                </cell>
+            </row>
+            <row id="161">
+                <cell id="162">
+                    <table id="7">
+                        <property name="dataSet">Data Set</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">REGION_NAME</property>
+                                <text-property name="displayName">REGION_NAME</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["REGION_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CITY_NAME</property>
+                                <text-property name="displayName">CITY_NAME</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["CITY_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">OFFICE_NAME</property>
+                                <text-property name="displayName">OFFICE_NAME</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["OFFICE_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">CUSTOMER_CODE</property>
+                                <text-property name="displayName">CUSTOMER_CODE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["CUSTOMER_CODE"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">BUSINESS_NAME</property>
+                                <text-property name="displayName">BUSINESS_NAME</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["BUSINESS_NAME"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">COMPONENT_VALUE</property>
+                                <text-property name="displayName">COMPONENT_VALUE</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["FuelSurchargePercentage"]</expression>
+                                <property name="dataType">float</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">NO_OF_DOX</property>
+                                <text-property name="displayName">NO_OF_DOX</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["NO_OF_DOX"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">tot_weight_dox</property>
+                                <text-property name="displayName">tot_weight_dox</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["tot_weight_dox"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">UPPER_LIMIT</property>
+                                <text-property name="displayName">UPPER_LIMIT</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["UPPER_LIMIT"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Actual_Revenue_DOX</property>
+                                <text-property name="displayName">Actual_Revenue_DOX</text-property>
+                                <expression name="expression" type="javascript">BirtMath.round(dataSetRow["Actual_Revenue_DOX"],2)</expression>
+                                <property name="dataType">decimal</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">NO_OF_PPX</property>
+                                <text-property name="displayName">NO_OF_PPX</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["NO_OF_PPX"]</expression>
+                                <property name="dataType">decimal</property>
+                            </structure>
+                            <structure>
+                                <property name="name">tot_weight_PPX</property>
+                                <text-property name="displayName">tot_weight_PPX</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["tot_weight_PPX"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Actual_Revenue_PPX</property>
+                                <text-property name="displayName">Actual_Revenue_PPX</text-property>
+                                <expression name="expression" type="javascript">BirtMath.round(dataSetRow["Actual_Revenue_PPX"],2)</expression>
+                                <property name="dataType">decimal</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Column Binding</property>
+                                <text-property name="displayName">Yield Per Consignment</text-property>
+                                <expression name="expression" type="javascript">if(dataSetRow["NO_OF_DOX"] > 0) {&#13;
+	BirtMath.divide(dataSetRow["Actual_Revenue_DOX"],dataSetRow["NO_OF_DOX"]);&#13;
+} else {&#13;
+	0;&#13;
+}</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Column Binding_1</property>
+                                <expression name="expression" type="javascript">if(row["tot_weight_PPX"] > 0) {&#13;
+	//BirtMath.round(dataSetRow["Actual_Revenue_PPX"],dataSetRow["tot_weight_PPX"])&#13;
+	Formatter.format(BirtMath.round(row["Actual_Revenue_PPX"]/row["tot_weight_PPX"],2),"0.00")&#13;
+} else {&#13;
+	0;&#13;
+}</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                            <structure>
+                                <property name="name">Aggregation</property>
+                                <text-property name="displayName">SN</text-property>
+                                <property name="dataType">integer</property>
+                                <property name="aggregateFunction">RUNNINGCOUNT</property>
+                                <list-property name="arguments">
+                                    <structure>
+                                        <property name="name">Expression</property>
+                                    </structure>
+                                </list-property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
+                        <column id="65"/>
+                        <column id="66"/>
+                        <column id="114"/>
+                        <column id="67"/>
+                        <column id="68"/>
+                        <column id="69"/>
+                        <column id="70"/>
+                        <column id="73"/>
+                        <column id="74"/>
+                        <column id="75"/>
+                        <column id="76"/>
+                        <column id="77"/>
+                        <column id="78"/>
+                        <column id="79"/>
+                        <column id="80"/>
+                        <column id="81"/>
+                        <column id="82"/>
+                        <header>
+                            <row id="8">
+                                <cell id="9">
+                                    <property name="colSpan">1</property>
+                                    <property name="rowSpan">2</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="102">
+                                        <text-property name="text">SL NO</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="10">
+                                    <property name="colSpan">1</property>
+                                    <property name="rowSpan">2</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="115">
+                                        <text-property name="text">Region</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="110">
+                                    <property name="colSpan">1</property>
+                                    <property name="rowSpan">2</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="116">
+                                        <text-property name="text">Station</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="11">
+                                    <property name="colSpan">1</property>
+                                    <property name="rowSpan">2</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="104">
+                                        <text-property name="text">Branch</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="12">
+                                    <property name="colSpan">1</property>
+                                    <property name="rowSpan">2</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="105">
+                                        <text-property name="text">Customer Code</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="13">
+                                    <property name="colSpan">1</property>
+                                    <property name="rowSpan">2</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="106">
+                                        <text-property name="text">Customer Name</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="14">
+                                    <property name="colSpan">1</property>
+                                    <property name="rowSpan">2</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="107">
+                                        <text-property name="text">Fuel Surcharge (%)</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="17">
+                                    <property name="colSpan">5</property>
+                                    <property name="rowSpan">1</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <label id="117">
+                                        <text-property name="text">DOX</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="22">
+                                    <property name="colSpan">5</property>
+                                    <property name="rowSpan">1</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <label id="118">
+                                        <text-property name="text">PPX</text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                            <row id="83">
+                                <cell id="92">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <label id="119">
+                                        <text-property name="text">Dox (No. of cmnts)</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="93">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="120">
+                                        <text-property name="text">Weight</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="94">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="121">
+                                        <text-property name="text">Committed Revenue</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="95">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="122">
+                                        <text-property name="text">Actual Revenue (Excl. Service Tax)</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="96">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="123">
+                                        <text-property name="text">Yield Per Consignment</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="97">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="124">
+                                        <text-property name="text">Non Dox (No. of Cmnts.)</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="98">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="125">
+                                        <text-property name="text">Weight in KG</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="99">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="126">
+                                        <text-property name="text">Committed Revenue</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="100">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="127">
+                                        <text-property name="text">Actual Revenue (Excl. Service Tax)</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="101">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="verticalAlign">middle</property>
+                                    <label id="128">
+                                        <text-property name="text">Yield Per KG</text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </header>
+                        <detail>
+                            <row id="27">
+                                <cell id="28">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">left</property>
+                                    <data id="153">
+                                        <property name="resultSetColumn">Aggregation</property>
+                                    </data>
+                                </cell>
+                                <cell id="29">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">left</property>
+                                    <data id="131">
+                                        <property name="resultSetColumn">REGION_NAME</property>
+                                    </data>
+                                </cell>
+                                <cell id="112">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">left</property>
+                                    <data id="132">
+                                        <property name="resultSetColumn">CITY_NAME</property>
+                                    </data>
+                                </cell>
+                                <cell id="30">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">left</property>
+                                    <data id="133">
+                                        <property name="resultSetColumn">OFFICE_NAME</property>
+                                    </data>
+                                </cell>
+                                <cell id="31">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">left</property>
+                                    <data id="134">
+                                        <property name="resultSetColumn">CUSTOMER_CODE</property>
+                                    </data>
+                                </cell>
+                                <cell id="32">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <data id="135">
+                                        <property name="resultSetColumn">BUSINESS_NAME</property>
+                                    </data>
+                                </cell>
+                                <cell id="33">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <data id="136">
+                                        <property name="resultSetColumn">COMPONENT_VALUE</property>
+                                    </data>
+                                </cell>
+                                <cell id="36">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">right</property>
+                                    <data id="137">
+                                        <property name="resultSetColumn">NO_OF_DOX</property>
+                                    </data>
+                                </cell>
+                                <cell id="37">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">right</property>
+                                    <data id="138">
+                                        <property name="resultSetColumn">tot_weight_dox</property>
+                                    </data>
+                                </cell>
+                                <cell id="38">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">right</property>
+                                    <data id="139">
+                                        <property name="resultSetColumn">UPPER_LIMIT</property>
+                                    </data>
+                                </cell>
+                                <cell id="39">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">right</property>
+                                    <data id="140">
+                                        <property name="resultSetColumn">Actual_Revenue_DOX</property>
+                                    </data>
+                                </cell>
+                                <cell id="40">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">right</property>
+                                    <data id="145">
+                                        <property name="resultSetColumn">Column Binding</property>
+                                    </data>
+                                </cell>
+                                <cell id="41">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">right</property>
+                                    <data id="141">
+                                        <property name="resultSetColumn">NO_OF_PPX</property>
+                                    </data>
+                                </cell>
+                                <cell id="42">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">right</property>
+                                    <data id="142">
+                                        <structure name="numberFormat">
+                                            <property name="category">Fixed</property>
+                                            <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                        </structure>
+                                        <property name="resultSetColumn">tot_weight_PPX</property>
+                                    </data>
+                                </cell>
+                                <cell id="43">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">right</property>
+                                    <data id="143">
+                                        <property name="resultSetColumn">UPPER_LIMIT</property>
+                                    </data>
+                                </cell>
+                                <cell id="44">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">right</property>
+                                    <data id="144">
+                                        <property name="resultSetColumn">Actual_Revenue_PPX</property>
+                                    </data>
+                                </cell>
+                                <cell id="45">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <property name="textAlign">right</property>
+                                    <data id="146">
+                                        <structure name="numberFormat">
+                                            <property name="category">Fixed</property>
+                                            <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                        </structure>
+                                        <property name="resultSetColumn">Column Binding_1</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="46">
+                                <cell id="47"/>
+                                <cell id="48"/>
+                                <cell id="113"/>
+                                <cell id="49"/>
+                                <cell id="50"/>
+                                <cell id="51"/>
+                                <cell id="52"/>
+                                <cell id="55"/>
+                                <cell id="56"/>
+                                <cell id="57"/>
+                                <cell id="58"/>
+                                <cell id="59"/>
+                                <cell id="60"/>
+                                <cell id="61"/>
+                                <cell id="62"/>
+                                <cell id="63"/>
+                                <cell id="64"/>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+    <list-property name="images">
+        <structure>
+            <property name="name">ff_logo_report.jpg</property>
+            <property name="data">
+                /9j/4AAQSkZJRgABAQEAYABgAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD/7AARRHVja3kAAQAEAAAA
+                ZAAA/+EDOmh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8APD94cGFja2V0IGJlZ2luPSLvu78iIGlk
+                PSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4NCjx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6
+                bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8x
+                Mi0xNzozMjowMCAgICAgICAgIj4NCgk8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3Jn
+                LzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPg0KCQk8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0i
+                IiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRw
+                Oi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNv
+                bS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3No
+                b3AgQ1M1IFdpbmRvd3MiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MzkxNEI1QjQwNzA2MTFFMjg3
+                NEFBQkY5QzA3RjdCNzEiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MzkxNEI1QjUwNzA2MTFFMjg3
+                NEFBQkY5QzA3RjdCNzEiPg0KCQkJPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9Inht
+                cC5paWQ6MzkxNEI1QjIwNzA2MTFFMjg3NEFBQkY5QzA3RjdCNzEiIHN0UmVmOmRvY3VtZW50SUQ9Inht
+                cC5kaWQ6MzkxNEI1QjMwNzA2MTFFMjg3NEFBQkY5QzA3RjdCNzEiLz4NCgkJPC9yZGY6RGVzY3JpcHRp
+                b24+DQoJPC9yZGY6UkRGPg0KPC94OnhtcG1ldGE+DQo8P3hwYWNrZXQgZW5kPSd3Jz8+/+IMWElDQ19Q
+                Uk9GSUxFAAEBAAAMSExpbm8CEAAAbW50clJHQiBYWVogB84AAgAJAAYAMQAAYWNzcE1TRlQAAAAASUVD
+                IHNSR0IAAAAAAAAAAAAAAAAAAPbWAAEAAAAA0y1IUCAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                AAAAAAAAAAAAAAAAAAAAAAAAAAARY3BydAAAAVAAAAAzZGVzYwAAAYQAAABsd3RwdAAAAfAAAAAUYmtw
+                dAAAAgQAAAAUclhZWgAAAhgAAAAUZ1hZWgAAAiwAAAAUYlhZWgAAAkAAAAAUZG1uZAAAAlQAAABwZG1k
+                ZAAAAsQAAACIdnVlZAAAA0wAAACGdmlldwAAA9QAAAAkbHVtaQAAA/gAAAAUbWVhcwAABAwAAAAkdGVj
+                aAAABDAAAAAMclRSQwAABDwAAAgMZ1RSQwAABDwAAAgMYlRSQwAABDwAAAgMdGV4dAAAAABDb3B5cmln
+                aHQgKGMpIDE5OTggSGV3bGV0dC1QYWNrYXJkIENvbXBhbnkAAGRlc2MAAAAAAAAAEnNSR0IgSUVDNjE5
+                NjYtMi4xAAAAAAAAAAAAAAASc1JHQiBJRUM2MTk2Ni0yLjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFhZWiAAAAAAAADzUQABAAAAARbMWFlaIAAAAAAAAAAAAAAA
+                AAAAAABYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAP
+                hAAAts9kZXNjAAAAAAAAABZJRUMgaHR0cDovL3d3dy5pZWMuY2gAAAAAAAAAAAAAABZJRUMgaHR0cDov
+                L3d3dy5pZWMuY2gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZGVz
+                YwAAAAAAAAAuSUVDIDYxOTY2LTIuMSBEZWZhdWx0IFJHQiBjb2xvdXIgc3BhY2UgLSBzUkdCAAAAAAAA
+                AAAAAAAuSUVDIDYxOTY2LTIuMSBEZWZhdWx0IFJHQiBjb2xvdXIgc3BhY2UgLSBzUkdCAAAAAAAAAAAA
+                AAAAAAAAAAAAAAAAAGRlc2MAAAAAAAAALFJlZmVyZW5jZSBWaWV3aW5nIENvbmRpdGlvbiBpbiBJRUM2
+                MTk2Ni0yLjEAAAAAAAAAAAAAACxSZWZlcmVuY2UgVmlld2luZyBDb25kaXRpb24gaW4gSUVDNjE5NjYt
+                Mi4xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB2aWV3AAAAAAATpP4AFF8uABDPFAAD7cwABBMLAANc
+                ngAAAAFYWVogAAAAAABMCVYAUAAAAFcf521lYXMAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAKPAAAA
+                AnNpZyAAAAAAQ1JUIGN1cnYAAAAAAAAEAAAAAAUACgAPABQAGQAeACMAKAAtADIANwA7AEAARQBKAE8A
+                VABZAF4AYwBoAG0AcgB3AHwAgQCGAIsAkACVAJoAnwCkAKkArgCyALcAvADBAMYAywDQANUA2wDgAOUA
+                6wDwAPYA+wEBAQcBDQETARkBHwElASsBMgE4AT4BRQFMAVIBWQFgAWcBbgF1AXwBgwGLAZIBmgGhAakB
+                sQG5AcEByQHRAdkB4QHpAfIB+gIDAgwCFAIdAiYCLwI4AkECSwJUAl0CZwJxAnoChAKOApgCogKsArYC
+                wQLLAtUC4ALrAvUDAAMLAxYDIQMtAzgDQwNPA1oDZgNyA34DigOWA6IDrgO6A8cD0wPgA+wD+QQGBBME
+                IAQtBDsESARVBGMEcQR+BIwEmgSoBLYExATTBOEE8AT+BQ0FHAUrBToFSQVYBWcFdwWGBZYFpgW1BcUF
+                1QXlBfYGBgYWBicGNwZIBlkGagZ7BowGnQavBsAG0QbjBvUHBwcZBysHPQdPB2EHdAeGB5kHrAe/B9IH
+                5Qf4CAsIHwgyCEYIWghuCIIIlgiqCL4I0gjnCPsJEAklCToJTwlkCXkJjwmkCboJzwnlCfsKEQonCj0K
+                VApqCoEKmAquCsUK3ArzCwsLIgs5C1ELaQuAC5gLsAvIC+EL+QwSDCoMQwxcDHUMjgynDMAM2QzzDQ0N
+                Jg1ADVoNdA2ODakNww3eDfgOEw4uDkkOZA5/DpsOtg7SDu4PCQ8lD0EPXg96D5YPsw/PD+wQCRAmEEMQ
+                YRB+EJsQuRDXEPURExExEU8RbRGMEaoRyRHoEgcSJhJFEmQShBKjEsMS4xMDEyMTQxNjE4MTpBPFE+UU
+                BhQnFEkUahSLFK0UzhTwFRIVNBVWFXgVmxW9FeAWAxYmFkkWbBaPFrIW1hb6Fx0XQRdlF4kXrhfSF/cY
+                GxhAGGUYihivGNUY+hkgGUUZaxmRGbcZ3RoEGioaURp3Gp4axRrsGxQbOxtjG4obshvaHAIcKhxSHHsc
+                oxzMHPUdHh1HHXAdmR3DHeweFh5AHmoelB6+HukfEx8+H2kflB+/H+ogFSBBIGwgmCDEIPAhHCFIIXUh
+                oSHOIfsiJyJVIoIiryLdIwojOCNmI5QjwiPwJB8kTSR8JKsk2iUJJTglaCWXJccl9yYnJlcmhya3Jugn
+                GCdJJ3onqyfcKA0oPyhxKKIo1CkGKTgpaymdKdAqAio1KmgqmyrPKwIrNitpK50r0SwFLDksbiyiLNct
+                DC1BLXYtqy3hLhYuTC6CLrcu7i8kL1ovkS/HL/4wNTBsMKQw2zESMUoxgjG6MfIyKjJjMpsy1DMNM0Yz
+                fzO4M/E0KzRlNJ402DUTNU01hzXCNf02NzZyNq426TckN2A3nDfXOBQ4UDiMOMg5BTlCOX85vDn5OjY6
+                dDqyOu87LTtrO6o76DwnPGU8pDzjPSI9YT2hPeA+ID5gPqA+4D8hP2E/oj/iQCNAZECmQOdBKUFqQaxB
+                7kIwQnJCtUL3QzpDfUPARANER0SKRM5FEkVVRZpF3kYiRmdGq0bwRzVHe0fASAVIS0iRSNdJHUljSalJ
+                8Eo3Sn1KxEsMS1NLmkviTCpMcky6TQJNSk2TTdxOJU5uTrdPAE9JT5NP3VAnUHFQu1EGUVBRm1HmUjFS
+                fFLHUxNTX1OqU/ZUQlSPVNtVKFV1VcJWD1ZcVqlW91dEV5JX4FgvWH1Yy1kaWWlZuFoHWlZaplr1W0Vb
+                lVvlXDVchlzWXSddeF3JXhpebF69Xw9fYV+zYAVgV2CqYPxhT2GiYfViSWKcYvBjQ2OXY+tkQGSUZOll
+                PWWSZedmPWaSZuhnPWeTZ+loP2iWaOxpQ2maafFqSGqfavdrT2una/9sV2yvbQhtYG25bhJua27Ebx5v
+                eG/RcCtwhnDgcTpxlXHwcktypnMBc11zuHQUdHB0zHUodYV14XY+dpt2+HdWd7N4EXhueMx5KnmJeed6
+                RnqlewR7Y3vCfCF8gXzhfUF9oX4BfmJ+wn8jf4R/5YBHgKiBCoFrgc2CMIKSgvSDV4O6hB2EgITjhUeF
+                q4YOhnKG14c7h5+IBIhpiM6JM4mZif6KZIrKizCLlov8jGOMyo0xjZiN/45mjs6PNo+ekAaQbpDWkT+R
+                qJIRknqS45NNk7aUIJSKlPSVX5XJljSWn5cKl3WX4JhMmLiZJJmQmfyaaJrVm0Kbr5wcnImc951kndKe
+                QJ6unx2fi5/6oGmg2KFHobaiJqKWowajdqPmpFakx6U4pammGqaLpv2nbqfgqFKoxKk3qamqHKqPqwKr
+                davprFys0K1ErbiuLa6hrxavi7AAsHWw6rFgsdayS7LCszizrrQltJy1E7WKtgG2ebbwt2i34LhZuNG5
+                SrnCuju6tbsuu6e8IbybvRW9j74KvoS+/796v/XAcMDswWfB48JfwtvDWMPUxFHEzsVLxcjGRsbDx0HH
+                v8g9yLzJOsm5yjjKt8s2y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW
+                2Ndc1+DYZNjo2WzZ8dp22vvbgNwF3IrdEN2W3hzeot8p36/gNuC94UThzOJT4tvjY+Pr5HPk/OWE5g3m
+                lucf56noMui86Ubp0Opb6uXrcOv77IbtEe2c7ijutO9A78zwWPDl8XLx//KM8xnzp/Q09ML1UPXe9m32
+                +/eK+Bn4qPk4+cf6V/rn+3f8B/yY/Sn9uv5L/tz/bf///9sAQwACAQECAQECAgICAgICAgMFAwMDAwMG
+                BAQDBQcGBwcHBgcHCAkLCQgICggHBwoNCgoLDAwMDAcJDg8NDA4LDAwM/9sAQwECAgIDAwMGAwMGDAgH
+                CAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwM/8AAEQgAQQCW
+                AwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQE
+                AAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5
+                OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqy
+                s7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEB
+                AQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKB
+                CBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdo
+                aWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW
+                19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A/eXI9KSm7qN1VuBIDRnJFeW/G79oK88E
+                6p/wi3hHw7qfjHx5fWhuLaxtUAtdPQsES4vJmKrFDuPTJdgrbVbBxx3j/wCBHi74S/C2+8cS/F/xJJ4x
+                0W2Oo3I1K4ii8PXbr8zWhttn7uFz+7VgxkUspyx+U9VPC8yTnLlvt5/dsvP7ieY+hd1Y/i74g6N4CsTc
+                axqFvYxdcuSSfwAJ/SvmvXP+ClOn698OtJ/svQvEfh3xb4ggLxWHiHSprFoSAfMKFhsmIxkBGOQQfUV8
+                /wDiXxPqPjXVnvdUvLjULuZsl5WzyfQdB9AK/FfEjxUp8NYl5ZRoueISTfNdRins77yv/d0/vX0P0PhL
+                gOpm9L63WnyUr2VtZO2/kvn9x9xR/ti/DmSURr4j3MewsLn/AON1j/Bz/goZ8Fv2gPiLqXhLwh8RNB1n
+                xJpMnk3NgrPFKr/3V8xVDn/cJr8Pf+Cmn7ZnijxR8QbX9nf4Li4vPHPiFlg1u9tGw1jGwz9nV/4DtO6R
+                8/KOOta37J3/AASe+G/7Emir8QviJry6v4k0FRf3OqTXT2um6Q6ndlNpDyMD0JPzHote1k/Gk8t4fp5z
+                xrJU62LSeEw1CnKVepFuyqTUptRhN6QTs5bq/wAJpjuDaGIxssJkrk40napUqSXJF9Yq0U2117bPuf0I
+                hs0obmvyZ/4J4f8ABzF4Q/aQ/bBtPg7rOm3lvo+rsun+HvFEx2tqF3kgJNEB+7WTgI2euAwGa/WNTX6Z
+                VwOOw9KlLMKEqM6kVPknbmSl0dm0mtmr3T0ep+fVowhVlThNTUW1zLZ26ryJBS7q4D48/tP/AA9/Ze0P
+                T9S+IXi7RfCFhql2tjaT6lOIknmbog98ck9AOTivEv8Agpd/wVC8E/sL/s2a94ksvF3gO78ZRWP2vQ9E
+                vtU+bVjwQqrCHfDDO1sBSccjrW2Fy3E4mpCnRg25uy0dm/Xy69upjKcUrs+rgeKA1fin+z9/wX9/ao/4
+                KXw6J4X+APwN0XSvECyY17xLq00l1omnru6g4THy9tzP6Ka/ZXwPFrFv4M0mPxBPZXOvJZxLqM1mhS3k
+                uAg8wxq3IQtnAPOMV25xkGKyuSp4zlU3f3VJNq3V2vZPprfyJp1Yz1ibAelz8tR5pRXiGhIDSg1HmlB6
+                0AW6KKKAMLP1/KlzUe6jdVAeZfED9j/wV8SviDe+KL6HWrfWtSt4rW6uNP1e5svtEcWfLVhE6g7dzYz0
+                3H1r5pk+Dvhv4cfHfVfFni3wr8aNU0nwTqLrpGlR3cmoaFPDGgC3s4llJnkZyWVTgIVXgnmvuQNn/wDV
+                XlX7ZurTab8A9VWFmX7S8ULkf3S65/PpXLnXElfKcqxOO+L2dOTSbdvdWi06O1tOh25Vl6xmNo4Vu3PJ
+                K/q7HhP7SX7Z/wAI/wBqT4djw74h8J/FK1WC4jvLK+sNK8m806eNgySRPk7TkYI6MMg1+fv7efxs8dfB
+                T9lrVPG+geNZvCLeHbya1tm1DR0a98TqzFLbdHuxC5XBbGecmveviX8Y9A+ENlaya7qDw3GoN5djY28b
+                XF9qD/3YYVy7/UDA718R/ta6L48/4KQ/tZ+GPhLHpc/gPwn4LgTxHrFxdSLc3UIk5jM8SkqkrKAFibn5
+                snFfgPCvElfjDNcLjuIcHh6OCwrlWq1pw5r0aafPTjGq5+0U5SULRhNxnKMlaVr/ALLi8jo5FhauHy2t
+                UnVq2hGClopytaT5UuVpJu7avFNPQ8r/AGNfhVqX7OFl/wALM8YfHnw78M/HHj21/te9sdT00XuqS2Du
+                ZA6liCjzA5wOcFa4X9ob9sO9/wCCpf7Qll4Nm8YWPw3+EelS5SXUpvK+1BSFM8ij/WTv/DH0XP411H/B
+                Y74c+FtB+J/gnwHa6nqfib4jasY5NU13Vrjc9jbNhIIFjXiNAAX2jouPWvrv9mv4Vab8Jfg1ofgv4afC
+                m18S/wBmor3XivxTarYWd5dHBknUSDzpF3fd2rjaor9tzLivLMBgcN4i4ui6+PxkZrDuUMPQhhqavFVY
+                TnBcySUY0FW56jjdxgk5p/L4fLMTWr1MipS5KNJpzSc5yqS35Wk9Orny2V93sewfswfsifD39mDwTYaf
+                4D8PWsbrEk/9rzQCXULtyARO0hGVJ4IAxgYr7n8P/wDBTT4deEfh7pdtruv/ANseNvKEEuhaFbSapqc0
+                oH/PGBXZM+r7Vz3FfnD8edJ/4V18Mbrxd8a/iFr194dtZYoJ9I8L2z2dkGkbaiEJ+8mBOByBX1J/wSk/
+                a8+Bvg2DUvCNnYx/D3UbjUrO00+11zS20u51Ge4RzFHEZQGldgrNxk4r8Y8IVmdfPKua4utWx0cRzqpU
+                jGbp88LSu6tRKTlHmSsqSilNWlZpHt8f08KsshQp04UXScXGN0pWldWUVdJO19ZX93bc5f8A4KI/sIfH
+                L/gt/f8Ah3QtVhtPgn8FNBnGopDq8cd14i1W6wV8wwxlkhRUZgFaQEk8jtXlvhT/AINUfBfin406Smv6
+                lr//AAgnhOVUvLzUb/7Rq/jRgvIUKSlnbKchVBZ2HJC5r9jgciq8+vWVrqtvYyXdvHeXSs0Nu0gEkoXl
+                iq9TgdcdK/qzD8ZZnh6Kw2Dl7OEU7KK2vu76tvzd7dLNK34k8PBu8tWc38BPgB4Q/Zj+FmkeDPA+h2Ph
+                /wAPaLbpbW1tbRhchRjc56sx6ljySa7IH/OK+ff2vf8Ago74F/Yv8feEfCviOx8W6x4i8cJM+j6foOjT
+                alcXXkjMmEiBPA5+lcZ8N/8AgtD8F/iX4s8NaPDc+IdKuvEWmahrLtq2lS2MWk2djI0VxNdPIAIlV1Ze
+                e4ryHlmYV4fWvZykpXfNZu+93f5PXyZpzxXu3PrfPFANY3gLx5o/xQ8F6X4i8P6jbaromtWyXljeW774
+                rmFxuV1PcEHIrzr4F/tqeD/2ifjl8SfAXhpdXn1T4V3cGn65cTWTw2qXEqFxEjsMOwUZOOORXBHDVZKT
+                UX7nxeWqWvzaXqVzI9gDUZz/APrri/iF8dfD/wAN9D+33l2s9uLsWTm3YP5UpONrEHgg8EdRXW2F6uoW
+                MNxHnbOiyLnrgjNRKnJLma0KuatFFFQBzfmD1pQ3NN3CkzjtiqC48mvNf2xLK5uv2ZPGtxY6bNrGoaXp
+                U+o2ljCuZLyWBDKkSj1coF/Guo8QeJNS0nUWjjt9P+z4HlvPdCNn454PvUQ13xFcBvK0vTpl6H/SwQK8
+                XMauFxNGpgsVSnKE04yXJOzT0aTS6rqn6HpYOFajVhiaMoqUWpL3o6NarRv8GfiF4b+Otv4B8Laj41sN
+                L1DxR8RNahU6t4u1+xks9J0Nn+5ZwBwGZUJCrBF8zkDOc1zV/rfif9l39n/xD4y1jV7nwBY+Irlr/UNV
+                vIFm8ZeO9RkHyJFEfltI+gRMBkTHSv0W/aU/4JrfEb4ofHbT/F3hjUPBdrY6TFM+m6Zrsc91DpV5Iebt
+                FjZQzhchd33c8YrifCn/AARZ1YfFC08dfFLxxp3xC8bWeTpn9oKINL0bJ/5dbQEIG/22Bb3r8nw+S4ij
+                TdbEYJyhJqU4JOpUqKnJ+zowUoRo06cUk1KUFCmmnToTqQjUP1CWdYOo1COISa2bfLGN0uaTs3Jye1k7
+                ytrNRbR8U/8ABL/9hrWPCWrah8avist3qXxE8V5l02DVXNxcaTbN92SQtk+cy4Az91QO5NfajyNIfmO4
+                17c37C/iaeYj+2NGkmbJwWOW9e9B/YN8UqQralo6u33V3N81fk3HGU8c8V5vUzjMsFNSdoxhFJQpwjpC
+                nBX0jFfe7yerZ9fkudcOZZhY4XD4mPdtvWUnvJu27f8Akfnd/wAFFF1z4sfEH4Q/Cfwu2ltq+uay3ia6
+                XUQzWa21gu5PPC/MUaRx07gVv+LPjT8QPhX4mvte8Xf8K81DVvgz4CvvHd3OmirPHYa1M32LSoIXYZ+d
+                5iVHUlDX1xY/8EfLyD9pkfFifWpLrxGNP/slbZ7tzZwWpYMyRx4wMkZz6mu88W/8Erfhr8SfEHjC81bQ
+                tT1C78YX2k3mtQDxHMsTjTnEtrb+WrgLF5g8wrj5iT9K/d/CnDxyergoZlhZxpYWjLX2N6kq9ecvbWkm
+                7U40uWC25pQg9kfnfGmZUcbTq/Va0ZSqTX2tFCCXLo7auV35JtHxf+0x/wAFCP2qP2Rvhz8L7b4s+NbX
+                Q7X4siK8vfF3h3wytwvgsmHNvYyxspVnkleNpCediuFr6D/YbHxA/ab/AOCqXxG8ceIvHVtrHh/4K6Tb
+                eCLe3s7BI7TUNQnhE17LHn5kCvjkc/wnivZ/ih/wTf8ACnxi+Nlx4017Sdcuo9QuNPvdS8O/8JDL/Yeq
+                XNgQbKeW2ztLREAgABWwNwatf9lj9hXwv+xf4i8Za94R0C6/trx5qEup65qWo67LcPM7sWwqs2xFGcDa
+                FOAMk1+6YjjDK5YOUaNCcasotO1Fpe9JN9Lq0U43V7qzsm5H5tHLavNrKNv8a/zPkb4z/wDC5P2tv+C0
+                vjTXPgrdeCI2/Z58LweGEuPE0Es1sl9f/vrkwhOk6RnBLcYAFeG/tKePNW+J/wAdfjp408O/2BqF54m8
+                T6R+z/4YhvNOWa01GJR9o1yZIsbRlzIxIHBFfpr+yr+xZpX7H1x47uvCun6tqF58S9XfXNdu9V12S6mu
+                bhl2llZicDB4x7egrxbxp/wSj8O/BD4U6frvw68E6hr3jb4Y6jqnjLwvpuoeJJmttY127X55LrLYbOAo
+                HAx1zk13Zdxhl7xEaEac0lGEIN03G9rSk5t2STmur0jKRlVy+pGDk5R76ST+5JnhWn/t+fExdd+GuqeE
+                fGGneB/hbca3q+kab4bttFt5wPDOhW22fU5nYFk86eMogGFVXA65rxn9h39rD4s/s0a14u8cXfiLR7fR
+                viX4J8TfGfxBYyaYr3WkCSZbbRWllYZaSUqoSM8bfrXvv7HX/BLbV/i74w+JOv8AjT4bap8I/Bnj7wdH
+                4bu/Bz+I2ubyW6luTc3s9rIpzY2rv8oijKh9xJ6AV9E/E/8A4JE/DT4oaf4yt77w7q9lB440bSvDmoC0
+                8QzRLBpmmlGt7SIbsJGWQFuMkk813Y7iLJ8BUlgqlOUlJK7hTU1a97OUbpyV73u9YJ395pZUcHVqx54y
+                S9ZJfgzT/wCCQH7OviDwF+wP4Xb4ia9N4o8SeNHk8WahLLEsLW018BK8WVwWwCBk88kdK+uLO2jsbWKC
+                JdkUKCNAP4QOAK474B/C/Svgn8KNH8KaFpKaLoehwi1sbUXb3ZSIdMyOzOxPqzE12INfF4zHfXK08Srp
+                TbaTXLa/93p6G3s/Z+5287/ia1FFFcoHK7vanbs1pf8ACL/9PH/kP/69H/CMf9PH/jn/ANeq0Fqfmb8b
+                /wBmf4g/tXf8FRfiVrGoWFo3w1+GGn6NYWlvrZ1BINR86CK9upbIW08StIuDGWcMAxxjqDzPwK+Lf7QU
+                XhnxJq1j9t8AaHovh+68V30M/hyS/k1LUrmfZaW+133iOOJC0ixkHHNfqx/wjH/Tb/xz/wCvR/wi4/57
+                Dnr8nX9a+iXELdNUp04tRUUk+llZuzTV5bt9H6GXsdb3Pyn+B/x3+On7QGqfs7WnifXvHmg2uoeP7+TW
+                9Qj0hY7PVILOF5IYd6op+yzSKoUuoODgk9a6b4r/ALPfjj9qT/gol8VvHN9pdrcfDv4b29ho1hZa3/aM
+                bXkkUIuLiawW3niQsXJTc6uCRjFfphH4RjijRFaNVj+4BEAF+nPFP/4Rn/pt/wCOf/XolxBy1HUoU1C6
+                cVbpeXM2tFrb3fQPY6WbPx0+C/xm+I3wRsdJ1rxNca14KsZ4LX+0PEWswPcXmkHWLy5vp/JikYpM0Nu0
+                EWzY3lkHg4xTtZ+P3x8/aEtfDPxN8O+IPEd0vgvRNV1jQ7+y0MfZvEIutYWxsYJIB8jMbe2aVzjKiQ4x
+                mv1o+I37PvhL4w6Zb2Xi7w74d8U2drL58MGr6XDfRQyYxvVZQwVsZGQM4NaPhH4VaP8AD/wzZ6LoOn6b
+                omj6bGIbSw0+zS2trVB0WONMKqjPQACuqXEdC/tVQXPfrZqzTTWqvrf0Xa5PsXtc+Gv2VvEHxm8Sj9qr
+                xJdaz4g1DxpZynS/Cvh7ULP7PZafNBpiPG9tkYdJbmSTnJzsGa+fv2c/Eknw++FMnjb4b+GvjZd/GLSd
+                Cij8d+INf+1yaeb25vIUuzNaSOVuJrWMzSxrCqqEiA5yQf13Xw0qMxEijd1ITr+tCeGVjDbZFXcctiP7
+                x9+a4459GPN+7VpcuidlaKSs0lqnvbvq7ley8z8y/FH/AAUF+Mvwct9LvGt/FnjDwV9r12TSNbPhYrqH
+                iqO3092tIWgRV8nfeFQrFV3IpyO5x/FnxS/aa+L/AMNfEFvrzX/2T7doPgyLRodB8o6teXez+0L2SVSH
+                S3iDMBsIAK8mv1MPhlML8y/J935Pu/TmnDw8o/5af+Of/XpxzyhCzhh4376d79tH0bXytoHsn3Pys0r9
+                tr9p7xDpXiTTdB0O90fxDNqCeHYLG70sXFv4XuJL0w28iDYpeNLcBpDI8mchgVzivS/gh+0P8bE/4KZQ
+                /DfWtc8QeKPBem200E17D4dSzhR4Y1LSXbFcfvJC3lSROAVABTjNfoQvhxEZmVlVmOSRH1NCeHVSVpNy
+                +YwwW2ckfXNTUzqhKMorDxV015pu2t2r6W09dQ9m+5+evwr/AGnJtA/4KC/tHSaxb+OrfXL9bfQvBtm2
+                l3EthPFZ2DTmaJjmIF55XXJxuKAelfO+jfFb48eIf2PZPBV94z+Iv/CQeMtGhnspn8Nu95rd7qOqSQXl
+                vJNtP2WOzt0XBBQjzSQSABX7Jf8ACPKH3bk3DofL5H605NAWMDa6rj0T161dPPqUHdUVf3N7PWCtpeOi
+                fVfrZo9k317/AInB/sx6tpnij4NaLHpLal9h0e3TS1e/geOeVoFETMQ/zHJUncevWvQBpWD/AKz/AMdq
+                SxsRYhgGBDY4AxirFfP1Jc03JGyCiiiswCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKK
+                ACiiigD/2Q==
+            </property>
+        </structure>
+    </list-property>
+</report>

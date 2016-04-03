@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE struts-config PUBLIC
+          "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN"
+          "http://struts.apache.org/dtds/struts-config_1_3.dtd">
+
+<struts-config>
+
+
+	<!-- ================================================ Form Bean Definitions -->
+
+	<form-beans>
+		<form-bean name="consignmentReportForm" type="com.ff.report.form.BookingReportForm" />
+		<form-bean name="lcCodReportForm" type="com.ff.report.form.LcCodReportForm" />
+		<form-bean name="rateRevisionAnalysisReportForm"
+			type="com.ff.report.form.RateRevisionAnalysisReportForm" />
+			<form-bean name="billPrintingForm" type="com.ff.report.billing.form.BillPrintingForm" />	
+	</form-beans>
+
+
+	<!-- ========================================= Global Exception Definitions -->
+
+	<global-exceptions>
+		<exception key="CGS000" type="java.lang.Exception" path="/pages/snippets/error.jsp" />
+	</global-exceptions>
+
+
+	<!-- =========================================== Global Forward Definitions -->
+
+	<global-forwards>
+
+	</global-forwards>
+
+	<!-- =========================================== Action Mappings -->
+
+	<action-mappings>
+
+
+		<!-- Report section Kamal -->
+		<action path="/consignmentBookingDetailsReport"
+			type="com.ff.report.action.ConsignmentBookingReportAction" name="consignmentReportForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="consignmentBookingDetailsReport" />
+		</action>
+
+		<action path="/consignmentBookingSummaryReport"
+			type="com.ff.report.action.ConsignmentBookingReportAction" name="consignmentReportForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="consignmentBookingSummaryReport" />
+		</action>
+
+		<action path="/branchCashBookReport"
+			type="com.ff.report.action.ConsignmentBookingReportAction" name="consignmentReportForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="branchCashBookReport" />
+		</action>
+
+		<action path="/podReport" type="com.ff.report.action.PODReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="podReport" />
+		</action>
+		<action path="/airportOffloadReport" type="com.ff.report.action.OutGoingHubReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="OffLoadReport" />
+		</action>
+		<action path="/heldUpReport" type="com.ff.report.action.OutGoingHubReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="HeldUpReport" />
+		</action>
+		<action path="/productRtoReport" type="com.ff.report.action.PerformanceReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="ProductRtoReport" />
+		</action>
+		<action path="/productStatusReport" type="com.ff.report.action.PerformanceReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="ProductStatusReport" />
+		</action>
+		<action path="/misRouteDestWiseReport" type="com.ff.report.action.PerformanceReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="MisRouteDestWiseReport" />
+		</action>
+		<action path="/originHitRatioReport" type="com.ff.report.action.PerformanceReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="OriginHitRatioReport" />
+		</action>
+		<action path="/priorityTatFailureReport" type="com.ff.report.action.PerformanceReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="PriorityTatFailureReport" />
+		</action>
+		<action path="/discrepencyCounterAlert" type="com.ff.report.action.DispatchReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="discrepencyCounterAlert" />
+		</action>
+		<action path="/weightDiscrepency" type="com.ff.report.action.OutGoingHubReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="weightDiscrepency" />
+		</action>
+		<action path="/brBkngBranchDesph" type="com.ff.report.action.DispatchReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="brBkngBranchDesph" />
+		</action>
+		<action path="/highValue" type="com.ff.report.action.OutGoingHubReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="highValue" />
+		</action>
+		<action path="/clientwiseProductwiseBkng" type="com.ff.report.action.ClientWiseReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="clientwiseProductwiseBkng" />
+		</action>
+		<action path="/clientwiseSummary" type="com.ff.report.action.ClientWiseReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="clientwiseSummary" />
+		</action>
+		<action path="/loadConfirmation" type="com.ff.report.action.DispatchReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="loadConfirmation" />
+		</action>
+		<action path="/validationReport" type="com.ff.report.action.ValidationReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="validationReport" />
+		</action>
+		<action path="/rthValidationReport" type="com.ff.report.action.RTHValidationReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="rthValidationReport" />
+		</action>
+		<action path="/stockUsedNUnused"
+			type="com.ff.report.action.StockUsedAndUnusedReportAction" name="consignmentReportForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="stockUsedNUnused" />
+		</action>
+
+		<action path="/brrDatewiseStatus" type="com.ff.report.action.PerformanceReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="brrDatewiseStatus" />
+		</action>
+		
+		<action path="/brrDetailReport" type="com.ff.report.action.PerformanceReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="brrDetailReport" />
+		</action>
+
+		<action path="/brrSummary" type="com.ff.report.action.PerformanceReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="brrSummary" />
+		</action>
+
+		<action path="/hitRatioOriginwise" type="com.ff.report.action.PerformanceReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="hitRatioOriginwise" />
+		</action>
+
+		<action path="/hitRatioBranchwise" type="com.ff.report.action.PerformanceReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="hitRatioBranchwise" />
+		</action>
+		
+		<action path="/hitRatioProductwise" type="com.ff.report.action.PerformanceReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="hitRatioProductwise" />
+		</action>
+		
+		<action path="/onlinePendingDatewise" type="com.ff.report.action.PerformanceReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="onlinePendingDatewise" />
+		</action>
+		
+		
+		<!-- ========== Action Mappings for dispatch module starts========== -->
+		<action path="/mblGatePassReport" type="com.ff.report.action.MbplGatePassReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="mblGatePassReport" />
+		</action>
+		<action path="/lcTopayCodConsignmentDetailsReport"
+			type="com.ff.report.action.LcTopayCodConsignmentReportAction" name="consignmentReportForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="lcTopayCodConsignmentDetailsReport" />
+		</action>
+		<action path="/originHubTallyReport" type="com.ff.report.action.OriginHubTallyReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="originHubTallyReport" />
+		</action>
+		<!-- ========== Action Mappings for dispatch module starts========== -->
+
+		<action path="/mblGatePassReport" type="com.ff.report.action.MbplGatePassReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="mblGatePassReport" />
+		</action>
+		<action path="/lcTopayCodConsignmentDetailsReport"
+			type="com.ff.report.action.LcTopayCodConsignmentReportAction" name="consignmentReportForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="lcTopayCodConsignmentDetailsReport" />
+		</action>
+		<action path="/originHubTallyReport" type="com.ff.report.action.OriginHubTallyReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="originHubTallyReport" />
+		</action>
+		<!-- ========== Action Mappings for dispatch module ends========== -->
+
+		<action path="/stockTransferReport" type="com.ff.report.action.StockTransferReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="stockTransferReport" />
+		</action>
+		<action path="/stockCancellationReport"
+			type="com.ff.report.action.StockCancellationReportAction" name="consignmentReportForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="stockCancellationReport" />
+		</action>
+		<action path="/fieldStaffDailyStockReport"
+			type="com.ff.report.action.FieldStaffDailyStockReportAction" name="consignmentReportForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="fieldStaffDailyStockReport" />
+		</action>
+		<action path="/stockRequestBranchReport"
+			type="com.ff.report.action.StockRequestBranchReportAction" name="consignmentReportForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="stockRequestBranchReport" />
+		</action>
+		<action path="/baSalesReport" type="com.ff.report.action.SalesReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="baSalesReport" />
+		</action>
+		<action path="/customerWiseQualityAnalysisReport" type="com.ff.report.action.SalesReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="customerWiseQualityAnalysisReport" />
+		</action>
+		<action path="/payment-adviceReport" type="com.ff.report.action.PaymentAdviceAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="payment-adviceReport" />
+		</action>
+		<action path="/salesProspectsReport" type="com.ff.report.action.SalesProspectReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="salesProspectsReport" />
+		</action>
+		<action path="/tptLoadHandled" type="com.ff.report.action.DispatchReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="tptLoadHandledReport" />
+		</action>
+		<action path="/clientGained" type="com.ff.report.action.ClientGainedReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="clientGainedReport" />
+		</action>
+		<action path="/branchProjection" type="com.ff.report.action.ClientGainedReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="branchProjectionReport" />
+		</action>
+		<action path="/targetVsActualSales" type="com.ff.report.action.ClientGainedReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="targetVsActualSalesReport" />
+		</action>
+		<action path="/regionWiseSalesTrafic"
+			type="com.ff.report.action.RegionWiseSalesRevenueAction" name="consignmentReportForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="regionWiseSalesTrafic" />
+		</action>
+
+		<action path="/custSlabWiseRevenue"
+			type="com.ff.report.action.CustomerSlabWiseRevenueAction" name="consignmentReportForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="custSlabWiseRevenue" />
+		</action>
+
+		<action path="/salesReport" type="com.ff.report.action.SaleDSRReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="salesReport" />
+			<forward name="viewDSR" path="/pages/report/salesDsrReport.jsp" />
+			<forward name="prepareDsr" path="prepareDsr" />
+		</action>
+
+		<action path="/rateRevisionReport" type="com.ff.report.action.RateRevisionReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="rateRevisionReport" />
+		</action>
+
+		<action path="/rateRevisionAnalysisReport"
+			type="com.ff.report.action.RateRevisionAnalysisReportAction" name="rateRevisionAnalysisReportForm"
+			scope="request" parameter="submitName">
+			<forward name="success" path="rateRevisionAnalysisReport" />
+		</action>
+
+		<action path="/yieldReport" type="com.ff.report.action.yieldReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="yieldReport" />
+		</action>
+
+		<action path="/lcCodReport" type="com.ff.report.action.LcCodReportAction"
+			name="lcCodReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="lcCodReportInSummary" />
+			<forward name="lcCodReportPreAlert" path="lcCodReportPreAlert" />
+			<forward name="lcCodReportOutPartWise" path="lcCodReportOutPartWise" />
+			<forward name="lcCodReportOutSummary" path="lcCodReportOutSummary" />
+		</action>
+
+		<action path="/customerwiseMISReport" type="com.ff.report.action.CustomerWiseMISAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="customerwiseMISReport" />
+		</action>
+		<action path="/brrReport" type="com.ff.report.action.BRRCommonReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="brrCommonReport" />
+		</action>
+
+		<action path="/brrdatewisestatusReport" type="com.ff.report.action.BRRCommonReportAction"
+			name="consignmentReportForm" scope="request" parameter="submitName">
+			<forward name="success" path="brrDateWiseStatusReport" />
+		</action>
+		
+		<action path="/billPrinting" type="com.ff.report.billing.action.BillPrintingAction"
+			name="billPrintingForm" scope="request" parameter="submitName">
+			<forward name="Success" path="billPrinting" />
+		</action>
+		
+		<action path="/consignmentDetailReport" type="com.ff.report.customer.action.ConsignmentDetailReportAction"
+			name="consignmentReportForm"  parameter="submitName">
+			<forward name="success" path="consignmentDetailReport" />
+		</action>
+		
+		<action path="/consignmentDetailReportForFFCL" type="com.ff.report.customer.action.ConsignmentDetailReportForFFCLAction"
+			name="consignmentReportForm"  parameter="submitName">
+			<forward name="success" path="consignmentDetailReportForFFCL" />
+		</action>
+	</action-mappings>
+
+
+	<controller processorClass="org.apache.struts.action.RequestProcessor" />
+
+	<message-resources parameter="UdaanReportApplicationResources_en_US" />
+	<message-resources parameter="UdaanReportErrorMessageResources"
+		key="errorBundle" />
+	<message-resources parameter="UniversalMessageResources"
+		key="universalResourceBundle" />
+
+	<message-resources parameter="frameworkErrorMessages"
+		key="frameworkResourceBundle" />
+
+	<plug-in className="org.apache.struts.tiles.TilesPlugin">
+		<set-property property="definitions-config"
+			value="/WEB-INF/report-tiles-def.xml,/WEB-INF/login-tiles-defs.xml" />
+		<set-property property="moduleAware" value="true" />
+		<set-property property="definitions-parser-validate"
+			value="true" />
+	</plug-in>
+
+</struts-config>

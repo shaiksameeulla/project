@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.2.2.v201301221637 Build &lt;4.2.2.v20130206-1509></property>
+    <property name="units">in</property>
+    <property name="theme">defaultTheme</property>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="ffdev" id="5">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">com.mysql.jdbc.Driver</property>
+            <property name="odaURL">jdbc:mysql://10.48.144.28:3306/udaan_gold_bcun</property>
+            <property name="odaUser">UdaanCA</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">Z3VydQ==</encrypted-property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Bill" id="83">
+            <property name="nullsOrdering">nulls lowest</property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">INVOICE_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">INVOICE_ID</text-property>
+                    <text-property name="heading">INVOICE_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">INVOICE_NUMBER</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">INVOICE_NUMBER</text-property>
+                    <text-property name="heading">INVOICE_NUMBER</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CREATED_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CREATED_DATE</text-property>
+                    <text-property name="heading">CREATED_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">FROM_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">FROM_DATE</text-property>
+                    <text-property name="heading">FROM_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">TO_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">TO_DATE</text-property>
+                    <text-property name="heading">TO_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">NO_OF_PICKUPS</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">NO_OF_PICKUPS</text-property>
+                    <text-property name="heading">NO_OF_PICKUPS</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">FREIGHT</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">FREIGHT</text-property>
+                    <text-property name="heading">FREIGHT</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">RISK_SURCHARGE</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">RISK_SURCHARGE</text-property>
+                    <text-property name="heading">RISK_SURCHARGE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">DOC_HANDLING_CHARGE</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">DOC_HANDLING_CHARGE</text-property>
+                    <text-property name="heading">DOC_HANDLING_CHARGE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">PARCAL_HANDLING_CHARGE</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">PARCAL_HANDLING_CHARGE</text-property>
+                    <text-property name="heading">PARCAL_HANDLING_CHARGE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">AIRPORT_HANDLING_CHARGE</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">AIRPORT_HANDLING_CHARGE</text-property>
+                    <text-property name="heading">AIRPORT_HANDLING_CHARGE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">OTHER_CHARGES</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">OTHER_CHARGES</text-property>
+                    <text-property name="heading">OTHER_CHARGES</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">TOTAL</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">TOTAL</text-property>
+                    <text-property name="heading">TOTAL</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">FUEL_SURCHARGE</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">FUEL_SURCHARGE</text-property>
+                    <text-property name="heading">FUEL_SURCHARGE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">SERVICE_TAX</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">SERVICE_TAX</text-property>
+                    <text-property name="heading">SERVICE_TAX</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">EDUCATION_CESS</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">EDUCATION_CESS</text-property>
+                    <text-property name="heading">EDUCATION_CESS</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">HIGHER_EDUCATION_CESS</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">HIGHER_EDUCATION_CESS</text-property>
+                    <text-property name="heading">HIGHER_EDUCATION_CESS</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">GRAND_TOTAL</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">GRAND_TOTAL</text-property>
+                    <text-property name="heading">GRAND_TOTAL</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">GRAND_TOTAL_ROUNDED_OFF</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">GRAND_TOTAL_ROUNDED_OFF</text-property>
+                    <text-property name="heading">GRAND_TOTAL_ROUNDED_OFF</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">OFFICE_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">OFFICE_NAME</text-property>
+                    <text-property name="heading">OFFICE_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">PHONE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">PHONE</text-property>
+                    <text-property name="heading">PHONE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">BUSINESS_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">BUSINESS_NAME</text-property>
+                    <text-property name="heading">BUSINESS_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CUSTOMER_CODE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CUSTOMER_CODE</text-property>
+                    <text-property name="heading">CUSTOMER_CODE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ADDRESS1</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ADDRESS1</text-property>
+                    <text-property name="heading">ADDRESS1</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ADDRESS2</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ADDRESS2</text-property>
+                    <text-property name="heading">ADDRESS2</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ADDRESS3</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ADDRESS3</text-property>
+                    <text-property name="heading">ADDRESS3</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CUSTOMER_TYPE_CODE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CustomerTypeCode</text-property>
+                    <text-property name="heading">CustomerTypeCode</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">PRODUCT_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">PRODUCT_ID</text-property>
+                    <text-property name="heading">PRODUCT_ID</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">INVOICE_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">INVOICE_NUMBER</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">CREATED_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">FROM_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">TO_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">NO_OF_PICKUPS</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">FREIGHT</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">RISK_SURCHARGE</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">DOC_HANDLING_CHARGE</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">PARCAL_HANDLING_CHARGE</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">AIRPORT_HANDLING_CHARGE</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">OTHER_CHARGES</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">TOTAL</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">FUEL_SURCHARGE</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">SERVICE_TAX</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">EDUCATION_CESS</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">HIGHER_EDUCATION_CESS</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">GRAND_TOTAL</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">GRAND_TOTAL_ROUNDED_OFF</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">OFFICE_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">PHONE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">22</property>
+                        <property name="name">BUSINESS_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">23</property>
+                        <property name="name">CUSTOMER_CODE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">24</property>
+                        <property name="name">ADDRESS1</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">25</property>
+                        <property name="name">ADDRESS2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">26</property>
+                        <property name="name">ADDRESS3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">27</property>
+                        <property name="name">CUSTOMER_TYPE_CODE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">28</property>
+                        <property name="name">PRODUCT_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <method name="beforeOpen"><![CDATA[var invoiceNumbers = "";
+if ( params["InvoiceNumbers"] != null &amp;&amp; params["InvoiceNumbers"].length > 0 ){
+	invoiceNumbers = params["InvoiceNumbers"].split(",");
+}
+var invoiceNumberCount = invoiceNumbers.length;
+
+var customers = "";
+if ( params["Customers"] != null &amp;&amp; params["Customers"].length > 0){
+	 customers = params["Customers"].split(",");
+}
+var customerCount = customers.length;
+
+logToDebugWindow("invoice numbers " + invoiceNumberCount + ", customers " + customerCount);
+var whereclause = "";
+if ( invoiceNumberCount > 0 ){
+	logToDebugWindow("invoice numbers are provided");
+	whereclause = " where b.INVOICE_NUMBER in ( "
+
+	for ( i=0; i < invoiceNumberCount; i++ ){
+	  	if( i == 0 ){
+			whereclause = whereclause + "'" + invoiceNumbers[i] + "'";
+		} else if ( i == invoiceNumberCount-1 ){
+			whereclause = whereclause + ", '" + invoiceNumbers[i] + "'";
+	  	} else {
+			whereclause = whereclause + ", '" + invoiceNumbers[i];
+		}
+	}
+	
+  	whereclause = whereclause + " ) ";
+  	
+} else if ( customerCount > 0 ){
+	logToDebugWindow("customers are provided");
+	whereclause = " where c.CUSTOMER_ID in ( "
+
+	for ( i=0; i < customerCount; i++ ){
+	  	if( i == 0 ){
+			whereclause = whereclause + customers[i];
+	  	} else {
+			whereclause = whereclause + " , " + customers[i];
+		}
+	}
+	whereclause = whereclause + " ) ";
+}
+
+var startDate = "";
+var endDate = "";
+logToDebugWindow("Start Date - " + params["StartDate"]);
+logToDebugWindow("End Date - " + params["EndDate"]);
+if ( (params["StartDate"] != null &amp;&amp; params["StartDate"].length > 0) &amp;&amp; 
+		(params["EndDate"] != null &amp;&amp; params["EndDate"].length > 0) ){
+	startDate = params["StartDate"];
+	endDate = params["EndDate"];
+	whereclause = whereclause + " and b.CREATED_DATE between str_to_date('" + startDate + "', '%d/%m/%Y')";
+	whereclause = whereclause + " and str_to_date('" + endDate + "', '%d/%m/%Y')";
+}
+
+var productId = "";
+logToDebugWindow("Product Id - " + params["ProductID"]);
+if ( params["ProductID"] != null &amp;&amp; params["ProductID"] > 0){
+	logToDebugWindow("Product provided");
+	productId = params["ProductID"];
+	whereclause = whereclause + " and p.PRODUCT_ID = " + productId;
+} else {
+	logToDebugWindow("Product not provided");
+}
+
+this.queryText = this.queryText + whereclause;
+logToDebugWindow("where clause -\n " + whereclause);
+logToDebugWindow("final bill query -\n " + this.queryText);]]></method>
+            <property name="dataSource">ffdev</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">INVOICE_ID</property>
+                    <property name="nativeName">INVOICE_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">INVOICE_NUMBER</property>
+                    <property name="nativeName">INVOICE_NUMBER</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">CREATED_DATE</property>
+                    <property name="nativeName">CREATED_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">FROM_DATE</property>
+                    <property name="nativeName">FROM_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">TO_DATE</property>
+                    <property name="nativeName">TO_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">NO_OF_PICKUPS</property>
+                    <property name="nativeName">NO_OF_PICKUPS</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">FREIGHT</property>
+                    <property name="nativeName">FREIGHT</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">RISK_SURCHARGE</property>
+                    <property name="nativeName">RISK_SURCHARGE</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">DOC_HANDLING_CHARGE</property>
+                    <property name="nativeName">DOC_HANDLING_CHARGE</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">PARCAL_HANDLING_CHARGE</property>
+                    <property name="nativeName">PARCAL_HANDLING_CHARGE</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">AIRPORT_HANDLING_CHARGE</property>
+                    <property name="nativeName">AIRPORT_HANDLING_CHARGE</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">OTHER_CHARGES</property>
+                    <property name="nativeName">OTHER_CHARGES</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">TOTAL</property>
+                    <property name="nativeName">TOTAL</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">FUEL_SURCHARGE</property>
+                    <property name="nativeName">FUEL_SURCHARGE</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">SERVICE_TAX</property>
+                    <property name="nativeName">SERVICE_TAX</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">EDUCATION_CESS</property>
+                    <property name="nativeName">EDUCATION_CESS</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">HIGHER_EDUCATION_CESS</property>
+                    <property name="nativeName">HIGHER_EDUCATION_CESS</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">GRAND_TOTAL</property>
+                    <property name="nativeName">GRAND_TOTAL</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">19</property>
+                    <property name="name">GRAND_TOTAL_ROUNDED_OFF</property>
+                    <property name="nativeName">GRAND_TOTAL_ROUNDED_OFF</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">20</property>
+                    <property name="name">OFFICE_NAME</property>
+                    <property name="nativeName">OFFICE_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">21</property>
+                    <property name="name">PHONE</property>
+                    <property name="nativeName">PHONE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">22</property>
+                    <property name="name">BUSINESS_NAME</property>
+                    <property name="nativeName">BUSINESS_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">23</property>
+                    <property name="name">CUSTOMER_CODE</property>
+                    <property name="nativeName">CUSTOMER_CODE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">24</property>
+                    <property name="name">ADDRESS1</property>
+                    <property name="nativeName">ADDRESS1</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">25</property>
+                    <property name="name">ADDRESS2</property>
+                    <property name="nativeName">ADDRESS2</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">26</property>
+                    <property name="name">ADDRESS3</property>
+                    <property name="nativeName">ADDRESS3</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">27</property>
+                    <property name="name">CUSTOMER_TYPE_CODE</property>
+                    <property name="nativeName">CUSTOMER_TYPE_CODE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">28</property>
+                    <property name="name">PRODUCT_ID</property>
+                    <property name="nativeName">PRODUCT_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT b.INVOICE_ID,
+       b.INVOICE_NUMBER,
+       b.CREATED_DATE,
+       b.FROM_DATE,
+       b.TO_DATE,
+       b.NO_OF_PICKUPS,
+       b.FREIGHT,
+       b.RISK_SURCHARGE,
+       b.DOC_HANDLING_CHARGE,
+       b.PARCAL_HANDLING_CHARGE,
+       b.AIRPORT_HANDLING_CHARGE,
+       b.OTHER_CHARGES,
+       b.TOTAL,
+       b.FUEL_SURCHARGE,
+       b.SERVICE_TAX,
+       b.EDUCATION_CESS,
+       b.HIGHER_EDUCATION_CESS,
+       b.GRAND_TOTAL,
+       b.GRAND_TOTAL_ROUNDED_OFF,
+       po.OFFICE_NAME,
+       po.PHONE,
+       c.BUSINESS_NAME,
+       c.CUSTOMER_CODE,
+       ca.ADDRESS1,
+       ca.ADDRESS2,
+       ca.ADDRESS3,
+       custtype.CUSTOMER_TYPE_CODE as CustomerTypeCode,
+       p.PRODUCT_ID
+  FROM ff_f_bill b
+       JOIN ff_d_contract_payment_billing_location cpbl
+          ON b.SHIP_TO_CODE =
+                cpbl.SHIPPED_TO_CODE
+       JOIN ff_d_rate_contract rc
+          ON cpbl.RATE_CONTRACT = rc.RATE_CONTRACT_ID
+       JOIN ff_d_customer c
+          ON c.CUSTOMER_ID = rc.CUSTOMER
+       join ff_d_customer_type custtype
+          on custtype.customer_type_id = c.CUSTOMER_TYPE
+       JOIN ff_d_address ca
+          ON ca.ADDRESS_ID = c.ADDRESS
+       JOIN ff_d_product p
+          ON p.PRODUCT_ID = b.PRODUCT_ID
+       JOIN ff_d_office po
+          ON po.OFFICE_ID = b.PICKUP_OFFICE_ID]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <themes>
+        <theme name="defaultTheme" id="4">
+            <styles>
+                <style name="NewStyle1" id="776"/>
+            </styles>
+        </theme>
+    </themes>
+    <page-setup>
+        <simple-master-page name="NewSimpleMasterPage" id="3"/>
+    </page-setup>
+</library>

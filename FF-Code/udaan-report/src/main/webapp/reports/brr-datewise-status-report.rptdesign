@@ -1,0 +1,2474 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.2.2.v201301221637 Build &lt;4.2.2.v20130206-1509></property>
+    <list-property name="userProperties">
+        <structure>
+            <property name="name">Data Cube.dsBRRSummary.x</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+        <structure>
+            <property name="name">Data Cube.dsBRRSummary.y</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+        <structure>
+            <property name="name">Data Cube.ConsignmentStatus.NewTabularHierarchy1.x</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+        <structure>
+            <property name="name">Data Cube.ConsignmentStatus.NewTabularHierarchy1.y</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+        <structure>
+            <property name="name">Data Cube.dsBRRSummary.width</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+        <structure>
+            <property name="name">Data Cube.dsBRRSummary.height</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+        <structure>
+            <property name="name">dcBRRSummaryReport.dsBRRSummary.x</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+        <structure>
+            <property name="name">dcBRRSummaryReport.dsBRRSummary.y</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+        <structure>
+            <property name="name">dcBRRSummaryReport.ConsignmentStatusGroup.NewTabularHierarchy1.x</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+        <structure>
+            <property name="name">dcBRRSummaryReport.ConsignmentStatusGroup.NewTabularHierarchy1.y</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+        <structure>
+            <property name="name">dcBRRSummaryReport.dsBRRSummary.width</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+        <structure>
+            <property name="name">dcBRRSummaryReport.dsBRRSummary.height</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+    </list-property>
+    <property name="Data Cube.dsBRRSummary.x">327</property>
+    <property name="Data Cube.dsBRRSummary.y">14</property>
+    <property name="Data Cube.ConsignmentStatus.NewTabularHierarchy1.x">21</property>
+    <property name="Data Cube.ConsignmentStatus.NewTabularHierarchy1.y">142</property>
+    <property name="Data Cube.dsBRRSummary.width">335</property>
+    <property name="Data Cube.dsBRRSummary.height">449</property>
+    <property name="dcBRRSummaryReport.dsBRRSummary.x">431</property>
+    <property name="dcBRRSummaryReport.dsBRRSummary.y">47</property>
+    <property name="dcBRRSummaryReport.ConsignmentStatusGroup.NewTabularHierarchy1.x">37</property>
+    <property name="dcBRRSummaryReport.ConsignmentStatusGroup.NewTabularHierarchy1.y">149</property>
+    <property name="dcBRRSummaryReport.dsBRRSummary.width">150</property>
+    <property name="dcBRRSummaryReport.dsBRRSummary.height">200</property>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[importPackage(Packages.java.util.logging);  
+
+importPackage(Packages.javax.swing);  
+
+   
+
+/****************************************************  
+
+ * Set "blnDisplayDebugWindow" to true/false  
+
+ * to enable/disable the debug window  
+
+ ***************************************************/ 
+
+blnDisplayDebugWindow = true;  
+
+   
+
+/*****************************************************  
+
+ * Name:        logToDebugWindow  
+
+ * Description: Quick and dirty way of displaying a debug  
+
+ *              messages to a Window in eclipse using Swing.  
+
+ *              Uses global variable so all function calls  
+
+ *              print to same window  
+
+ * Parameters:  strMessage - message to display  
+
+ * Returns:     void  
+
+ ****************************************************/ 
+
+function logToDebugWindow(strMessage) {  
+
+   
+
+    // can turn on/off using this variable  
+
+    if(!blnDisplayDebugWindow) { return; }  
+
+   
+
+    // current JTextArea - global parameter  
+
+    var currJTextArea = reportContext.getGlobalVariable("jfDebugWindow");  
+
+   
+
+    // if null, then create and store as global variable  
+
+    if(currJTextArea == null) {  
+
+   
+
+        // Create JFrame  
+
+        var jFrame = new JFrame("Debug Window");  
+
+   
+
+        // Create JTextArea - append message and new-line  
+
+        var jTextArea = new JTextArea(20, 100);  
+
+        jTextArea.append(strMessage);  
+
+        jTextArea.append("\n");  
+
+   
+
+        //Create a JPanel  
+
+        var jPanel = new JPanel();  
+
+        // add text area to scroll pane  
+
+        jPanel.add(jTextArea);  
+
+   
+
+        //Create a vert and horiz scroll bar using JScrollPane  
+
+        var jScrollPane = new JScrollPane(jPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  
+
+        jScrollPane.getHorizontalScrollBar().setUnitIncrement(5);  
+
+        jScrollPane.getVerticalScrollBar().setUnitIncrement(5);  
+
+   
+
+        //Add JScrollPane into JFrame  
+
+        jFrame.add(jScrollPane);  
+
+        jFrame.setSize(400, 400);  
+
+        jFrame.show();  
+
+   
+
+        // set JTextArea as a Global Parameter for future reference  
+
+        reportContext.setGlobalVariable("jfDebugWindow", jTextArea);  
+
+    } else {  
+
+        // Print to Global Reference of the JTextArea  
+
+        currJTextArea.append(strMessage);  
+
+        currJTextArea.append("\n");  
+
+    }  
+
+}]]></method>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="RegionId" id="340">
+            <text-property name="promptText">RegionId</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">6</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="StationId" id="342">
+            <text-property name="promptText">StationId</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">129</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="FromDate" id="343">
+            <text-property name="promptText">FromDate</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">2013-11-27</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="ToDate" id="344">
+            <text-property name="promptText">ToDate</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">2014-04-10</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Series" id="345">
+            <text-property name="promptText">Series</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">ALL</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="ConsignmentTypeCode" id="346">
+            <text-property name="promptText">ConsignmentTypeCode</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">ALL</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Category" id="347">
+            <text-property name="promptText">Category</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">National</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="RegionName" id="348">
+            <text-property name="promptText">RegionName</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">Karnataka</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="StationName" id="349">
+            <text-property name="promptText">StationName</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">Bangalore</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="ConsignmentTypeName" id="351">
+            <text-property name="promptText">ConsignmentTypeName</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">Document</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="DeliveryCategoryCode" id="359">
+            <text-property name="promptText">DeliveryCategoryCode</text-property>
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">ALL</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="BranchId" id="626">
+            <text-property name="promptText">BranchId</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">0</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="BranchName" id="627">
+            <text-property name="promptText">BranchName</text-property>
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">ALL</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="ffdev" id="655">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">com.mysql.jdbc.Driver</property>
+            <property name="odaURL">jdbc:mysql://172.16.10.128:3306/CorpUDAAN</property>
+            <property name="odaUser">UdaanReport</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">cGFzc3dvcmQxMjM=</encrypted-property>
+            <property name="odaJndiName">java:/comp/env/jdbc/UdaanGoldDB</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="dsBRRSummary" id="8">
+            <property name="nullsOrdering">nulls lowest</property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">CONSG_REC_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CONSG_REC_DATE</text-property>
+                    <text-property name="heading">CONSG_REC_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">SUM(data.CONSIGNMENTS_DOB)</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">SUM(data.CONSIGNMENTS_DOB)</text-property>
+                    <text-property name="heading">SUM(data.CONSIGNMENTS_DOB)</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">TotalReceived</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">TotalReceived</text-property>
+                    <text-property name="heading">TotalReceived</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Delivered</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Delivered</text-property>
+                    <text-property name="heading">Delivered</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">PendingWithReason</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">PendingWithReason</text-property>
+                    <text-property name="heading">PendingWithReason</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">PendingWithoutReason</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">PendingWithoutReason</text-property>
+                    <text-property name="heading">PendingWithoutReason</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">RTHMarked</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">RTHMarked</text-property>
+                    <text-property name="heading">RTHMarked</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">TotalPending</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">TotalPending</text-property>
+                    <text-property name="heading">TotalPending</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ReturnToConsigner</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">ReturnToConsigner</text-property>
+                    <text-property name="heading">ReturnToConsigner</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">RTOMarked</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">RTOMarked</text-property>
+                    <text-property name="heading">RTOMarked</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Misrouted</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Misrouted</text-property>
+                    <text-property name="heading">Misrouted</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">LostMarked</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">LostMarked</text-property>
+                    <text-property name="heading">LostMarked</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">CONSG_REC_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">SUM(data.CONSIGNMENTS_DOB)</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">TotalReceived</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">Delivered</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">PendingWithReason</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">PendingWithoutReason</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">RTHMarked</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">TotalPending</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">ReturnToConsigner</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">RTOMarked</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">Misrouted</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">LostMarked</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <method name="beforeOpen"><![CDATA[var query = this.queryText;
+
+query = query.replaceAll("@RegionId",params["RegionId"]);
+query = query.replaceAll("@StationId",params["StationId"]);
+query = query.replaceAll("@BranchId",params["BranchId"]);
+query = query.replaceAll("@Series","'"+params["Series"].value.split(",").join("','")+"'");
+query = query.replaceAll("@ConsignmentTypeCode","'"+params["ConsignmentTypeCode"]+"'");
+query = query.replaceAll("@DeliveryCategoryCode","'"+params["DeliveryCategoryCode"]+"'");
+query = query.replaceAll("@FromDate","'"+params["FromDate"]+"'");
+query = query.replaceAll("@ToDate","'"+params["ToDate"]+"'");
+
+this.queryText = query;
+//logToDebugWindow(this.queryText);]]></method>
+            <property name="dataSource">ffdev</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">CONSG_REC_DATE</property>
+                    <property name="nativeName">CONSG_REC_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">SUM(data.CONSIGNMENTS_DOB)</property>
+                    <property name="nativeName">SUM(data.CONSIGNMENTS_DOB)</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">TotalReceived</property>
+                    <property name="nativeName">TotalReceived</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">Delivered</property>
+                    <property name="nativeName">Delivered</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">PendingWithReason</property>
+                    <property name="nativeName">PendingWithReason</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">PendingWithoutReason</property>
+                    <property name="nativeName">PendingWithoutReason</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">RTHMarked</property>
+                    <property name="nativeName">RTHMarked</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">TotalPending</property>
+                    <property name="nativeName">TotalPending</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">ReturnToConsigner</property>
+                    <property name="nativeName">ReturnToConsigner</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">RTOMarked</property>
+                    <property name="nativeName">RTOMarked</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">Misrouted</property>
+                    <property name="nativeName">Misrouted</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">LostMarked</property>
+                    <property name="nativeName">LostMarked</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT distinct
+  data.CONSG_REC_DATE
+  ,SUM(data.CONSIGNMENTS_DOB)
+ ,sum(data.CONSIGNMENTS_RECD) AS TotalReceived
+ ,sum(data.CONSIGNMENTS_DLVD) AS Delivered
+ ,sum(data.CONSIGNMENTS_PNWR) AS PendingWithReason
+ ,sum(data.CONSIGNMENTS_PNOR) AS PendingWithoutReason
+ ,sum(data.CONSIGNMENTS_RTHM) AS RTHMarked
+ ,sum(data.CONSIGNMENTS_TOT_PN) AS TotalPending
+ ,sum(data.CONSIGNMENTS_RECO) AS ReturnToConsigner
+ ,sum(data.CONSIGNMENTS_RTOM) AS RTOMarked
+ ,sum(data.CONSIGNMENTS_MRCN) AS Misrouted
+ ,sum(data.CONSIGNMENTS_LOCN) AS LostMarked
+FROM
+  ff_f_brr_datewise_status_report_data data
+  LEFT JOIN ff_dim_geography dg_del ON data.DELIVERY_OFFICE = dg_del.OFFICE_ID
+  /*LEFT JOIN ff_d_consignment_status_for_reports cs
+    ON data.CONSG_STATUS_ID = cs.CONSG_STATUS_ID*/
+  LEFT JOIN ff_dim_product dp ON dp.PRODUCT_ID = data.PRODUCT
+  LEFT JOIN ff_d_consignment_type ct
+    force index for join (PRIMARY)
+    ON data.CONSIGNMENT_TYPE_ID = ct.CONSIGNMENT_TYPE_ID
+  LEFT JOIN ff_d_category_for_reports cat 
+    force index for join (PRIMARY)
+    ON data.CATEGORY_ID = cat.CATEGORY_ID
+WHERE
+  dg_del.REGION_ID = @RegionId AND
+  CASE WHEN @StationId = 0 THEN TRUE ELSE dg_del.CITY_ID = @StationId END AND
+  CASE WHEN @BranchId = 0 THEN TRUE ELSE dg_del.office_id = @BranchId END AND
+  -- CASE WHEN @Series = 'ALL' THEN TRUE ELSE dp.CONSG_SERIES IN (@Series) END AND
+  dp.CONSG_SERIES IN (@Series) AND
+  CASE
+    WHEN @ConsignmentTypeCode = 'ALL' THEN TRUE
+    ELSE ct.CONSIGNMENT_CODE = @ConsignmentTypeCode
+  END AND
+  CASE
+    WHEN @DeliveryCategoryCode = 'ALL' THEN TRUE
+    ELSE cat.CATEGORY_CODE = @DeliveryCategoryCode
+  END AND
+  data.CONSG_REC_DATE BETWEEN str_to_date(
+                                @FromDate
+                               ,'%Y-%m-%d')
+                          AND str_to_date(
+                                @ToDate
+                               ,'%Y-%m-%d')
+GROUP BY
+  data.CONSG_REC_DATE]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSG_NO</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>25</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSG_NO</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSG_NO</design:label>
+            <design:formattingHints>
+              <design:displaySize>25</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSG_ID</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSG_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSG_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>TRANS_MODIFIED_DATE_TIME</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>TRANS_MODIFIED_DATE_TIME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>TRANS_MODIFIED_DATE_TIME</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>DELIVERY_STATUS</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>1</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>DELIVERY_STATUS</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>DELIVERY_STATUS</design:label>
+            <design:formattingHints>
+              <design:displaySize>1</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>BOOKING_DATE</design:name>
+              <design:position>5</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>BOOKING_DATE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>BOOKING_DATE</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>DELIVERY_TIME</design:name>
+              <design:position>6</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>DELIVERY_TIME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>DELIVERY_TIME</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>MANIFEST_DATE</design:name>
+              <design:position>7</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>19</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>MANIFEST_DATE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>MANIFEST_DATE</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>LOAD_NO</design:name>
+              <design:position>8</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>2</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>LOAD_NO</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>LOAD_NO</design:label>
+            <design:formattingHints>
+              <design:displaySize>2</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSG_STATUS_ID</design:name>
+              <design:position>9</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSG_STATUS_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSG_STATUS_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>0</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>ORG_OFF</design:name>
+              <design:position>10</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ORG_OFF</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ORG_OFF</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>REASON_ID</design:name>
+              <design:position>11</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>REASON_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>REASON_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CREATED_OFFICE_ID</design:name>
+              <design:position>12</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CREATED_OFFICE_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CREATED_OFFICE_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>OFFICE_ID</design:name>
+              <design:position>13</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>office_id</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>office_id</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>PRODUCT</design:name>
+              <design:position>14</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>PRODUCT</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>PRODUCT</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CONSG_TYPE</design:name>
+              <design:position>15</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CONSG_TYPE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CONSG_TYPE</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>FINAL_WEIGHT</design:name>
+              <design:position>16</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>8</design:nativeDataTypeCode>
+            <design:precision>20</design:precision>
+            <design:scale>4</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>FINAL_WEIGHT</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>FINAL_WEIGHT</design:label>
+            <design:formattingHints>
+              <design:displaySize>20</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>EVENT_DATE</design:name>
+              <design:position>17</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>91</design:nativeDataTypeCode>
+            <design:precision>10</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>EVENT_DATE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>EVENT_DATE</design:label>
+            <design:formattingHints>
+              <design:displaySize>10</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>RECEIVER_NAME</design:name>
+              <design:position>18</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>30</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>RECEIVER_NAME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>RECEIVER_NAME</design:label>
+            <design:formattingHints>
+              <design:displaySize>30</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>DEST_PINCODE</design:name>
+              <design:position>19</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>DEST_PINCODE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>DEST_PINCODE</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>MANIFEST_TYPE</design:name>
+              <design:position>20</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>1</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>MANIFEST_TYPE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>MANIFEST_TYPE</design:label>
+            <design:formattingHints>
+              <design:displaySize>1</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>IS_EXCESS_CONSG</design:name>
+              <design:position>21</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>1</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>IS_EXCESS_CONSG</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>IS_EXCESS_CONSG</design:label>
+            <design:formattingHints>
+              <design:displaySize>1</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>MIS_ROUTED</design:name>
+              <design:position>22</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>1</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>MIS_ROUTED</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>MIS_ROUTED</design:label>
+            <design:formattingHints>
+              <design:displaySize>1</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="4">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="5">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="6">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <page-footer>
+                <text id="3">
+                    <property name="contentType">html</property>
+                    <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                </text>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="279">
+            <column id="280"/>
+            <column id="312"/>
+            <column id="281"/>
+            <column id="317"/>
+            <column id="282"/>
+            <column id="336"/>
+            <column id="331"/>
+            <column id="283"/>
+            <row id="284">
+                <cell id="285">
+                    <property name="colSpan">8</property>
+                    <property name="rowSpan">1</property>
+                    <label id="304">
+                        <property name="fontSize">16pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text">First Flight Couriers Ltd.</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="289">
+                <cell id="290">
+                    <property name="colSpan">8</property>
+                    <property name="rowSpan">1</property>
+                    <label id="305">
+                        <property name="fontSize">11pt</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="textAlign">center</property>
+                        <text-property name="text">BRR STATUS REPORT DATEWISE</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="294">
+                <cell id="295">
+                    <label id="306">
+                        <property name="fontWeight">bold</property>
+                        <text-property name="text">Region :-</text-property>
+                    </label>
+                </cell>
+                <cell id="310">
+                    <data id="352">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">RegionName</property>
+                                <expression name="expression" type="javascript">params["RegionName"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">RegionName</property>
+                    </data>
+                </cell>
+                <cell id="296">
+                    <label id="318">
+                        <property name="fontWeight">bold</property>
+                        <text-property name="text">Station :-</text-property>
+                    </label>
+                </cell>
+                <cell id="315">
+                    <data id="354">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">StationName</property>
+                                <expression name="expression" type="javascript">params["StationName"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">StationName</property>
+                    </data>
+                </cell>
+                <cell id="297">
+                    <label id="628">
+                        <property name="fontWeight">bold</property>
+                        <text-property name="text">Branch :-</text-property>
+                    </label>
+                </cell>
+                <cell id="334">
+                    <data id="629">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">BranchName</property>
+                                <expression name="expression" type="javascript">params["BranchName"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">BranchName</property>
+                    </data>
+                </cell>
+                <cell id="329">
+                    <label id="321">
+                        <property name="fontWeight">bold</property>
+                        <text-property name="text">Type :-</text-property>
+                    </label>
+                </cell>
+                <cell id="298">
+                    <data id="357">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">ConsignmentTypeName</property>
+                                <expression name="expression" type="javascript">params["ConsignmentTypeName"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">ConsignmentTypeName</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="299">
+                <cell id="300">
+                    <label id="307">
+                        <property name="fontWeight">bold</property>
+                        <text-property name="text">Category :-</text-property>
+                    </label>
+                </cell>
+                <cell id="311">
+                    <data id="353">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">Category</property>
+                                <expression name="expression" type="javascript">params["Category"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">Category</property>
+                    </data>
+                </cell>
+                <cell id="301">
+                    <label id="319">
+                        <property name="fontWeight">bold</property>
+                        <text-property name="text">Product :-</text-property>
+                    </label>
+                </cell>
+                <cell id="316">
+                    <property name="colSpan">5</property>
+                    <property name="rowSpan">1</property>
+                    <data id="355">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">Series</property>
+                                <expression name="expression" type="javascript">params["Series"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">Series</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="656">
+                <cell id="657">
+                    <label id="337">
+                        <property name="fontWeight">bold</property>
+                        <text-property name="text">From Date :-</text-property>
+                    </label>
+                </cell>
+                <cell id="658">
+                    <data id="356">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">FromDate</property>
+                                <expression name="expression" type="javascript">params["FromDate"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">FromDate</property>
+                    </data>
+                </cell>
+                <cell id="659">
+                    <label id="338">
+                        <property name="fontWeight">bold</property>
+                        <text-property name="text">To Date :-</text-property>
+                    </label>
+                </cell>
+                <cell id="660">
+                    <data id="358">
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">ToDate</property>
+                                <expression name="expression" type="javascript">params["ToDate"]</expression>
+                                <property name="dataType">date</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">ToDate</property>
+                    </data>
+                </cell>
+                <cell id="661"/>
+                <cell id="662"/>
+                <cell id="663"/>
+                <cell id="664"/>
+            </row>
+        </grid>
+        <table id="513">
+            <property name="dataSet">dsBRRSummary</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">TotalReceived</property>
+                    <text-property name="displayName">TotalReceived</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["TotalReceived"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Delivered</property>
+                    <text-property name="displayName">Delivered</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Delivered"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">PendingWithReason</property>
+                    <text-property name="displayName">PendingWithReason</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["PendingWithReason"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">PendingWithoutReason</property>
+                    <text-property name="displayName">PendingWithoutReason</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["PendingWithoutReason"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">RTHMarked</property>
+                    <text-property name="displayName">RTHMarked</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["RTHMarked"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalPending</property>
+                    <text-property name="displayName">TotalPending</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["TotalPending"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">ReturnToConsigner</property>
+                    <text-property name="displayName">ReturnToConsigner</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["ReturnToConsigner"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">RTOMarked</property>
+                    <text-property name="displayName">RTOMarked</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["RTOMarked"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">Misrouted</property>
+                    <text-property name="displayName">Misrouted</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Misrouted"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">LostMarked</property>
+                    <text-property name="displayName">LostMarked</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["LostMarked"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalDelivered</property>
+                    <text-property name="displayName">TotalDelivered</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["Delivered"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalPendingWithReason</property>
+                    <text-property name="displayName">TotalPendingWithReason</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["PendingWithReason"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalPendingWithoutReason</property>
+                    <text-property name="displayName">TotalPendingWithoutReason</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["PendingWithoutReason"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalRTH</property>
+                    <text-property name="displayName">TotalRTH</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["RTHMarked"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalTotalPending</property>
+                    <text-property name="displayName">TotalTotalPending</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["TotalPending"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalReturnToConsigner</property>
+                    <text-property name="displayName">TotalReturnToConsigner</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["ReturnToConsigner"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalRTO</property>
+                    <text-property name="displayName">TotalRTO</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["RTOMarked"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalMisrouted</property>
+                    <text-property name="displayName">TotalMisrouted</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["Misrouted"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalLost</property>
+                    <text-property name="displayName">TotalLost</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["LostMarked"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalTotalReceived</property>
+                    <text-property name="displayName">TotalTotalReceived</text-property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["TotalReceived"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">DeliveredPercentage</property>
+                    <text-property name="displayName">DeliveredPercentage</text-property>
+                    <expression name="expression" type="javascript">Formatter.format(BirtMath.round((BirtMath.divide(row["TotalDelivered"],row["TotalTotalReceived"])*100), 2), "0.00");</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">PendingWithReasonPercentage</property>
+                    <text-property name="displayName">PendingWithReasonPercentage</text-property>
+                    <expression name="expression" type="javascript">Formatter.format(BirtMath.round((BirtMath.divide(row["TotalPendingWithReason"],row["TotalTotalReceived"])*100), 2), "0.00");</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">PendingWithoutReasonPercentage</property>
+                    <text-property name="displayName">PendingWithoutReasonPercentage</text-property>
+                    <expression name="expression" type="javascript">Formatter.format(BirtMath.round((BirtMath.divide(row["TotalPendingWithoutReason"],row["TotalTotalReceived"])*100), 2), "0.00");</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">RTHPercentage</property>
+                    <text-property name="displayName">RTHPercentage</text-property>
+                    <expression name="expression" type="javascript">Formatter.format(BirtMath.round((BirtMath.divide(row["TotalRTH"],row["TotalTotalReceived"])*100), 2), "0.00");</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalPendingPercentage</property>
+                    <text-property name="displayName">TotalPendingPercentage</text-property>
+                    <expression name="expression" type="javascript">Formatter.format(BirtMath.round((BirtMath.divide(row["TotalTotalPending"],row["TotalTotalReceived"])*100), 2), "0.00");</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">ReturnToConsignerPercentage</property>
+                    <text-property name="displayName">ReturnToConsignerPercentage</text-property>
+                    <expression name="expression" type="javascript">Formatter.format(BirtMath.round((BirtMath.divide(row["TotalReturnToConsigner"],row["TotalTotalReceived"])*100), 2), "0.00");</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">RTOMarkedPercentage</property>
+                    <text-property name="displayName">RTOMarkedPercentage</text-property>
+                    <expression name="expression" type="javascript">Formatter.format(BirtMath.round((BirtMath.divide(row["TotalRTO"],row["TotalTotalReceived"])*100), 2), "0.00");</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">MisroutedPercentage</property>
+                    <text-property name="displayName">MisroutedPercentage</text-property>
+                    <expression name="expression" type="javascript">Formatter.format(BirtMath.round((BirtMath.divide(row["TotalMisrouted"],row["TotalTotalReceived"])*100), 2), "0.00");</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TotalLostPercentage</property>
+                    <text-property name="displayName">TotalLostPercentage</text-property>
+                    <expression name="expression" type="javascript">Formatter.format(BirtMath.round((BirtMath.divide(row["TotalLost"],row["TotalTotalReceived"])*100), 2), "0.00");</expression>
+                    <property name="dataType">float</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">RECEIVED_DATE</property>
+                    <text-property name="displayName">RECEIVED_DATE</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CONSG_REC_DATE"]</expression>
+                    <property name="dataType">date</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">Aggregation</property>
+                    <property name="dataType">float</property>
+                    <property name="aggregateFunction">SUM</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["dob"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">Column Binding</property>
+                    <expression name="expression" type="javascript">Formatter.format(BirtMath.round((BirtMath.divide(row["Aggregation"],row["TotalTotalReceived"])*100), 2), "0");</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">dob</property>
+                    <text-property name="displayName">dob</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["SUM(data.CONSIGNMENTS_DOB)"]</expression>
+                    <property name="dataType">integer</property>
+                    <property name="allowExport">true</property>
+                </structure>
+            </list-property>
+            <column id="586">
+                <property name="width">0.9791666666666666in</property>
+            </column>
+            <column id="572">
+                <property name="width">0.96875in</property>
+            </column>
+            <column id="573"/>
+            <column id="574"/>
+            <column id="575"/>
+            <column id="576"/>
+            <column id="687"/>
+            <column id="670"/>
+            <column id="579"/>
+            <column id="580"/>
+            <column id="581"/>
+            <column id="582"/>
+            <column id="676">
+                <property name="repeat">1</property>
+            </column>
+            <header>
+                <row id="514">
+                    <cell id="583">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="587">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Date</text-property>
+                        </label>
+                    </cell>
+                    <cell id="515">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="516">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingLeft">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Day</text-property>
+                        </label>
+                    </cell>
+                    <cell id="517">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="518">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Total Rcvd</text-property>
+                        </label>
+                    </cell>
+                    <cell id="519">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="520">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">DELIVERED</text-property>
+                        </label>
+                    </cell>
+                    <cell id="521">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="522">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Pending With Reason</text-property>
+                        </label>
+                    </cell>
+                    <cell id="523">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="524">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Pending Without Reason</text-property>
+                        </label>
+                    </cell>
+                    <cell id="682">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="526">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">RTH</text-property>
+                        </label>
+                    </cell>
+                    <cell id="665">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="528">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Total Pending</text-property>
+                        </label>
+                    </cell>
+                    <cell id="529">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="530">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Return In</text-property>
+                        </label>
+                    </cell>
+                    <cell id="531">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="532">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">RTO</text-property>
+                        </label>
+                    </cell>
+                    <cell id="533">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="534">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Mis Route</text-property>
+                        </label>
+                    </cell>
+                    <cell id="535">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="536">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">Lost</text-property>
+                        </label>
+                    </cell>
+                    <cell id="671">
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="677">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">DOB</text-property>
+                        </label>
+                    </cell>
+                </row>
+                <row id="632">
+                    <cell id="633">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                    </cell>
+                    <cell id="634">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                    </cell>
+                    <cell id="635">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <label id="645">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">(A)</text-property>
+                        </label>
+                    </cell>
+                    <cell id="636">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <label id="646">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">(B)</text-property>
+                        </label>
+                    </cell>
+                    <cell id="637">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <label id="647">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">(C)</text-property>
+                        </label>
+                    </cell>
+                    <cell id="638">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <label id="648">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">(D)</text-property>
+                        </label>
+                    </cell>
+                    <cell id="683">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <label id="649">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">(E)</text-property>
+                        </label>
+                    </cell>
+                    <cell id="666">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <label id="650">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">(F)</text-property>
+                        </label>
+                    </cell>
+                    <cell id="641">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <label id="651">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">(G)</text-property>
+                        </label>
+                    </cell>
+                    <cell id="642">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <label id="652">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">(H)</text-property>
+                        </label>
+                    </cell>
+                    <cell id="643">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <label id="653">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">(I)</text-property>
+                        </label>
+                    </cell>
+                    <cell id="644">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <label id="654">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <text-property name="text">(J)</text-property>
+                        </label>
+                    </cell>
+                    <cell id="672">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                    </cell>
+                </row>
+            </header>
+            <detail>
+                <row id="537">
+                    <cell id="584">
+                        <data id="630">
+                            <property name="fontSize">7pt</property>
+                            <structure name="dateTimeFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">dd-MM-yyyy</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">RECEIVED_DATE</property>
+                        </data>
+                    </cell>
+                    <cell id="538">
+                        <data id="631">
+                            <property name="fontSize">7pt</property>
+                            <structure name="dateTimeFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">EEEE</property>
+                            </structure>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">RECEIVED_DATE</property>
+                        </data>
+                    </cell>
+                    <cell id="540">
+                        <data id="541">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalReceived</property>
+                        </data>
+                    </cell>
+                    <cell id="542">
+                        <data id="543">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Delivered</property>
+                        </data>
+                    </cell>
+                    <cell id="544">
+                        <data id="545">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">PendingWithReason</property>
+                        </data>
+                    </cell>
+                    <cell id="546">
+                        <data id="547">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">PendingWithoutReason</property>
+                        </data>
+                    </cell>
+                    <cell id="684">
+                        <data id="549">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">RTHMarked</property>
+                        </data>
+                    </cell>
+                    <cell id="667">
+                        <data id="551">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalPending</property>
+                        </data>
+                    </cell>
+                    <cell id="552">
+                        <data id="553">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">ReturnToConsigner</property>
+                        </data>
+                    </cell>
+                    <cell id="554">
+                        <data id="555">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">RTOMarked</property>
+                        </data>
+                    </cell>
+                    <cell id="556">
+                        <data id="557">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Misrouted</property>
+                        </data>
+                    </cell>
+                    <cell id="558">
+                        <data id="559">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">LostMarked</property>
+                        </data>
+                    </cell>
+                    <cell id="673">
+                        <data id="681">
+                            <property name="fontSize">7pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">dob</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+            <footer>
+                <row id="560">
+                    <cell id="585">
+                        <property name="colSpan">2</property>
+                        <property name="rowSpan">1</property>
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="589">
+                            <property name="fontSize">7pt</property>
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">All India Total :-</text-property>
+                        </label>
+                    </cell>
+                    <cell id="615">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="616">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalTotalReceived</property>
+                        </data>
+                    </cell>
+                    <cell id="563">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="590">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalDelivered</property>
+                        </data>
+                    </cell>
+                    <cell id="564">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="591">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalPendingWithReason</property>
+                        </data>
+                    </cell>
+                    <cell id="565">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="592">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalPendingWithoutReason</property>
+                        </data>
+                    </cell>
+                    <cell id="685">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="593">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalRTH</property>
+                        </data>
+                    </cell>
+                    <cell id="668">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="594">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalTotalPending</property>
+                        </data>
+                    </cell>
+                    <cell id="568">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="595">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalReturnToConsigner</property>
+                        </data>
+                    </cell>
+                    <cell id="569">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="596">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalRTO</property>
+                        </data>
+                    </cell>
+                    <cell id="570">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="597">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalMisrouted</property>
+                        </data>
+                    </cell>
+                    <cell id="571">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="598">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalLost</property>
+                        </data>
+                    </cell>
+                    <cell id="674">
+                        <property name="fontSize">7pt</property>
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="679">
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Aggregation</property>
+                        </data>
+                    </cell>
+                </row>
+                <row id="599">
+                    <cell id="600">
+                        <property name="colSpan">3</property>
+                        <property name="rowSpan">1</property>
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <label id="612">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Percentage ( % ) :-</text-property>
+                        </label>
+                    </cell>
+                    <cell id="603">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="617">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">DeliveredPercentage</property>
+                        </data>
+                    </cell>
+                    <cell id="604">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="618">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">PendingWithReasonPercentage</property>
+                        </data>
+                    </cell>
+                    <cell id="605">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="619">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">PendingWithoutReasonPercentage</property>
+                        </data>
+                    </cell>
+                    <cell id="686">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="620">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">RTHPercentage</property>
+                        </data>
+                    </cell>
+                    <cell id="669">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="621">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalPendingPercentage</property>
+                        </data>
+                    </cell>
+                    <cell id="608">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="622">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">ReturnToConsignerPercentage</property>
+                        </data>
+                    </cell>
+                    <cell id="609">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="623">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">RTOMarkedPercentage</property>
+                        </data>
+                    </cell>
+                    <cell id="610">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="624">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">MisroutedPercentage</property>
+                        </data>
+                    </cell>
+                    <cell id="611">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="625">
+                            <property name="fontSize">7pt</property>
+                            <property name="paddingRight">5pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">TotalLostPercentage</property>
+                        </data>
+                    </cell>
+                    <cell id="675">
+                        <property name="borderBottomColor">#000000</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderTopColor">#000000</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <data id="680">
+                            <property name="fontSize">7pt</property>
+                            <property name="textAlign">right</property>
+                            <property name="resultSetColumn">Column Binding</property>
+                        </data>
+                    </cell>
+                </row>
+            </footer>
+        </table>
+    </body>
+</report>

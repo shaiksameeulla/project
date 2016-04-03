@@ -1,0 +1,1279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.2.2.v201301221637 Build &lt;4.2.2.v20130206-1509></property>
+    <list-property name="propertyBindings">
+        <structure>
+            <property name="name">queryText</property>
+            <property name="id">100</property>
+        </structure>
+        <structure>
+            <property name="name">queryTimeOut</property>
+            <property name="id">100</property>
+        </structure>
+        <structure>
+            <property name="name">rowFetchSize</property>
+            <property name="id">100</property>
+        </structure>
+    </list-property>
+    <property name="units">in</property>
+    <property name="iconFile">/templates/simple_listing.gif</property>
+    <property name="cheatSheet">org.eclipse.birt.report.designer.ui.cheatsheet.simplelisting</property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="Region" id="161">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="StartDate" id="162">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">date</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Custom</property>
+                <property name="pattern">dd/MM/yyy</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="EndDate" id="163">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">date</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Custom</property>
+                <property name="pattern">dd/MM/yyy</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Station" id="164">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Branch" id="165">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="Product" id="166">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="99">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">org.gjt.mm.mysql.Driver</property>
+            <property name="odaURL">jdbc:mysql://172.16.10.128:3306/CorpUDAAN</property>
+            <property name="odaUser">UdaanReport</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">cGFzc3dvcmQxMjM=</encrypted-property>
+            <property name="odaJndiName">java:/comp/env/jdbc/UdaanGoldDB</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Data Set" id="100">
+            <property name="nullsOrdering">nulls lowest</property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">STOCK_TRANSFER_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">STOCK_TRANSFER_ID</text-property>
+                    <text-property name="heading">STOCK_TRANSFER_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">REGION_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">REGION_NAME</text-property>
+                    <text-property name="heading">REGION_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">REGION_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">REGION_ID</text-property>
+                    <text-property name="heading">REGION_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CITY_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">CITY_NAME</text-property>
+                    <text-property name="heading">CITY_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">CITY_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">CITY_ID</text-property>
+                    <text-property name="heading">CITY_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">OFFICE_NAME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">OFFICE_NAME</text-property>
+                    <text-property name="heading">OFFICE_NAME</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">OFFICE_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">OFFICE_ID</text-property>
+                    <text-property name="heading">OFFICE_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">TRANSFER_DATE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">TRANSFER_DATE</text-property>
+                    <text-property name="heading">TRANSFER_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ITEM_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">ITEM_ID</text-property>
+                    <text-property name="heading">ITEM_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">QUANTITY</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">QUANTITY</text-property>
+                    <text-property name="heading">QUANTITY</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">START_SI_NUMBER</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">START_SI_NUMBER</text-property>
+                    <text-property name="heading">START_SI_NUMBER</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">END_SI_NUMBER</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">END_SI_NUMBER</text-property>
+                    <text-property name="heading">END_SI_NUMBER</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ITEM_TYPE_ID</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">ITEM_TYPE_ID</text-property>
+                    <text-property name="heading">ITEM_TYPE_ID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">TRANSFERROR</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">TRANSFERROR</text-property>
+                    <text-property name="heading">TRANSFERROR</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">TRANSFEREE</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">TRANSFEREE</text-property>
+                    <text-property name="heading">TRANSFEREE</text-property>
+                </structure>
+            </list-property>
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">in</property>
+                    <expression name="expr" type="javascript">params["Region"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>""</value>
+                        <value>row["REGION_ID"]</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">in</property>
+                    <expression name="expr" type="javascript">params["Station"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>""</value>
+                        <value>row["CITY_ID"]</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">in</property>
+                    <expression name="expr" type="javascript">params["Branch"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>""</value>
+                        <value>row["OFFICE_ID"]</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">in</property>
+                    <expression name="expr" type="javascript">params["Product"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>""</value>
+                        <value>row["ITEM_TYPE_ID"]</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">le</property>
+                    <expression name="expr" type="javascript">params["StartDate"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>row["TRANSFER_DATE"]</value>
+                    </simple-property-list>
+                </structure>
+                <structure>
+                    <property name="operator">ge</property>
+                    <expression name="expr" type="javascript">params["EndDate"].value</expression>
+                    <simple-property-list name="value1">
+                        <value>row["TRANSFER_DATE"]</value>
+                    </simple-property-list>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">STOCK_TRANSFER_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">REGION_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">REGION_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">CITY_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">CITY_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">OFFICE_NAME</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">OFFICE_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">TRANSFER_DATE</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">ITEM_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">QUANTITY</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">START_SI_NUMBER</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">END_SI_NUMBER</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">ITEM_TYPE_ID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">TRANSFERROR</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">TRANSFEREE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">STOCK_TRANSFER_ID</property>
+                    <property name="nativeName">STOCK_TRANSFER_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">REGION_NAME</property>
+                    <property name="nativeName">REGION_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">REGION_ID</property>
+                    <property name="nativeName">REGION_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">CITY_NAME</property>
+                    <property name="nativeName">CITY_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">CITY_ID</property>
+                    <property name="nativeName">CITY_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">OFFICE_NAME</property>
+                    <property name="nativeName">OFFICE_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">OFFICE_ID</property>
+                    <property name="nativeName">OFFICE_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">TRANSFER_DATE</property>
+                    <property name="nativeName">TRANSFER_DATE</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">ITEM_ID</property>
+                    <property name="nativeName">ITEM_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">QUANTITY</property>
+                    <property name="nativeName">QUANTITY</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">START_SI_NUMBER</property>
+                    <property name="nativeName">START_SI_NUMBER</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">END_SI_NUMBER</property>
+                    <property name="nativeName">END_SI_NUMBER</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">ITEM_TYPE_ID</property>
+                    <property name="nativeName">ITEM_TYPE_ID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">TRANSFERROR</property>
+                    <property name="nativeName">TRANSFERROR</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">TRANSFEREE</property>
+                    <property name="nativeName">TRANSFEREE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT
+ST.STOCK_TRANSFER_ID,
+REGION.REGION_NAME,
+REGION.REGION_ID,
+CITY.CITY_NAME,
+CITY.CITY_ID,
+OFF.OFFICE_NAME,
+OFF.OFFICE_ID,
+ST.TRANSFER_DATE,
+ST.ITEM_ID,  
+ST.QUANTITY,
+ST.START_SI_NUMBER,
+ST.END_SI_NUMBER,
+itemtype.ITEM_TYPE_ID,
+IF(ST.FROM_EMPLOYEE_ID IS NOT NULL,FROMEMPLOYEE.FIRST_NAME ,IF(ST.FROM_BA_ID IS NOT NULL, FROMBACUSTOMER.BUSINESS_NAME,IF(ST.FROM_CUSTOMER_ID IS NOT NULL, FROMCUSTOMER.BUSINESS_NAME," "))) AS TRANSFERROR,
+IF(ST.TO_EMPLOYEE_ID IS NOT NULL,TOEMPLOYEE.FIRST_NAME ,IF(ST.TO_BA_ID IS NOT NULL, TOBACUSTOMER.BUSINESS_NAME,IF(ST.TO_CUSTOMER_ID IS NOT NULL, TOCUSTOMER.BUSINESS_NAME,IF(ST.TO_BRANCH_ID IS NOT NULL, TOBRANCH.OFFICE_NAME," ")))) AS TRANSFEREE
+FROM ff_f_stock_transfer ST
+LEFT JOIN ff_d_item item ON ST.ITEM_ID = item.ITEM_ID
+LEFT JOIN ff_d_item_type itemtype ON item.ITEM_TYPE_ID = itemtype.ITEM_TYPE_ID
+LEFT JOIN ff_d_office OFF ON ST.CREATED_BY_OFFICE = OFF.OFFICE_ID
+LEFT JOIN ff_d_city CITY ON OFF.CITY_ID = CITY.CITY_ID
+LEFT JOIN ff_d_region REGION ON OFF.MAPPED_TO_REGION = REGION.REGION_ID
+LEFT JOIN ff_d_customer FROMCUSTOMER ON FROMCUSTOMER.CUSTOMER_ID = ST.FROM_CUSTOMER_ID 
+LEFT JOIN ff_d_customer FROMBACUSTOMER ON FROMBACUSTOMER.CUSTOMER_ID = ST.FROM_BA_ID
+LEFT JOIN ff_d_employee FROMEMPLOYEE ON FROMEMPLOYEE.EMPLOYEE_ID = ST.FROM_EMPLOYEE_ID
+LEFT JOIN ff_d_customer TOCUSTOMER ON TOCUSTOMER.CUSTOMER_ID = ST.TO_CUSTOMER_ID 
+LEFT JOIN ff_d_customer TOBACUSTOMER ON TOBACUSTOMER.CUSTOMER_ID = ST.FROM_BA_ID
+LEFT JOIN ff_d_employee TOEMPLOYEE ON TOEMPLOYEE.EMPLOYEE_ID = ST.TO_EMPLOYEE_ID
+LEFT JOIN ff_d_office TOBRANCH ON TOBRANCH.OFFICE_ID = ST.TO_BRANCH_ID
+ORDER BY REGION.REGION_ID,OFF.OFFICE_ID,ST.TRANSFER_DATE ASC;
+]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>REGION_NAME</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>REGION_NAME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>REGION_NAME</design:label>
+            <design:formattingHints>
+              <design:displaySize>150</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>REGION_ID</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>REGION_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>REGION_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CITY_NAME</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CITY_NAME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CITY_NAME</design:label>
+            <design:formattingHints>
+              <design:displaySize>150</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CITY_ID</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CITY_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CITY_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>OFFICE_NAME</design:name>
+              <design:position>5</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>OFFICE_NAME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>OFFICE_NAME</design:label>
+            <design:formattingHints>
+              <design:displaySize>50</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>OFFICE_ID</design:name>
+              <design:position>6</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>OFFICE_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>OFFICE_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>TRANSFER_DATE</design:name>
+              <design:position>7</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>93</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>TRANSFER_DATE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>TRANSFER_DATE</design:label>
+            <design:formattingHints>
+              <design:displaySize>19</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>ITEM_ID</design:name>
+              <design:position>8</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ITEM_ID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ITEM_ID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>QUANTITY</design:name>
+              <design:position>9</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>7</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>QUANTITY</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>QUANTITY</design:label>
+            <design:formattingHints>
+              <design:displaySize>7</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>START_SI_NUMBER</design:name>
+              <design:position>10</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>START_SI_NUMBER</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>START_SI_NUMBER</design:label>
+            <design:formattingHints>
+              <design:displaySize>13</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>END_SI_NUMBER</design:name>
+              <design:position>11</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>END_SI_NUMBER</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>END_SI_NUMBER</design:label>
+            <design:formattingHints>
+              <design:displaySize>13</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>TRANSFERROR</design:name>
+              <design:position>12</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>TRANSFERROR</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>TRANSFERROR</design:label>
+            <design:formattingHints>
+              <design:displaySize>23</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>TRANSFEREE</design:name>
+              <design:position>13</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>0</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>TRANSFEREE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>TRANSFEREE</design:label>
+            <design:formattingHints>
+              <design:displaySize>50</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="report" id="24">
+            <property name="fontFamily">sans-serif</property>
+            <property name="fontSize">10pt</property>
+        </style>
+        <style name="crosstab-cell" id="25">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+        <style name="crosstab" id="26">
+            <property name="borderBottomColor">#CCCCCC</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">1pt</property>
+            <property name="borderLeftColor">#CCCCCC</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">1pt</property>
+            <property name="borderRightColor">#CCCCCC</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">1pt</property>
+            <property name="borderTopColor">#CCCCCC</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">1pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <page-footer>
+                <text id="3">
+                    <property name="contentType">html</property>
+                    <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                </text>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <table id="101">
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">thin</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">thin</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">thin</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">thin</property>
+            <property name="width">7.958333333333333in</property>
+            <property name="dataSet">Data Set</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">REGION_NAME</property>
+                    <text-property name="displayName">REGION_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["REGION_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">CITY_NAME</property>
+                    <text-property name="displayName">CITY_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["CITY_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">OFFICE_NAME</property>
+                    <text-property name="displayName">OFFICE_NAME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["OFFICE_NAME"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TRANSFER_DATE</property>
+                    <text-property name="displayName">TRANSFER_DATE</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["TRANSFER_DATE"]</expression>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="name">QUANTITY</property>
+                    <text-property name="displayName">QUANTITY</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["QUANTITY"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+                <structure>
+                    <property name="name">START_SI_NUMBER</property>
+                    <text-property name="displayName">START_SI_NUMBER</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["START_SI_NUMBER"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">END_SI_NUMBER</property>
+                    <text-property name="displayName">END_SI_NUMBER</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["END_SI_NUMBER"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TRANSFERROR</property>
+                    <text-property name="displayName">TRANSFERROR</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["TRANSFERROR"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">TRANSFEREE</property>
+                    <text-property name="displayName">TRANSFEREE</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["TRANSFEREE"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <column id="132">
+                <property name="width">0.625in</property>
+            </column>
+            <column id="133">
+                <property name="width">0.6041666666666666in</property>
+            </column>
+            <column id="134">
+                <property name="width">0.8541666666666666in</property>
+            </column>
+            <column id="135">
+                <property name="width">1.1354166666666667in</property>
+            </column>
+            <column id="136">
+                <property name="width">0.4166666666666667in</property>
+            </column>
+            <column id="137">
+                <property name="width">0.9583333333333334in</property>
+            </column>
+            <column id="138">
+                <property name="width">0.9895833333333334in</property>
+            </column>
+            <column id="139">
+                <property name="width">0.9375in</property>
+            </column>
+            <column id="140">
+                <property name="width">1.4375in</property>
+            </column>
+            <header>
+                <row id="102">
+                    <cell id="103">
+                        <property name="backgroundColor">#FAD764</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="141">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Region</text-property>
+                        </label>
+                    </cell>
+                    <cell id="104">
+                        <property name="backgroundColor">#FAD764</property>
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="143">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">City</text-property>
+                        </label>
+                    </cell>
+                    <cell id="105">
+                        <property name="backgroundColor">#FAD764</property>
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="145">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Branch</text-property>
+                        </label>
+                    </cell>
+                    <cell id="106">
+                        <property name="backgroundColor">#FAD764</property>
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="147">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Transfer Date</text-property>
+                        </label>
+                    </cell>
+                    <cell id="107">
+                        <property name="backgroundColor">#FAD764</property>
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="149">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Quantity </text-property>
+                        </label>
+                    </cell>
+                    <cell id="108">
+                        <property name="backgroundColor">#FAD764</property>
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="151">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">Start Cmnt. No.</text-property>
+                        </label>
+                    </cell>
+                    <cell id="109">
+                        <property name="backgroundColor">#FAD764</property>
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="153">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">End Cmnt. No.</text-property>
+                        </label>
+                    </cell>
+                    <cell id="110">
+                        <property name="backgroundColor">#FAD764</property>
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="155">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">FS/BA - Transferror</text-property>
+                        </label>
+                    </cell>
+                    <cell id="111">
+                        <property name="backgroundColor">#FAD764</property>
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <label id="157">
+                            <property name="fontWeight">bold</property>
+                            <text-property name="text">FS/BA - Transferee</text-property>
+                        </label>
+                    </cell>
+                </row>
+            </header>
+            <detail>
+                <row id="112">
+                    <cell id="113">
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="142">
+                            <property name="resultSetColumn">REGION_NAME</property>
+                        </data>
+                    </cell>
+                    <cell id="114">
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="144">
+                            <property name="resultSetColumn">CITY_NAME</property>
+                        </data>
+                    </cell>
+                    <cell id="115">
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="146">
+                            <property name="resultSetColumn">OFFICE_NAME</property>
+                        </data>
+                    </cell>
+                    <cell id="116">
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="148">
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderTopStyle">none</property>
+                            <structure name="dateTimeFormat">
+                                <property name="category">Custom</property>
+                                <property name="pattern">dd/MM/yyy</property>
+                            </structure>
+                            <property name="resultSetColumn">TRANSFER_DATE</property>
+                        </data>
+                    </cell>
+                    <cell id="117">
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="150">
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderRightStyle">none</property>
+                            <property name="borderTopStyle">none</property>
+                            <property name="resultSetColumn">QUANTITY</property>
+                        </data>
+                    </cell>
+                    <cell id="118">
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="152">
+                            <property name="resultSetColumn">START_SI_NUMBER</property>
+                        </data>
+                    </cell>
+                    <cell id="119">
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="154">
+                            <property name="resultSetColumn">END_SI_NUMBER</property>
+                        </data>
+                    </cell>
+                    <cell id="120">
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="156">
+                            <property name="resultSetColumn">TRANSFERROR</property>
+                        </data>
+                    </cell>
+                    <cell id="121">
+                        <property name="borderBottomColor">#808080</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftColor">#808080</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightColor">#808080</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopColor">#808080</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <data id="159">
+                            <property name="resultSetColumn">TRANSFEREE</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+            <footer>
+                <row id="122">
+                    <cell id="123"/>
+                    <cell id="124"/>
+                    <cell id="125"/>
+                    <cell id="126"/>
+                    <cell id="127"/>
+                    <cell id="128"/>
+                    <cell id="129"/>
+                    <cell id="130"/>
+                    <cell id="131"/>
+                </row>
+            </footer>
+        </table>
+    </body>
+</report>

@@ -1,0 +1,212 @@
+
+	/* navigation container */
+	#top_nav {
+		background: url(/ud/static/images/menubg_orange.gif) repeat-x ;		
+		border-bottom: 0px;		
+		/*height: auto;*/
+		min-height: 32px;
+		position: relative;
+		/*z-index: 10;*/
+		font: 12px bold Verdana, Geneva, sans-serif;
+		margin: 2px 0px 2px 0px;
+		width: 100%;
+		border: 0px solid #666;
+	}
+
+
+/* -----------------------------------------
+   Top-Men Required CSS
+----------------------------------------- */
+#top_nav_menu {
+	color:#fff;	
+	margin: 0px 0px 0px 0px;
+	padding: 0px;
+	min-width: 900px;
+	border:0px solid #000;
+	
+	
+}
+
+#top_nav_menu li {
+	float: left;	
+	margin: 0px 0px 0px 0px;
+	padding: 0px;
+	position: relative;
+	width: auto;
+	display: block;
+}
+#top_nav_menu li a {
+	text-decoration: none;
+	padding: 9px 10px;
+	font: 14px bold Verdana, Geneva, sans-serif;
+	color:#fff;
+	line-height: 12px; 
+	display: block;
+}
+
+#top_nav_menu li ul {
+	position: absolute;	
+	left:-5000px;
+	height: auto;
+	background:#222;
+	margin: 0px 0px 0px 0px !important;
+	padding: 0px !important;
+	
+	font-size: 12px; 
+	
+}
+.ie9 #top_nav_menu li ul, .gt-ie9 #top_nav_menu li ul {
+	z-index: 10000;	
+}
+#top_nav_menu li ul li {
+	float: none;	
+	margin: 0px;
+	padding: 0px;
+	/*width: 195px;*/
+	border-top: 0px solid #555;
+	border-bottom: 0px;
+	border-left: 0px;
+	border-right: 0px;
+	font-size: 12px; 	
+	position: relative;
+	display: block;
+}
+.lt-ie9 #top_nav_menu li ul li {
+	list-style-type: none;
+	display: inline;
+}
+#top_nav_menu li ul li a {
+	width: 125px;
+	height: auto;
+	padding: 9px 10px;
+	margin: 0px;
+	border: 0px;
+	display: block;	
+	font-size: 12px; 
+	position: relative;
+}
+.lt-ie9 #top_nav_menu li ul li ul li ul, .lt-ie9 #top_nav_menu li ul li ul li ul li, .lt-ie9 #top_nav_menu li ul li ul li ul li a {
+	z-index: 1 !important;	
+}
+.lt-ie9 #top_nav_menu li ul li ul, .lt-ie9 #top_nav_menu li ul li ul li, .lt-ie9 #top_nav_menu li ul li ul li a {
+	z-index: 2 !important;	
+}
+.lt-ie9 #top_nav_menu li ul, .lt-ie9 #top_nav_menu li ul li, .lt-ie9 #top_nav_menu li ul li a {
+	z-index: 3 !important;	
+}
+.lt-ie9 #top_nav_menu, .lt-ie9 #top_nav_menu li, .lt-ie9 #top_nav_menu li a  {
+	z-index: 4 !important;	
+}
+/* ------ set navigation level HOVER and FOCUS background colors - progressive to help distinguish levels */
+/* ---- default level background colors - these values pass WCAG 2.0 AA level of contrast  
+	first (base) and second:				#000
+	second (hover), third:					#292929
+	first (base hover), third (hover), fourth:	#444 
+	fourth (hover), fifth: 					#666, 
+	fifth (hover), sixth: 					#757575
+--- */
+/* - first level - */
+#top_nav_menu li a, #top_nav_menu li ul li a, .firstlevel, .secondlevel {
+	background:#ff8314 url(../static/images/menubg_orange.gif) repeat-x;
+		
+	
+}
+/* - second level - */
+#top_nav_menu li ul li ul li a, #top_nav_menu li ul li a:hover, #top_nav_menu li a:focus, #top_nav_menu li ul li a:focus, .secondlevelhover, .thirdlevel {
+	background:#1d407a;	
+	
+}
+/* - third level - primary navigation shares this color for its hover */
+#top_nav_menu li ul li ul li ul li a, #top_nav_menu li a:hover, #top_nav_menu li a:focus,, #top_nav_menu li ul li ul li a:hover, #top_nav_menu li ul li ul li a:focus, .firstlevelhover, .thirdlevelhover, .fourthlevel {
+	background:#ff8314 url(../static/images/menubg_grey.gif) repeat-x;
+	
+
+}
+.toplevelhoverfocus, {
+	
+	background: url(../static/images/menubg_grey.gif) repeat-x !important; /* hack to ensure first level stays lit */
+}
+/* - fourth level - */
+#top_nav_menu li ul li ul li ul li ul li a, #top_nav_menu li ul li ul li ul li a:hover, #top_nav_menu li ul li ul li ul li a:focus, .fourthlevelhover, .fifthlevel {
+	background:#666;	
+}
+/* - fifth level level - */
+#top_nav_menu li ul li ul li ul li ul li ul li a, #top_nav_menu li ul li ul li ul li ul li a:hover, #top_nav_menu li ul li ul li ul li ul li a:focus, .fifthlevelhover, .sixthlevel {
+	background:#757575;	
+}
+
+/* -- right arrow -- */
+/* level 1 */
+#top_nav_menu li .rightarrow {
+	background-color:none; background: url(../static/images/mn_arrow-r.png) no-repeat center right #000;
+}
+/* level 2 */
+#top_nav_menu li ul li .rightarrow, .right2arrow {
+	background-color:none; background: url(../static/images/mn_arrow-r.png) no-repeat center right #000;
+}
+/* level 3 */
+#top_nav_menu li ul li ul li .rightarrow, .right3arrow {
+	background-color:none; background: url(../static/images/mn_arrow-r.png) no-repeat center right #292929;
+}
+/* level 4 */
+#top_nav_menu li ul li ul li ul li .rightarrow, .right4arrow {
+	background-color:none; background: url(../static/images/mn_arrow-r.png) no-repeat center right #444;
+}
+/* -- left arrow -- */
+/* level 1 */
+#top_nav_menu li .leftarrow {
+	background-color:none; background: url(images/mn_arrow-l.png) no-repeat center right #000;
+}
+/* level 2 */
+#top_nav_menu li ul li .leftarrow, .left2arrow {
+	background-color:none; background: url(images/mn_arrow-l.png) no-repeat center right #000;
+}
+/* level 3 */
+#top_nav_menu li ul li ul li .leftarrow, .left3arrow {
+	background-color:none; background: url(images/mn_arrow-l.png) no-repeat center right #292929;
+}
+/* level 4 */
+#top_nav_menu li ul li ul li ul li .leftarrow, .left4arrow {
+	background-color:none; background: url(images/mn_arrow-l.png) no-repeat center right #444;
+}
+
+
+/* -- right arrow on HOVER/FOCUS -- */
+/* level 1 */
+#top_nav_menu li .rightarrow:hover, #top_nav_menu li .rightarrow:focus {
+	background-color:#292929; background: url(../static/images/mn_arrow-r.png) no-repeat center right #292929;
+}
+/* level 2 */
+#top_nav_menu li ul li .rightarrow:hover, #top_nav_menu li ul li .rightarrow:focus, .right2arrowhover {
+	background-color:#292929; background: url(../static/images/mn_arrow-r.png) no-repeat center right #292929 !important;
+}
+/* level 3 */
+#top_nav_menu li ul li ul li .rightarrow:hover, #top_nav_menu li ul li ul li .rightarrow:focus, .right3arrowhover {
+	background-color:#444; background: url(../static/images/mn_arrow-r.png) no-repeat center right #444 !important;
+}
+/* level 4 */
+#top_nav_menu li ul li ul li ul li .rightarrow:hover, #top_nav_menu li ul li ul li ul li .rightarrow:focus, .right4arrowhover {
+	background-color:#666; background: url(../static/images/mn_arrow-r.png) no-repeat center right #666 !important;
+}
+/* -- left arrow on HOVER/FOCUS -- */
+/* level 1 */
+#top_nav_menu li .leftarrow:hover, #top_nav_menu li .leftarrow:focus {
+	background-color:#292929; background: url(images/mn_arrow-l.png) no-repeat center right #292929;
+}
+/* level 2 */
+#top_nav_menu li ul li .leftarrow:hover, #top_nav_menu li ul li .leftarrow:focus, .left2arrowhover {
+	background-color:#292929; background: url(images/mn_arrow-l.png) no-repeat center right #292929 !important;
+}
+/* level 3 */
+#top_nav_menu li ul li ul li .leftarrow:hover, #top_nav_menu li ul li ul li .leftarrow:focus, .left3arrowhover {
+	background-color:#444; background: url(images/mn_arrow-l.png) no-repeat center right #444 !important;
+}
+/* level 4 */
+#top_nav_menu li ul li ul li ul li .leftarrow:hover, #top_nav_menu li ul li ul li ul li .leftarrow:focus, .left4arrowhover {
+	background-color:#666; background: url(images/mn_arrow-l.png) no-repeat center right #666 !important;
+}
+
+
+.dimText {
+	color:#999 !important;	
+}
