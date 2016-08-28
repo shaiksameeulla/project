@@ -1,0 +1,72 @@
+<beans 	xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" 	xmlns="http://www.springframework.org/schema/beans">
+
+
+<util:properties id="serviceProperties"
+		location="classpath:mqItestConfigurations.properties" />
+	<context:property-placeholder properties-ref="serviceProperties" order="1" ignore-unresolvable="true" ignore-resource-not-found="false" />
+		
+	<bean id="transactionManager"
+		class="org.springframework.jms.connection.JmsTransactionManager">
+		<property name="connectionFactory" ref="primaryRawConnectionFactory" />
+	</bean>
+
+
+
+	<bean p:password="g3wS5Cbepq6xbRA" p:username="ssCargoSystem"
+		p:targetConnectionFactory-ref="ConnectionFactory"
+		class="org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter"
+		id="primaryRawConnectionFactory" />
+
+	<bean class="com.ibm.mq.jms.MQConnectionFactory" id="ConnectionFactory"
+		p:securityExit="biz.capitalware.mqausx.MQAUSXJ2EE" p:channel="${channel}"
+		p:port="${port}" p:hostName="${host}" p:queueManager="${queueManager}">
+		<property name="transportType">
+			<util:constant static-field="com.ibm.mq.jms.JMSC.MQJMS_TP_CLIENT_MQ_TCPIP" />
+		</property>
+	</bean>
+
+	<bean id="cyberarkCredential" class="javapasswordsdk.PasswordSDK"
+		factory-method="getPassword" scope="prototype">
+		<constructor-arg>
+			<bean class="javapasswordsdk.PSDKPasswordRequest" id="passwordRequest"
+				p:reason="MQ connection" p:object="Directory-AIMswaldapdev-ssCargoSystem"
+				p:folder="Root" p:safe="AIM-DEV-LDAP-CARGO" p:appID="SWAApp-CARGO-Dev-Itest" />
+		</constructor-arg>
+	</bean>
+
+	<bean id="cyberarkPassword" scope="prototype" factory-method="getContent"
+		factory-bean="cyberarkCredential" />
+
+<bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+    <property name="connectionFactory" ref="primaryRawConnectionFactory" />
+    <property name="destination" ref="jmsDestination" />
+    <property name="messageListener" ref="mqMessageListener" />
+    
+        <property name="sessionTransacted" value="true" />
+        <property name="transactionManager" ref="transactionManager" />
+        <property name="concurrentConsumers" value="1" />
+        <property name="recoveryInterval" value="600000000" />
+    
+</bean>
+
+
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+
+		<property name="connectionFactory" ref="primaryRawConnectionFactory" />
+ 
+		 <property name="receiveTimeout" value="10000" /> 
+		<property name="pubSubDomain" value="false" />
+		<property name="defaultDestination" ref="jmsDestination" />
+
+	</bean>
+
+	<bean id="jmsDestination" class="com.ibm.mq.jms.MQQueue">
+		<constructor-arg value="${queue}" />
+	</bean>
+
+
+		<bean id="mqMessageListener" class="com.swa.sample.mq.MQListener" />
+</beans>
