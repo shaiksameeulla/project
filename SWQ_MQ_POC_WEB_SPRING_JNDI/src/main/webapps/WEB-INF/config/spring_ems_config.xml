@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:int="http://www.springframework.org/schema/integration"
+			xmlns:jms="http://www.springframework.org/schema/integration/jms" xmlns:util="http://www.springframework.org/schema/util"
+			xmlns:context="http://www.springframework.org/schema/context" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xmlns:jee="http://www.springframework.org/schema/jee"
+			xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd
+								http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+								http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+								http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+								http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+								http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd">
+
+<bean id="messageTopicListener" class="com.capgemini.listener.JMSTIBCOMessageListener">
+<property name="jmsSender" ref="jmsSender" />
+</bean>
+
+	<bean id="jndiTopicTemplate" class="org.springframework.jndi.JndiTemplate">
+        <property name="environment">
+            <props>
+                <prop key="java.naming.factory.initial">com.tibco.tibjms.naming.TibjmsInitialContextFactory</prop>
+                <prop key="java.naming.provider.url">tibjmsnaming://localhost:7222</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="jmsTopicConnectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiTemplate" ref="jndiTopicTemplate" /> <property name="jndiName"
+        value="TestEMSTopicFactory" /> </bean>
+
+    <bean id="jmsTopicDestinationResolver"
+        class="org.springframework.jms.support.destination.JndiDestinationResolver">
+        <property name="jndiTemplate" ref="jndiTopicTemplate" />
+        <property name="cache" value="true" />
+    </bean>
+
+    <bean id="jndiTopicDestination" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiTemplate" ref="jndiTopicTemplate" />
+        <property name="jndiName" value="TestEmsJNDI" />
+    </bean>
+
+   
+
+
+    <bean
+		class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsTopicConnectionFactory" />
+		<property name="destination" ref="jndiTopicDestination" />
+		<property name="messageListener" ref="messageTopicListener" />
+	</bean> 
+<!-- <bean id="authenticationConnectionFactory"
+    class="org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter">
+    <property name="targetConnectionFactory" ref="jmsTopicConnectionFactory" />
+    <property name="username" value="yyyyy" />
+    <property name="password" value="xxxx" />
+</bean>
+
+<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+    <property name="connectionFactory" ref="authenticationConnectionFactory" />
+    <property name="destinationResolver" ref="jmsTopicDestinationResolver" />
+    <property name="defaultDestination" ref="jndiTopicDestination" /> -->
+    
+    <bean id="jmsTIBCOTemplate" class="org.springframework.jms.core.JmsTemplate">
+    <property name="connectionFactory" ref="jmsTopicConnectionFactory" />
+    <property name="destinationResolver" ref="jmsTopicDestinationResolver" />
+    <property name="defaultDestination" ref="jndiTopicDestination" /> 
+    </bean>
+     <bean id="jmsTopicReceiver" class="com.capgemini.tibco.JMSEMSTopicReceiver">
+     <property name="jmsTemplate" ref="jmsTIBCOTemplate" /> 
+     </bean>
+     
+     <bean id="jmsTopicSender" class="com.capgemini.tibco.JMSEMSTopicSender">
+     <property name="jmsTemplate" ref="jmsTIBCOTemplate" /> 
+     </bean>
+    
+
+</beans>
