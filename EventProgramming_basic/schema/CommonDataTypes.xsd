@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema version="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.swacorp.com/cargo/common/services/data/v1"
+            xmlns:commonDataTypes="http://www.swacorp.com/cargo/common/services/data/v1">
+
+    <xsd:annotation>
+        <xsd:documentation>Schemas for SWA Cargo</xsd:documentation>
+    </xsd:annotation>
+
+    <xsd:complexType name="BaseRequest" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>Base Service Request</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="header" type="commonDataTypes:RequestHeaderType"
+                         minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="BaseResponse" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>Base Service Response</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="header" type="commonDataTypes:ResponseHeaderType"
+                         minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="RequestHeaderType">
+        <xsd:annotation>
+            <xsd:documentation>Service Request Header</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="callingApplication" type="xsd:string" nillable="false"/>
+
+            <xsd:element name="language" type="xsd:string"/>
+            <xsd:element name="transactionid" type="xsd:string"/>
+            <xsd:element name="contractVersion" type="commonDataTypes:ContractVersionType" minOccurs="1" maxOccurs="1"/>
+
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="ContractVersionType">
+        <xsd:annotation>
+            <xsd:documentation>version of the service</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="major" type="xsd:int"/>
+            <xsd:element name="minor" type="xsd:int"/>
+        </xsd:sequence>
+    </xsd:complexType>
+       <xsd:complexType name="WeightType">
+        <xsd:sequence>
+            <xsd:element name="value" type="xsd:int"/>			
+            <xsd:element name="isPercentage" type="xsd:boolean"/>
+        </xsd:sequence>
+	  </xsd:complexType>
+
+    <xsd:complexType name="VolumeType">
+        <xsd:sequence>
+            <xsd:element name="value" type="xsd:int"/>	    
+            <xsd:element name="isPercentage" type="xsd:boolean"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="FlightLegKeyType">
+        <xsd:annotation>
+            <xsd:documentation>
+                flight leg key. Key used to retrieve the flight capacities and schedules
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="carrierCode" type="xsd:string" nillable="false"/>
+            <xsd:element name="flightNumber" type="xsd:int"/>
+            <xsd:element name="origin" type="xsd:string"/>
+            <xsd:element name="localDateTimeAtDep" type="xsd:string"/>
+	    <xsd:element name="flightLegDepartureDate" type="xsd:string"/>
+            <xsd:element name="flightLegSuffix" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="AuditParameters">
+        <xsd:annotation>
+            <xsd:documentation>Audit Parameters</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element type="xsd:string" name="updatedBy" />
+            <xsd:element type="xsd:int" name="id" />
+            <xsd:element type="xsd:string" name="active" />
+            <xsd:element type="xsd:date" name="lastUpdatedDate" />
+            <xsd:element type="xsd:string" name="formattedUpdatedByAndDate" />
+            <xsd:element type="xsd:int" name="versionNumber" />
+             <xsd:element name="lastUpdatedUser" type="commonDataTypes:UserInfo"
+                         minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="ResponseHeaderType">
+        <xsd:annotation>
+            <xsd:documentation>Service Response Header</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="code" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="messages" type="commonDataTypes:Message" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="Message">
+        <xsd:sequence>
+            <xsd:element name="msg-code" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="msg-type" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="message" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="UserInfo">
+        <xsd:sequence>
+            <xsd:element name="userId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+	    <xsd:element name="initial" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="firstName" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+	    <xsd:element name="middleName" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="lastName" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="userStation" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="SWADateTime">
+		<xsd:sequence>
+			<xsd:element name="swaDate" type="xsd:dateTime" />
+			<xsd:element name="timeZone" type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+    <xsd:complexType name="Base" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>With a few exceptions the abstract Base element
+                serves as the base for all schema elements.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+	<xsd:element name="createdBy" type="xsd:string"
+                         minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="updatedBy" type="xsd:string"
+                         minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="createDate" type="xsd:dateTime"
+                         minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="lastUpdatedDate" type="xsd:dateTime"
+                         minOccurs="0" maxOccurs="1"/>
+	    <xsd:element name="updateInfo" type="xsd:string"
+                         minOccurs="0" maxOccurs="1"/>
+           <xsd:element name="lastUpdatedBy" type="commonDataTypes:UserInfo"
+                         minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="header" type="commonDataTypes:ResponseHeaderType"
+                         minOccurs="1" maxOccurs="1"/>
+            <xsd:element type="xsd:int" name="versionNumber"/> 
+			<xsd:element name="lastUpdatedSWADate" type="commonDataTypes:SWADateTime"
+				minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+		
+	<xsd:simpleType name="LotStatusType">
+        <xsd:restriction base="xsd:string">            
+            <xsd:enumeration value="DRFT" />
+			<xsd:enumeration value="BKD" />
+			<xsd:enumeration value="FOH" />
+			<xsd:enumeration value="RCT" />
+			<xsd:enumeration value="SCRN" />
+			<xsd:enumeration value="RCS" />
+			<xsd:enumeration value="DEP" />
+			<xsd:enumeration value="ARR" />
+			<xsd:enumeration value="RCF" />
+			<xsd:enumeration value="XFOH" />
+			<xsd:enumeration value="TFD" />
+			<xsd:enumeration value="DLV" />
+			<xsd:enumeration value="MSNG" />
+			<xsd:enumeration value="TRC" />
+			<xsd:enumeration value="LOST" />
+			<xsd:enumeration value="OTH" />
+			<xsd:enumeration value="VOID" />
+			<xsd:enumeration value="CXLD" />
+
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="RefValueType">
+        
+        <xsd:annotation>
+            <xsd:documentation>
+                Used to store the data for reference values
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="code" type="xsd:string"/>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="description" type="xsd:string"/>
+
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>
