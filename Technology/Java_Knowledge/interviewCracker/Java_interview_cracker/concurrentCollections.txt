@@ -1,0 +1,33 @@
+
+
+
+2) BlockingQueue can be bounded or unbounded. 
+A bounded BlockingQueue is one which is initialized with initial capacity and call to put() will be blocked if BlockingQueue is full 
+and size is equal to capacity. This bounding nature makes it ideal to use a shared queue between multiple threads like in most common Producer consumer solutions in Java. An unbounded Queue is one which is initialized without capacity, actually by default it initialized with Integer.MAX_VALUE. 
+most common example of BlockingQueue uses bounded BlockingQueue as shown in below example.
+
+
+
+ArrayBlockingQueue and LinkedBlockingQueue in Java
+ArrayBlockingQueue and LinkedBlockingQueue are common implementation of BlockingQueue<E> interface. ArrayBlockingQueue is backed by array  and Queue impose orders as FIFO. head of the queue is the oldest element in terms of time and tail of the queue is youngest element. ArrayBlockingQueue is also fixed size bounded buffer on the other hand LinkedBlockingQueue is an optionally bounded queue built on top of Linked nodes. In terms of throughput LinkedBlockingQueue provides higher throughput than ArrayBlockingQueue in Java.
+4. Deque and BlockingDeque
+Deque interface is added in Java 6 and it extends Queue interface to support insertion and removal from both end of Queue referred as head and tail. Java6 also provides concurrent implementation of Deque like ArrayDeque and LinkedBlockingDeque. Deque Can be used efficiently to increase parallelism in program by allowing set of worker thread to help each other by taking some of work load from other thread by utilizing Deque double end consumption property. So if all Thread has there own set of task Queue and they are consuming from head; helper thread can also share some work load via consumption from tail.
+
+The PriorityBlockingQueue class implements the BlockingQueue interface. Read the BlockingQueue text for more information about the interface.
+
+The PriorityBlockingQueue is an unbounded concurrent queue. It uses the same ordering rules as the java.util.PriorityQueue class. You cannot insert null into this queue.
+
+All elements inserted into the PriorityBlockingQueue must implement the java.lang.Comparable interface. The elements thus order themselves according to whatever priority you decide in your Comparable implementation.
+
+Notice that the PriorityBlockingQueue does not enforce any specific behaviour for elements that have equal priority (compare() == 0).
+
+Also notice, that in case you obtain an Iterator from a PriorityBlockingQueue, the Iterator does not guarantee to iterate the elements in priority order.
+
+Here is an example of how to use the PriorityBlockingQueue:
+
+BlockingQueue queue   = new PriorityBlockingQueue();
+
+    //String implements java.lang.Comparable
+    queue.put("Value");
+
+    String value = queue.take();

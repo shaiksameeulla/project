@@ -1,0 +1,758 @@
+A thread state. A thread can be in one of the following states:
+NEW
+A thread that has not yet started is in this state.
+RUNNABLE
+A thread executing in the Java virtual machine is in this state.
+BLOCKED
+A thread that is blocked waiting for a monitor lock is in this state.
+WAITING
+A thread that is waiting indefinitely for another thread to perform a particular action is in this state.
+TIMED_WAITING
+A thread that is waiting for another thread to perform an action for up to a specified waiting time is in this state.
+TERMINATED
+A thread that has exited is in this state.
+
+
+Difference between WAIT and BLOCKED thread states ::
+
+A thread goes to wait state once it calls wait() on an Object. This is called Waiting State. Once a thread reaches waiting state, it will need to wait till some other thread notify() or notifyAll() on the object.
+
+Once this thread is notified, it will not be runnable. It might be that other threads are also notified(using notifyAll()) or the first thread has not finished his work, so it is still blocked till it gets its chance. This is called Blocked State.
+
+Once other threads have left and its this thread chance, it moves to Runnable state after that it is eligible pick up work based on JVM threading mechanism and moves to run state.
+
+The difference is relatively simple.
+
+In the BLOCKED state, a thread is about to enter a synchronized block, but there is another thread currently running inside a synchronized block on the same object. The first thread must then wait for the second thread to exit its block.
+
+In the WAITING state, a thread is waiting for a signal from another thread. This happens typically by calling Object.wait(), or Thread.join(). The thread will then remain in this state until another thread calls Object.notify(), or dies.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+-->How to use wait and notify in code
+
+Even though wait and notify are quite a fundamental concept and they are defined in object class, surprisingly, its not easy to write code using wait and notify. You can test this during interview by asking candidate to write code to solve producer consumer problem using wait and notify by hand. I am sure many will stuck and make mistakes e.g. synchronizing at wrong place, not calling wait on right object or not following standard idiom. To be honest its confusing for non regular coders. First confusion arise from the fact, how to call wait() method? Since wait method is not defined in Thread class, you cannot simply call Thread.wait(), that won't work but since many Java developers are used to calling Thread.sleep() they try same thing with wait() method and stuck. You need to call wait() method on the object which is shared between two threads, in producer consumer problem its the queue which is shared between producer and consumer threads. Second confusion comes from the fact that wait needs to be call from synchronized block or method? So if you use synchronized block, which object should be put to go inside block? This should be the same object, whose lock you want to acquire i.e. the shared object between multiple threads. In our case its queue.
+
+How to use wait and notify method in Java with example
+
+
+
+Always call wait and notify from Loop Instead of If Block
+
+Once you know that you need to call wait from synchronized context and on the shared object, next thing is to avoid mistake made by several Java developer by calling wait() method inside if block instead of while loop. Since you call wait inside a conditional block e.g. producer thread should call wait() if queue is full, first instinct goes towards using if block, but calling wait() inside if block can lead to subtle bugs because its possible for thread to wake up spuriously even when waiting condition is not changed. If you don't check the condition again after waking up by using loop, you will take wrong action which may cause problem e.g. trying to insert item on full queue or trying to consume from empty queue. That's why you should always call wait and notify method from loop and not from if block. I also suggest to read Effective Java item on same topic, probably the best reference in how to properly call wait and notify method.
+
+Based upon above knowledge here is  the standard code template or idiom to call wait and notify method in Java :
+
+// The standard idiom for calling the wait method in Java
+synchronized (sharedObject) {
+   while (condition) {
+      sharedObject.wait(); // (Releases lock, and reacquires on wakeup)
+   }
+   ... // do action based upon condition e.g. take or put into queue
+}
+
+As I suggested, you should always invoke wait method from a loop. The loop is used to test the condition before and after waiting. If the condition still holds and the notify (or notifyAll) method has already been invoked before a thread calls wait() method, then there is no guarantee that the thread will ever awake from the wait, potentially causing a deadlock.
+
+
+
+Java wait(), notify() and notifyAll() Example
+
+Here is our sample program to demonstrate how to use wait and notify method in Java. In this program, we have used the standard idiom discussed above to call wait(), notify() and notifyAll() method in Java. In this program we have two threads named PRODUCER and CONSUMER and implemented using Producer and Consumer class which extends Thread class. The logic of what producer and consumer should do is written in their respective run() method. Main thread starts both producer and consumer threads and also create an object of LinkedList class to share as Queue between them. If you don't know LinkedList also implements Queue interface in Java. Producer runs in infinite loop and keep inserting random integer value into Queue until queue is full. We check this condition at while(queue.size == maxSize), remember before doing this check we synchronize on queue object so that no other thread modify the queue when we are doing this check. If Queue is full then our PRODUCER thread waits until CONSUMER thread consume one item and make space in your queue and call notify() method to inform PRODUCER thread. Both wait() and notify() method are called on shared object which is queue in our case.
+
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Random;
+
+/**
+ * Simple Java program to demonstrate How to use wait, notify and notifyAll()
+ * method in Java by solving producer consumer problem.
+ * 
+ * @author Javin Paul
+ */
+public class ProducerConsumerInJava {
+
+    public static void main(String args[]) {
+        System.out.println("How to use wait and notify method in Java");
+        System.out.println("Solving Producer Consumper Problem");
+        
+        Queue<Integer> buffer = new LinkedList<>();
+        int maxSize = 10;
+        
+        Thread producer = new Producer(buffer, maxSize, "PRODUCER");
+        Thread consumer = new Consumer(buffer, maxSize, "CONSUMER");
+        
+        producer.start();
+        consumer.start();
+        
+
+    }
+
+}
+
+/**
+ * Producer Thread will keep producing values for Consumer
+ * to consumer. It will use wait() method when Queue is full
+ * and use notify() method to send notification to Consumer
+ * Thread.
+ * 
+ * @author WINDOWS 8
+ *
+ */
+class Producer extends Thread {
+    private Queue<Integer> queue;
+    private int maxSize;
+    
+    public Producer(Queue<Integer> queue, int maxSize, String name){
+        super(name);
+        this.queue = queue;
+        this.maxSize = maxSize;
+    }
+    
+    @Override
+    public void run() {
+        while (true) {
+            synchronized (queue) {
+                while (queue.size() == maxSize) {
+                    try {
+                        System.out .println("Queue is full, "
+                                + "Producer thread waiting for "
+                                + "consumer to take something from queue");
+                        queue.wait();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                Random random = new Random();
+                int i = random.nextInt();
+                System.out.println("Producing value : " + i);
+                queue.add(i);
+                queue.notifyAll();
+            }
+
+        }
+    }
+}
+
+/**
+ * Consumer Thread will consumer values form shared queue.
+ * It will also use wait() method to wait if queue is
+ * empty. It will also use notify method to send 
+ * notification to producer thread after consuming values
+ * from queue.
+ * 
+ * @author WINDOWS 8
+ *
+ */
+class Consumer extends Thread {
+    private Queue<Integer> queue;
+    private int maxSize;
+    
+    public Consumer(Queue<Integer> queue, int maxSize, String name){
+        super(name);
+        this.queue = queue;
+        this.maxSize = maxSize;
+    }
+    
+    @Override
+    public void run() {
+        while (true) {
+            synchronized (queue) {
+                while (queue.isEmpty()) {
+                    System.out.println("Queue is empty,"
+                            + "Consumer thread is waiting"
+                            + " for producer thread to put something in queue");
+                    try {
+                        queue.wait();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+                }
+                System.out.println("Consuming value : " + queue.remove());
+                queue.notifyAll();
+            }
+
+        }
+    }
+}
+
+Output
+How to use wait and notify method in Java
+Solving Producer Consumper Problem
+Queue is empty,Consumer thread is waiting for producer thread to put something in queue
+Producing value : -1692411980
+Producing value : 285310787
+Producing value : -1045894970
+Producing value : 2140997307
+Producing value : 1379699468
+Producing value : 912077154
+Producing value : -1635438928
+Producing value : -500696499
+Producing value : -1985700664
+Producing value : 961945684
+Queue is full, Producer thread waiting for consumer to take something from queue
+Consuming value : -1692411980
+Consuming value : 285310787
+Consuming value : -1045894970
+Consuming value : 2140997307
+Consuming value : 1379699468
+Consuming value : 912077154
+Consuming value : -1635438928
+Consuming value : -500696499
+Consuming value : -1985700664
+Consuming value : 961945684
+Queue is empty,Consumer thread is waiting for producer thread to put something in queue
+Producing value : 1182138498
+
+In order to understand this program better, I suggest you to debug it instead of running. Once you start your program in debug mode it will stop at either PRODUCER or CONSUMER thread, depending upon which one thread scheduler chose to give CPU. Since both threads has wait condition they will go there, now you just run it and see what it does, it will most likely print the output shown above. You can even use Step Into and Step Over buttons in Eclipse to run the program step by step to understand it better.
+
+
+
+Things to Remember about Using wait(), notify() and notifyAll() method 
+
+
+You an use wait() and notify() method to implement inter thread communication in Java. Not just one or two threads but multiple thread can communicate to each other by using these methods.
+Always call wait(), notify() and notifyAll() methods from synchronized method or synchronized block otherwise JVM will throw IllegalMonitorStateException.
+Always call wait and notify method from loop and never from if() block, because loop test waiting condition before and after sleeping and handles notification even if waiting condition is not changed.
+Always call wait in shared object e.g. shared queue in this example.
+Prefer notifyAll() over notify() method due to reasons given in this article. 
+
+Producer consumer solution in Java using wait and notify
+
+
+That's all about how to use wait, notify and notifyAll() method in Java. You should use wait and notify for inter thread communication in Java only if you know what you are doing otherwise there are many high level concurrency utility available for different task. For example, if you want to implement producer consumer pattern then you can use BlockingQueue which will manage both thread-safety and flow control for you, if you want your thread should wait for other threads before proceeding you can use CycliBarrier or CountDownLatch or if you want to protect resource you can use Semaphore.
+
+Read more: http://javarevisited.blogspot.com/2015/07/how-to-use-wait-notify-and-notifyall-in.html#ixzz3ozXRaoM2
+
+Why do we need Synchronization in Java?
+
+If your code is executing in multi-threaded environment, you need synchronization for objects, which are shared among multiple threads, to avoid any corruption of state or any kind of unexpected behavior. Synchronization in Java will only be needed if shared object is mutable. if your shared object is either read only or immutable object, than you don't need synchronization, despite running multiple threads. Same is true with what threads are doing with object if all the threads are only reading value then you don't require synchronization in Java. JVM guarantees that Java synchronized code will only be executed by one thread at a time. In Summary Java synchronized Keyword provides following functionality essential for concurrent programming : 
+
+1) synchronized keyword in Java provides locking, which ensures mutual exclusive access of shared resource and prevent data race.
+
+2) synchronized keyword also prevent reordering of code statement by compiler which can cause subtle concurrent issue if we don't use synchronized or volatile keyword.
+
+3) synchronized keyword involve locking and unlocking. before entering into synchronized method or block thread needs to acquire the lock, at this point it reads data from main memory than cache and when it release the lock, it flushes write operation into main memory which eliminates memory inconsistency errors.
+
+Synchronized keyword in Java
+
+java synchronized keyword example , synchronization in java tutorialPrior to Java 1.5 synchronized keyword was only way to provide synchronization of shared object in Java. Any code written by using  synchronized block or enclosed inside synchronized method will be mutually exclusive, and can only be executed by one thread at a time. You can have both static synchronized method and non static synchronized method and synchronized blocks in Java but we can not have synchronized variable in java. Using synchronized keyword with variable is illegal and will result in compilation error. Instead of synchronized variable in Java, you can have java volatile variable, which will instruct JVM threads to read value of volatile variable from main memory and don’t cache it locally. Block synchronization in Java is preferred over method synchronization in Java because by using block synchronization, you only need to lock the critical section of code instead of whole method. Since synchronization in Java comes with cost of performance, we need to synchronize only part of code which absolutely needs to be synchronized.
+
+
+Example of Synchronized Method in Java
+
+Using synchronized keyword along with method is easy just apply synchronized keyword in front of method. What we need to take care is that static synchronized method locked on class object lock and non static synchronized method locks on current object (this). So it’s possible that both static and non static java synchronized method running in parallel.  This is the common mistake a naive developer do while writing Java synchronized code.
+
+
+public class Counter{
+
+  private static int count = 0;
+
+  public static synchronized int getCount(){
+    return count;
+  }
+
+  public synchoronized setCount(int count){
+     this.count = count;
+  }
+
+}
+
+In this example of Java synchronization code is not properly synchronized because both getCount() and setCount() are not getting locked on same object and can run in parallel which may results in incorrect count. Here getCount() will lock in Counter.class object while setCount() will lock on current object (this). To make this code properly synchronized in Java you need to either make both method static or non static or use java synchronized block instead of java synchronized method.By the way this is one of the common mistake Java developers make while synchronizing their code.
+
+
+Example of Synchronized Block in Java
+
+Using synchronized block in java is also similar to using synchronized keyword in methods. Only important thing to note here is that if object used to lock synchronized block of code, Singleton.class in below example is null then Java synchronized block will throw a NullPointerException.
+
+public class Singleton{
+
+private static volatile Singleton _instance;
+
+public static Singleton getInstance(){
+   if(_instance == null){
+            synchronized(Singleton.class){
+              if(_instance == null)
+              _instance = new Singleton();
+            }
+   }
+   return _instance;
+}
+
+This is a classic example of double checked locking in Singleton. In this example of Java synchronized code, we have made only critical section (part of code which is creating instance of singleton) synchronized and saved some performance. If you make whole method synchronized than every call of this method will be blocked, while you only need blocking to create singleton instance on first call. By the way, this is not the only way to write threadsafe singleton in Java. You can use Enum, or lazy loading to avoid thread-safety issue during instantiation. Even above code will not behave as expected because prior to Java 1.5, double checked locking was broker and even with volatile variable you can view half initialized object. Introduction of Java memory model and happens before guarantee in Java 5 solves this issue. To read more about Singleton in Java see that.
+
+
+Important points of synchronized keyword in Java
+
+synchronized keywrod java example , synchronization in java tutorial1. Synchronized keyword in Java is used to provide mutual exclusive access of a shared resource with multiple threads in Java. Synchronization in Java guarantees that, no two threads can execute a synchronized method which requires same lock simultaneously or concurrently.
+
+2. You can use java synchronized keyword only on synchronized method or synchronized block.
+
+3. When ever a thread enters into java synchronized method or block it acquires a lock and whenever it leaves java synchronized method or block it releases the lock. Lock is released even if thread leaves synchronized method after completion or due to any Error or Exception.
+
+4. Java Thread acquires an object level lock when it enters into an instance synchronized java method and acquires a class level lock when it enters into static synchronized java method.
+
+5. Java synchronized keyword is re-entrant in nature it means if a java synchronized method calls another synchronized method which requires same lock then current thread which is holding lock can enter into that method without acquiring lock.
+
+6. Java Synchronization will throw NullPointerException if object used in java synchronized block is null e.g. synchronized (myInstance) will throws java.lang.NullPointerException if myInstance is null.
+
+7. One Major disadvantage of Java synchronized keyword is that it doesn't allow concurrent read, which can potentially limit scalability. By using concept of lock stripping and using different locks for reading and writing, you can overcome this limitation of synchronized in Java. You will be glad to know that java.util.concurrent.locks.ReentrantReadWriteLock provides readymade implementation of ReadWriteLock in Java.
+
+8. One more limitation of java synchronized keyword is that it can only be used to control access of shared object within the same JVM. If you have more than one JVM and need to synchronized access to a shared file system or database, the Java synchronized keyword is not at all sufficient. You need to implement a kind of global lock for that.
+
+9. Java synchronized keyword incurs performance cost. Synchronized method in Java is very slow and can degrade performance. So use synchronization in java when it absolutely requires and consider using java synchronized block for synchronizing critical section only.
+
+10. Java synchronized block is better than java synchronized method in Java because by using synchronized block you can only lock critical section of code and avoid locking whole method which can possibly degrade performance. A good example of java synchronization around this concept is getInstance() method Singleton class. See here.
+
+11. Its possible that both static synchronized and non static synchronized method can run simultaneously or concurrently because they lock on different object.
+
+12. From java 5 after change in Java memory model reads and writes are atomic for all variables declared using volatile keyword (including long and double variables) and simple atomic variable access is more efficient instead of accessing these variables via synchronized java code. But it requires more care and attention from the programmer to avoid memory consistency errors.
+
+13. Java synchronized code could result in deadlock or starvation while accessing by multiple thread if synchronization is not implemented correctly. To know how to avoid deadlock in java see here.
+
+14. According to the Java language specification you can not use Java synchronized keyword with constructor it’s illegal and result in compilation error. So you can not synchronized constructor in Java which seems logical because other threads cannot see the object being created until the thread creating it has finished it.
+
+15. You cannot apply java synchronized keyword with variables and can not use java volatile keyword with method.
+
+16. Java.util.concurrent.locks extends capability provided by java synchronized keyword for writing more sophisticated programs since they offer more capabilities e.g. Reentrancy and interruptible locks.
+
+17. Java synchronized keyword also synchronizes memory. In fact java synchronized synchronizes the whole of thread memory with main memory.
+
+18. Important method related to synchronization in Java are wait(), notify() and notifyAll() which is defined in Object class. Do you know, why they are defined in java.lang.object class instead of java.lang.Thread? You can find some reasons, which make sense.
+
+19. Do not synchronize on non final field on synchronized block in Java. because reference of non final field may change any time and then different thread might synchronizing on different objects i.e. no synchronization at all. example of synchronizing on non final field :
+
+ private String lock = new String("lock");
+synchronized(lock){
+    System.out.println("locking on :"  + lock);
+}
+
+any if you write synchronized code like above in java you may get warning "Synchronization on non-final field"  in IDE like Netbeans and InteliJ
+
+20. Its not recommended to use String object as lock in java synchronized block because string is immutable object and literal string and interned string gets stored in String pool. so by any chance if any other part of code or any third party library used same String as there lock then they both will be locked on same object despite being completely unrelated which could result in unexpected behavior and bad performance. instead of String object its advised to use new Object() for Synchronization in Java on synchronized block.
+private static final String LOCK = "lock";   //not recommended
+private static final Object OBJ_LOCK = new Object(); //better
+
+public void process() {
+   synchronized(LOCK) {
+      ........
+   }
+}
+
+21. From Java library Calendar and SimpleDateFormat classes are not thread-safe and requires external synchronization in Java to be used in multi-threaded environment.  
+
+
+Probably most important point about Synchronization in Java is that, in the absence of synchronized keyword or other construct e.g. volatile variable or atomic variable, compiler, JVM and hardware are free to make optimization, assumption, reordering or caching of code and data, which can cause subtle concurrency bugs in code. By introducing synchronization by using volatile, atomic variable or synchronized keyword, we instruct compiler and JVM to not to do that.
+
+Update 1: Recently I have been reading several Java Synchronization and Concurrency articles in internet and I come across jeremymanson's blog which works in google and has worked on JSR 133 Java Memory Model, I would recommend some of this blog post for every java developer, he has covered certain details about concurrent programming , synchronization and volatility in simple and easy to understand language, here is the link atomicity, visibility and ordering. 
+
+Update 2:  I am grateful to my readers, who has left some insightful comments on this post. They have shared lots of good information and experience and to provide them more exposure, I am including some of there comments on main article, to benefit new readers. 
+
+@Vikas wrote
+Good comprehensive article about synchronized keyword in Java. to be honest I have never read all these details about synchronized block or method at one place. you may want to highlight some limitation of synchronized keyword in Java which is addressed by explicit locking using new concurrent package and Lock interface :
+
+1. synchronized keyword doesn't allow separate locks for reading and writing. as we know that multiple thread can read without affecting thread-safety of class, synchronized keyword suffer performance due to contention in case of multiple reader and one or few writer.
+
+ 2. if one thread is waiting for lock then there is no way to time out, thread can wait indefinitely for lock.
+ 
+3. on similar note if thread is waiting for lock to acquired there is no way to interrupt the thread.
+ 
+All these limitation of synchronized keyword is addressed and resolved by using ReadWriteLock and ReentrantLock in Java 5. 
+
+@George wrote
+Just my 2 cents on your great list of Java Synchronization facts and best practices :
+ 
+1) synchronized keyword in internally implemented using two byte code instructions MonitorEnter and MonitorExit, this is generated by compiler. Compiler also ensures that there must be a MonitorExit for every MonitorEnter in different code path e.g. normal execution and abrupt execution, because of Exception.
+
+2) java.util.concurrent package different locking mechanism than provided by synchronized keyword, they mostly used ReentrantLock, which internally use CAS operations, volatile variables and atomic variables to get better performance.
+ 
+3) With synchronized keyword, you have to leave the lock, once you exist a synchronized method or block, there is no way you can take the lock to other method. java.util.concurrent.locks.ReentrantLock solves this problem by providing control for acquiring and releasing lock, which means you can acquire lock in method A and can release in method B, if they both needs to be locked in same object lock. Though this could be risky as compiler will neither check nor warn you about any accidental leak of locks. Which means, this can potentially block other threads, which are waiting for same lock.
+
+4) Prefer ReentrantLock over synchronized keyword, it provides more control on lock acquisition, lock release and better performance compared to synchronized keyword.
+ 
+5) Any thread trying to acquire lock using synchronized method will block indefinitely, until lock is available. Instead this, tryLock() method of java.util.concurrent.locks.ReentrantLock will not block if lock is not available.
+Having said that, I must say, lots of good information.
+
+
+
+Recommend Books to learn Synchronization and Concurrency in Java
+
+Synchronization and Concurrency is complex topic in Java and it's not easy to master them. Even more experienced Java developers struggle to write correct concurrent code in Java. I would highly recommend following Java books to master multi-threading, synchronization and Concurrency.
+Java Concurrency in Practice By Brian Goeatz and team
+Effective Java by Joshua Bloach
+Java Threads By Scott Oaks and Henry Wong
+
+
+Read more: http://javarevisited.blogspot.com/2011/04/synchronization-in-java-synchronized.html#ixzz3oza1WPHC
+
+
+------------------
+Though this could have many answers , my version is first I would look the code if I see nested synchronized block or calling one synchronized method from other or trying to get lock on different object then there is good chance of deadlock if developer is not very careful.
+
+Other way is to find it when you actually get locked while running the application , try to take thread dump , in Linux you can do this by command "kill -3" , this will print status of all the thread in application log file and you can see which thread is locked on which object.
+
+Other way is to use jconsole, it will show you exactly which threads are get locked and on which object.
+
+
+Write a Java program which will result in deadlock?
+
+Once you answer this , they may ask you to write code which will result in deadlock ?
+here is one of my version
+
+/**
+ * Java program to create a deadlock by imposing circular wait.
+ * 
+ * @author WINDOWS 8
+ *
+ */
+public class DeadLockDemo {
+
+    /*
+     * This method request two locks, first String and then Integer
+     */
+    public void method1() {
+        synchronized (String.class) {
+            System.out.println("Aquired lock on String.class object");
+
+            synchronized (Integer.class) {
+                System.out.println("Aquired lock on Integer.class object");
+            }
+        }
+    }
+
+    /*
+     * This method also requests same two lock but in exactly
+     * Opposite order i.e. first Integer and then String. 
+     * This creates potential deadlock, if one thread holds String lock
+     * and other holds Integer lock and they wait for each other, forever.
+     */
+    public void method2() {
+        synchronized (Integer.class) {
+            System.out.println("Aquired lock on Integer.class object");
+
+            synchronized (String.class) {
+                System.out.println("Aquired lock on String.class object");
+            }
+        }
+    }
+}
+
+If method1() and method2() both will be called by two or many threads , there is a good chance of deadlock because if thread 1 acquires lock on Sting object while executing method1() and thread 2 acquires lock on Integer object while executing method2() both will be waiting for each other to release lock on Integer and String to proceed further which will never happen.
+
+This diagram exactly demonstrate our program, where one thread holds lock on one object and waiting for other object lock which is held by other thread.
+
+How do you avoid deadlock in Java?
+
+
+How to avoid deadlock in Java?
+
+Now interviewer comes to final part, one of the most important in my view; How do you fix deadlock? or How to avoid deadlock in Java?
+
+If you have looked above code carefully then you may have figured out that real reason for deadlock is not multiple threads but the way they are requesting lock , if you provide an ordered access then problem will be resolved , here is my fixed version, which avoids deadlock by avoiding circular wait with no preemption.
+
+public class DeadLockFixed {
+
+    /**
+     * Both method are now requesting lock in same order, first Integer and then String.
+     * You could have also done reverse e.g. first String and then Integer,
+     * both will solve the problem, as long as both method are requesting lock
+     * in consistent order.
+     */
+    public void method1() {
+        synchronized (Integer.class) {
+            System.out.println("Aquired lock on Integer.class object");
+
+            synchronized (String.class) {
+                System.out.println("Aquired lock on String.class object");
+            }
+        }
+    }
+
+    public void method2() {
+        synchronized (Integer.class) {
+            System.out.println("Aquired lock on Integer.class object");
+
+            synchronized (String.class) {
+                System.out.println("Aquired lock on String.class object");
+            }
+        }
+    }
+}
+
+
+Now there would not be any deadlock because both methods are accessing lock on Integer and String class literal in same order. So, if thread A acquires lock on Integer object , thread B will not proceed until thread A releases Integer lock, same way thread A will not be blocked even if thread B holds String lock because now thread B will not expect thread A to release Integer lock to proceed further.
+
+Read more: http://javarevisited.blogspot.com/2010/10/what-is-deadlock-in-java-how-to-fix-it.html#ixzz3p1GJyPnp
+-------------------------------------
+hat's an Intrinsic lock OR a monitor lock in Java?
+
+An intrinsic lock, a monitor lock, or a monitor - all three refer to the same internal entity associated with every object in Java which enables the implementation of the Synchronization mechanism. This lock is used to enforce an exclusive and consistent access in Java as a monitor can be acquired by only one thread at a time.
+
+A thread needs to acquire the monitor of an appropriate object before entering a synchronized method/block which it releases when the thread returns from the method (or completes the block). The monitor is released even if an uncaught exception is thrown from the method/block.
+
+Synchronized methods vs Synchronized blocks
+
+These are the two ways of achieving synchronized access in Java. In Java, a method is also a block only, but we normally refer to a block as a part of the method definition. As we know that a thread needs to acquire an appropriate monitor (which it releases when the method returns) before entering any synchronized method/block, so we can easily figure out that in case of a synchronized method a thread may need to have the lock for a longer period of time as compared to that in case of synchronized block.
+
+Another difference is that we don't specify the particular object whose monitor is required to be obtained by a thread for entering a synchronized method whereas we can specify the particular object in case of a synchronized block.
+
+static synchronized method vs instance synchronized method
+
+When a thread needs to enter a static synchronized method, it acquires the monitor of the Class object associated with the particular class to which the static method belongs to whereas in case of a synchronized instance method, the thread requires to obtain the monitor of the particular object on which the method call is being made. Easy to understand the reason... right?
+
+Synchronization of static fields in an instance synchronized method
+
+As we just saw that a thread needs to acquire the monitor of the Class object of the class in case synchronized static method, but how can you handle the synchronization of static fields in instance methods?
+
+In Java, an instance method can access static fields as well (vice versa is not possible for the obvious reason), suppose a synchronized instance method having code accessing static fields, is being accessed on different objects by different threads (which is quite possible as each of the different threads would have acquired monitor of one of the different objects) then in such a case we can't guarantee a exclusive access to those static fields. The reason is very simple - a static field doesn't belong to an instance instead to the class and hence the access to it is not controlled by monitors associated with the instances of the class instead the access to them is controlled by the monitor of the Class object associated with the class. Hence, we need to be very careful in such scenarios and any synchronized instance method should have an explicit synchronized block for accessing static fields if the static fields require an exclusive access. This synchronized block can specify the Class object associated with the class and hence a thread which enters the synchronized instance method after acquiring the monitor of the particular instance will first need to acquire the monitor of the Class object as well before executing the code which accesses static fields. And this way we can guarantee exclusive access to the static fields accessed inside a synchronized instance method.
+---------------------------
+Avoid deadlock
+
+These are some of the guidelines using which we can avoid most of the deadlock situations.
+
+Avoid Nested Locks: This is the most common reason for deadlocks, avoid locking another resource if you already hold one. It’s almost impossible to get deadlock situation if you are working with only one object lock. For example, here is the another implementation of run() method without nested lock and program runs successfully without deadlock situation.
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+public void run() {
+    String name = Thread.currentThread().getName();
+    System.out.println(name + " acquiring lock on " + obj1);
+    synchronized (obj1) {
+        System.out.println(name + " acquired lock on " + obj1);
+        work();
+    }
+    System.out.println(name + " released lock on " + obj1);
+    System.out.println(name + " acquiring lock on " + obj2);
+    synchronized (obj2) {
+        System.out.println(name + " acquired lock on " + obj2);
+        work();
+    }
+    System.out.println(name + " released lock on " + obj2);
+ 
+    System.out.println(name + " finished execution.");
+}
+Lock Only What is Required: You should acquire lock only on the resources you have to work on, for example in above program I am locking the complete Object resource but if we are only interested in one of it’s fields, then we should lock only that specific field not complete object.
+Avoid waiting indefinitely: You can get deadlock if two threads are waiting for each other to finish indefinitely using thread join. If your thread has to wait for another thread to finish, it’s always best to use join with maximum time you want to wait for thread to finish.
+
+-------------------------------
+"
+Java ThreadLocal is used to create thread-local variables. We know that all threads of an Object share it’s variables, so if the variable is not thread safe, we can use synchronization but if we want to avoid synchronization, we can use ThreadLocal variables. Every thread has it’s own ThreadLocal variable and they can use it’s get() and set() methods to get the default value or change it’s value local to Thread. ThreadLocal instances are typically private static fields in classes that wish to associate state with a thread. 
+Check this post for small example program showing ThreadLocal Example.
+"
+Java ThreadLocal is used to create thread-local variables. We know that all threads of an Object share it’s variables, so if the variable is not thread safe, we can use synchronization but if we want to avoid synchronization, we can use ThreadLocal variables.
+
+Every thread has it’s own ThreadLocal variable and they can use it’s get() and set() methods to get the default value or change it’s value local to Thread. ThreadLocal instances are typically private static fields in classes that wish to associate state with a thread.
+
+Here is a small example showing use of ThreadLocal and proving that every thread has it’s own copy of ThreadLocal variable.
+
+ThreadLocalExample
+
+package com.journaldev.threads;
+ 
+import java.text.SimpleDateFormat;
+import java.util.Random;
+ 
+public class ThreadLocalExample implements Runnable{
+ 
+    // SimpleDateFormat is not thread-safe, so give one to each thread
+ // SimpleDateFormat is not thread-safe, so give one to each thread
+    private static final ThreadLocal<SimpleDateFormat> formatter = new ThreadLocal<SimpleDateFormat>(){
+        @Override
+        protected SimpleDateFormat initialValue()
+        {
+            return new SimpleDateFormat("yyyyMMdd HHmm");
+        }
+    };
+     
+    public static void main(String[] args) throws InterruptedException {
+        ThreadLocalExample obj = new ThreadLocalExample();
+        for(int i=0 ; i<10; i++){
+            Thread t = new Thread(obj, ""+i);
+            Thread.sleep(new Random().nextInt(1000));
+            t.start();
+        }
+    }
+ 
+    @Override
+    public void run() {
+        System.out.println("Thread Name= "+Thread.currentThread().getName()+" default Formatter = "+formatter.get().toPattern());
+        try {
+            Thread.sleep(new Random().nextInt(1000));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+         
+        formatter.set(new SimpleDateFormat());
+         
+        System.out.println("Thread Name= "+Thread.currentThread().getName()+" formatter = "+formatter.get().toPattern());
+    }
+ 
+}
+Output of the above program is:
+
+Thread Name= 0 default Formatter = yyyyMMdd HHmm
+Thread Name= 1 default Formatter = yyyyMMdd HHmm
+Thread Name= 0 formatter = M/d/yy h:mm a
+Thread Name= 2 default Formatter = yyyyMMdd HHmm
+Thread Name= 1 formatter = M/d/yy h:mm a
+Thread Name= 3 default Formatter = yyyyMMdd HHmm
+Thread Name= 4 default Formatter = yyyyMMdd HHmm
+Thread Name= 4 formatter = M/d/yy h:mm a
+Thread Name= 5 default Formatter = yyyyMMdd HHmm
+Thread Name= 2 formatter = M/d/yy h:mm a
+Thread Name= 3 formatter = M/d/yy h:mm a
+Thread Name= 6 default Formatter = yyyyMMdd HHmm
+Thread Name= 5 formatter = M/d/yy h:mm a
+Thread Name= 6 formatter = M/d/yy h:mm a
+Thread Name= 7 default Formatter = yyyyMMdd HHmm
+Thread Name= 8 default Formatter = yyyyMMdd HHmm
+Thread Name= 8 formatter = M/d/yy h:mm a
+Thread Name= 7 formatter = M/d/yy h:mm a
+Thread Name= 9 default Formatter = yyyyMMdd HHmm
+Thread Name= 9 formatter = M/d/yy h:mm a
+As you can see from the output that Thread-0 has changed the value of formatter but still thread-2 default formatter is same as the initialized value.
+
+Update: ThreadLocal class is extend in Java 8 with a new method withInitial() that takes Supplier functional interface as argument. So we can use lambda expressions to easily create the ThreadLocal instance. For example, above formatter ThreadLocal variable can be defined in one line as below:
+
+
+private static final ThreadLocal<SimpleDateFormat> formatter = 
+    ThreadLocal.<SimpleDateFormat>withInitial
+    (() -> {return new SimpleDateFormat("yyyyMMdd HHmm");});
+----------------------
+
+Synchronized uses intrinsic locks or monitors. Every object in Java has an intrinsic lock associated with it. Whenever a thread tries to access a synchronized block or method, it acquires the intrinsic lock or the monitor on that object. In case of static methods, the thread acquires the lock over the class object. An intrinsic locking mechanism is a clean approach in terms of writing code, and is pretty good for most of the use-cases. So why do we need the additional feature of explicit locks? Let's discuss.
+
+An intrinsic locking mechanism can have some functional limitations, such as:
+
+
+###########################
+A race condition is a special condition that may occur inside a critical section. A critical section is a section of code that is executed by multiple threads and where the sequence of execution for the threads makes a difference in the result of the concurrent execution of the critical section.
+
+When the result of multiple threads executing a critical section may differ depending on the sequence in which the threads execute, the critical section is said to contain a race condition. The term race condition stems from the metaphor that the threads are racing through the critical section, and that the result of that race impacts the result of executing the critical section.
+
+This may all sound a bit complicated, so I will elaborate more on race conditions and critical sections in the following sections.
+
+Critical Sections
+
+Running more than one thread inside the same application does not by itself cause problems. The problems arise when multiple threads access the same resources. For instance the same memory (variables, arrays, or objects), systems (databases, web services etc.) or files.
+
+In fact, problems only arise if one or more of the threads write to these resources. It is safe to let multiple threads read the same resources, as long as the resources do not change.
+
+Here is a critical section Java code example that may fail if executed by multiple threads simultaneously:
+
+  public class Counter {
+
+     protected long count = 0;
+
+     public void add(long value){
+         this.count = this.count + value;
+     }
+  }
+Imagine if two threads, A and B, are executing the add method on the same instance of the Counter class. There is no way to know when the operating system switches between the two threads. The code in the add() method is not executed as a single atomic instruction by the Java virtual machine. Rather it is executed as a set of smaller instructions, similar to this:
+
+Read this.count from memory into register.
+Add value to register.
+Write register to memory.
+Observe what happens with the following mixed execution of threads A and B:
+
+       this.count = 0;
+
+   A:  Reads this.count into a register (0)
+   B:  Reads this.count into a register (0)
+   B:  Adds value 2 to register
+   B:  Writes register value (2) back to memory. this.count now equals 2
+   A:  Adds value 3 to register
+   A:  Writes register value (3) back to memory. this.count now equals 3
+The two threads wanted to add the values 2 and 3 to the counter. Thus the value should have been 5 after the two threads complete execution. However, since the execution of the two threads is interleaved, the result ends up being different.
+
+In the execution sequence example listed above, both threads read the value 0 from memory. Then they add their i ndividual values, 2 and 3, to the value, and write the result back to memory. Instead of 5, the value left in this.count will be the value written by the last thread to write its value. In the above case it is thread A, but it could as well have been thread B.
+
+Race Conditions in Critical Sections
+
+The code in the add() method in the example earlier contains a critical section. When multiple threads execute this critical section, race conditions occur.
+
+More formally, the situation where two threads compete for the same resource, where the sequence in which the resource is accessed is significant, is called race conditions. A code section that leads to race conditions is called a critical section.
+
+Preventing Race Conditions
+
+To prevent race conditions from occurring you must make sure that the critical section is executed as an atomic instruction. That means that once a single thread is executing it, no other threads can execute it until the first thread has left the critical section.
+
+Race conditions can be avoided by proper thread synchronization in critical sections. Thread synchronization can be achieved using a synchronized block of Java code. Thread synchronization can also be achieved using other synchronization constructs like locks or atomic variables like java.util.concurrent.atomic.AtomicInteger.
+
+Critical Section Throughput
+
+For smaller critical sections making the whole critical section a synchronized block may work. But, for larger critical sections it may be beneficial to break the critical section into smaller critical sections, to allow multiple threads to execute each a smaller critical section. This may decrease contention on the shared resource, and thus increase throughput of the total critical section.
+
+Here is a very simplified Java code example to show what I mean:
+
+public class TwoSums {
+    
+    private int sum1 = 0;
+    private int sum2 = 0;
+    
+    public void add(int val1, int val2){
+        synchronized(this){
+            this.sum1 += val1;   
+            this.sum2 += val2;
+        }
+    }
+}
+Notice how the add() method adds values to two different sum member variables. To prevent race conditions the summing is executed inside a Java synchronized block. With this implementation only a single thread can ever execute the summing at the same time.
+
+However, since the two sum variables are independent of each other, you could split their summing up into two separate synchronized blocks, like this:
+
+public class TwoSums {
+    
+    private int sum1 = 0;
+    private int sum2 = 0;
+    
+    public void add(int val1, int val2){
+        synchronized(this){
+            this.sum1 += val1;   
+        }
+        synchronized(this){
+            this.sum2 += val2;
+        }
+    }
+}
+Now two threads can execute the add() method at the same time. One thread inside the first synchronized block, and another thread inside the second synchronized block. This way threads will have to wait less for each other to execute the add() method.
+
+This example is very simple, of course. In a real life shared resource the breaking down of critical sections may be a whole lot more complicated, and require more analysis of execution order possibilities.
+######################
+
+
+
+1.) It is not possible to interrupt a thread waiting to acquire a lock (lock Interruptibly).
+
+2.) It is not possible to attempt to acquire a lock without being willing to wait for it forever (try lock).
+
+3.) Cannot implement non-block-structured locking disciplines, as intrinsic locks must be released in the same block in which they are acquired.___________
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
+
+	synchronized block are reentrant in nature i.e if a thread has lock on the monitor object and if another synchronized block requires to have the lock on the same monitor object then thread can enter that code block. I think this is the reason for the class name to be ReentrantLock. Let’s understand this feature with a simple example.
+
+Lock vs synchronized
+
+Based on above details and program, we can easily conclude following differences between Lock and synchronization.
+
+Lock provides more visibility and options for locking, unlike synchronized where a thread might end up waiting indefinitely for the lock, we can use tryLock() to make sure thread waits for specific time only.
+Synchronization code is much cleaner and easy to maintain whereas with Lock we are forced to have try-finally block to make sure Lock is released even if some exception is thrown between lock() and unlock() method calls.
+synchronization blocks or methods can cover only one method whereas we can acquire the lock in one method and release it in another method with Lock API.
+synchronized keyword doesn’t provide fairness whereas we can set fairness to true while creating ReentrantLock object so that longest waiting thread gets the lock first.
+We can create different conditions for Lock and different thread can await() for different conditions.

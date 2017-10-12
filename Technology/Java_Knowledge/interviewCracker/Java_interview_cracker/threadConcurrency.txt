@@ -1,0 +1,367 @@
+
+Some important interfaces and classes in Java Concurrency Lock API are:
+
+1.   Lock:
+		This is the base interface for Lock API. It provides all the features of synchronized keyword with additional         ways 	to create different Conditions for locking, providing timeout for thread to wait for lock. Some of the important methods are lock() to acquire the lock, unlock() to release the lock, tryLock() to wait for lock for a certain period of time, newCondition() to create the Condition etc.
+2. Condition: 
+	Condition objects are similar to Object wait-notify model with additional feature to create different sets of wait. A Condition object is always created by Lock object. Some of the important methods are await() that is similar to wait() and signal(), signalAll() that is similar to notify() and notifyAll() methods.
+3. ReadWriteLock: 
+	It contains a pair of associated locks, one for read-only operations and another one for writing. The read lock may be held simultaneously by multiple reader threads as long as there are no writer threads. The write lock is exclusive.
+4. ReentrantLock: 
+	This is the most widely used implementation class of Lock interface. This class implements the Lock interface in similar way as synchronized keyword. Apart from Lock interface implementation, ReentrantLock contains some utility methods to get the thread holding the lock, threads waiting to acquire the lock etc.
+
+the high-level concurrency features introduced with version 5.0 of the Java platform. Most of these features are implemented in the new java.util.concurrent packages. There are also new concurrent data structures in the Java Collections Framework.
+
+1. Lock objects support locking idioms that simplify many concurrent applications.
+2. Executors define a high-level API for launching and managing threads.
+	Executor implementations provided by java.util.concurrent provide thread pool management suitable for large-scale applications.
+3. Concurrent collections make it easier to manage large collections of data, and can greatly reduce the need for synchronization.
+4.Atomic variables have features that minimize synchronization and help avoid memory consistency errors.
+5. ThreadLocalRandom (in JDK 7) provides efficient generation of pseudorandom numbers from multiple threads.
+
+Lock Objects
+
+Synchronized code relies on a simple kind of reentrant lock. This kind of lock is easy to use, but has many limitations. More sophisticated locking idioms are supported by the java.util.concurrent.locks package. We won't examine this package in detail, but instead will focus on its most basic interface, Lock.
+
+Lock objects work very much like the implicit locks used by synchronized code. As with implicit locks, only one thread can own a Lock object at a time. Lock objects also support a wait/notify mechanism, through their associated Condition objects.
+
+The biggest advantage of Lock objects over implicit locks is their ability to back out of an attempt to acquire a lock. The tryLock method backs out if the lock is not available immediately or before a timeout expires (if specified). The lockInterruptibly method backs out if another thread sends an interrupt before the lock is acquired.
+
+Lprivate final Lock lock = new ReentrantLock();
+Boolean myLock = false;
+            Boolean yourLock = false;
+            try {
+                myLock = lock.tryLock();
+                yourLock = bower.lock.tryLock();
+            } finally {
+                if (! (myLock && yourLock)) {
+                    if (myLock) {
+                        lock.unlock();
+                    }
+                    if (yourLock) {
+                        bower.lock.unlock();
+                    }
+                }
+            }
+			
+----Executors----
+
+In all of the previous examples, there's a close connection between the task being done by a new thread, as defined by its Runnable object, and the thread itself, as defined by a Thread object. This works well for small applications, but in large-scale applications, it makes sense to separate thread management and creation from the rest of the application. Objects that encapsulate these functions are known as executors. The following subsections describe executors in detail.
+
+Executor Interfaces define the three executor object types.
+	Thread Pools are the most common kind of executor implementation.
+	Fork/Join is a framework (new in JDK 7) for taking advantage of multiple processors.
+	Executor Interfaces
+
+The java.util.concurrent package defines three executor interfaces:
+
+	1.Executor, a simple interface that supports launching new tasks.
+	2.ExecutorService, a subinterface of Executor, which adds features that help manage the lifecycle, both of the individual tasks and of the executor itself.
+	3. ScheduledExecutorService, a subinterface of ExecutorService, supports future and/or periodic execution of tasks.
+	Typically, variables that refer to executor objects are declared as one of these three interface types, not with an executor class type.
+
+----The Executor Interface----
+
+The Executor interface provides a single method, execute, designed to be a drop-in replacement for a common thread-creation idiom. If r is a Runnable object, and e is an Executor object you can replace
+
+(new Thread(r)).start();
+with
+
+e.execute(r);
+
+Example :
+ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        for(int i=0; i<5; i++) {
+            executor.execute(new Processor(i));
+        }
+
+However, the definition of execute is less specific. The low-level idiom creates a new thread and launches it immediately. Depending on the Executor implementation, execute may do the same thing, but is more likely to use an existing worker thread to run r, or to place r in a queue to wait for a worker thread to become available. (We'll describe worker threads in the section on Thread Pools.)
+
+The executor implementations in java.util.concurrent are designed to make full use of the more advanced ExecutorService and ScheduledExecutorService interfaces, although they also work with the base Executor interface.
+
+The ExecutorService Interface
+
+The ExecutorService interface supplements execute with a similar, but more versatile submit method. Like execute, submit accepts Runnable objects, but also accepts Callable objects, which allow the task to return a value. The submit method returns a Future object, which is used to retrieve the Callable return value and to manage the status of both Callable and Runnable tasks.
+
+ExecutorService also provides methods for submitting large collections of Callable objects. Finally, ExecutorService provides a number of methods for managing the shutdown of the executor. To support immediate shutdown, tasks should handle interrupts correctly.
+
+The ScheduledExecutorService Interface
+
+The ScheduledExecutorService interface supplements the methods of its parent ExecutorService with schedule, which executes a Runnable or Callable task after a specified delay. In addition, the interface defines ***scheduleAtFixedRate**** and ***scheduleWithFixedDelay****, which executes specified tasks repeatedly, at defined intervals.
+
+ExecutorService vs ThreadPoolExecutor:
+
+Here is the source of Executors.newFixedThreadPool:
+
+ public static ExecutorService newFixedThreadPool(int nThreads) {
+    return new ThreadPoolExecutor(nThreads, nThreads,
+                                  0L, TimeUnit.MILLISECONDS,
+                                  new LinkedBlockingQueue<Runnable>());
+}
+It internally uses ThreadPoolExecutor class with default configuration as you can see above
+
+
+Executors::
+Factory and utility methods for Executor, ExecutorService, ScheduledExecutorService, ThreadFactory, and Callable classes defined in this package. This class supports the following kinds of methods:
+Methods that create and return an ExecutorService set up with commonly useful configuration settings.
+Methods that create and return a ScheduledExecutorService set up with commonly useful configuration settings.
+Methods that create and return a "wrapped" ExecutorService, that disables reconfiguration by making implementation-specific methods inaccessible.
+Methods that create and return a ThreadFactory that sets newly created threads to a known state.
+Methods that create and return a Callable out of other closure-like forms, so they can be used in execution methods requiring Callable.
+
+1) static ExecutorService	newFixedThreadPool(int nThreads)
+Creates a thread pool that reuses a fixed number of threads operating off a shared unbounded queue.
+2)static ExecutorService	newCachedThreadPool()
+Creates a thread pool that creates new threads as needed, but will reuse previously constructed threads when they are available.
+3)static ScheduledExecutorService	newScheduledThreadPool(int corePoolSize)
+Creates a thread pool that can schedule commands to run after a given delay, or to execute periodically.
+4) static ExecutorService	newSingleThreadExecutor()
+Creates an Executor that uses a single worker thread operating off an unbounded queue.
+5)static ScheduledExecutorService	newSingleThreadScheduledExecutor()
+Creates a single-threaded executor that can schedule commands to run after a given delay, or to execute periodically.
+6)
+
+Thread Pools :::
+----------------
+
+Most of the executor implementations in java.util.concurrent use thread pools, which consist of worker threads. This kind of thread exists separately from the Runnable and Callable tasks it executes and is often used to execute multiple tasks.
+
+Using worker threads minimizes the overhead due to thread creation. Thread objects use a significant amount of memory, and in a large-scale application, allocating and deallocating many thread objects creates a significant memory management overhead.
+
+One common type of thread pool is the fixed thread pool. This type of pool always has a specified number of threads running; if a thread is somehow terminated while it is still in use, it is automatically replaced with a new thread. Tasks are submitted to the pool via an internal queue, which holds extra tasks whenever there are more active tasks than threads.
+
+An important advantage of the fixed thread pool is that applications using it degrade gracefully. To understand this, consider a web server application where each HTTP request is handled by a separate thread. If the application simply creates a new thread for every new HTTP request, and the system receives more requests than it can handle immediately, the application will suddenly stop responding to all requests when the overhead of all those threads exceed the capacity of the system. With a limit on the number of the threads that can be created, the application will not be servicing HTTP requests as quickly as they come in, but it will be servicing them as quickly as the system can sustain.
+
+A simple way to create an executor that uses a fixed thread pool is to invoke the newFixedThreadPool factory method in java.util.concurrent.Executors This class also provides the following factory methods:
+
+The newCachedThreadPool method creates an executor with an expandable thread pool. This executor is suitable for applications that launch many short-lived tasks.
+The newSingleThreadExecutor method creates an executor that executes a single task at a time.
+Several factory methods are ScheduledExecutorService versions of the above executors.
+If none of the executors provided by the above factory methods meet your needs, constructing instances of java.util.concurrent.ThreadPoolExecutor or java.util.concurrent.ScheduledThreadPoolExecutor will give you additional options.
+
+-------------------
+
+The interface ExecutorService extends Executor and provides methods to manage the lifecycle of an Executor like:
+
+means to termination of an Executor,
+
+methods that can produce a Future etc.
+
+Note: A Future object can be used for tracking the progress of one or more asynchronous tasks. 
+
+ 
+Important Lifecycle Methods of ExecutorService
+
+1)Method submit extends base method Executor.execute(java.lang.Runnable) by creating and returning a Future that can be used to cancel execution and/or wait for completion. 
+
+2) Methods invokeAny and invokeAll execute a collection of tasks and then wait for at least one, or all, to complete, respectively.  
+
+3) An ExecutorService can be shut down, which will cause it to reject new tasks. The shutdown() method will allow previously submitted tasks to execute before terminating, while the shutdownNow() method prevents waiting tasks from starting and attempts to even stop currently executing tasks. Tasks submitted to an ExecutorService after it has been shut down are handled by the rejected execution handler, which  might  discard  the  task  or  might  cause  execute  to  throw  the  unchecked RejectedExecutionException.  
+
+4)Once  all  tasks  have  completed, the  ExecutorService  transitions  to  the  terminated state. The awaitTermination(long timeout, TimeUnit unit) method blocks until all tasks have completed execution after a shutdown request, or the timeout occurs, or the current thread is interrupted.
+
+5)The isShutdown() and isTerminated() methods returns true if this executor has been shut down or if  executor is in terminated state, respectively.
+
+===================
+
+
+========================================
+CompletionService
+A service that decouples the production of new asynchronous tasks from the consumption of the results of completed tasks. Producers submit tasks for execution. Consumers take completed tasks and process their results in the order they complete. A CompletionService can for example be used to manage asynchronous I/O, in which tasks that perform reads are submitted in one part of a program or system, and then acted upon in a different part of the program when the reads complete, possibly in a different order than they were requested.
+Typically, a CompletionService relies on a separate Executor to actually execute the tasks, in which case the CompletionService only manages an internal completion queue. The ExecutorCompletionService class provides an implementation of this approach.
+
+A CompletionService that uses a supplied Executor to execute tasks. This class arranges that submitted tasks are, upon completion, placed on a queue accessible using take. The class is lightweight enough to be suitable for transient use when processing groups of tasks.
+
+Everyone is talking about the future of Java, we continue our journey explaining Future<T> interface in Java. ExecutorCompletionService wrapper class tries to address one of the biggest deficiencies of Future<T> type - no support for callbacks or any event-driven behaviour whatsoever. Let's go back for a moment to our sample asynchronous task downloading contents of a given URL:
+
+final ExecutorService pool = Executors.newFixedThreadPool(10);
+pool.submit(new Callable<String>() {
+    @Override
+    public String call() throws Exception {
+        try (InputStream input = url.openStream()) {
+            return IOUtils.toString(input, StandardCharsets.UTF_8);
+        }
+    }
+});
+ Having such code we can easily write a simple web search engine/crawler, examining several URLs concurrently:
+
+        final List<String> topSites = Arrays.asList(
+"www.google.com", "www.youtube.com", "www.yahoo.com", "www.msn.com",
+        "www.wikipedia.org", "www.baidu.com", "www.microsoft.com", "www.qq.com",
+        "www.bing.com", "www.ask.com", "www.adobe.com", "www.taobao.com",
+        "www.youku.com", "www.soso.com", "www.wordpress.com", "www.sohu.com",
+        "www.windows.com", "www.163.com", "www.tudou.com", "www.amazon.com"
+);
+ 
+final ExecutorService pool = Executors.newFixedThreadPool(5);
+List<Future<String>> contentsFutures = new ArrayList<>(topSites.size());
+for (final String site : topSites) {
+    final Future<String> contentFuture = pool.submit(new Callable<String>() {
+        @Override
+        public String call() throws Exception {
+            return IOUtils.toString(new URL("http://" + site), StandardCharsets.UTF_8);
+        }
+    });
+    contentsFutures.add(contentFuture);
+}
+ As easy as that. We simply submit separate task for each web site to a pool and wait for results. To achieve that we collect all Future<String> objects into a collection and iterate through them:
+
+for (Future<String> contentFuture : contentsFutures) {
+    final String content = contentFuture.get();
+    //...process contents
+}
+Each call to contentFuture.get() waits until downloading given web site (remember that each Future represent one site) is finished. This works, but has a major bottleneck. Imagine you have as many threads in a pool as tasks (20 sites in that case). I think it's understandable that you want to start processing contents of web sites as soon as they arrive, no matter which one is first. Response times vary greatly so don't be surprised to find some web sites responding within a second while others need even 20 seconds. But here's the problem: after submitting all the tasks we block on an arbitrary Future<T>. There is no guarantee that this Future will complete first. It is very likely that other Future objects already completed and are ready for processing but we keep hanging on that arbitrary, first Future. In worst case scenario, if the first submitted page is slower by an order of magnitude compared to all the others, all the results except the first one are ready for processing and idle, while we keep waiting for the first one.
+
+The obvious solution would be to sort web sites from fastest to slowest and submit them in that order. Then we would be guaranteed that Futures complete in the order in which we submitted them. But this is impractical and almost impossible in real life due to dynamic nature of web.
+
+This is where ExecutorCompletionService steps in. It is a thin wrapper around ExecutorService that "remembers" all submitted tasks and allows you to wait for the first completed, as opposed to first submitted task. In a way ExecutorCompletionService keeps a handle to all intermediate Future objects and once any of them finishes, it's returned. Crucial API method is CompletionService.take() that blocks and waits for any underlying Future to complete. Here is the submit step with ExecutorCompletionService:
+
+final ExecutorService pool = Executors.newFixedThreadPool(5);
+final ExecutorCompletionService<String> completionService = new ExecutorCompletionService<>(pool);
+for (final String site : topSites) {
+    completionService.submit(new Callable<String>() {
+        @Override
+        public String call() throws Exception {
+            return IOUtils.toString(new URL("http://" + site), StandardCharsets.UTF_8);
+        }
+    });
+}
+ Notice how we seamlessly switched to completionService. Now the retrieval step:
+
+for(int i = 0; i < topSites.size(); ++i) {
+    final Future<String> future = completionService.take();
+    try {
+        final String content = future.get();
+        //...process contents
+    } catch (ExecutionException e) {
+        log.warn("Error while downloading", e.getCause());
+    }
+}
+You might be wondering why we need an extra counter? Unfortunately ExecutorCompletionService doesn't tell you how many Future objects are still there waiting so you must remember how many times to call take().
+
+This solution feels much more robust. We process responses immediately when they are ready. take() blocks until fastest task still running finishes. And if processing takes a little bit longer and multiple responses finished, subsequent call to take() will return immediately. It's fun to observe the program when number of pool threads is as big as the number of tasks so that we begin downloading each site at the same time. You can easily see which websites have shortest response time and which respond very slowly.
+
+ExecutorCompletionService seems wonderful, but in fact it is quite limited. You cannot use it with arbitrary collection of Future objects which you happened to obtain somehow. It works only with Executor abstraction. Also there is no built in support for processing incoming results concurrently as well. If we want to parse results concurrently, we need to manually submit them to a second thread pool. In the next few articles I will show you more powerful constructs that mitigate these disadvantages.  
+
+ExecutorService vs ExecutorCompletionService:
+
+Suppose task B finished first followed by task C. But task A was still going on. In that case when using ExecutorService the for loop would be waiting for the result of task A to be available. So in case of ExecutorService tasks will be processed in the same order in which they were submitted.
+
+But in later case the tasks will be processed in order the result becomes available, the order tasks are completed. One interesting example is where we want to download some file which can be downloaded from various mirrors. In that case we can quickly get the response from the server which is located closest to us. In that case we can get the first available result and discard the others. 
+
+
+=========================================
+
+ ------
+ Drawbacks with Futures and Callbacks
+
+The Future interface is limited as a model of asynchronously executed tasks. While Future allows a client to query a Callable task for its result, it does not provide the option to register a callback method, which would allow to notified once a task is done. In Java 5 you could use ExecutorCompletionService for this purpose but as of Java 8 you can use the CompletableFuture interface which allows to provide a callback interface which is called once a task is completed.
+CompletableFuture
+
+CompletableFuture extends the functionality of the Future interface with the possibility to notify callbacks once a task is done. This callback can be executed in another thread as the thread in which the CompletableFuture is executed.
+
+CompletableFutures
+
+CompletableFutures were introduced in Java 8 (2014). Completable futures are in fact an evolution of regular Futures, inspired by Google's Listenable Futures, part of the Guava libary. They are Futures that also allow you to string tasks together in a chain. You can use them to tell some worker thread to "go do some task X, and when you're done, go do this other thing using the result of X". Here's a simple example:
+
+/**
+* A supplier that sleeps for a second, and then returns one
+**/
+public static class MySupplier implements Supplier<Integer> {
+
+    @Override
+    public Integer get() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            //Do nothing
+        }
+        return 1;
+    }
+}
+
+/**
+* A (pure) function that adds one to a given Integer
+**/
+public static class PlusOne implements Function<Integer, Integer> {
+
+    @Override
+    public Integer apply(Integer x) {
+        return x + 1;
+    }
+}
+
+public static void main(String[] args) throws Exception {
+    ExecutorService exec = Executors.newSingleThreadExecutor();
+    CompletableFuture<Integer> f = CompletableFuture.supplyAsync(new MySupplier(), exec);
+    System.out.println(f.isDone()); // False
+    CompletableFuture<Integer> f2 = f.thenApply(new PlusOne());
+    System.out.println(f2.get()); // Waits until the "calculation" is done, then prints 2
+}
+==========================--------------------9################################
+1. Implementations of ReadWriteLock
+	ReadWriteLock is implemented by ReentrantReadWriteLock Class in java.util.concurrent.locks package.Multiple Threads can acquire multiple read Locks, but only a single Thread can acquire mutually-exclusive write Lock .Other threads requesting readLocks have to wait till the write Lock is released. A thread is allowed to degrade from write lock to read lock but not vice-versa. Allowing a read thread to upgrade would lead to a deadlock as more than one thread can try to upgrade its lock. The ReentrantReadWriteLock also supports all the features of the Reentrant lock like providing fair mechanism ,reentrantLocks, Condition Support (on a write Lock only), allowing interruption on read as well as write Locks.
+An example below demonstrating how the ReentrantReadWriteLock class can be used.
+ThreadSafeArrayList.java:
+
+package com.jcg.examples;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+public class ThreadSafeArrayList<E>
+{
+private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+ private final Lock readLock = readWriteLock.readLock();
+private final Lock writeLock = readWriteLock.writeLock();
+private final List<E> list = new ArrayList<>();
+ public void set(E o)
+  {
+    writeLock.lock();
+   try
+       {
+          list.add(o);
+          System.out.println("Adding element by thread"+Thread.currentThread().getName());
+            }
+        finally
+        {
+           writeLock.unlock();
+        }
+    }
+ public E get(int i)
+  {
+   readLock.lock();
+       try
+       {
+                       System.out.println("Printing elements by thread"+Thread.currentThread().getName());
+            return list.get(i);
+        }
+        finally
+        {readLock.unlock();}}
+ public static void main(String[] args)
+
+      {
+
+           ThreadSafeArrayList<String> threadSafeArrayList = new ThreadSafeArrayList<>();
+  threadSafeArrayList.set("1");
+ threadSafeArrayList.set("2");
+threadSafeArrayList.set("3");
+System.out.println("Printing the First Element : "+threadSafeArrayList.get(1));
+     }
+}
+OUTPUT :
+1
+Adding element by threadmain
+2
+Adding element by threadmain
+3
+Adding element by threadmain
+4
+Printing elements by threadmain
+5
+Reading from List : 2
+2. Closing words
+ReadWriteLocks offer greater level of concurrency as compared to traditional mutually-exclusive locks. However, this lock performs best when there are more readLocks required as compared to writeLocks. Using ReadWriteLocks without properly understanding its benefits and trade-offs may hamper the application throughput.

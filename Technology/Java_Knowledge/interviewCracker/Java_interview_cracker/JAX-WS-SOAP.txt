@@ -1,0 +1,80 @@
+SOAP :
+======
+
+
+1. WSDL File : wsdl has following elements
+	->Types
+	->message
+	->portType 
+	->binding
+	->service
+ consider below example :
+ 
+ @webservice
+ public class ProductCatalog{
+ 
+	 @webmethod
+	 public List<String> getProductCategories(){
+	 return Arrays.asList({a,b,c});
+	 }
+ }
+ 
+ WSDL file :
+ ->portType : it's webservice endpoint name, and it has all the operations which it has.
+				 for an operation, there would be two types, input, & output types.
+				 why there is only one input??
+				 if there are any arguments in a method, they bundle together into a message.
+				 every method takes one message as input and other as output.
+				 
+				 they are tagged under <message> in the WSDL
+				 
+-->message: input & output of the messages, if there is no input param of the method, method name would be type of param
+ --> Types : it'll tell you the types of Inputs to the operation.(message), each message refers to types.
+ 
+ -->binding:how webservice accepts soap request. ex : http
+ 
+ ->service : it's list of ports, the address of the service
+ 
+2. Customing the WSDL :
+
+<definition targetNamespace="" name="productCatalogService">
+@webservice(name="testmartcatalog" portName="" ,serviceName="TestmartService" , targetNamespace="http://www.testmart.org")
+ "name" is  refers portType,it's endpoint
+ "serviceName" is referes name in definition tag, which is service to access wsdl
+ "targetNamespace" ,its package name in xml world.
+ 3. how to access WSDL :
+ 
+ serverName:port/context/endpointService?wsdl
+ 
+ 3. schema types & binding  styles :
+ -----------------------------------
+ <types>
+ <xsd:schema>
+ <xsd:import="package of webservice endpoint " schemaLocation=" location of your operation such as input/ouput of your operaions in xsd format ">
+ </xsd:schema>
+ </types>
+ 
+ @SOAPBinding :at webservice endpoint level
+ -----------
+ it refers to the the binding section of wsdl. it talks about Operation ,input and output .
+ 
+@SOAPBinding (style='Style.Document(default) | Style.RPC'):
+
+then <types> will be empty. and your message tags, now not referring to any external xsd.
+"When RPC style is used, no schema gets generated for types".
+
+here RPC is a just style,it still uses SOAP.
+
+@webparam(partName="lookupInput") : it at method param name , it'll use given in name in wsdl rather than using defaults name.
+similarly for @webresults
+
+RPC Vs Document :
+
+Document: it can validate against xsd
+RPC : it loose the advantage of xsd validation
+
+Document is recommended,sothat SOAP request/response can be validated by XSD
+
+Service interface & custom types :
+----------------------------------
+
