@@ -1,0 +1,74 @@
+Spring Boot:
+------------
+ A)Spring boot app can be started in one of below ways.
+  a) Spring initializer    b) Spring boot CLI    c) STS IDE
+  
+ B) Configuration
+
+
+1.  @SpringBootApplication :
+   The @SpringBootApplication annotation is equivalent to using @Configuration, @EnableAutoConfiguration and @ComponentScan with their default attributes.
+   @SpringBootApplication // same as @Configuration @EnableAutoConfiguration @ComponentScan
+   public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+		//Sets default configuration
+	//Starts  Spring application context
+	//performs classpath scan
+	//start tomcat embedded container
+    }
+
+   }
+ 2.Disabling restart :
+ public static void main(String[] args) {
+    System.setProperty("spring.devtools.restart.enabled", "false");
+    SpringApplication.run(MyApp.class, args);
+}
+3.application.properties
+	it's for tomcat custom configuration.
+4. To make Spring boot application ready for war deployment to Java EE containers.
+
+Spring boot application should extend SpringBootServletInitializer
+
+@SpringBootApplication
+public class CourseApiApp extends SpringBootServletInitializer{
+
+	public static void main(String[] args) {
+	SpringApplication.run(CourseApiApp.class, args);
+	//Sets default configuration
+	//Starts  Spring application context
+	//performs classpath scan
+	//start tomcat embedded container
+	
+	}
+	
+	 @Override
+	    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+	        return application.sources(CourseApiApp.class);
+	    }
+
+}
+
+5. Spring actuator :
+--------------------
+
+Spring Boot Actuator is a sub-project of Spring Boot. It adds several production grade services to your application with little effort on your part. 
+
+**IMP***********used to check health to the api.*********
+
+6> How to configure XMLs in Spring boot application.
+
+
+Use @ImportResource to Import XML Configuration
+
+
+@SpringBootApplication
+@ImportResource("classpath:app-config.xml")
+public class MyApplication {  
+	public static void main(String[] args) {
+		SpringApplication.run(MyApplication.class, args);
+        }       
+} 
+
+7)
