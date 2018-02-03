@@ -1,0 +1,1 @@
+gemfire stop-locator

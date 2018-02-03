@@ -1,0 +1,1 @@
+gemfire start-locator -port=5522

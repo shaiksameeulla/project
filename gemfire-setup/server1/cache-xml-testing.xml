@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cache PUBLIC "-//GemStone Systems, Inc.//GemFire Declarative Cache 7.0//EN" "http://www.gemstone.com/dtd/cache7_0.dtd">
+<cache copy-on-read="true">
+    <disk-store name="ds_record" auto-compact="true" max-oplog-size="512" queue-size="10000" time-interval="1000">
+        <disk-dirs>
+            <disk-dir>D:\SWA_PROJECT\Gemfire-setup\gemfire-setup\cache-xml\</disk-dir>
+        </disk-dirs>
+    </disk-store>
+	 <disk-store name="ds_report" auto-compact="true" max-oplog-size="512" queue-size="10000" time-interval="1000">
+        <disk-dirs>
+            <disk-dir>D:\SWA_PROJECT\Gemfire-setup\gemfire-setup\cache-xml\</disk-dir>
+        </disk-dirs>
+    </disk-store>
+       
+	   
+	
+	<!-- Build2 Diskstores ... -->
+	
+    <disk-store name="pdxcargodiskstores" auto-compact="true" max-oplog-size="512" queue-size="10000" time-interval="1000">
+        <disk-dirs>
+            <disk-dir>D:\SWA_PROJECT\Gemfire-setup\gemfire-setup\cache-xml\</disk-dir>
+        </disk-dirs>
+    </disk-store>
+
+    <pdx read-serialized="true" persistent="true" disk-store-name="pdxcargodiskstores">
+    </pdx>
+
+    <!-- Region Configuration -->
+
+    
+	
+	<region name="record" refid="REPLICATE_PERSISTENT">
+		<region-attributes  disk-store-name="ds_record" disk-synchronous="false" concurrency-checks-enabled="true"/>
+	</region>
+	
+	<region name="ReportDO" refid="REPLICATE_PERSISTENT">
+		<region-attributes  disk-store-name="ds_report" disk-synchronous="false" concurrency-checks-enabled="true"/>
+	</region>
+	
+	
+	
+	
+	
+	
+    <!--  *******  Do not Modify without discussing **** -->
+    <resource-manager critical-heap-percentage="90"/>
+
+    
+</cache>
