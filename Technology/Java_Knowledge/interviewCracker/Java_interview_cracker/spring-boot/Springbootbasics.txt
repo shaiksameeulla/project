@@ -1,3 +1,8 @@
+Spring Boot takes a different approach :
+--------------------------------
+
+The spring-boot-loader modules allows Spring Boot to support executable jar and war files. If you’re using the Maven or Gradle plugin, executable jars are automatically generated and you generally won’t need to know the details of how they work.
+
 Spring Boot:
 ------------
  A)Spring boot app can be started in one of below ways.
@@ -72,3 +77,18 @@ public class MyApplication {
 } 
 
 7)
+
+@Configuration
+@PropertySource("classpath:configprops.properties")
+@ConfigurationProperties(prefix = "mail")
+public class ConfigProperties {
+    // previous code
+}
+That’s it! Now any properties defined in the property file that has the prefix mail and the same name as one of the properties are automatically assigned to this object.
+
+Also, by default, a relaxed binding scheme is adopted for the binding, so all of the following variations are bound to the property authMethod of the Credentials class:
+
+mail.credentials.auth_method
+mail.credentials.auth-method
+mail.credentials_AUTH_METHOD
+mail.CREDENTIALS_AUTH_METHOD

@@ -5,6 +5,18 @@ Equals and hashCode:
 
 	By making the hash code of objects a prime number (or a multiple of a prime number) the objects will be distributed better over the buckets, because a prime number is not a multiple of the number of buckets (which is a power of 2), so hashCode() % numberOfBuckets won't quickly cycle back to the same number (which means the same bucket). 
 
+	What is the difference in using instanceof and getClass() method for checking type inside equals?
+	
+This question was asked multiple times, sometimes by looking at your equals() and hashCode implementation. Well, key difference comes from the point that instanceof operator returns true, even if compared with subclass e.g. Subclass instanceof Superclass is true, but with getClass() it's false. By using getClass() you ensure that your equals() implementation doesn't return true if compared with subclass object. While if you use instanceof operator, you end up breaking symmetry rule for equals which says that if a.equals(b) is true than b.equals(a) should also be true. Just replace a and b with an instance of Superclass and Subclass, and you will end up breaking symmetry rule for equals() method.
+
+Ex:
+public int hashCode() {
+        int result = 1;
+        result = 31 * result + manufacturer.hashCode();
+        result = 31 * result + engine.hashCode();
+        return 31 * result + color.hashCode();
+    }
+
 
 Method Overloading Rules:
 1) First and important rule to overload a method in java is to change method signature. 
