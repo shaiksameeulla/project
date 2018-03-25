@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.sample.assemble</groupId>
+	<artifactId>SampleAssemblyProfilesAdv</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<!-- <finalName>${project.build.finalName}-${build.profile.id}</finalName> -->
+					<!-- <filters> <filter>profiles/${build.profile.id}/config.properties</filter> 
+						</filters> -->
+					<descriptors>
+						<descriptor>assembly/distribution.xml</descriptor>
+					</descriptors>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>package-test</id>
+						<phase>package</phase>
+						<configuration>
+							<finalName>${project.build.finalName}-test</finalName>
+							<filters>
+								<filter>profiles/test/config.properties</filter>
+							</filters>
+							<classifier>test</classifier>
+						</configuration>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+
+					<execution>
+						<id>package-dev</id>
+						<phase>package</phase>
+						<configuration>
+							<finalName>${project.build.finalName}-dev</finalName>
+							<filters>
+								<filter>profiles/dev/config.properties</filter>
+							</filters>
+							<classifier>dev</classifier>
+						</configuration>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+
+					<execution>
+						<id>package-prod</id>
+						<phase>package</phase>
+						<configuration>
+							<finalName>${project.build.finalName}-prod</finalName>
+							<filters>
+								<filter>profiles/prod/config.properties</filter>
+							</filters>
+							<classifier>prod</classifier>
+						</configuration>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>*.*</exclude>
+				</excludes>
+			</resource>
+		</resources>
+
+	</build>
+</project>
