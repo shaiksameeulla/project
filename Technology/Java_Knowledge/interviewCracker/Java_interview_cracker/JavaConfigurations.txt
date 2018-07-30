@@ -102,12 +102,16 @@ If there is more than one class that implements WebApplicationInitializer, the o
  *    }
  Alternatively we can also extends AbstractAnnotationConfigDispatcherServletInitializer.
  
+ Note : no need to annotate this call with anything.
+ 
   =============================================
   
   Spring :
   --------------
   
   1) WebMvcConfigurer (interface): for MVC configuration ( and WebMvcConfigurerAdapter is not deprecated because of defaults methods in interface).
+      Note : @EnableWebMvc will be used to annotate this call
+  
   2)  WebSecurityConfigurerAdapter (abstract class) : for Spring security.
 		 example:  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 			auth.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder());
@@ -115,5 +119,17 @@ If there is more than one class that implements WebApplicationInitializer, the o
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {http.authorizeRequests().anyRequest().hasAnyRole("ADMIN", "USER")
 				.and().formLogin().and().logout().permitAll().logoutSuccessUrl("/login").and().csrf().disable();}
-3)The SpringSecurityInitializer is used to register the DelegatingFilterProxy. No additional code is required other than extending the AbstractSecurityWebApplicationInitializer.
+				Note : @EnableWebSecurity is used to annotate this class.
+				
+3)The Spring Security Initializer is used to register the DelegatingFilterProxy. No additional code is required other than extending the AbstractSecurityWebApplicationInitializer.
+ Note : no need to add any annotation to this class.
+
+Spring Boot:
+---------------
+Spring mvc:
+----------
+   If you want to keep Spring Boot MVC features and you want to add additional MVC configuration (interceptors, formatters, view controllers, and other features), you can add your own @Configuration class of type WebMvcConfigurer but without @EnableWebMvc. If you wish to provide custom instances of RequestMappingHandlerMapping, RequestMappingHandlerAdapter, or ExceptionHandlerExceptionResolver, you can declare a WebMvcRegistrationsAdapter instance to provide such components.
+
+If you want to take complete control of Spring MVC, you can add your own @Configuration annotated with @EnableWebMvc.
+
   
