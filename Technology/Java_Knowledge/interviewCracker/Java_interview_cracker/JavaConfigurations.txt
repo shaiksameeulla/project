@@ -1,0 +1,119 @@
+Java Configuration ::
+---------------------
+
+Servlet 3.0 java configuration :
+-------------------------------------
+
+To provide enhanced pluggability, Servlet 3.0 provides support for the programmatic declaration and registration of servlet, filter and listener components via new methods added to ServletContext. We can call these methods from within "ServletContextListener#contextInitialized" method or "ServletContainerInitializer#onStartup" method.
+
+1. ServletContainerInitializer 
+
+	Interface which allows a library/runtime to be notified of a web application's startup phase and perform any required programmatic registration of servlets, filters, and listeners in response to it.
+	
+	a) ServletContainerInitializer is based on Service Provider Interface (SPI) concept. See an example on SPI here.
+
+    b)Implementation of ServletContainerInitializer interface must be configured in META-INF/services directory.
+
+		c)ServletContainerInitializer has only one method:
+
+	void onStartup(java.util.Set<java.lang.Class<?>> c,
+               ServletContext ctx)
+               throws ServletException
+Notifies this ServletContainerInitializer of the startup of the application represented by the given ServletContext.
+If this ServletContainerInitializer is bundled in a JAR file inside the WEB-INF/lib directory of an application, its onStartup method will be invoked only once during the startup of the bundling application. If this ServletContainerInitializer is bundled inside a JAR file outside of any WEB-INF/lib directory, but still discoverable as described above, its onStartup method will be invoked every time an application is started.
+
+Parameters:
+c - the Set of application classes that extend, implement, or have been annotated with the class types specified by the HandlesTypes annotation, or null if there are no matches, or this ServletContainerInitializer has not been annotated with HandlesTypes
+ctx - the ServletContext of the web application that is being started and in which the classes contained in c were found
+Throws:
+ServletException - if an error has occurred
+
+ (https://www.logicbig.com/tutorials/java-ee-tutorial/java-servlet/servlet-container-initializer-example.html)
+ 
+ -->The ServletContainerInitializer implementation is intented to be bundled in a JAR file which is in turn been dropped in /WEB-INF/lib of the webapp. The JAR file itself should have a /META-INF/services/javax.servlet.ServletContainerInitializer file containing the FQN of the ServletContainerInitializer implementation in the JAR. Please note that this file should thus not be placed in the webapp itself!
+
+-->This allows webapp module developers to let their JAR file hook on webapp's startup and shutdown cycle. It's true that they could also have used a ServletContextListener with @WebListener for this, but this won't work if the webapp's own web.xml file has a metadata-complete="true" attribute set in <web-app> which means that the webapp shouldn't scan JARs for annotations (which saves startup time).
+
+-->That the ServletContainerInitializer doesn't work in your particular case can only mean that you're actually not developing a module JAR file, but just a part integral to your own web application. In that case, the ServletContainerInitializer is useless for you and you should be using ServletContextListener instead.
+
+@WebListener
+public class Config implements ServletContextListener {
+
+    @Override
+    public void contextInitialized(ServletContextEvent event) {
+        // Do stuff during server startup.
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent event) {
+        // Do stuff during server shutdown.
+    }
+
+}
+
+Important Points:
+=====================
+This feature enable framework designer to add the framework specific web components during startup without asking end user on application side to provide same configurations deployment descriptor and add them manually. For example frameworks like JSF and Spring are already using ServletContainerInitializer approach for that (see source code of FacesInitializer and SpringServletContainerInitializer. The developers just need to add the framework jar dependencies and create some POJOs (using framework specific annotation or implementing some interfaces) to use the framework. They even don't have to provide /META-INF/services/javax.servlet.ServletContainerInitializer as this file already resides inside the framework jar.
+
+The same configuration can be done in a ServletContextListener residing inside the framework jar, but disadvantage is, that will not work if the application's web.xml file has been decidedly configured  metadata-complete="true" to improve performance. Setting this flag causes the container not to scan JARs for annotations. Also ServletContainerInitializer approach (SPI) is more standard way to go as it's built into Java SE.
+
+ServletContextListener#contextInitialized should do programmatic configuration on application level only. Based on some dynamic conditional parameters we can decide to plug/register some web components selectively.
+
+********IMP************8
+The metadata-complete="true" 
+-----------------------------
+indicates that the JAR files in /WEB-INF/lib doesn't need to be scanned for Servlet 3.0 specific annotations, but the webapp's own classes will still be scanned.
+If metadata-complete is set to "true", the deployment tool only examines the web.xml file and must ignore annotations such as @WebServlet, @WebFilter, and @WebListener present in the class files of the application, 
+========================================================================================================================================
+
+Spring Web java configuration ::
+-------------------------------
+1)As first step "SpringServletContainerInitializer implements ServletContainerInitializer" will be initialized.
+2) then SpringServletContainerInitializer class annotated with @HandlesTypes(WebApplicationInitializer.class).
+3) Because this class declares @HandleTypes,Servlet 3.0+ containers will automatically scan the classpath for implementations of Spring's  WebApplicationInitializer interface and provide the set of all such types to the {@code webAppInitializerClasses} parameter of this method.
+
+
+Fundamentals :  Spring WebApplicationInitializer - how it works and what may go wrong (Startup of servlet contexts without web.xml)
+------------------ 
+Servlets of release 3 can be configured programatically, without any web.xml.
+
+With Spring and its Java-configuration you create a configuration class that implements org.springframework.web.WebApplicationInitializer.
+Spring will automatically find all classes that implement this interface and start the according servlet contexts. More excatly its not Spring that searches for those classes, its the servlet container (e.g. jetty or tomcat ).
+
+The class org.springframework.web.SpringServletContainerInitializer is annotated with
+@javax.servlet.annotation.HandlesTypes(WebApplicationInitializer.class)
+and implements javax.servlet.ServletContainerInitializer
+According to the Servlet 3 specification the container will call org.springframework.web.SpringServletContainerInitializer.onStartup(Set<Class<?>>, ServletContext) on every class in the classpath implementing that interface, suppling a set of classes as defined in HandlesTypes
+
+Startup order, if there is more than one context
+If there is more than one class that implements WebApplicationInitializer, the order in which they are started can be controlled with the annotation org.springframework.core.Ordered .
+
+1. implements WebApplicationInitializer
+  example : public void onStartup(ServletContext container) {
+ 
+ *      AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();// Create the 'root' Spring application context
+ *      rootContext.register(AppConfig.class);// Manage the lifecycle of the root application context
+ *      container.addListener(new ContextLoaderListener(rootContext));// Create the dispatcher servlet's Spring application context
+ *      AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
+ *      dispatcherContext.register(DispatcherConfig.class);// Register and map the dispatcher servlet
+ *      ServletRegistration.Dynamic dispatcher =container.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));
+ *      dispatcher.setLoadOnStartup(1);
+ *      dispatcher.addMapping("/");
+ *    }
+ Alternatively we can also extends AbstractAnnotationConfigDispatcherServletInitializer.
+ 
+  =============================================
+  
+  Spring :
+  --------------
+  
+  1) WebMvcConfigurer (interface): for MVC configuration ( and WebMvcConfigurerAdapter is not deprecated because of defaults methods in interface).
+  2)  WebSecurityConfigurerAdapter (abstract class) : for Spring security.
+		 example:  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+			auth.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder());
+			}
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {http.authorizeRequests().anyRequest().hasAnyRole("ADMIN", "USER")
+				.and().formLogin().and().logout().permitAll().logoutSuccessUrl("/login").and().csrf().disable();}
+3)The SpringSecurityInitializer is used to register the DelegatingFilterProxy. No additional code is required other than extending the AbstractSecurityWebApplicationInitializer.
+  
