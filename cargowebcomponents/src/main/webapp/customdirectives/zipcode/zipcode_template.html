@@ -1,0 +1,17 @@
+<div>
+	<label style="font-weight: bold">{{ labelName || "Zip Code/Postal Code"}}</label>
+
+	<!-- Input fields for Country: US -->
+	<span ng-if="countryCode === \'US\'">
+		<input ng-model="zipCode.zip1" ng-change="reValidate()" placeholder="Zip Code"></input>
+		<input ng-model="zipCode.zip2" ng-change="reValidate()"></input>
+	</span>
+	<!-- Input fields for Country: CA -->
+	<span ng-if="countryCode !== \'US\'">
+		<input ng-model="zipCode.postalCode" ng-change="reValidate()" placeholder="Postal Code">
+	</span>
+	
+</div>
+
+
+
