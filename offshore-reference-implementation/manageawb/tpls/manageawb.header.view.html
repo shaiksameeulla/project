@@ -1,0 +1,65 @@
+<div class="AwbTop">
+	<div class="row">
+		<div class="col-md-2">
+			<div class="title">AIR WAYBILL PREFIX</div>
+			<b class="value">526</b>
+		</div>
+		<div class="col-md-2">
+			<div class="title">AIR WAYBILL NUMBER</div>
+			<b class="value">{{headerData.awbNumber}}</b>
+		</div>
+		<div class="col-md-2">
+			<div class="title">TENDER DATE & TIME</div>
+			<b class="value" ng-bind="tenderDateGeneration"></b>
+		</div>
+		<div class="col-md-2">
+			<div class="title">ORIGIN (FROM)</div>
+			<b class="value">{{headerData.origin}}</b>
+		</div>
+		<div class="col-md-2">
+			<div class="title">DESTINATION (TO)</div>
+			<b class="value">{{headerData.destination}}</b>
+		</div>
+		<div class="col-md-2">
+			<div class="title">SERVICE LEVEL </div>
+			<b class="value">{{headerData.serviceLevel}}</b>
+		</div>
+		<div class="col-md-12">
+			<div class="AwbTopStatus">		
+				<div class="row">
+					<div class="col-md-4">
+						<span class="normal txtStatusOne">STATUS - </span>
+						<span class="status txtStatusOne" ng-bind="headerData.Fullstatus | uppercase"></span>
+					</div>
+					<div class="col-md-2">
+						<span class="normal">CUSTOMS STATUS</span>
+					</div>
+					<div class="col-md-2"><!--iconTick txtStatusThree txtStatusOne txtStatusOne-->
+					  <span ng-if="!screeningStatus || (screeningStatus && totalScreenData.screeningFailed) || displayDivErrorBarCS">
+						<span class="status">CARGO SCREENING</span>
+					  </span>
+					  <span ng-if="displayDivErrorBarCS==false && screeningStatus && !totalScreenData.screeningFailed">
+						<span class="status txtStatusOne iconTick">CARGO SCREENING</span>
+					  </span>
+					</div>
+					<div class="col-md-2">
+					    <span ng-if="!printState">
+						<span class="status">LOT LABELS PRINTED</span>
+					  </span>
+					  <span ng-if="printState">
+						<span class="status txtStatusOne iconTick">LOT LABELS PRINTED</span>
+					  </span>
+					</div>
+					<div class="col-md-2">
+					  <span ng-if="!commentsStatus">
+						<span class="status">COMMENTS</span>
+					  </span>
+					  <span ng-if="commentsStatus">
+						<span class="status txtStatusOne iconTick">COMMENTS</span>
+					  </span>
+					</div>
+				</div>
+			</div>	
+		</div>
+	</div>
+</div>

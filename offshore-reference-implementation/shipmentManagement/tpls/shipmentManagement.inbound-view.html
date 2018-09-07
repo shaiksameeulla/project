@@ -1,0 +1,252 @@
+<tabinner data-ng-controller="inboundShipmentController">
+	<div class="pull-left popupBtns">
+		<button class="swc_button TypeBlue pull-left MrgL_0" data-toggle="modal" ng-disabled="!has_permission(role.role_RECEIVE_SHIPMENT) || !receive" data-target="#ReceiveShipmnt" data-ng-click="getSelectedRowValue('receive');">Receive</button>
+		<button class="swc_button TypeBlue pull-left " data-toggle="modal" ng-disabled="!undoReceive" data-ng-click="undoReceiveLots();">Undo Receive</button>
+		<button class="swc_button TypeBlue pull-left" data-toggle="modal" ng-disabled="!has_permission(role.role_DELIVER_SHIPMENT) || !deliver" data-target="#DeliverShipmnt" ng-click="getSelectedRowValue('deliver');">Deliver</button>
+		<button class="swc_button TypeBlue pull-left" data-toggle="modal" ng-disabled="!has_permission(role.role_RECEIVE_SHIPMENT) || !has_permission(role.role_DELIVER_SHIPMENT) || !receiveDeliver" data-target="#ReceivDeliverShipmnt" ng-click="getSelectedRowValue('receive-deliver');" >Receive & Deliver</button>
+		<button class="swc_button TypeBlue pull-left" data-toggle="modal" ng-disabled="!discrepancy ||(!has_permission(role.role_MARK_DISCREPANCY_SHIPMENT_MISSING) && !has_permission(role.role_MARK_DISCREPANCY_SHIPMENT_TRACE) && !has_permission(role.role_MARK_DISCREPANCY_SHIPMENT_LOST) ) " ng-click="getSelectedRowValue('discrepancy');" data-target="{{diffAWBErrorFlag?'':'#DiscrepancyShipmnt'}}" >Discrepancy</button>
+		<button class="swc_button TypeBlue pull-left" data-toggle="modal"  ng-disabled="!has_permission(role.role_ASSIGN_RUNNER) || inboundLots.length==0 || facilityChanged || !assignRunner" 
+		data-ng-click="getAssignRunnner('assignRunner');" >Assign Runner</button>
+		<button class="swc_button TypeBlue pull-left" data-toggle="modal" ng-disabled="!has_permission(role.role_PRINT_RUNNER_ASSIGNMENTS) || inboundLots.length==0 ||facilityChanged"  data-target="#assignRunnerPerson"  data-ng-click="getAssignRunnner('printAssignment');" >Print Assignments</button>
+		
+	</div>
+			 
+	 <div class="pull-right">
+		<div class="pull-right">
+			<p Caps class="fontsize13 marginBottom10">
+			  SERVICE LEVEL:<strong>
+							 <span ng-repeat="data in srvLvlData track by $index">{{data | uppercase }}<span ng-show=" ! $last ">,&nbsp;</span></span>
+						   </strong> | 
+			  LOT STATUS:<strong>
+						   <span ng-repeat="data in lotStatusData track by $index">{{data | uppercase }}<span ng-show=" ! $last ">,&nbsp;</span></span>
+						 </strong>
+			</p>
+		</div>
+		<div class="clear"></div>
+		<div class="btn-group btnGroup ShipMangmtFilter pull-right">
+		  <button type="button" class="btn" data-ng-click="filterFlags.openInboundFilters=!filterFlags.openInboundFilters;setFilterState()">Filters</button>
+		  <button type="button" class="btn dropdown-toggle" data-ng-click="filterFlags.openInboundFilters=!filterFlags.openInboundFilters;setFilterState();"  data-toggle="dropdown" aria-expanded="false">
+			<span class="caret"></span>
+			<span class="sr-only">Toggle Dropdown</span>
+		  </button>
+		 
+		 <div class="filterWrap" data-ng-show="filterFlags.openInboundFilters">
+			<div class="selectAll"><a ng-click="selectAll('SELECTALL')">Select All</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a ng-click="selectAll('CLEARALL')">Clear All</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a ng-click="resetFilters()">Reset</a></div>
+			<table>
+				<tr><td colspan="2"><h4>Service Level:</h4></td></tr>
+			</table>
+			  <ul class="listService">
+					<li ng-repeat="serviceLevelData in serviceLevel track by $index">
+						<div class="checkboxRadio">
+							<input type="checkbox" ng-model="srvLvl[serviceLevelData.key]">
+							<span class="innerCheck"><label ng-bind="serviceLevelData.key"></label></span>
+						</div>
+					</li>
+			   </ul>
+			<table>
+				<tr><td colspan="2"><h4>Lot Status:</h4></td></tr>
+			</table>
+				<ul class="listService">
+					<li><div class="checkboxRadio"><input type="checkbox" ng-model="lotStatus.RCS"><span class="innerCheck"><label>RCS (Ready for Carriage)</label></span></div></li>
+					<li><div class="checkboxRadio"><input type="checkbox" ng-model="lotStatus.RCF"><span class="innerCheck"><label>RCF (Received at facility)</label></span></div></li>
+					<li><div class="checkboxRadio"><input type="checkbox" ng-model="lotStatus.DEP"><span class="innerCheck"><label>DEP (Departed)</label></span></div></li>
+					<li><div class="checkboxRadio"><input type="checkbox" ng-model="lotStatus.XFOH"><span class="innerCheck"><label>XFOH (XFR freight on hand)</label></span></div></li>
+					<li><div class="checkboxRadio"><input type="checkbox" ng-model="lotStatus.ARR" ><span class="innerCheck"><label>ARR (Arrived)</label></span></div></li>
+			   </ul>
+			<table>
+				<tr><td colspan="2"><button class="pull-left swc_button Nominwidth MrgL_0 marginTop10" ng-click="applyFilter();filterFlags.openInboundFilters=!filterFlags.openInboundFilters">Apply</button></tr>
+			</table>
+		 </div>
+		</div>
+	</div>
+
+<div class="clear"></div>
+<div class="tableWrapper typeTwo shipMangmtTbl overflow-x-auto">
+	<div class="tableHeaderFixedHead">
+		<table class="tbl type2 tableBordered tableFixedLayout tableBorderIndicate">
+			<thead>
+				<tr class="shipMangmtTR">
+					<td class="cellFirst">
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('awbNumber', reverse);addSortIconUpDown($event,reverse)" class="sortingText">AIR WAYBILL&nbsp;#</span>
+					</td>
+					<td class="cellSec">
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('consigneeName', reverse);addSortIconUpDown($event,reverse)" class="sortingText">CONSIGNEE</span>
+						
+					</td>
+					<td>
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('lotNumber', reverse);addSortIconUpDown($event,reverse)" class="sortingText">LOT&nbsp;#</span>
+						
+					</td>
+					<td>
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('noOfPieces', reverse);addSortIconUpDown($event,reverse)" class="sortingText">PCS</span>
+						
+					</td> 
+					<td>
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('weight', reverse);addSortIconUpDown($event,reverse)" class="sortingText">WT</span>
+						
+					</td> 
+					<td>
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('customsSatus', reverse);addSortIconUpDown($event,reverse)" class="sortingText">CSTM</span>
+						
+					</td> 
+					<td>
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('origin.code', reverse);addSortIconUpDown($event,reverse)" class="sortingText">ORIG</span>
+						
+					</td> 
+					<td>
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('destination.code', reverse);addSortIconUpDown($event,reverse)" class="sortingText">DEST</span>
+						
+					</td> 
+					<td class="serviceLevel">
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('serviceLevel.code', reverse);addSortIconUpDown($event,reverse)" class="sortingText">SVC LEVEL</span>
+						
+					</td> 
+					<td class="cellFlt">
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('flightNumber', reverse);addSortIconUpDown($event,reverse)" class="sortingText">FLT</span>
+						
+					</td> 
+					<td class="cellEta">
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('expectedArrTime', reverse);addSortIconUpDown($event,reverse)" class="sortingText iconSort iconSortUp">&nbsp;ETA</span>
+					</td> 
+					<td>
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('inGateNumber', reverse);addSortIconUpDown($event,reverse)" class="sortingText">GATE</span>
+						
+					</td> 
+					<td class="cellLotstatus">
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('lotStatus', reverse);addSortIconUpDown($event,reverse)" class="sortingText">LOT STATUS</span>
+						
+					</td>
+					<td class="cellDT">
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('lotUpdatedDateTime', reverse);addSortIconUpDown($event,reverse)" class="sortingText">DATE & TIME</span>
+						
+					</td>
+					<td>
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('specialHandlingCodes', reverse);addSortIconUpDown($event,reverse)" class="sortingText">SHC</span>
+						
+					</td>
+					<td class="cellWHSEloc">
+					
+					WHSE LOC</td>
+					
+					<td class="cellRunner">
+						
+						<span data-ng-click="reverse=!reverse; sortFunction=order('assignedRunner', reverse);addSortIconUpDown($event,reverse)" class="sortingText">RUNNER</span>
+						
+					 <icon class="iconSize1 iUploadApp pull-right cursorPointer" data-ng-click="updateRunnerInline()" ></icon><span class="pull-right">&nbsp;</span><icon class="iconSize1 iPencill pull-right cursorPointer" data-ng-click="editRunnerName=true" ></icon></td>
+				</tr>                                	
+			</thead>
+		</table>	
+	</div>						
+	<div class="tableHeaderFixedBody minHeightNone">
+		<table class="tbl type2 tableFixedLayout tableBorderIndicate">	
+			<tbody class="wordbreakTR">
+			
+				<tr class="shipMangmtTR {{(lot.expectedArrTime.toString().substring(0, 8)>inboundDay)?'canyon': ''}}" ng-repeat-start="lot in inboundLots track by $index" 
+				ng-class="{bgGrey:lot.lotStatus=='RCF', yellow: RSITime >= lot.rcfStatusUpdateThresholdTime1 && RSITime < lot.rcfStatusUpdateThresholdTime2 &&  lot.rcfStatusUpdateThresholdTime1 !=0 && lot.rcfStatusUpdateThresholdTime2 != 0 && lot.lotStatus!=='RCF' && lot.awbStatus=='ARR' , red: RSITime >= lot.rcfStatusUpdateThresholdTime2 && lot.rcfStatusUpdateThresholdTime2 !=0 && lot.lotStatus!=='RCF' && lot.awbStatus=='ARR'}"  ng-log-dom-creation>
+				
+				
+					<td class="cellFirst">
+						<span class="borderCell borderNone awb" ng-controller="searchAwbController">
+						 <span ng-if="allowToCheck">
+							<div class="checkboxRadio displayInline">
+							   <input type="checkbox" ng-disabled="allowToCheck!=lot.lotStatus || facilityChanged" name="checkbox_{{$index}}" id="checkbox_{{$index}}" ng-model="selectedRow[$index]" ng-true-value="{{$index}}" ng-false-value="-1" ng-change="checkLotStatus(lot.lotStatus, $index)">
+								<span class="innerCheck"></span>
+							 </div>
+						 </span>
+						 <span ng-if="!allowToCheck">
+							<div class="checkboxRadio displayInline">
+							   <input type="checkbox" name="checkbox_{{$index}}" id="checkbox_{{$index}}" ng-disabled="facilityChanged" ng-model="selectedRow[$index]" ng-true-value="{{$index}}" ng-false-value="-1" ng-change="checkLotStatus(lot.lotStatus, $index)">
+								<span class="innerCheck"></span>
+							 </div>
+						 </span>
+							<a ng-click="redirectShipperDetails(lot.awbNumber)"><fontbold ng-bind="lot.awbNumber"></fontbold></a>
+						</span>
+					</td>
+					<td class="cellSec"><span class="borderCell txtEllipsis" title="{{lot.consigneeName}}" ng-bind="lot.consigneeName"></span></td>
+					<td alignLeft><span class="borderCell">{{lot.lotNumber}} <span ng-if="lot.totalLots >1" >of {{lot.totalLots}}</span></span></td>
+					<td number><span class="borderCell" ng-bind="lot.noOfPieces"></span></td>
+					<td number><span class="borderCell" ng-bind="lot.weight"></span></td>
+					<td><span class="borderCell" ng-bind="lot.customsSatus"></span></td>
+					<td alignLeft><span class="borderCell" ng-bind="lot.origin.code"></span></td>
+					<td alignLeft><span class="borderCell" ng-bind="lot.destination.code"></span></td>
+					<td class="serviceLevel" ng-class="(lot.svcLvlPreimum)?'serviceLevel2':''"><span class="borderCell serviceLevelInner" ng-bind="lot.serviceLevel.code"></span></td><!--icon-->
+					<td number class="cellFlt"><span class="borderCell borderNone">
+						<a  ng-if="has_permission(role.role_VIEW_MANIFESTED_FLIGHTS_INBOUND)" data-toggle="modal" data-target="#Manifest" class="flt" ng-click="getManifestPopupwindow('inbound','inbound',this,'ETA');" >
+						<b ng-bind="lot.flightNumber"></b></a>
+						<span ng-if="!has_permission(role.role_VIEW_MANIFESTED_FLIGHTS_INBOUND)"><b ng-bind="lot.flightNumber"></b></span>
+						</span>
+					</td>
+					
+					<td number class="cellEta">
+					
+					
+						<span ng-if="lot.expectedArrTime!=lot.scheduledArrTime && lot.flighStatus!='CXLD'" class="borderCell eta " ng-class="{red:lot.arrFlightProgress=='LATE',green:lot.arrFlightProgress=='EARLY', gray:lot.arrFlightProgress=='SAME'}">
+							<fontbold >{{lot.expectedArrTime | swaTimeFormat}}</fontbold>
+							<span class="plusOne" ng-if="lot.expectedArrTime.toString().substring(0, 8)!=inboundDay">{{lot.expectedArrTime.toString().substring(0, 8) | daysdifference:inboundDay}} </span>
+							<div >
+								<span class="eta2Inner">{{lot.scheduledArrTime | swaTimeFormat}}</span>
+							</div>
+						</span>
+						
+						<span ng-if="lot.expectedArrTime==lot.scheduledArrTime && lot.flighStatus!='CXLD'" class="borderCell eta " >
+							<fontbold >{{lot.expectedArrTime | swaTimeFormat}}</fontbold>
+							
+							<span class="plusOne" ng-if="lot.expectedArrTime.toString().substring(0, 8)!=inboundDay">{{lot.expectedArrTime.toString().substring(0, 8) | daysdifference:inboundDay}} </span>
+						</span>
+						
+						<span ng-if="lot.flighStatus=='CXLD'" class="borderCell eta red">
+							<fontbold >{{lot.flighStatus | uppercase}}</fontbold>
+							<div class="eta2">
+								<span class="eta2Inner">{{lot.scheduledArrTime | swaTimeFormat}}</span>
+							</div>
+						</span>
+					
+					</td>
+					<td><span class="borderCell gate" ng-bind="lot.inGateNumber"></span></td>
+					<td class="cellLotstatus"><span class="borderCell lotStatus">{{lot.lotStatusStation}}</span></td>
+					<td class="cellDT"><span class="borderCell" >{{lot.lotUpdatedDateTime.substring(0, 5)}} {{lot.lotUpdatedDateTime.substring(10, 13)}}:{{lot.lotUpdatedDateTime.substring(13, 20)}}</span></td>
+					<td><span class="borderCell txtEllipsis" title="{{lot.specialHandlingCodes.join()}}" data-ng-bind="lot.specialHandlingCodes.join()" ></span></td>
+					<td class="cellWHSEloc cellLotstatus">
+						<span class="borderCell" ng-if="!facilityChanged" >
+						<!-- Modified for defect #5217  -->
+						   <icon  ng-if="!lot.wharehouseLocation" data-toggle="modal" data-target="#AssignLocation" class="iconSize1 iPencill cursorPointer" ng-click="getDetailForAssignLocation($index)" ></icon>
+						   <a ng-if="lot.wharehouseLocation" ng-click="getDetailForAssignLocation($index)" data-toggle="modal" data-target="#AssignLocation"><b title="{{lot.wharehouseLocation}}" ng-bind="lot.wharehouseLocation"></b></a>
+						</span>
+						<span class="borderCell" ng-if="facilityChanged" >
+						   <icon  ng-if="!lot.wharehouseLocation"  class="iconSize1 iPencill cursorPointer" ></icon>
+						   <a ng-if="lot.wharehouseLocation" ><b title="{{lot.wharehouseLocation}}" ng-bind="lot.wharehouseLocation"></b></a>
+						</span>
+					</td>
+						
+					
+					<td class="cellRunner"  data-ng-if="!editRunnerName || facilityChanged"><span class="borderCell txtEllipsis" ng-bind="lot.assignedRunner"></span></td>	
+					
+					<td class="cellRunner" data-ng-if="editRunnerName && !facilityChanged" >
+						<div widthFormEleFull class="borderCell" align="center">
+							<input type="text" align="center" class="borderCell" data-ng-model="lot.assignedRunner"  maxlength="30" />
+						</div>
+					</td> 
+				</tr>
+				<tr ng-repeat-end ng-if="!$last">
+					<td class="tdEmpty" colspan="17" ></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>	
+</div>
+</tabinner>

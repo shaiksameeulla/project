@@ -1,0 +1,385 @@
+<span>
+	<script type="text/ng-template" id="myModalContentInfo.html">
+		
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-12">
+				<i class="icon_success"></i>
+				<p ng-bind ="infoMsg" class="warningTxt" ></p>
+			</div>
+			<div class="col-md-12 alertButtonPart">
+				<button type="button" data-ng-click="cancel()" class="pull-right swc_button">Ok</button>
+			</div>
+		</div>
+	</div>
+	
+</script> 
+<!---ERROR MESSAGE--->
+
+<div class="relative">
+	<div id="AWBerrorWrapper">
+		<!-- Error Nutral -->
+		<div class="errorTop" style="display:none">
+			<table>
+				<tr>
+					<td class="ETicon">
+						<icon class="iconSize2 iAlert cursorPointer"></icon>
+					</td>
+					<td class="ETtxt">
+						<h4>Here,s the long heading that wraps to the next line.</h4>
+						<p>-Content 1 Here,s the long heading that wraps to the next line.</p>
+						<p>-Content 2</p>
+						<p>-Content 3</p>
+					</td>
+					<td class="ETClose">
+						<icon class="iconSize1 icloseBtn cursorPointer"></icon>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<!-- Error Nedative -->
+		<div class="errorTop negative" ng-if="((displayDivErrorInGeneral === true) && showBar==true || concurrentMsg)">
+			<table>
+				<tr>
+					<td class="ETicon">
+						<icon class="iconSize2 iAlert cursorPointer"></icon>
+					</td>
+					<td class="ETtxt">
+					  <span ng-if="concurrentMsg">
+					     <p ng-bind="concurrentMsg"></p>
+					  </span>
+					  <span ng-if="!concurrentMsg">
+			              <h4>Unable to save.</h4>
+						  <p>Items flagged red require attention </p>		  
+		  			  </span>
+					</td>
+					<td class="ETClose">
+						<icon class="iconSize1 icloseBtn cursorPointer" ng-click="removeFlagMsg()"></icon>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<!-- Error positive -->
+		<div class="errorTop positive" style="display:none">
+			<table>
+				<tr>
+					<td class="ETicon">
+						<icon class="iconSize2 iAlert cursorPointer"></icon>
+					</td>
+					<td class="ETtxt">
+						<p>Positive feedback</p>
+					</td>
+					<td class="ETClose">
+						<icon class="iconSize1 icloseBtn cursorPointer"></icon>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<!--Awb Accepted Msg-->
+		<div class="errorTop positive" ng-if="displayAwbAccepted">
+			<table>
+				<tr>
+					<td class="ETicon">
+						<icon class="iconSize2 iAlert cursorPointer"></icon>
+					</td>
+					<td class="ETtxt">
+						<p>Air Waybill has been accepted</p>
+					</td>
+					<td class="ETClose">
+						<icon class="iconSize1 icloseBtn cursorPointer"></icon>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+<!---ERROR MESSAGE---> 
+<div name="manageAwbForm">
+	<div class="ContentArea minHeightNoneChildTbl awbAirwayBill">
+		<h1 class="pageTitle">Air Waybill</h1>
+		<div id="content_body" class="tabWrapper">
+			<!-- Nav tabs -->
+			<ul class="nav nav-tabs" role="tablist">
+				<li role="presentation" class="active" ><a data-toggle="tab">Shipment</a></li>
+				<li role="presentation" class="" ng-class="{disable:!has_permission(role.role_VIEW_AIR_WAYBILL_HISTORY)}">
+				<a data-toggle="{{(has_permission(role.role_VIEW_AIR_WAYBILL_HISTORY))?tab:false}}" ng-click="awbHistoryClick(0);">AWB History</a></li>
+				<li role="presentation" class="" ng-class="{disable:!has_permission(role.role_VIEW_DISCREPANCY_TAB)}">
+				<a data-toggle="{{(has_permission(role.role_VIEW_DISCREPANCY_HISTORY))?tab:false}}" ng-click="getDiscrepancyData();">Discrepancy</a></li>
+			</ul>
+			<!-- Tab panes -->
+			<div class="tab-content">
+				<!-- Tab 111 starts -->
+				<section role="tabpanel" class="tab-pane active"> 
+					<div class="container-fluid AwpWrapper" ng-init="init()">
+						<div id="AWBprintTop">
+							<button tabindex = "-1" class="swc_button widthAuto TypeBlue pull-right" ng-disabled="isAWBAutoSave=='FALSE'" ng-click="expandAllSections()"><span class="iconCollapse expand"></span></button>
+							<button tabindex = "-1" class="swc_button widthAuto TypeBlue pull-right" ng-disabled="isAWBAutoSave=='FALSE'" ng-click="collapseAllSections()"><span class="iconCollapse"></span></button>
+							<button tabindex = "-1" class="swc_button TypeBlue pull-right" 
+							ng-disabled="(updatedVersionNumber === '' && isAWBAutoSave=='FALSE' && awbContent.versionNumber=='') || 
+								(isAWBAutoSave=='TRUE' && (displayDivErrorBarFs ||  displayDivErrorBarTc || displayDivErrorBarSd || 
+								 displayDivErrorBarCS || displayDivErrorBarRt || displayDivErrorBarSig || displayDivErrorBarLotLabels || displayDivErrorBarCom || displayDivErrorBarDoc))"
+							ng-click="printAWB()">Print AWB</button>
+						</div>
+						<!-- AWB top info wrapper -->
+						<data-ng-include src="'../modules/manageawb/header.html'"></data-ng-include>
+						<!-- AWB top info wrapper -->
+						<!-- Accordion wrapper starts -->
+						<ul class="accordionWrapper marginBottom20 AWBList">
+							<!-- Accordion FROM (SHIPPER) 111 -->
+							<li class="accordion" ng-class="{errorAccord:(displayDivErrorBarFs==true && (isSection1SC || isRetrive)),errorNoAccord:(displayDivErrorBarFs==false && (isSection1SC || isRetrive)),
+                            'active displayAccordionBody':(hasSectionPrivilege('SECTION1_') && !collapseSec1),disabled:!hasSectionPrivilege('SECTION1_')&& sectionAWBPrivilege.length>0}" id="fromShipperAcrdn">
+								<div class="accordionTitle" ng-click="autoSaveData('fromshipper','1');showErrorBar(displayDivErrorBarFs);">
+									<div class="accordionToggle">
+									<i class="iconCircle">1</i><span class="accrdName">FROM (SHIPPER)</span>
+									<fontbold ng-bind="assignedShipperMsg" class="txtColorError"></fontbold>
+									<fontbold ng-bind="alertSecurityMsg" class="txtColorError"></fontbold>
+									<fontbold ng-bind="restrictionMsg" class="txtColorError"></fontbold>
+									<span class="txtColorError" ng-if="(alertSecurityMsg && (alertCCSFFailure || ccfidBR18 || alertCoCFailure))">;&nbsp;</span> 
+									<fontbold ng-bind="alertCCSFFailure" class="txtColorError"></fontbold>
+									<span class="txtColorError" ng-if="alertCCSFFailure && ccfidBR18">;&nbsp;</span> 
+									<fontbold ng-bind="ccfidBR18" class="txtColorError"></fontbold> 
+									<span class="txtColorError" ng-if="alertCoCFailure && alertCCSFFailure">;&nbsp;</span> 
+									<fontbold ng-bind="alertCoCFailure" class="txtColorError"></fontbold>
+									<fontbold class="showAccessDenied txtStatusTwo" ng-bind="constant.access_denied"></fontbold>
+									<span ng-class="dispAccHdrErrorFs !== true?'txtColorNormal':'txtColorError'" ng-if="errorFieldNameFs !== ''">{{errorFieldNameFs}}</span>
+									</div>		
+									<icon class="iconHistory" ng-if="has_permission(role.role_VIEW_AIR_WAYBILL_HISTORY)" data-ng-click="moveHistory('0');awbHistoryClick(1)"></icon>
+								</div>
+								   <div id="fromShipperBody" class="accordionBody accordionBodyPadding">
+								     <ng-include src="'manageawb/tpls/manageawb.shipper.view.html'"></ng-include>
+                                </div>
+									</li>
+									<!-- Accordion TO (CONSIGNEE) 222-->  
+                                    <li class="accordion" ng-class="{errorAccord:(displayDivErrorBarTc==true && (isSection2SC || isRetrive)),errorNoAccord:(displayDivErrorBarTc==false && (isSection2SC || isRetrive)),disabled:!hasSectionPrivilege('SECTION2') && sectionAWBPrivilege.length>0 || (!moveNextSection && isAWBAutoSave!='TRUE'),sectionNotAccessible:!moveNextSection && isAWBAutoSave!='TRUE'}" id="toConsigneeAcrdn">
+										<div class="accordionTitle" ng-click="autoSaveData('toconsignee','2');showErrorBar(displayDivErrorBarTc);">
+											<div class="accordionToggle">
+											<i class="iconCircle">2</i><span class="accrdName">TO (CONSIGNEE)</span>
+											<fontbold class="showAccessDenied txtStatusTwo" ng-bind="constant.access_denied"></fontbold>
+											<fontbold ng-bind="alertSecurityMsgConsignee" class="txtColorError"></fontbold>
+											<span ng-class="dispAccHdrErrorTc !== true?'txtColorNormal':'txtColorError'" ng-if="dispErrorToConsignee > 1">{{fieldName}}</span>
+											</div>
+											<icon class="iconHistory" ng-if="has_permission(role.role_VIEW_AIR_WAYBILL_HISTORY)"  data-ng-click="moveHistory('1'); awbHistoryClick(2)"></icon>
+										</div>
+										<div id="toConsigneeBody" class="accordionBody accordionBodyPadding"></div>
+									</li>
+									<!-- Accordion SHIPMENT DETAILS 333-->
+                                    <li class="accordion" ng-class="{errorAccord:(displayDivErrorBarSd==true && (isSection3SC || isRetrive)),errorNoAccord:(displayDivErrorBarSd==false && (isSection3SC || isRetrive)),disabled:!hasSectionPrivilege('SECTION3')&& sectionAWBPrivilege.length>0 || (!moveNextSection && isAWBAutoSave!='TRUE'),sectionNotAccessible:!moveNextSection && isAWBAutoSave!='TRUE'}" id="shipmentDetailsAcrdn">
+										<div class="accordionTitle" ng-click="openAccordionPanel('shipmentdetails');autoSaveData('shipmentdetails','3');showErrorBar(displayDivErrorBarSd);">
+											<div class="accordionToggle">
+											<i class="iconCircle">3</i><span class="accrdName">SHIPMENT DETAILS</span>
+											<fontbold class="showAccessDenied txtStatusTwo" ng-bind="constant.access_denied"></fontbold>
+											<fontbold ng-bind="assignedShipmentMsg" class="txtColorError"></fontbold>
+											<fontbold ng-bind="alertSecurityMsgShipmentDetails" class="txtColorError"></fontbold>
+											<span ng-class="dispAccHdrErrorSd !== true?'txtColorNormal':'txtColorError'" ng-if="dispErrorShipmentDetails > 1">{{fieldNameSd}}</span>
+											</div>	
+											<icon class="iconHistory" ng-if="has_permission(role.role_VIEW_AIR_WAYBILL_HISTORY)"  data-ng-click="moveHistory('2'); awbHistoryClick(3)"></icon>
+										</div>
+										<div id="shipmentDetailsBody" class="accordionBody">
+										</span>
+									</div>
+								</li>
+								<!-- Accordion CARGO SCREENING 444-->
+                                <li class="accordion" ng-class="{errorAccord:(displayDivErrorBarCS==true && (isSection4SC || (isRetrive && !isSection4Null))),errorNoAccord:(displayDivErrorBarCS==false && (isSection4SC || (isRetrive && !isSection4Null))),disabled:!hasSectionPrivilege('SECTION4')&& sectionAWBPrivilege.length>0 || (!moveNextSection && isAWBAutoSave!='TRUE'),sectionNotAccessible:!moveNextSection && isAWBAutoSave!='TRUE'}" id="cargoScreeningAcrdn">
+									<div class="accordionTitle"
+									ng-class="displayDivErrorBarCS !== undefined?((displayDivErrorBarCS !== true && totalScreenData.screeningFailed !== false)?('redBorder'):('')):''" ng-click="autoSaveData('cargoScreen','4');showErrorBar(displayDivErrorBarCS);">
+										<div class="accordionToggle">
+										<i class="iconCircle">4</i><span class="accrdName">CARGO SCREENING</span>
+										<fontbold class="showAccessDenied txtStatusTwo" ng-bind="constant.access_denied"></fontbold>
+										<fontbold ng-bind="alertCCSFFailure4" class="txtColorError"></fontbold><span ng-if="alertSecurityMsgScreening && alertCCSFFailure4">,</span>
+										<fontbold ng-bind="alertSecurityMsgScreening" class="txtColorError"></fontbold>
+										</div>
+										<icon class="iconHistory" ng-if="has_permission(role.role_VIEW_AIR_WAYBILL_HISTORY)"   data-ng-click="moveHistory('3'); awbHistoryClick(4)"></icon>
+									</div>
+									<div id="cargoScreenBody" class="cargoScreening accordionBody">
+									</div>
+								</li>
+								<!-- Accordion ROUTING 555-->
+                                <li class="accordion" ng-class="{errorAccord:(displayDivErrorBarRt==true),errorNoAccord:(displayDivErrorBarRt==false),disabled:!hasSectionPrivilege('SECTION5')&& sectionAWBPrivilege.length>0 || (!moveNextSection && isAWBAutoSave!='TRUE'),sectionNotAccessible:!moveNextSection && isAWBAutoSave!='TRUE'}" id="routingAcrdn">
+									<div class="accordionTitle" ng-click="openAccordionPanel('routing');autoSaveData('routing','5');showErrorBar(displayDivErrorBarRt);">
+										<div class="accordionToggle">
+										<i class="iconCircle">5</i><span class="accrdName">ROUTING</span>
+										<fontbold class="showAccessDenied txtStatusTwo" ng-bind="constant.access_denied"></fontbold>
+										<span ng-class="dispAccHdrErrorRt !== true?'txtColorNormal':'txtColorError'" ng-if="dispAccHdrErrorRt !== undefined">{{fieldNameRt}}</span>
+										</div>
+										<icon class="iconHistory" ng-if="has_permission(role.role_VIEW_AIR_WAYBILL_HISTORY)"  data-ng-click="moveHistory('4'); awbHistoryClick(5)"></icon>
+									</div>
+									<div id="routingBody" class="accordionBody">
+									</div>
+								</li>
+								<!-- Accordion CHARGES 666-->
+								<li class="accordion disabled">
+									<div class="accordionTitle" ng-click="openAccordionPanel('charges');autoSaveData('charges','6');">
+									<div class="accordionToggle">
+										<i class="iconCircle">6</i><span class="accrdName">CHARGES</span> 
+										<fontbold class="showAccessDenied txtStatusTwo" ng-bind="constant.access_denied"></fontbold>
+									</div>
+									<icon class="iconHistory" ng-if="has_permission(role.role_VIEW_AIR_WAYBILL_HISTORY)"  data-ng-click="moveHistory('5');awbHistoryClick(6)"></icon>
+									</div>
+									<div id="chargesBody" class="accordionBody">
+									</div>
+								</li>
+								<!-- Accordion SIGNATURES 777-->
+                                <li class="accordion" ng-class="{errorAccord:(displayDivErrorBarSig==true && (isSection7SC || (isRetrive && tenderDateGeneration))),errorNoAccord:(displayDivErrorBarSig==false && (isSection7SC || (isRetrive && tenderDateGeneration))),disabled:!hasSectionPrivilege('SECTION7')&& sectionAWBPrivilege.length>0 || (!moveNextSection && isAWBAutoSave!='TRUE'),sectionNotAccessible:!moveNextSection && isAWBAutoSave!='TRUE'}" id="signatureAccn">
+									<div class="accordionTitle" ng-click="autoSaveData('signatures','7');">
+										<div class="accordionToggle">
+										<i class="iconCircle">7</i><span class="accrdName">SIGNATURES</span><fontbold class="showAccessDenied txtStatusTwo" ng-bind="constant.access_denied"></fontbold>
+										</div>
+									<icon class="iconHistory" ng-if="has_permission(role.role_VIEW_AIR_WAYBILL_HISTORY)"  data-ng-click="moveHistory('6');awbHistoryClick(7)"></icon>
+									</div>
+									<div id="signatureBody" class="accordionBody">
+									</div>
+								</li>
+								<!-- Accordion LOT LABELS 888-->
+                                <li class="accordion" ng-class="{errorAccord:displayDivErrorBarLotLabels==true,errorNoAccord:displayDivErrorBarLotLabels==false,disabled:!hasSectionPrivilege('SECTION8')&& sectionAWBPrivilege.length>0 || (!moveNextSection && isAWBAutoSave!='TRUE'),sectionNotAccessible:!moveNextSection && isAWBAutoSave!='TRUE'}" id="lotLabelsAcrdn">
+									<div class="accordionTitle" ng-click="openAccordionPanel('lotlables');autoSaveData('lotlables','8');">
+										<div class="accordionToggle">
+										<i class="iconCircle">8</i><span class="accrdName">LOT LABELS</span>
+										<fontbold ng-bind="alertSecurityMsgLotLabel" class="txtColorError"></fontbold>
+										<span ng-class="dispAccHdrErrorRLotLabels !== true?'txtColorNormal':'txtColorError'" ng-if="dispAccHdrErrorRLotLabels !== undefined">{{fieldNameLotLabels}}</span>
+										<fontbold class="showAccessDenied txtStatusTwo" ng-bind="constant.access_denied"></fontbold>
+										</div>
+										<icon class="iconHistory" ng-if="has_permission(role.role_VIEW_AIR_WAYBILL_HISTORY)"  data-ng-click="moveHistory('7'); awbHistoryClick(8)"></icon>
+									</div>
+									<div id="lotLablesBody" class="accordionBody">
+									</div>
+								</li>
+								<!-- Accordion COMMENTS 999-->
+                                <li class="accordion" ng-class="{errorAccord:displayDivErrorBarCom==true,errorNoAccord:displayDivErrorBarCom==false,disabled:!hasSectionPrivilege('SECTION9')&& sectionAWBPrivilege.length>0 || (!moveNextSection && isAWBAutoSave!='TRUE'),sectionNotAccessible:!moveNextSection && isAWBAutoSave!='TRUE'}" id="commentsBody1">
+									<div class="accordionTitle" ng-click="autoSaveData('comments');">
+										<div class="accordionToggle">
+										<i class="iconCircle">9</i><span class="accrdName">COMMENTS</span>
+										<fontbold class="showAccessDenied txtStatusTwo" ng-bind="constant.access_denied"></fontbold>
+										</div>
+										<icon class="iconHistory" ng-if="has_permission(role.role_VIEW_AIR_WAYBILL_HISTORY)"  data-ng-click="moveHistory('8');awbHistoryClick(9)"></icon>
+									</div>
+									<div id="commentsBody" class="accordionBody">
+									</div>
+								</li>
+								<!-- Accordion DOCUMENTS 101010-->
+                                <li class="accordion" ng-class="{errorAccord:displayDivErrorBarDoc==true,errorNoAccord:displayDivErrorBarDoc==false,disabled:!hasSectionPrivilege('SECTION10')&& sectionAWBPrivilege.length>0 || (!moveNextSection && isAWBAutoSave!='TRUE'),sectionNotAccessible:!moveNextSection && isAWBAutoSave!='TRUE'}" id="documentsAccordion">
+									<div class="accordionTitle" ng-click="openAccordionPanel('documents');autoSaveData('documents','10');">
+										<div class="accordionToggle">
+										<i class="iconCircle">10</i><span class="accrdName">DOCUMENTS</span>
+										<fontbold class="showAccessDenied txtStatusTwo" ng-bind="constant.access_denied"></fontbold>
+										</div>
+									</div>
+									<div id="documentsBody" class="accordionBody">
+									</div>
+								</li>
+							</ul>
+							<!-- Accordion wrapper ends -->
+						</div>
+						<!-- button wrapper bottom -->
+						<div>
+							<div class="pull-left">
+								<button class="swc_button TypeBlue pull-left MrgL_0" 
+								ng-disabled="(updatedVersionNumber === '' && isAWBAutoSave=='FALSE' && awbContent.versionNumber=='') || 
+								(isAWBAutoSave=='TRUE' && (displayDivErrorBarFs ||  displayDivErrorBarTc || displayDivErrorBarSd || 
+								 displayDivErrorBarCS || displayDivErrorBarRt || displayDivErrorBarSig || displayDivErrorBarLotLabels || displayDivErrorBarCom || displayDivErrorBarDoc))"
+								ng-click="printAWB()" id="printAWB" >Print AWB</button>
+								<!--AWB STATUS BASED PRIVILEGES---> 
+								<span ng-if="!voidStatus">
+								    <span ng-if="(has_permission(role.role_VOID_AWB) && !cancelVoid) || (has_permission(role.role_CANCEL_AWB) && cancelVoid)">
+									  <button class="swc_clear_button pull-left" ng-click="voidPopUpAWB();" ng-disabled="(misMatchStation) || (updatedVersionNumber === '' && isAWBAutoSave=='FALSE' && awbContent.versionNumber=='')" tabindex="-1">Void AWB</button>
+									</span>
+									<span ng-if="(!has_permission(role.role_CANCEL_AWB)&& cancelVoid) || (!has_permission(role.role_VOID_AWB) && !cancelVoid)">
+									  <button class="swc_clear_button pull-left" ng-disabled="true" tabindex="-1">Void AWB</button>
+									</span>
+								</span>
+								<span ng-if="voidStatus">
+									<button class="swc_clear_button pull-left" ng-disabled="true" tabindex="-1">Void AWB</button>
+								</span>
+								<!--AWB STATUS BASED PRIVILEGES--->
+							</div>
+							<div class="pull-right">
+								<span ng-if="isAWBAutoSave!='TRUE'">
+									<button class="swc_clear_button pull-left" ng-disabled="misMatchStation" ng-click="saveSectionWise()" tabindex="-1">Save</button>
+									<button class="pull-left swc_button" name="saveExit" id="saveExit" ng-disabled="misMatchStation" ng-click="saveSectionWise('CLOSE')">Save & Close</button>
+									<a href id="exitButton" class="buttonLink pull-left marginNone" ng-click="exitClickAutoSave()" tabindex="-1">Exit</a>
+								</span>	
+								<span ng-if="isAWBAutoSave=='TRUE'">
+									<button class="swc_clear_button pull-left" ng-click="awbRevalidation()" tabindex="-1">Save</button>
+									<button class="pull-left swc_button" ng-click="awbRevalidation('CLOSE')">Save & Close</button>
+									<a href id="exitButton" class="buttonLink pull-left marginNone" ng-click="exitClick()" tabindex="-1">Exit</a>
+								</span>								
+							</div> 
+						</div>	
+					</section>
+					<!-- Tab 222 starts -->
+					<section role="tabpanel" class="tab-pane AWBHistory">
+						<div ng-show="awbhistory">
+							<data-ng-include src="'../modules/manageawb/header.html'"></data-ng-include>
+							<data-ng-include src="'../modules/manageawb/awbHistory.html'"></data-ng-include>
+						</div>
+					</section>	
+					<section role="tabpanel" class="tab-pane">
+						<data-ng-include src="'../modules/manageawb/header.html'"></data-ng-include>
+						<data-ng-include src="'../modules/manageawb/discrepancy.html'"></data-ng-include>
+					</section>
+				</div>
+				
+			</div>	
+		</div>
+	</div>
+</span>
+<script>
+	$(document).ready(function(){
+		$('.selectpicker').selectpicker();
+	});
+</script>
+
+<script type="text/ng-template" id="exitAwbModal.html">
+	<div class="popupAlert popupAlert-full marginNone">
+    	<div class="popup-header"><h2>You are leaving this page</h2></div>
+        <div class="popup-body">
+			<div class="row Margin0">
+				<p class="warningTxt">Air Waybill changes will be discarded upon exit - do you wish to continue?</p>
+			</div>
+		</div>
+        <div class="popup-footer">
+        	<div class="row Margin0">
+				<div class="pull-right">
+					<button  data-dismiss="modal" class="pull-right swc_button" ng-click="yes()">Yes</button>
+					<a data-ng-click="no()" class="pull-right buttonLink2">No</button>
+				</div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="saveAwbModal.html">
+	<div class="popupAlert popupAlert-full marginNone">
+    	<div class="popup-header"><h2>Success</h2></div>
+        <div class="popup-body">
+			<div class="row Margin0">
+				<p class="warningTxt" ng-bind="infoMsg"></p>
+			</div>
+		</div>
+        <div class="popup-footer">
+        	<div class="row Margin0">
+				<div class="pull-right">
+					<button class="pull-left swc_button MrgL_0" ng-click="cancel()" autofocus="true">OK</button>
+				</div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="printAwbModal.html">
+	<div class="popupAlert popupAlert-full marginNone">
+    	<div class="popup-header"><h2>You have unsaved changes</h2></div>
+        <div class="popup-body">
+			<div class="row Margin0">
+				<p class="warningTxt">Air Waybill has been changed - do you wish to save your changes?</p>
+			</div>
+		</div>
+        <div class="popup-footer">
+        	<div class="row Margin0">
+				<div class="pull-right">
+					<button  data-dismiss="modal" class="pull-right swc_button" ng-click="yes()">Yes</button>
+					<a data-ng-click="no()" class="pull-right buttonLink2">No</button>
+				</div>
+            </div>
+        </div>
+    </div>
+</script>

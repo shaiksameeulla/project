@@ -1,0 +1,1124 @@
+<div class="ContentArea shipMangmt">
+	<!--SUCCESS MSG-->
+	<div class="relative">
+		<div id="AWBerrorWrapper">
+		   <div class="errorTop positive" ng-if="shipmentFacilityChanged" id="isStationUpdated">
+				<table>
+					<tr>
+						<td class="ETicon" >
+							<icon class="iconSize2 iAlert cursorPointer"></icon>
+						</td>
+						<td class="ETtxt">
+							<p ng-bind="shipmentFacilityChanged"></p>
+						</td>
+						<td class="ETClose">
+							<icon class="iconSize1 icloseBtn cursorPointer"></icon>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!--SUCCESS MSG-->
+	<h1 class="pageTitle pull-left">Shipment Management</h1>
+	<!--ERROR MSG-->
+	 <div id="AWBerrorWrapper">
+	 	<div class="errorTop negative" ng-if="errorObject.diffAWBError">
+		 <table>
+			<tr>
+			   <td class="ETicon">
+				  <icon class="iconSize2 iAlert cursorPointer"></icon>
+			   </td>
+			   <td class="ETtxt">
+				  <h4 ng-bind="errorObject.showMsg"></h4>
+			   </td>
+			   <td class="ETClose">
+				  <icon class="iconSize1 icloseBtn cursorPointer" ng-click="removeError()"></icon>
+			   </td>
+			</tr>
+		 </table>
+		</div>
+	  </div>
+	  <!--ERROR MSG-->
+	<div class="pageTitleOpps pull-right">
+		<label>Location</label>
+		<div class="combinedWrapper pull-left marginR20 marginBottom20">
+			<div class="ddSingle">
+				<select selectpicker ng-model="shipmentInboundSearch.facility" ng-change="validateStationCode(shipmentInboundSearch.facility)" ng-options="facility.key as facility.value for facility in facilityOptions">
+					<option value=""></option>
+				</select>
+			</div>		
+		</div>
+		<!--<div class="combinedWrapper pull-left"><span>Last refreshed {{shipmentRefereshTime.substring(0,2)}}:{{shipmentRefereshTime.substring(2,8)}}</span></div>
+		 <div class="pull-left"><button class="buttonIcon TypeBlue"><span class="iconCollapse expand"></span></button></div> -->
+	</div>
+	<div class="clear"></div>
+	<div id="content_body" class="tabWrapper">
+		<!-- Nav tabs -->
+		<!--Modified code for CCB - 298 -Start changed tab sequence  to "inbound" ,"missing","transfer","outbound" , delivered-->
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation" class="" ng-class="{disable:!has_permission(role.role_VIEW_INBOUND_SHIPMENTS)}">
+				<a data-toggle="{{(has_permission(role.role_VIEW_INBOUND_SHIPMENTS))?tab:false}}" ng-if="has_permission(role.role_VIEW_INBOUND_SHIPMENTS)" ng-click="init();getInboundDataOnInterval();stopOtherTimers('INBOUND');clearFilterFlags()">Inbound</a>
+				<a ng-if="!has_permission(role.role_VIEW_INBOUND_SHIPMENTS)">Inbound</a>
+			</li>
+			<li role="presentation" class="" ng-class="{disable:!has_permission(role.role_VIEW_MISSING_SHIPMENTS)}">
+				<a data-toggle="{{(has_permission(role.role_VIEW_MISSING_SHIPMENTS))?tab:false}}" ng-if="has_permission(role.role_VIEW_MISSING_SHIPMENTS)" ng-click="loadMissingdata();stopOtherTimers('MISSING');clearFilterFlags()">Missing</a>
+				<a ng-if="!has_permission(role.role_VIEW_MISSING_SHIPMENTS)">Missing</a>
+			</li>
+			<li role="presentation" class="" ng-class="{disable:!has_permission(role.role_VIEW_TRANSFER_SHIPMENTS)}" >
+				<a data-toggle="{{(has_permission(role.role_VIEW_TRANSFER_SHIPMENTS))?tab:false}}" ng-if="has_permission(role.role_VIEW_TRANSFER_SHIPMENTS)" ng-click="loadTransferdata();stopOtherTimers('TRANSFER');clearFilterFlags()">Transfer</a>
+				<a ng-if="!has_permission(role.role_VIEW_TRANSFER_SHIPMENTS)">Transfer</a> 
+			</li>
+			<li role="presentation" class="" ng-class="{disable:!has_permission(role.role_VIEW_OUTBOUND_SHIPMENTS)}" >
+				<a data-toggle="{{(has_permission(role.role_VIEW_OUTBOUND_SHIPMENTS))?tab:false}}" ng-if="has_permission(role.role_VIEW_OUTBOUND_SHIPMENTS)" ng-click="loadOutbounddata();stopOtherTimers('OUTBOUND');clearFilterFlags()" >Outbound</a>
+				<a ng-if="!has_permission(role.role_VIEW_OUTBOUND_SHIPMENTS)">Outbound</a>
+			</li>
+			<li role="presentation" class="" ng-class="{disable:!has_permission(role.role_VIEW_PICKUP_SHIPMENTS)}">
+				<a data-toggle="{{(has_permission(role.role_VIEW_PICKUP_SHIPMENTS))?tab:false}}" ng-if="has_permission(role.role_VIEW_PICKUP_SHIPMENTS)" ng-click="loadDelivereddata();stopOtherTimers('DELIVERED');clearFilterFlags()">Delivered</a>
+				<a ng-if="!has_permission(role.role_VIEW_PICKUP_SHIPMENTS)">Delivered</a>
+			</li>
+			
+		</ul>
+		<!--Modified code for CCB - 298 -End -->
+		<!-- Tab panes -->
+		<div class="tab-content">
+			<!-- Tab1 Inbound starts -->
+			<section role="tabpanel" class="tab-pane">
+				<div data-ng-include = "'shipmentManagement/tpls/shipmentManagement.inbound-view.html'"></div>
+			</section>
+			<!--Modified code for CCB - 298 -Start changed tab sequence  to "inbound" ,"missing","transfer","outbound" , delivered-->
+			<!-- Tab2 Missing starts -->
+			<section role="tabpanel" class="tab-pane">
+				<div data-ng-include = "'shipmentManagement/tpls/shipmentManagement.missing-view.html'"></div>
+				
+			</section>
+			<!-- Tab2 Missing End -->				
+			<!-- Tab3 Transfer  starts -->
+			<section role="tabpanel" class="tab-pane">
+				 <div data-ng-include = "'shipmentManagement/tpls/shipmentManagement.transfer-view.html'"></div>
+				
+			</section>
+			<!-- Tab3 Transfer End -->
+			
+			<!-- Tab4 Outbound starts -->
+			<section role="tabpanel" class="tab-pane">
+				<div data-ng-include = "'shipmentManagement/tpls/shipmentManagement.outbound-view.html'"></div>
+				 
+			</section>
+			<!-- Tab4 Outbound End -->
+			
+			<!-- Tab5 Delivered starts -->
+			<section role="tabpanel" class="tab-pane">
+				 <div data-ng-include = "'shipmentManagement/tpls/shipmentManagement.delivered-view.html'"></div>
+			</section>
+			<!-- Tab5 Delivered End -->
+		</div>
+		<!--Modified code for CCB - 298 -End-->
+	</div>	
+</div>
+
+<!-- popup Receive shipments -->
+<div class="modal fade"  data-backdrop="static" id="ReceiveShipmnt" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="popupAlert modal-dialog">
+
+		<!---WARNING MSG-->
+		<span ng-if="allowToCheck!='ARR'">
+			<label class="txtStatusTwo" ng-bind="errorLabel.notArrStatus"></label>
+		</span>
+
+		<!---WARNING MSG-->
+    	<div class="popup-header"><h2>Receive Shipments</h2></div> 
+	    <div class="popup-body">
+		<form name="receiveForm" novalidate>
+			<div class="tableWrapper tableOutlined2 overflow-x-auto">
+				<div class="tableHeaderFixedHead">	
+					<table class="tbl type2 tableBordered tableFixedLayout">
+						<thead>
+							<tr>
+								<td>Air Waybill</td>
+								<td>Lot #</td>
+								<td>Pcs</td>
+								<td widthformele2>Pcs Received *</td>
+								<td widthFormEle3Td widthFormEleFull requiredNo>
+								 	 <div class="ddSingle">
+										<select selectpickercountry name="warehouseLocation" ng-options="wareHouse.key as wareHouse.value for wareHouse in warehouseLocationList" id="warehouseLocationsInboundReceive" ng-model="masterDropDown.warehouseLocation" 
+										 ng-change="upateMasterLocationValue(masterDropDown.warehouseLocation)">
+											<option value=""></option>
+										</select>
+									</div> 
+								</td>	
+							</tr>                                	
+						</thead>
+					</table>
+				</div>
+				
+			   <div class="tableHeaderFixedBody minHeightNone">	
+					<table class="tbl type2 tableBordered tableFixedLayout">
+						<tbody>
+							<tr ng-repeat="inboundData in inboundProcess track by $index" ng-form="receiveFormInner"; >
+							 	<td ng-controller="searchAwbController">
+								<a ng-click="redirectShipperDetails(inboundData.awbNumber);backDropRemove();"><fontbold>{{inboundData.awbNumber}}</fontbold></a>
+								</td>	
+							<td><span>{{inboundData.lotNumber}} <span ng-if="inboundData.totalLots >1" >of {{inboundData.totalLots}}</span></span></td>
+								<td number ng-bind="inboundData.totalPieces"></td>	
+								<td widthformele2 widthFormEleFull>
+								 <span class="eleShowErrorMsg widthFull">
+								 <!-- pcs received should always be greater than zero and only highlighting border of input box incase validation failed-->
+								<input number type="number" max="{{inboundData.totalPieces}}" min="1" ng-model="inboundData.piecesReceived" name="piecesReceived" data-ng-focus-no-validate id="piecesReceived" data-ng-pattern="/^[0-9]{1,4}$/" required>
+								
+								</span>
+								</td>
+								<td widthFormEle3Td widthFormEleFull>
+									<div class="ddSingle">
+									   <select selectpickercountry name="warehouseLocation" id="warehouseLocation" ng-options="wareHouse.key as wareHouse.value for wareHouse in warehouseLocationList" ng-model="inboundData.warehouseLocation">
+											<option value=""></option>
+										</select>
+									</div> 
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>	
+			</div>
+			
+			<div class="row Margin0">
+				<div class="combinedWrapper pull-left marginR20" widthformele3 widthFormEleFull>
+					<label required>Employee ID</label>
+					 <span class="eleShowErrorMsg">
+					<input type="text" ng-model="commonData.empId" name="empId" id="empId"  maxlength="8" data-ng-pattern="/^[a-zA-Z0-9]*$/" required>
+					<error data-ng-if="(receiveForm.empId.$error.pattern || receiveForm.empId.$error.required ||receiveForm.empId.$error.minlength) && !receiveForm.empId.$focused">{{errorLabel.invalidAlphanumeric}}</error>	
+					</span>
+				</div>
+				<div class="combinedWrapper pull-left marginR20">
+					<label required>Received Date</label>
+					 <span class="eleShowErrorMsg">
+					<span class="date dateAlone"><input type="text" ng-model="commonData.receiveDateTime" data-ng-minlength="10" data-start-date-picker="{{commonData.receiveDateTime}}" 
+					 from-date-validation="" name="receiveDate" id="receiveDate" data-ng-pattern="/(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d/" required></span>
+					
+					 <error data-ng-if="(receiveForm.receiveDate.$error.pattern ||receiveForm.receiveDate.$error.required || receiveForm.receiveDate.$error.minlength)&& !receiveForm.receiveDate.$focused">{{errorLabel.InvalidDateRange}}</error>
+				  </span>
+
+				</div>
+				<div class="combinedWrapper pull-left marginR20">
+					<label required>Received Time</label>
+				   <span class="eleShowErrorMsg">
+					<input time type="text" ng-model="commonData.receiveTime" data-ng-minlength="5" data-ng-focus-no-validate onkeyup="updateTimeFormat(this,event)" maxlength="5" placeholder="HH:MM" data-ng-pattern="/^(?:(?:([01]?\d|2[0-3]))?(:[0-5]?\d))$/" name="receiveTime" id="receiveTime" required>
+					<error data-ng-if="(receiveForm.receiveTime.$error.pattern || receiveForm.receiveTime.$error.minlength)&& !receiveForm.receiveTime.$focused">{{errorLabel.invalidTimeEntry}}</error>
+				  </span>
+				</div>
+			</div>
+
+	        <div class="popup-footer">
+	        	<div class="row Margin0">
+	                <button data-dismiss="modal" class="swc_button pull-right" ng-disabled="receiveForm.$invalid" ng-click="sendReceiveInbound('receive');receiveForm.$setPristine()">Submit</button>
+					<a data-dismiss="modal" class="buttonLink2 pull-right" ng-click="receiveForm.$setPristine()">Cancel</a>
+	            </div>
+	        </div>
+		</form>
+		</div>
+    </div>
+</div>
+<!-- popup Receive shipments end-->
+
+<!-- popup Deliver shipments -->
+<div class="modal fade" data-backdrop="static" id="DeliverShipmnt" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="popupAlert modal-dialog">
+		<!---WARNING MSG-->
+		<span ng-if="allowToCheck!=('RCF'||'XFOH')">
+			<label class="txtStatusTwo" ng-bind="errorLabel.notRCFStatus"></label>
+		</span>
+
+		<!---WARNING MSG-->
+    	<div class="popup-header"><h2>Deliver Shipments</h2></div>
+        <div class="popup-body">
+		<form name="deliverForm" novalidate>
+			<div class="tableWrapper tableOutlined2 overflow-x-auto">
+				<div class="tableHeaderFixedHead">	
+					<table class="tbl type2 tableBordered tableFixedLayout">
+						<thead>
+							<tr>
+								<td>Air Waybill</td>
+								<td>Lot #</td>
+								<td>Pcs</td>
+								<td widthformele2>Pcs Delivered *</td>
+							</tr>                                	
+						</thead>
+					</table>
+				</div>
+				<div class="tableHeaderFixedBody minHeightNone">	
+					<table class="tbl type2 tableBordered tableFixedLayout">
+						<tbody>
+							<tr ng-repeat="inboundData in inboundProcess track by $index" data-ng-form="deliverFormInner">
+								<td ng-controller="searchAwbController">
+								<a ng-click="redirectShipperDetails(inboundData.awbNumber);backDropRemove();"><fontbold>{{inboundData.awbNumber}}</fontbold></a> 
+								</td>	
+								<td><span>{{inboundData.lotNumber}} <span ng-if="lot.totalLots >1" >of {{inboundData.totalLots}}</span></span></td>
+								<td number ng-bind="inboundData.totalPieces"></td>
+								<td widthformele2 widthFormEleFull> 
+								<span class="eleShowErrorMsg widthFull"> <!--Only highlighting border of input box incase validation failed-->
+								<input number type="number" max="{{inboundData.totalPieces}}" data-ng-model="inboundData.piecesDelivered" min="1" name="piecesDelivered" id="piecesDelivered" data-ng-pattern="/^[0-9]{1,4}$/" data-ng-focus-no-validate required>
+								
+								</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>	
+			</div>
+		 
+			<div class="row Margin0">
+				<div class="combinedWrapper pull-left marginR20" widthformele3 widthFormEleFull>
+					<label required>Customer Name</label>
+					<span class="eleShowErrorMsg">
+					<input type="text" ng-model="commonData.customerName" name="deliverCustomerName" id="deliverCustomerName"  maxlength="70" data-ng-pattern="/^[a-zA-Z\s]*$/" data-ng-focus-no-validate required>
+					<error data-ng-if="(deliverForm.deliverCustomerName.$error.pattern || deliverForm.deliverCustomerName.$error.required) && !deliverForm.deliverCustomerName.$focused">{{errorLabel.invalidAlphanumeric}}</error>	
+					</span>
+				</div>
+			</div>	
+
+			<div class="row Margin0">
+				<div class="combinedWrapper pull-left marginR20" widthformele3 widthFormEleFull>
+					<label required>Employee ID</label>
+					<span class="eleShowErrorMsg">
+					<input type="text" ng-model="commonData.empId" name="deliverEmpId" id="deliverEmpId" data-ng-focus-no-validate maxlength="8" data-ng-pattern="/^[a-zA-Z0-9]*$/" required>
+					<error data-ng-if="(deliverForm.deliverEmpId.$error.pattern || deliverForm.deliverEmpId.$error.required) && !deliverForm.deliverEmpId.$focused">{{errorLabel.invalidAlphanumeric}}</error>	
+					</span>
+					
+				</div>
+				<div class="combinedWrapper pull-left marginR20">
+					<label required>Delivered Date</label>
+					<span class="eleShowErrorMsg">
+					<span class="date dateAlone"><input type="text" ng-model="commonData.deliverDateTime" name="deliverDateTime" id="deliverDateTime" data-ng-focus-no-validate data-start-date-picker="{{commonData.deliverDateTime}}" from-date-validation="" 
+						 data-ng-pattern="/(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d/" required></span>
+					 
+					 <error data-ng-if="(deliverForm.deliverDateTime.$error.pattern || deliverForm.deliverDateTime.$error.minlength)&& !deliverForm.deliverDateTime.$focused">{{errorLabel.InvalidDateRange}}</error>
+					 </span>
+				</div>
+				<div class="combinedWrapper pull-left marginR20">
+					<label required>Delivered Time</label>
+					<span class="eleShowErrorMsg">
+					<input time type="text" ng-model="commonData.deliverDateTimeStr" data-ng-minlength="5" maxlength="5" placeholder="HH:MM" onkeyup="updateTimeFormat(this,event)"  data-ng-focus-no-validate data-ng-pattern="/^(?:(?:([01]?\d|2[0-3]))?(:[0-5]?\d))$/" name="deliverDateTimeStr" id="deliverDateTimeStr" required>
+					<error data-ng-if="(deliverForm.deliverDateTimeStr.$error.pattern || deliverForm.deliverDateTimeStr.$error.minlength)&& !deliverForm.deliverDateTimeStr.$focused">{{errorLabel.invalidTimeEntry}}</error>
+				  </span>
+				</div>
+			</div>
+
+	        <div class="popup-footer">
+	        	<div class="row Margin0">
+	                <button data-dismiss="modal" class="swc_button pull-right" ng-disabled="deliverForm.$invalid" ng-click="sendPrintReceiveDeliverInbound('receivedeliverPrint');deliverForm.$setPristine()" >Submit & Print</button>
+					<button data-dismiss="modal" class="swc_clear_button pull-right" ng-disabled="deliverForm.$invalid" ng-click="sendDeliverInbound('deliver');deliverForm.$setPristine()">Submit</button>
+					<a data-dismiss="modal" class="buttonLink2 pull-right" ng-click="deliverForm.$setPristine()">Cancel</a>
+	            </div>
+	        </div>
+
+		</form>
+		</div>
+    </div>
+</div>
+<!-- popup Deliver shipments end-->
+
+<!-- popup Receive&Deliver shipments -->
+<div class="modal fade" data-backdrop="static" id="ReceivDeliverShipmnt" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="popupAlert modal-dialog">
+		<!---WARNING MSG-->
+		<span ng-if="allowToCheck!='ARR'">
+			<label class="txtStatusTwo" ng-bind="errorLabel.notArrStatus"></label>
+		</span>
+
+		<!---WARNING MSG-->
+	    <div class="popup-header"><h2>Receive & Deliver Shipments</h2></div>
+	    <div class="popup-body">
+			<form name="deliverReceiveForm" novalidate>
+				<div class="tableWrapper tableOutlined2 overflow-x-auto">
+					<div class="tableHeaderFixedHead">	
+						<table class="tbl type2 tableBordered tableFixedLayout">
+							<thead>
+								<tr>
+									<td>Air Waybill</td>
+									<td>Lot #</td>
+									<td>Pcs</td>
+									<td widthformele2>Pcs Received *</td>
+								</tr>                                	
+							</thead>
+						</table>
+					</div>
+					<div class="tableHeaderFixedBody minHeightNone">	
+						<table class="tbl type2 tableBordered tableFixedLayout">
+							<tbody>
+								<tr ng-repeat="inboundData in inboundProcess track by $index" data-ng-form = "deliverReceiveFormInner">
+									<td ng-controller="searchAwbController">
+									<a ng-click="redirectShipperDetails(inboundData.awbNumber);backDropRemove();"><fontbold>{{inboundData.awbNumber}}</fontbold></a>
+									</td>	
+								<td><span>{{inboundData.lotNumber}} <span ng-if="lot.totalLots >1" >of {{inboundData.totalLots}}</span></span></td>
+									<td number ng-bind="inboundData.totalPieces"></td>
+									<td widthformele2 widthFormEleFull>
+									<span class="eleShowErrorMsg widthFull" > 
+									<!--Only highlighting border of input box incase validation failed-->
+									<input number type="number" max="{{inboundData.totalPieces}}" min="1" ng-model="inboundData.piecesDelivered" data-ng-focus-no-validate name="piecesReceived" data-ng-pattern="/^[0-9]{1,4}$/" id="piecesReceived" required>
+									
+									</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>	
+				</div>
+			
+				<div class="row Margin0">
+					<div class="combinedWrapper pull-left marginR20" widthformele3 widthFormEleFull>
+						<label required>Customer Name</label>
+						<span class="eleShowErrorMsg">
+						<input type="text" ng-model="commonData.customerName" name="rDeliverCustomerName" id="rDeliverCustomerName" maxlength="70" data-ng-focus-no-validate data-ng-pattern="/^[a-zA-Z\s]*$/" required>
+						<error data-ng-if="(deliverReceiveForm.rDeliverCustomerName.$error.pattern || deliverReceiveForm.rDeliverCustomerName.$error.required) && !deliverReceiveForm.rDeliverCustomerName.$focused">{{errorLabel.invalidAlphanumeric}}</error>	
+						</span>
+					</div>
+				</div>	
+
+				<div class="row Margin0">
+					<div class="combinedWrapper pull-left marginR20" widthformele3 widthFormEleFull>
+						<label required>Employee ID</label>
+						<span class="eleShowErrorMsg">
+						<input type="text" ng-model="commonData.empId" name="rDeliverEmpId" id="rDeliverEmpId" data-ng-focus-no-validate maxlength="8" data-ng-pattern="/^[a-zA-Z0-9]*$/" required>
+						<error data-ng-if="(deliverReceiveForm.rDeliverEmpId.$error.pattern || deliverReceiveForm.rDeliverEmpId.$error.required) && !deliverReceiveForm.rDeliverEmpId.$focused">{{errorLabel.invalidAlphanumeric}}</error>	
+						</span>
+					</div>
+					<div class="combinedWrapper pull-left marginR20">
+						<label required>Delivered Date</label>
+						<span class="eleShowErrorMsg">
+						<span class="date dateAlone"><input type="text" ng-model="commonData.deliverDateTime" name="deliverDateTime" id="deliverDateTime" data-start-date-picker="{{commonData.deliverDateTime}}" from-date-validation="" 
+							 data-ng-pattern="/(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d/" data-ng-focus-no-validate required></span>
+						 <error data-ng-if="(deliverReceiveForm.deliverDateTime.$error.pattern || deliverReceiveForm.deliverDateTime.$error.minlength)&& !deliverReceiveForm.deliverDateTime.$focused">{{errorLabel.InvalidDateRange}}</error>
+						</span>
+					</div>
+					<div class="combinedWrapper pull-left marginR20">
+						<label required>Delivered Time</label>
+						<span class="eleShowErrorMsg">
+						<input time type="text" ng-model="commonData.deliverDateTimeStr" onkeyup="updateTimeFormat(this,event)" maxlength="5" placeholder="HH:MM" data-ng-minlength="5" data-ng-focus-no-validate data-ng-pattern="/^(?:(?:([01]?\d|2[0-3]))?(:[0-5]?\d))$/" name="deliverDateTimeStr" id="deliverDateTimeStr" required>
+						<error data-ng-if="(deliverReceiveForm.deliverDateTimeStr.$error.pattern || deliverReceiveForm.deliverDateTimeStr.$error.minlength)&& !deliverReceiveForm.deliverDateTimeStr.$focused">{{errorLabel.invalidTimeEntry}}</error>
+					  </span>
+					</div>
+				</div>
+		    
+			    <div class="popup-footer">
+		        	<div class="row Margin0">
+		                <button data-dismiss="modal" class="swc_button pull-right" ng-disabled="deliverReceiveForm.$invalid" ng-click="sendPrintReceiveDeliverInbound('receivedeliverPrint');deliverReceiveForm.$setPristine()">Submit & Print</button>
+						<button data-dismiss="modal" class="swc_clear_button pull-right" ng-disabled="deliverReceiveForm.$invalid" ng-click="sendReceiveDeliverInbound('receivedeliver');deliverReceiveForm.$setPristine()">Submit</button>
+						<a data-dismiss="modal" class="buttonLink2 pull-right" ng-click="deliverReceiveForm.$setPristine()">Cancel</a>
+		            </div>
+		        </div>
+		  	</form>
+	  	</div>
+	</div>
+</div>
+<!-- popup Receive&Deliver shipments end-->
+
+<!-- popup Discrepancy -->
+<div class="modal fade" data-backdrop="static" id="DiscrepancyShipmnt" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="popupAlert modal-dialog">
+    	<div class="popup-header"><h2>Discrepancy Shipments</h2></div>
+        <div class="popup-body">
+		<form name="discrepancyForm" novalidate>
+			<div class="tableWrapper tableOutlined2 overflow-x-auto">
+				<div class="tableHeaderFixedHead">	
+					<table class="tbl type2 tableBordered tableFixedLayout">
+						<thead>
+							<tr>
+								<td>Air Waybill</td>
+								<td>Lot #</td>
+								<td>Pcs</td>
+							</tr>                                	
+						</thead>
+					</table>
+				</div>
+				<div class="tableHeaderFixedBody minHeightNone">	
+					<table class="tbl type2 tableBordered tableFixedLayout">
+						<tbody>
+							<tr ng-repeat="inboundData in inboundProcess track by $index" >
+								<td ng-controller="searchAwbController">
+								<a ng-click="redirectShipperDetails(inboundData.awbNumber); backDropRemove();">{{inboundData.awbNumber}}</fontbold></a>
+								</td>
+                            	<td><span>{{inboundData.lotNumber}} <span ng-if="lot.totalLots >1" >of {{inboundData.totalLots}}</span></span></td>
+								<td number ng-bind="inboundData.totalPieces"></td>								
+							</tr>
+						</tbody>
+					</table>
+				</div>
+            </div> 
+			<!-- <form name="discrepancyForm" novalidate> -->
+			<div class="row Margin0">
+				<div class="combinedWrapper pull-left">
+					<div class="checkboxRadio pull-left marginR20"><input name="DiscrepancyOption" type="radio" data-ng-disabled="!has_permission(role.role_MARK_DISCREPANCY_SHIPMENT_MISSING)" ng-model="commonData.discrepancyOption" value="MSNG" required><span class="innerCheck" ><label>Missing</label></span></div>
+					<div class="checkboxRadio pull-left marginR20"><input name="DiscrepancyOption" type="radio" ng-disabled="!has_permission(role.role_MARK_DISCREPANCY_SHIPMENT_TRACE)" ng-model="commonData.discrepancyOption"  value="TRC" required><span class="innerCheck" ><label>Trace</label></span></div>
+					<div class="checkboxRadio pull-left"><input name="DiscrepancyOption" type="radio" ng-disabled="!has_permission(role.role_MARK_DISCREPANCY_SHIPMENT_LOST)" ng-model="commonData.discrepancyOption" value="LOST" required><span class="innerCheck"><label>Declare Lost</label></span></div>
+				</div>
+			</div>
+
+			<div class="row Margin0">
+				<div class="combinedWrapper pull-left marginR20" widthformele3 widthFormEleFull>
+					<label required>Employee ID</label>
+					<span class="eleShowErrorMsg">
+					<input type="text" ng-model="commonData.empId" name="empId" id="empId" data-ng-focus-no-validate maxlength="8" data-ng-focus-no-validate data-ng-pattern="/^[a-zA-Z0-9]*$/" required>
+					<error data-ng-if="(discrepancyForm.empId.$error.pattern || discrepancyForm.empId.$error.required || discrepancyForm.empId.$error.minlength) && !discrepancyForm.empId.$focused">{{errorLabel.invalidAlphanumeric}}</error>	
+					</span>
+					
+				</div>
+				<div class="combinedWrapper pull-left marginR20">
+				
+				<label required>Discrepancy Date</label>
+				<span class="eleShowErrorMsg">
+					<span class="date dateAlone"><input type="text" ng-model="commonData.receiveDateTime" name="discripancyDate" id="discripancyDate"  data-search-date-picker="{{commonData.receiveDateTime}}" ng-change="resetSeconds();"
+						 data-ng-pattern="/(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d/" data-ng-focus-no-validate required></span>
+					 <error data-ng-if="(discrepancyForm.discripancyDate.$error.pattern||discrepancyForm.discripancyDate.$error.minlength)&& !discrepancyForm.discripancyDate.$focused">{{errorLabel.InvalidDateRange}}</error>
+					</span>
+				
+                    </div>
+				<div class="combinedWrapper pull-left marginR20">
+					<label required>Discrepancy Time</label>
+					<span class="eleShowErrorMsg">
+					<input time type="text" ng-model="commonData.receiveTime" data-ng-minlength="5" maxlength="5" placeholder="HH:MM" onkeyup="updateTimeFormat(this,event)"  data-ng-focus-no-validate data-ng-pattern="/^(?:(?:([01]?\d|2[0-3]))?(:[0-5]?\d))$/" name="receiveTime" id="receiveTime" required>
+					<error data-ng-if="(discrepancyForm.receiveTime.$error.pattern||discrepancyForm.receiveTime.$error.minlength)&& !discrepancyForm.receiveTime.$focused">{{errorLabel.invalidTimeEntry}}</error>
+				  </span>
+				</div>
+			</div>
+
+			<div class="row Margin0">
+				<div class="combinedWrapper textareaWidthFull">
+					<label>Notes</label> 
+                    <textarea type="text" ng-model="commonData.userComments" name="userComments" id="userComments" maxlength="1000">{{commonData.userComments}}</textarea>
+
+				</div>
+			</div>
+	        <div class="popup-footer">
+	        	<div class="row Margin0">
+	                <button data-dismiss="modal" class="swc_button pull-right" ng-disabled="discrepancyForm.$invalid" ng-click="sendDiscrepancyInbound('discrepancy');discrepancyForm.$setPristine()">Submit</button>
+					<a data-dismiss="modal" class="buttonLink2 pull-right" ng-click="discrepancyForm.$setPristine()">Cancel</a>
+	            </div>
+	        </div>
+		</form>
+		</div>
+	</div>
+</div>
+<!-- popup Discrepancy end-->
+
+<!-- popup Assign Location -->
+<div class="modal fade"  data-backdrop="static" id="AssignLocation" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="popupAlert modal-dialog">
+    	<div class="popup-header"><h2>Assign Location</h2></div>
+        <div class="popup-body">
+		<form name ="assignLocationForm" novalidate>
+			<div class="tableWrapper tableOutlined2 overflow-x-auto">
+				<div class="tableHeaderFixedHead">	
+					<table class="tbl type2 tableBordered tableFixedLayout">
+						<thead>
+							<tr>
+								<td>Air Waybill</td>
+								<td>Lot #</td>
+								<td>Pcs</td>
+								<td widthFormEle3Td>Location</td>
+							</tr>                                	
+						</thead>
+					</table>
+				</div>
+				<div class="tableHeaderFixedBody">	
+					<table class="tbl type2 tableBordered tableFixedLayout">
+					    <tbody>
+							<tr ng-repeat="inboundData in inboundProcess">
+								<td ng-controller="searchAwbController">
+								<a ng-click="redirectShipperDetails(inboundData.awbNumber);backDropRemove();"><fontbold>{{inboundData.awbNumber}}</fontbold></a>
+								</td>	
+								<td><span>{{inboundData.lotNumber}} <span ng-if="inboundData.totalLots >1" >of {{inboundData.totalLots}}</span></span></td>
+								<td number ng-bind="inboundData.totalPieces"></td>
+							    <td widthFormEle3Td widthFormEleFull>
+									<div class="ddSingle">
+										<select class="reinitialize" selectpickercountry name="warehouseLocation" ng-options="wareHouse.key as wareHouse.value for wareHouse in warehouseLocationList" id="warehouseLocationAssign" ng-model="masterDropDown.warehouseLocation" 
+										 ng-change="upateMasterLocationValue(masterDropDown.warehouseLocation)">
+											<option value=""></option>
+										</select>
+									</div> 
+								</td>
+							</tr>
+						</tbody>
+
+					</table>
+                
+
+				</div>	
+			</div>
+			
+			<div class="row Margin0">
+				<div class="combinedWrapper pull-left marginR20" widthformele3 widthFormEleFull>
+					<label required>Employee ID</label>
+					<span class="eleShowErrorMsg">
+					<input type="text" ng-model="commonData.empId" name="empId" id="empId" maxlength="8" data-ng-pattern="/^[a-zA-Z0-9]*$/" data-ng-focus-no-validate required>
+					<error data-ng-if="(assignLocationForm.empId.$error.pattern || assignLocationForm.empId.$error.minlength) && !assignLocationForm.empId.$focused">{{errorLabel.invalidAlphanumeric}}</error>	
+					</span>
+				</div>
+				<div class="combinedWrapper pull-left marginR20">
+					<label required>Received Date</label>					
+					<span class="eleShowErrorMsg">
+					<span class="date dateAlone"><input type="text" ng-model="commonData.receiveDateTime" name="assignLocationDate" id="assignLocationDate" data-start-date-picker="{{commonData.receiveDateTime}}" from-date-validation="" 
+						 data-ng-pattern="/(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d/" required></span>
+					 <error data-ng-if="(assignLocationForm.assignLocationDate.$error.pattern || assignLocationForm.assignLocationDate.$error.minlength)&& !assignLocationForm.assignLocationDate.$focused">{{errorLabel.InvalidDateRange}}</error>
+					</span>
+				</div>
+				<div class="combinedWrapper pull-left marginR20">
+					<label required>Received Time</label>
+					<span class="eleShowErrorMsg">
+					<input time type="text" ng-model="commonData.receiveTime" data-ng-minlength="5" maxlength="5" placeholder="HH:MM" onkeyup="updateTimeFormat(this,event)"  data-ng-focus-no-validate data-ng-pattern="/^(?:(?:([01]?\d|2[0-3]))?(:[0-5]?\d))$/" name="receiveTime" id="receiveTime" required>
+					<error data-ng-if="(assignLocationForm.receiveTime.$error.pattern || assignLocationForm.receiveTime.$error.minlength)&& !assignLocationForm.receiveTime.$focused">{{errorLabel.invalidTimeEntry}}</error>
+				  </span>
+				</div>
+			</div>		
+		
+			<div class="popup-footer">
+				<div class="row Margin0">
+					<button data-dismiss="modal" class="swc_button pull-right" ng-disabled="assignLocationForm.$invalid" data-ng-click="sendAssignLocationInbound('assignLocation')">Submit</button>
+					<a data-dismiss="modal" class="buttonLink2 pull-right" ng-click="assignLocationForm.$setPristine()">Cancel</a>
+				</div>
+			</div>
+		</form>
+        </div>        
+    </div>
+</div>
+<!-- popup Assign Location end-->
+
+<!-- popup AssignRunner -->
+<div class="modal fade"  data-backdrop="static" id="assignRunner" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="popupAlert modal-dialog">
+    	<div class="popup-header"><h2>Assign Runner - Inbound</h2></div>
+        <div class="popup-body">
+		<form name ="assignRunnerForm" novalidate>
+			<div class="row Margin0">
+				<div class="combinedWrapper pull-left marginR20">
+					<label >Runner</label>
+					<div class="ddSingleInput">
+					
+					 <input type="text" class="form-control inputField"  data-ng-model="selectedRunner" typeahead="runner for runner in runners | filter:$viewValue"> 
+					 <div class="input-group-btn"> 
+						 <button type="button" class="btn btn-default" data-toggle="dropdown"><span class="caret"></span></button>
+						<ul id="color-dropdown-menu" class="dropdown-menu" role="menu">
+							<li data-ng-repeat="runner in runners track by $index"  data-ng-click="changeRunner(runner)">{{runner}}</li>
+						</ul>
+					</div>
+					</div>
+				</div>
+				<div class="combinedWrapper pull-left marginR20">
+					<label>&nbsp;</label>
+					<button data-dismiss="modal" class="swc_button pull-left Margin0" data-ng-disabled="!has_permission(role.role_PRINT_RUNNER_ASSIGNMENTS) || !assignRunnerFormValid " data-ng-click="sendAssignRunnerInbound('assignAndPrintRunner')" >Assign & Print</button>
+				</div>
+				<div class="combinedWrapper pull-left marginR20">
+					<label>&nbsp;</label>
+					<button data-dismiss="modal" class="swc_clear_button pull-left Margin0" data-ng-disabled="!assignRunnerFormValid" data-ng-click="sendAssignRunnerInbound('assignRunner')">Assign</button>
+				</div>
+				<div class="combinedWrapper pull-left">
+					<label>&nbsp;</label>
+					<a data-dismiss="modal" class="buttonLink2 pull-left" data-ng-click="assignRunnerForm.$setPristine()">Cancel</a>
+				</div>
+			</div>
+			
+			<div class="tableWrapper overflow-x-auto marginTop10">
+				<div class="tableHeaderFixedHead">	
+					<table class="tbl type2 tableBordered tableFixedLayout">
+						<thead>
+							<tr>
+								
+								<td width40><div class="checkboxRadio"><input type="checkbox" id="selectAll" data-ng-model="headerChkBox.selected"  data-ng-click="selectAllClicked()"><span class="innerCheck"></span></div></td>
+								
+								 <td><span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('assignRunner','flightNumber', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;Flt</span></td>
+								
+								 <td timestampNotYr>
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('assignRunner','date', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;Date</span>
+								</td>
+								 <td>								
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('assignRunner','inGateNumber', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;Gate</span>
+								</td> 
+								<td>								
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('assignRunner','expectedArrTime', reverse);addSortIconUpDown($event,reverse)" class="sortingText iconSort iconSortUp">&nbsp;ETA</span>
+								</td>
+								
+								
+							</tr>                                	
+						</thead>
+					</table>
+				</div>
+				<div class="tableHeaderFixedBody minHeightNone">	
+					<table class="tbl type2 tableBordered tableFixedLayout">
+						<tbody>
+							<tr data-ng-repeat="lot in assignRunnerRecords track by $index" ng-log-dom-creation>
+								
+								<td width40><div class="checkboxRadio"><input type="checkbox" data-ng-click="chkClicked($index)" data-ng-model="lot.itemSelected"><span class="innerCheck"></span></div></td>
+								<td>{{lot.flightNumber}}</td>
+								
+								<td timestampNotYr>{{lot.expectedArrTime | swaRunnerDateFormat}}</td>
+								<td>{{lot.inGateNumber}}</td>
+								
+								<td number class="cellEta">{{lot.expectedArrTime | swaTimeFormat}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>	
+			</div>
+		</form>
+			
+		</div>
+    </div>
+</div>
+<!-- popup AssignRunner end-->
+
+<!-- popup Inbound runner assignments -->
+<div class="modal fade"  data-backdrop="static" id="assignRunnerPerson" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="popupAlert modal-dialog">
+    	<div class="popup-header"><h2>Inbound Runner Assignment for {{selectedRunner}}</h2></div>
+        <div class="popup-body">
+		<form name ="printAssignRunnerForm" novalidate>
+			<div class="row Margin0">
+				<div class="combinedWrapper pull-left marginR20">
+					<label>Runner</label>
+					
+					<div class="ddSingleInput">
+					 <input type="text" class="form-control inputField"  ng-model="selectedRunner" typeahead="runner for runner in runners | filter:$viewValue"> 
+					 <div class="input-group-btn"> 
+						 <button type="button" class="btn btn-default" data-toggle="dropdown"><span class="caret"></span></button>
+						<ul id="color-dropdown-menu" class="dropdown-menu" role="menu">
+							<li ng-repeat="runner in runners track by $index"  ng-click="changeRunner(runner,'print')">{{runner}}</li>
+						</ul>
+					</div>
+					</div>
+				</div>
+				<div class="combinedWrapper pull-left marginR20">
+					<label required>Date</label>
+					<span class="eleShowErrorMsg">
+					<span class="date dateAlone"><input required type="text" ng-model="commonData.receiveDate" name="localDateTime" id="localDateTime" data-ng-minlength="8"  data-ng-focus-no-validate data-start-date-picker="{{commonData.receiveDateTime}}" 
+						 data-ng-pattern="/(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d/" required></span>
+					 <error data-ng-if="(printAssignRunnerForm.localDateTime.$error.pattern ||printAssignRunnerForm.localDateTime.$error.minlength)&& !printAssignRunnerForm.localDateTime.$focused">{{errorLabel.InvalidDateRange}}</error>
+					</span>
+					
+				</div>
+				<div class="combinedWrapper pull-left marginR20">
+					<label required>Start Time</label>
+					<span class="eleShowErrorMsg">
+					<input time type="text" ng-model="commonData.receiveTime" data-ng-minlength="5" maxlength="5" placeholder="HH:MM" onkeyup="updateTimeFormat(this,event)"  data-ng-focus-no-validate data-ng-pattern="/^(?:(?:([01]?\d|2[0-3]))?(:[0-5]?\d))$/" name="localTime" id="localTime" required>
+					<error data-ng-if="(printAssignRunnerForm.localTime.$error.pattern || printAssignRunnerForm.localTime.$error.minlength)&& !printAssignRunnerForm.localTime.$focused">{{errorLabel.invalidTimeEntry}}</error>
+				  </span>
+				</div>
+				<div class="combinedWrapper pull-left">
+					<label>&nbsp;</label>
+					<button class="swc_button TypeBlue pull-left Margin0" data-ng-click ="showAssignmentForRunner()" ng-disabled="printAssignRunnerForm.$invalid" >View</button>
+				</div>
+			</div>
+			
+			<div class="tableWrapper overflow-x-auto marginTop10">
+				<div class="tableHeaderFixedHead">	
+					<table class="tbl type2 tableBordered tableFixedLayout">
+						<thead>
+							<tr>
+								 <td widthFormEle2>
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('printAssignment','awbNumber', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;Air Waybill</span>
+								</td> 
+								
+								  <td width80> 
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('printAssignment','serviceLevel.code', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;SVC Level</span>
+								</td>
+								
+								<td> 								
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('printAssignment','origin.code', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;Orig</span>
+								</td> 
+								 <td> 
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('printAssignment','destination.code', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;Dest</span>
+								</td> 
+								
+								 <td> 
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('printAssignment','flightNumber', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;Flt</span>
+								</td> 
+								 <td> 
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('printAssignment','expectedArrTime', reverse);addSortIconUpDown($event,reverse)"  class="sortingText iconSort iconSortUp">&nbsp;ETA</span>
+								</td> 
+								 <td >
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('printAssignment','inGateNumber', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;Gate</span>
+								</td> 
+								
+								 <td width100> 
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('printAssignment','lotStatus', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;Lot STS</span>
+								</td>
+								
+								<td width80>
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('printAssignment','lotNumber', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;Lot</span>
+								</td>
+								
+								 <td> 
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('printAssignment','noOfPieces', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;Pcs</span>
+								</td> 
+								
+								 <td>
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('printAssignment','weight', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;Wt</span>
+								</td> 
+								
+								 <td widthFormEle1Td>								
+									<span data-ng-click="reverse=!reverse; sortFunction=orderRunnerDetails('printAssignment','specialHandlingCodes.toString()', reverse);addSortIconUpDown($event,reverse)" class="sortingText">&nbsp;SHC</span>
+								</td>
+
+							</tr>                                	
+						</thead>
+					</table>
+				</div>
+				<div class="tableHeaderFixedBody minHeightNone">	
+					<table class="tbl type2 tableBordered tableFixedLayout">
+						<tbody>
+						
+						<tr ng-repeat="lot in filteredInboundLots track by $index">
+								<td widthFormEle2>{{lot.awbPrefix}} {{lot.awbNumber}}</td>	
+								<td width80>{{lot.serviceLevel.code}}</td>
+								<td>{{lot.origin.code}}</td>
+								<td>{{lot.destination.code}}</td>
+								<td number>{{lot.flightNumber}}</td>
+								<td number>{{lot.expectedArrTime | swaTimeFormat}}</td>
+								<td number>{{lot.inGateNumber}}</td>
+								<td width100>{{lot.lotStatusStation}}</td>
+								
+								<td width80><span>{{lot.lotNumber}} <span ng-if="lot.totalLots >1" >of {{lot.totalLots}}</span></span></td> 
+							
+								<td number>{{lot.noOfPieces}}</td>
+								<td number>{{lot.weight}}</td>
+								<td widthFormEle1Td>{{lot.specialHandlingCodes.toString()}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>	
+			</div>
+			<div class="row Margin0">
+                <button data-dismiss="modal" class="swc_button pull-right" data-ng-click="printRunnerAssignment();printAssignRunnerForm.$setPristine();" ng-disabled="filteredInboundLots.length==0" >Print</button>
+				<div id="pdf-holder" ng-hide="true">
+					</div>
+				<a data-dismiss="modal" class="buttonLink2 pull-right" data-ng-clck="printAssignRunnerForm.$setPristine();">Cancel</a>
+				</form>
+            </div>
+			
+		</div>
+    </div>
+</div>
+<!-- popup Inbound runner assignments end-->
+
+<!-- popup Flight Manifest -->
+<div class="modal fade" data-backdrop="static" id="Manifest" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="popupAlert modal-dialog" style="width:1250px">
+        <div class="popup-header"><h2>
+		<span data-ng-bind="manifestPopupDetails.inbound"> </span> Flight Manifest - 
+		<span data-ng-bind="manifestPopupDetails.carrierType"></span><span data-ng-bind="manifestPopupDetails.flightNumber"></span> /
+		<span data-ng-bind="manifestPopupDetails.date"></span> 
+                     </h2></div>
+        <div class="popup-body">
+            <div class="row Margin0">
+               <div class="combinedWrapper pull-left marginR20">
+                    <label>Leg O&D</label>
+                    <div>
+                    <span data-ng-bind="manifestPopupDetails.originStr"></span> -
+					<span data-ng-bind="manifestPopupDetails.destination"></span> 
+					</div>
+                </div>
+                <div class="combinedWrapper pull-left marginR20">
+                    <label><span data-ng-bind="manifestPopupDetails.timeLabel"></span></label>
+                    <div>
+                     <span data-ng-bind="manifestPopupDetails.timeValue"></span></div>
+                </div>
+                <div class="combinedWrapper pull-left marginR20">
+                    <label>Tail #</label>
+                    <div>
+                    <span data-ng-bind="manifestPopupDetails.manifestFlightInfo.tailNumber"></span></div>
+                </div>
+                <div class="combinedWrapper pull-left marginR20">
+                    <label>Gate</label>
+                    <div>
+                    <span data-ng-bind="manifestPopupDetails.manifestFlightInfo.gateNumber"></span></div>
+                </div>
+                <div class="combinedWrapper pull-left">
+                    <label>AC Type</label>
+                    <div>
+                    <span data-ng-bind="manifestPopupDetails.manifestFlightInfo.equipmentType"></span></div>
+                </div>  
+            </div>
+            
+            <!-- <div class="tableWrapper tableOutlined2 overflow-x-auto marginTop10 tblFlightmanifest"> -->
+				
+			<div class="tblVscrollVisible marginTop10 tblFlightmanifest">
+			<!-- table header -->
+			<div class="tableHeaderFixedHeadParent">
+                <div class="tableHeaderFixedHead">  
+                    <table class="tbl type2 tableBordered tableFixedLayout">
+                        <thead>
+							<tr>
+								<td widthFormEle1Td>&nbsp;</td>
+								<td colspan="11" class="paddingNone">
+									<table class="tbl type2 tableBordered tableFixedLayout">
+										<thead>
+										 <tr>
+											<td width60>Orig</td>
+											<td width60>Dest</td>
+											<td widthFormEle2> 
+											     <span ng-click="sortTyped = 'awbNumberAwbPrefix'; sortReverses = !sortReverses" ng-show="sortTyped == 'awbNumberAwbPrefix' && !sortReverses" class="iconSortingDown"></span>
+											     <span ng-click="sortTyped = 'awbNumberAwbPrefix'; sortReverses = !sortReverses" ng-show="sortTyped == 'awbNumberAwbPrefix' && sortReverses" class="iconSortingUp"></span>
+												 &nbsp;&nbsp;Air&nbsp;Waybill</td>
+											<td width60>Lot&nbsp;#</td>
+											<td width60>Pcs</td>
+											<td width60 >Wt</td>
+											<td width60>Vol</td>
+											<td widthFormEle1>SVC Level</td>
+											<td widthFormEle1>SHC</td>
+											<td widthFormEle3><span data-ng-bind="manifestPopupDetails.flightServiceNameDetail"></span></td>
+											<td widthFormEle3>Description</td>
+										</tr>
+										</thead>
+									</table>
+								</td>
+							</tr>
+                        </thead>
+                    </table>
+                </div>
+			</div>	
+			<!-- table body -->
+			<div class="tableWrapper overflow-x-auto">	
+                <div class="tableHeaderFixedBody">  
+                    <table class="tbl type2 noAlternateBG alterTRbg tableBordered tableFixedLayout tableTdSingleLine">
+                        <tbody>
+                            <!-- Booked Row starts -->
+							<tr>
+								<td vAlignMid centeralign widthFormEle1Td>Booked</td>
+								<td colspan="11" class="paddingNone">
+									<table class="tbl type2 noAlternateBG tableBordered tableFixedLayout">
+										 <tr data-ng-repeat=" manifestInboundData in manifestPopupDetails.bookedShipments | orderBy:sortTyped:sortReverses">
+											<td width60 data-ng-bind="manifestInboundData.origin"></td>
+											<td width60 data-ng-bind="manifestInboundData.destination"></td>
+											<td data-ng-bind="manifestInboundData.awbNumberAwbPrefix" widthFormEle2></td>
+											<td width60 data-ng-bind="manifestInboundData.lots"> </td>
+											<td width60 data-ng-bind="manifestInboundData.noOfPieces" number></td>
+											<td width60 data-ng-bind="manifestInboundData.lotWeight" number></td>
+											<td width60 data-ng-bind="manifestInboundData.lotVolume" number></td>
+											<td data-ng-bind="manifestInboundData.serviceLevel" widthFormEle1></td>
+											<td data-ng-bind="manifestInboundData.specialHandlingCodes" widthFormEle1></td>
+											<td data-ng-bind="manifestInboundData.consignee" widthFormEle3 class="txtEllipsis"></td>
+											<td data-ng-bind="manifestInboundData.contentDescription" widthFormEle3 class="txtEllipsis"></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+                            
+							<!-- total row -->
+							<tr class="totalRow">
+								<td widthFormEle1Td>Total</td>
+								<td colspan="11" class="paddingNone">
+									<table class="tbl type2 noAlternateBG tableBordered tableFixedLayout">
+										<tr class="totalRow">
+											<td width60>&nbsp;</td>
+											<td width60>&nbsp;</td>
+											<td widthFormEle2>&nbsp;</td>
+											<td width60>&nbsp;</td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsBooked.noOfPieces != 0"  width60 number data-ng-bind="manifestPopupDetails.totalShipmentsBooked.noOfPieces" ></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsBooked.noOfPieces == 0" width60 number></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsBooked.lotWeight != 0"  width60 number data-ng-bind="manifestPopupDetails.totalShipmentsBooked.lotWeight"></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsBooked.lotWeight == 0" width60 number></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsBooked.lotVolume != 0"  width60 number data-ng-bind="manifestPopupDetails.totalShipmentsBooked.lotVolume"></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsBooked.lotVolume == 0" width60 number></td>
+											<td widthFormEle1>&nbsp;</td>
+											<td widthFormEle1>&nbsp;</td>
+											<td widthFormEle3>&nbsp;</td>
+											<td widthFormEle3>&nbsp;</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+                            <!-- Booked Row end -->
+           
+                            
+                           <!-- Terminating Row starts -->
+							<tr>
+								<td vAlignMid centeralign widthFormEle1Td>{{manifestPopupDetails.terminatingLabel}}</td>
+								<td colspan="11" class="paddingNone">
+									<table class="tbl type2 noAlternateBG tableBordered tableFixedLayout">
+										<tr data-ng-repeat=" manifestInboundData in manifestPopupDetails.orginatingTerminatingShipments  | orderBy:sortTyped:sortReverses">
+											<td width60 data-ng-bind="manifestInboundData.origin"></td>
+											<td width60 data-ng-bind="manifestInboundData.destination"></td>
+											<td data-ng-bind="manifestInboundData.awbNumberAwbPrefix" widthFormEle2></td>
+											<td width60 ><span data-ng-bind="manifestInboundData.lots"></span><span data-ng-if="(manifestInboundData.forcedBook)" class="afterStar"></span></td>
+											<td width60 data-ng-bind="manifestInboundData.noOfPieces" number></td>
+											<td width60 data-ng-bind="manifestInboundData.lotWeight" number></td>
+											<td width60 data-ng-bind="manifestInboundData.lotVolume" number></td>
+											<td data-ng-bind="manifestInboundData.serviceLevel" widthFormEle1></td>
+											<td data-ng-bind="manifestInboundData.specialHandlingCodes" widthFormEle1></td>
+											<td data-ng-bind="manifestInboundData.consignee" widthFormEle3 class="txtEllipsis"></td>
+											<td data-ng-bind="manifestInboundData.contentDescription" widthFormEle3 class="txtEllipsis"></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							
+							<!-- total row -->
+							<tr class="totalRow">
+								<td>Total</td>
+								<td colspan="11" class="paddingNone">
+									<table class="tbl type2 noAlternateBG tableBordered tableFixedLayout">
+										<tr class="totalRow">
+											<td width60>&nbsp;</td>
+											<td width60>&nbsp;</td>
+											<td widthFormEle2>&nbsp;</td>
+											<td width60>&nbsp;</td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsTerminating.noOfPieces != 0" width60 number data-ng-bind="manifestPopupDetails.totalShipmentsTerminating.noOfPieces" ></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsTerminating.noOfPieces == 0" width60 number></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsTerminating.lotWeight != 0"  width60 number data-ng-bind="manifestPopupDetails.totalShipmentsTerminating.lotWeight"></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsTerminating.lotWeight == 0" width60 number></td>
+											<td  data-ng-if="manifestPopupDetails.totalShipmentsTerminating.lotVolume != 0"  width60 number data-ng-bind="manifestPopupDetails.totalShipmentsTerminating.lotVolume"></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsTerminating.lotVolume == 0" width60 number></td>
+											<td widthFormEle1></td>
+											<td widthFormEle1></td>
+											<td widthFormEle3></td>
+											<td widthFormEle3></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+                            </span>
+                            <!-- Terminating Row end -->
+
+							<!-- Defect 3936/3995(CCB 290) - Removed warehouse transfer section : Start -->
+
+							<!-- Defect 3936/3995(CCB 290) : End -->
+							
+                            <!-- tail Row starts -->
+							<!-- Changing the name from Tail to Tail section to Transfer as a part of 3936/3995(CCB 290) -->
+							<tr>
+								<td vAlignMid centeralign widthFormEle1Td > Transfer </td>
+								<td colspan="11" class="paddingNone">
+									<table class="tbl type2 noAlternateBG tableBordered tableFixedLayout">
+										<tr data-ng-repeat=" manifestInboundData in manifestPopupDetails.tailToTailShipments  | orderBy:sortTyped:sortReverses">
+											<td width60 data-ng-bind="manifestInboundData.origin"></td>
+											<td width60 data-ng-bind="manifestInboundData.destination"></td>
+											<td data-ng-bind="manifestInboundData.awbNumberAwbPrefix" widthFormEle2></td>
+											<td width60 ><span data-ng-bind="manifestInboundData.lots"></span><span data-ng-if="(manifestInboundData.forcedBook)" class="afterStar"></span></td>
+											<td width60 data-ng-bind="manifestInboundData.noOfPieces" number></td>
+											<td width60 data-ng-bind="manifestInboundData.lotWeight" number></td>
+											<td width60 data-ng-bind="manifestInboundData.lotVolume" number></td>
+											<td data-ng-bind="manifestInboundData.serviceLevel" widthFormEle1></td>
+											<td data-ng-bind="manifestInboundData.specialHandlingCodes" widthFormEle1></td>
+											<td data-ng-bind="manifestInboundData.consignee" widthFormEle3 class="txtEllipsis"></td>
+											<td data-ng-bind="manifestInboundData.contentDescription" widthFormEle3 class="txtEllipsis"></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							
+							<tr class="totalRow">
+								<td>Total</td>
+								<td colspan="11" class="paddingNone">
+									<table class="tbl type2 noAlternateBG tableBordered tableFixedLayout">
+										<tr class="totalRow">
+											<td width60>&nbsp;</td>
+											<td width60>&nbsp;</td>
+											<td widthFormEle2>&nbsp;</td>
+											<td width60>&nbsp;</td>
+											<td  data-ng-if="manifestPopupDetails.totalShipmentsTailToTail.noOfPieces != 0" width60 number data-ng-bind="manifestPopupDetails.totalShipmentsTailToTail.noOfPieces" ></td>
+												<td data-ng-if="manifestPopupDetails.totalShipmentsTailToTail.noOfPieces == 0" width60 number></td>
+											<td  data-ng-if="manifestPopupDetails.totalShipmentsTailToTail.lotWeight != 0" width60 number data-ng-bind="manifestPopupDetails.totalShipmentsTailToTail.lotWeight"></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsTailToTail.lotWeight == 0" width60 number></td>
+											<td  data-ng-if="manifestPopupDetails.totalShipmentsTailToTail.lotVolume != 0" width60 number data-ng-bind="manifestPopupDetails.totalShipmentsTailToTail.lotVolume"></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsTailToTail.lotVolume == 0" width60 number></td>
+											<td widthFormEle1></td>
+											<td widthFormEle1></td>
+											<td widthFormEle3></td>
+											<td widthFormEle3></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+                            <!-- tail Row end -->
+                            
+                            <!-- Through Row starts -->
+							<tr>
+								<td vAlignMid centeralign widthFormEle1Td >Through</td>
+								<td colspan="11" class="paddingNone">
+									<table class="tbl type2 noAlternateBG tableBordered tableFixedLayout">
+										<tr data-ng-repeat=" manifestInboundData in manifestPopupDetails.throughShipments  | orderBy:sortTyped:sortReverses">
+											<td width60 data-ng-bind="manifestInboundData.origin"></td>
+											<td width60 data-ng-bind="manifestInboundData.destination"></td>
+											<td data-ng-bind="manifestInboundData.awbNumberAwbPrefix" widthFormEle2></td>
+											<td width60 ><span data-ng-bind="manifestInboundData.lots"></span><span data-ng-if="(manifestInboundData.forcedBook)" class="afterStar"></span></td>
+											<td width60 data-ng-bind="manifestInboundData.noOfPieces" number></td>
+											<td width60 data-ng-bind="manifestInboundData.lotWeight" number></td>
+											<td width60 data-ng-bind="manifestInboundData.lotVolume" number></td>
+											<td data-ng-bind="manifestInboundData.serviceLevel" widthFormEle1></td>
+											<td data-ng-bind="manifestInboundData.specialHandlingCodes" widthFormEle1></td>
+											<td data-ng-bind="manifestInboundData.consignee" widthFormEle3 class="txtEllipsis"></td>
+											<td data-ng-bind="manifestInboundData.contentDescription" widthFormEle3 class="txtEllipsis"></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+
+							<tr class="totalRow">
+								<td>Total</td>
+								<td colspan="11" class="paddingNone">
+									<table class="tbl type2 noAlternateBG tableBordered tableFixedLayout">
+										<tr class="totalRow">
+											<td width60>&nbsp;</td>
+											<td width60>&nbsp;</td>
+											<td widthFormEle2>&nbsp;</td>
+											<td width60>&nbsp;</td>
+											<td   data-ng-if="manifestPopupDetails.totalShipmentsThrough.noOfPieces != 0" width60 number data-ng-bind="manifestPopupDetails.totalShipmentsThrough.noOfPieces" ></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsThrough.noOfPieces == 0" width60 number></td>
+											<td  data-ng-if="manifestPopupDetails.totalShipmentsThrough.lotWeight != 0" width60 number data-ng-bind="manifestPopupDetails.totalShipmentsThrough.lotWeight"></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsThrough.lotWeight == 0" width60 number></td>
+											<td  data-ng-if="manifestPopupDetails.totalShipmentsThrough.lotVolume != 0" width60 number data-ng-bind="manifestPopupDetails.totalShipmentsThrough.lotVolume"></td>
+											<td data-ng-if="manifestPopupDetails.totalShipmentsThrough.lotVolume == 0" width60 number></td>
+											<td widthFormEle1></td>
+											<td widthFormEle1></td>
+											<td widthFormEle3></td>
+											<td widthFormEle3></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+                            <!-- Through Row end -->
+                            
+							<tr class="totalRow version2">
+								<td> Flight Total</td>
+								<td colspan="11" class="paddingNone">
+									<table class="tbl type2 noAlternateBG tableBordered tableFixedLayout">
+										<tr class="totalRow version2">
+											<td width60>&nbsp;</td>
+											<td width60>&nbsp;</td>
+											<td widthFormEle2>&nbsp;</td>
+											<td width60>&nbsp;</td>
+											<td width60 number data-ng-bind="manifestPopupDetails.totalShipments.noOfPieces" ></td>
+											<td width60 number data-ng-bind="manifestPopupDetails.totalShipments.lotWeight"></td>
+											<td width60 number data-ng-bind="manifestPopupDetails.totalShipments.lotVolume"></td>
+											<td widthFormEle1></td>
+											<td widthFormEle1></td>
+											<td widthFormEle3></td>
+											<td widthFormEle3></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+                        </tbody>
+                    </table>
+                </div> 
+            </div>
+			</div>
+			<!-- Table End -->
+			
+			<!--START TOOL TIP FOR ASTERISK-->
+		      <span data-ng-if="manifestPopupDetails.mainFlagAsterisk">* on Lot # indicates forced booking</span>
+		    <!--END TOOL TIP FOR ASTERISK-->
+            
+        </div>
+        <div class="popup-footer">
+            <div class="row Margin0">
+                <button data-dismiss="modal" class="swc_button pull-right" ng-click="printManifest()">Print</button>
+				<div id="pdf-holder" ng-hide="true">
+					</div>
+                <a data-dismiss="modal" class="buttonLink2 pull-right">Exit</a>
+            </div>
+        </div>
+		
+    </div>
+</div>
+<!-- popup Flight Manifest end-->
+
+

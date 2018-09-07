@@ -1,0 +1,615 @@
+<div ng-controller="ShipperController">
+										<form name="fromShipperForm" id="fromShipperForm" class="applyDisabled" ng-class="(isSectionHaveRWPermission(sectionPrivilege[0],'fromShipperForm'))?'icon':'disableOtherIcon'"novalidate>
+											<div class="row">
+												<div class="col-md-2">
+													<div class="combinedWrapper">
+														<label>Shipper ID &nbsp;</label>
+														<div class="desWrap">
+															<span class="eleShowErrorMsg">
+																<input type="text" digit9 only-digits ng-model="Shipper.masterActNumber" name="masterActNumber" id="masterActNumber" maxlength="9" 
+																data-ng-pattern="/^(\d)+$/" data-ng-focus-no-validate data-ng-blur="validateMasterAccountId(fromShipperForm.masterActNumber.$error.pattern)">
+																<!--ERR MSG---> 
+																<error ng-if="fromShipperForm.masterActNumber.$error.pattern && !fromShipperForm.masterActNumber.$focused">{{::erroMsg.invalidAlphanumeric}}</error>
+																<!--ERR MSG---> 
+															</span>
+															<span>-</span>
+															<span class="eleShowErrorMsg">
+																<input type="text" digit3 only-digits ng-model="Shipper.locationId" name="locationId" id="locationId" data-ng-pattern="/^(\d)+$/" data-ng-focus-no-validate ng-focus="getShipperMasterData(fromShipperForm.masterActNumber.$error.pattern && !fromShipperForm.masterActNumber.$focused);restrictInValid('false');" data-ng-blur="getShipperData('masterActNumber');commonErrorHandling()" maxlength="3">
+																<!--ERR MSG--->
+																<error ng-if="fromShipperForm.locationId.$error.pattern && !fromShipperForm.locationId.$focused">{{::erroMsg.invalidAlphanumeric}}</error>
+																<!--ERR MSG--->
+															</span>
+															<div class="desTxt">ID will pre-populate form</div>
+														</div>
+													</div>
+												</div>
+												<div class="col-md-2">
+													<div class="combinedWrapper inputWidthFull applyDisabled">
+														<label class="required">Shipper Name</label>
+														<span class="eleShowErrorMsg">
+															<input type="text" id="shipperName" name="shipperName" maxlength="70" data-ng-focus-no-validate ng-disabled="Shipper.primarySecurityType=='KNOWN SHIPPER' || Shipper.primarySecurityType=='IAC' || (Shipper.primarySecurityType=='ESP' && disableEmpHire)" ng-model="Shipper.shipperName" ng-blur="commonErrorHandling()" required>
+														</span>
+													</div>
+												</div>
+												<div class="col-md-2 col-md-offset-2">
+													<div class="combinedWrapper">
+														<label class="displayInline">Shipper Address</label>
+														<span ng-if="Shipper.primarySecurityType!='KNOWN SHIPPER' && Shipper.primarySecurityType!='DECLARED KNOWN'">
+															<span class="iPopup" data-toggle="modal" data-target="#shipperAddress" data-ng-click="populateData()">
+															</span>
+														</span>
+														<div Caps>
+															<div ng-if="Shipper.shipperAddress.addressLine">
+																<div>{{Shipper.shipperAddress.addressLine}}</div>
+																<div>{{(Shipper.shipperAddress.addressLine2!='')?Shipper.shipperAddress.addressLine2:''}}</div>	
+																<span>{{Shipper.shipperAddress.city}}</span>,&nbsp;<span>{{Shipper.shipperAddress.state}}</span> <span>{{Shipper.shipperAddress.zipCode | tel}}</span>
+															</div>
+															<div>{{Shipper.shipperAddress.country}}</div>
+															<div>{{Shipper.shipperAddress.phoneNumber | tel}}</div>
+														</div>
+													</div>
+												</div>
+												<div class="col-md-2 col-md-offset-2">
+													<div class="combinedWrapper inputWidthFull">
+														<label>Shipper Reference</label>
+														<input type="text" id="shipperReference" name="shipperReference" maxlength="35" ng-model="Shipper.shipperReference" ng-blur="commonErrorHandling()">
+													</div>
+												</div>
+												
+												<!-- row 2 -->
+												<div class="clear"></div>
+												<div class="col-md-2">
+													<div class="combinedWrapper inputWidthFull applyDisabled">
+														<label class="required">Security Type</label>
+														<input disabled="disabled" type="text" ng-model="Shipper.primarySecurityType" required ng-blur="commonErrorHandling()">
+													</div>
+												</div>
+												<div class="col-md-2 col-md-offset-2">
+													<div class="combinedWrapper inputWidthFull applyDisabled">
+														<!--IF SEC-TYPE IS IAC IT'S MANDAOTRY-->
+														<span ng-if="Shipper.primarySecurityType=='IAC'">
+															<label class="required">IAC #</label>
+															<span class="eleShowErrorMsg">
+																<input type="text" disabled="disabled" ng-model="Shipper.iacNumber" maxlength="9" data-ng-focus-no-validate name="iacNumber" id="iacNumber" required ng-blur="commonErrorHandling()">
+																<!--ERR MSG--->
+																<error ng-if="fromShipperForm.iacNumber.$invalid-required && fromShipperForm.iacNumber.$touched && !fromShipperForm.iacNumber.$focused">{{::erroMsg.invalidAlphanumeric}}</error>
+																<!--ERR MSG--->
+															</span>
+														</span>
+														<!--IF SEC-TYPE IS IAC IT'S MANDAOTRY-->
+														<!--IF SEC-TYPE IS NOT IAC-->
+														<span ng-if="Shipper.primarySecurityType!='IAC'">
+															<label>IAC #</label>
+															<input type="text" disabled="disabled" ng-model="Shipper.iacNumber" name="iacNumber" id="iacNumber" ng-blur="commonErrorHandling()">
+														</span>
+														<!--IF SEC-TYPE IS NOT IAC-->
+													</div>
+												</div>
+												<div class="col-md-2">
+													<div class="combinedWrapper">
+														<label>CCSF ID</label>
+														<span class="eleShowErrorMsg">
+															<div id="ccsfCont">
+																<input type="text" maxlength="3" digit3 placeholder="DAL" name="ccsf1" onKeyup="autotab(this, document.fromShipperForm.ccsf2)" ng-model="Shipper.ccsf1" data-ng-pattern="/^[A-z]+$/" data-ng-focus-no-validate>.<input type="text" maxlength="1" digit1 data-ng-pattern="/^[A-z]+$/" data-ng-focus-no-validate name="ccsf2" placeholder="L" ng-model="Shipper.ccsf2" onKeyup="autotab(this, document.fromShipperForm.ccsf3)" >.<input type="text" data-ng-focus-no-validate placeholder="99" digit2 name="ccsf3" data-ng-pattern="/^(\d)+$/" maxlength="2" ng-model="Shipper.ccsf3" onKeyup="autotab(this, document.fromShipperForm.ccsf4)" >.<input type="text" data-ng-pattern="/^(\d)+$/" ng-model="Shipper.ccsf4" maxlength="2" placeholder="99" data-ng-focus-no-validate  digit2 name="ccsf4" onKeyup="autotab(this, document.fromShipperForm.ccsf5)" >.<input type="text" ng-model="Shipper.ccsf5" maxlength="4" data-ng-pattern="/^(\d)+$/" digit4 placeholder="9999" data-ng-focus-no-validate name="ccsf5" onKeyup="autotab(this, document.fromShipperForm.ccsf6)" >.<input type="text" data-ng-focus-no-validate data-ng-pattern="/^(\d)+$/" maxlength="3" placeholder="999" digit3 name="ccsf6" ng-model="Shipper.ccsf6" ng-blur="validateCCFID()">
+															</div>
+															<!--ERR MSG---
+																<error ng-if="(fromShipperForm.ccsf1.$error.pattern && !fromShipperForm.ccsf1.$focused) || (fromShipperForm.ccsf2.$error.pattern && !fromShipperForm.ccsf2.$focused) || (fromShipperForm.ccsf3.$error.pattern && !fromShipperForm.ccsf3.$focused) || (fromShipperForm.ccsf4.$error.pattern && !fromShipperForm.ccsf4.$focused) || (fromShipperForm.ccsf5.$error.pattern && !fromShipperForm.ccsf5.$focused) || (fromShipperForm.ccsf6.$error.pattern && !fromShipperForm.ccsf6.$focused)">{{::erroMsg.invalidAlphanumeric}}</error>
+															<!--ERR MSG--->
+														</span>
+													</div>
+												</div>
+												<div class="col-md-2">
+													<div class="combinedWrapper">
+														<label>&nbsp;</label>
+														<div>
+															<label class="pull-left marginR20">&nbsp;&nbsp;&nbsp;COC Failure</label>
+															<div class="radioSwitch pull-left">
+																<input type="checkbox" ng-model="Shipper.cocFailure" ng-true-value="'YES'" ng-false-value="'NO'" ng-change="updateComments();">
+																<label><i></i></label>
+															</div>
+														</div>	
+													</div>
+												</div>
+												<div class="col-md-2">
+													<div class="combinedWrapper selectWidthFull inputWidthFull applyDisabled">
+														<div class="ddSingle">
+															<div ng-show="Shipper.cocFailure!='YES'">
+																<label>COC Failure Reason</label>
+																<input type="text" disabled="disabled" ng-model="Shipper.cocFailureReason.value">
+															</div>
+															<div ng-if="Shipper.cocFailure=='YES'">
+																<!--FORM VALIDATION--->
+																<input eleInvisible style="display:none" type="text" name="cocFailure" ng-model="Shipper.cocFailureReason" required>
+																<!--FORM VALIDATION--->
+															</div>
+															<div ng-show="Shipper.cocFailure=='YES'">
+																<label class="required">COC Failure Reason</label>
+																<div class="selectWidthFull">
+																	<code-name-drop-down name="cocFailure" ng-change="commonErrorHandling();" items="cocFailure" ng-model="Shipper.cocFailureReason" id="cocFailureId" ></code-name-drop-down>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<!-- row 3 -->
+												<div class="clear"></div>										
+												<div class="col-md-2">
+													<div class="combinedWrapper inputWidthFull">
+														<!--IF SEC-TYPE IS ESP IT'S MANDAOTRY-->
+														<span ng-if="Shipper.primarySecurityType=='ESP'">
+															<label class="required">Employee #</label>
+															<span class="eleShowErrorMsg">
+																<input type="text" ng-model="Shipper.employeeNumber" data-ng-focus-no-validate maxlength="8" name="employeeNumber" id="employeeNumber" ng-blur="verifyEmpId(); commonErrorHandling()" required ng-disabled="disableEmpHire">
+															</span>
+														</span>
+														<!--IF SEC-TYPE IS ESP IT'S MANDAOTRY-->
+													</div>
+												</div>
+												<div class="col-md-2">
+													<div class="combinedWrapper inputWidthFull applyDisabled">
+														<!--IF SEC-TYPE IS ESP IT'S MANDAOTRY-->
+														<span ng-if="Shipper.primarySecurityType=='ESP'">
+															<label class="required">Hire Date</label>
+															<span class="eleShowErrorMsg input-group dateAlone">
+																<input type="text" ng-model="Shipper.employeeHireDate" name="employeeHireDate" id="employeeHireDate" required ng-disabled="true">
+															</span>
+														</span>
+														<!--IF SEC-TYPE IS ESP IT'S MANDAOTRY-->
+													</div>
+												</div>
+												<!-- row 4 -->
+												<div class="clear"></div>										
+												<div class="col-md-2">
+													<div class="combinedWrapper inputWidthFull"  ng-if="Shipper.primarySecurityType!='SWA-INT'">
+														<label required>ID Verification #</label>
+														<span class="eleShowErrorMsg">
+															<input type="text" maxlength="12" id="idVarificationNumber" name="idVarificationNumber" ng-keypress="idVerificationTxtKey()" 
+															ng-blur="idVerificationTxt();" data-ng-model="Shipper.idVerificationNumber" required>
+															<!--ERR MSG--->
+															<!--  <error ng-if="fromShipperForm.idVarificationNumber.$invalid-required && fromShipperForm.idVarificationNumber.$touched && !fromShipperForm.idVarificationNumber.$focused">{{::erroMsg.invalidAlphanumeric}}</error> -->
+															<!--ERR MSG--->
+														</span>
+													</div>
+													
+													<div class="combinedWrapper inputWidthFull"  ng-if="Shipper.primarySecurityType=='SWA-INT'">
+														<label>ID Verification #</label>
+														<input type="text" maxlength="12" id="idVarificationNumber" name="idVarificationNumber" ng-keypress="idVerificationTxtKey()" 
+														ng-blur="idVerificationTxt();" data-ng-model="Shipper.idVerificationNumber">
+													</div>
+												</div>
+												<div class="col-md-2 btnLabelTop">
+													<button class="pull-left swc_button MrgL_0 widthAuto" ng-click="assignClick()" ng-disabled="dispAssign">Assign </button>
+													<button class="pull-left swc_button widthAuto" id="viewBtn" ng-click="viewClick()" ng-disabled="dispView">View</button>
+												</div>
+												<!-- row 5 -->
+												<div class="clear"></div>
+												<div class="col-md-12"> 
+													<button data-toggle="modal" ng-if="!dispNewForm" ng-click="newIdentifyClick()" 
+													ng-disabled="!has_permission(role.role_CREATE_ID_VERIFICATION_FORM)"
+													a-disabled="dispNewForm" data-target="#identVerifyForm" ng-blur="triggerNxtSection('1','toconsignee');" class="addlocation marginNone fontsize13">New Identification Verification Form</button>
+													<button data-toggle="modal" ng-if="dispNewForm" ng-disabled="!has_permission(role.role_CREATE_ID_VERIFICATION_FORM)" ng-click="newIdentifyClick()" ng-blur="triggerNxtSection('1','toconsignee');" a-disabled="dispNewForm" class="addlocation marginNone fontsize13">New Identification Verification Form</button>
+												</div>
+											</div>
+										</form>
+										<data-ng-include src="'../modules/manageawb/newIdentificationVerification.html'"></data-ng-include> 
+										
+										<!-- No shipper ID pop up start -->
+										<div class="modal fade" id="noShipperID" tabindex="-1" role="dialog" aria-hidden="true">
+											<form name="noShipperForm" novalidate>
+												<div class="popup_1 modal-dialog">
+													<div class="popup-header">
+														<h2>No Shipper ID was entered</h2>
+													</div>
+													<div class="popup-body">
+														<div class="borderWrapper"></div>
+														<p class="combinedWrapper fontsize13">To continue as an Unknown Shipper please enter the following:</p>
+														<div class="combinedWrapper width198">
+															<label required="">Secondary Security Type</label>
+															<div class="ddSingle">
+																<select selectpicker ng-model="address.securityType"  name="ssecurityType" id="ssecurityType" class="reinitializeDD" ng-options="security.key as security.value for security in security" required>
+																	<option value=""></option>
+																</select> 
+																<!--<drop-down items="security" ng-model="address.securityType" widthFormEle3 class="pull-left" ></drop-down>-->
+															</div>
+															<div class="clear"></div>
+															<div class="desTxt">E.g. < 16 OZ, Live Animal</div>
+															</div>
+															<div class="combinedWrapper width198">
+																<label required >Shipper Name</label>
+																<span class="eleShowErrorMsg">
+																	<input type="text" ng-model="address.shipperName" maxlength="70" name="shipperName" id="shipperName" required>
+																	<!--ERR MSG--->
+																	<error ng-if="noShipperForm.shipperName.$invalid-required && noShipperForm.shipperName.$touched && !noShipperForm.shipperName.$focused"></error>
+																	<!--ERR MSG--->
+																</span>
+															</div>
+															<div class="combinedWrapper width198">
+																<label required="">Country</label>
+																<div class="ddSingle">
+																	<select selectpickercountry ng-model="address.ShipperAddress.country" ng-options="country.key as country.value for country in country" 
+																	ng-change="pickStateData(address.ShipperAddress.country);reSetData();noShipperForm.$setUntouched();" required>
+																		<option value=""></option>
+																	</select>
+																</div>
+															</div>
+															<div class="combinedWrapper pull-left width198 marginR20">
+																<label required >Street Address Line 1</label>
+																<span class="eleShowErrorMsg">
+																	<input type="text" ng-model="address.ShipperAddress.addressLine" maxlength="35" name="addressLine" id="addressLine" required>
+																</span>
+															</div>
+															<div class="combinedWrapper pull-left width198">
+																<label>Street Address Line 2</label>
+																<input type="text" ng-model="address.ShipperAddress.addressLine2" maxlength="35" name="addressLine2" id="addressLine2">
+															</div>
+															<div class="combinedWrapper pull-left width198 marginR20">
+																<label required >City</label>
+																<span class="eleShowErrorMsg">
+																	<input type="text" ng-model="address.ShipperAddress.city" maxlength="17" name="city" id="city" required>
+																</span>
+															</div>
+															<div class="combinedWrapper pull-left marginR20">
+																<label required="">State/Prov</label>
+																<div class="ddSingle">
+																	<span ng-if="address.ShipperAddress.country==='US' || address.ShipperAddress.country==='CA'">
+																		<div class="ddSingle">
+																			<!-- <select selectpicker ng-model="address.ShipperAddress.state" ng-options="state.code as state.name for state in stateOptions" required>
+																				<option value=""></option>
+																			</select> -->
+																			<select  n-drop-down list-option="stateOptions" ng-model="address.ShipperAddress.state" ng-options="state.key as state.value for state in stateOptions" required>
+																				<option value=""></option>
+																			</select>
+																		</div> 
+																	</span>
+																	<span ng-if="address.ShipperAddress.country!=='US' && address.ShipperAddress.country!=='CA'">
+																		<span class="eleShowErrorMsg">
+																			<input widthformele1 type="text" maxlength="35" ng-model="address.ShipperAddress.state" name="state" id="state" required>
+																		</span>
+																	</span>
+																</div>
+															</div>
+															<div class="combinedWrapper pull-left">
+																<label required>Zip Code</label>
+																<span ng-if="address.ShipperAddress.country==='US'">
+																	<div>
+																		<span class="eleShowErrorMsg">
+																			<input digit5 type="text" ng-trim="false" ng-model="util.zip1" name="zip1" id="zip1" data-ng-focus-no-validate onKeyup="autotab(this, document.noShipperForm.zip2)" data-ng-pattern="/^[0-9]+$/" ng-minlength="5" maxlength="5" required>
+																			<!--ERR MSG--->
+																			<error ng-if="(noShipperForm.zip1.$error.pattern && !noShipperForm.zip1.$focused || noShipperForm.zip1.$error.minlength && !noShipperForm.zip1.$focused)">{{::erroMsg.invalidAlphanumeric}}</error>
+																			<!--ERR MSG--->
+																		</span>
+																		<span>-</span>
+																		<span class="eleShowErrorMsg">
+																			<input digit4 type="text" ng-trim="false" ng-model="util.zip2" name="zip2" id="zip2" data-ng-focus-no-validate data-ng-pattern="/^[0-9]+$/" ng-minlength="4" maxlength="4">
+																			<!--ERR MSG--->
+																			<error ng-if="(noShipperForm.zip2.$error.pattern || noShipperForm.zip2.$error.minlength)&& !noShipperForm.zip2.$focused && !util.zip2">{{::erroMsg.invalidAlphanumeric}}</error>
+																			<!--ERR MSG--->
+																		</span>
+																	</div>
+																</span>
+																<span ng-if="address.ShipperAddress.country==='CA'">
+																	<span class="eleShowErrorMsg">
+																		<input widthformele1 type="text" ng-model="util.zipCode" name="zipCode" id="zipCode" data-ng-focus-no-validate capitalize 
+																		data-ng-pattern="/^[A-Z]\d[A-Z] \d[A-Z]\d$/" maxlength="7" required>
+																		<!--ERR MSG--->
+																		<error ng-if="noShipperForm.zipCode.$error.pattern && !noShipperForm.zipCode.$focused && !util.zipCode">{{::erroMsg.invalidAlphanumeric}}</error>
+																		<!--ERR MSG--->
+																	</span>
+																</span>
+																<span ng-if="address.ShipperAddress.country!=='US' && address.ShipperAddress.country!=='CA'">
+																	<span class="eleShowErrorMsg">
+																		<input widthformele1 type="text" ng-model="util.zipCode" data-ng-focus-no-validate name="zipCode" id="zipCode" maxlength="9" required>
+																		<!--ERR MSG--->
+																		<error ng-if="noShipperForm.zipCode.$error.pattern && !noShipperForm.zipCode.$focused && !util.zipCode">{{::erroMsg.invalidAlphanumeric}}</error>
+																		<!--ERR MSG--->
+																	</span>
+																</span>
+															</div>
+															<div class="combinedWrapper">
+																<label class="required">Phone</label>
+																<div>
+																	<span ng-if="address.ShipperAddress.country==='US' || address.ShipperAddress.country==='CA'">
+																		<span>+</span>
+																		<span class="eleShowErrorMsg">
+																			<input digit1 type="text" ng-trim="false" data-ng-pattern="/^[0-9]+$/" data-ng-focus-no-validate onKeyup="autotab(this, document.noShipperForm.phNo2)" name="phNo1" id="phNo1" ng-model="util.phNo1" maxlength="1" ng-minlength="1" required ng-readonly="true">
+																			<!--ERR MSG--->
+																			<error ng-if="(noShipperForm.phNo1.$error.pattern || noShipperForm.phNo1.$error.minlength) && !noShipperForm.phNo1.$focused">{{::erroMsg.invalidAlphanumeric}}</error>
+																			<!--ERR MSG--->
+																		</span>
+																		<span>(</span>
+																		<span class="eleShowErrorMsg">
+																			<input digit3 type="text" ng-trim="false" data-ng-pattern="/^[0-9]+$/" data-ng-focus-no-validate onKeyup="autotab(this, document.noShipperForm.phNo3)" name="phNo2" id="phNo2" ng-model="util.phNo2" maxlength="3" ng-minlength="3"  required>
+																			<!--ERR MSG--->
+																			<error ng-if="(noShipperForm.phNo2.$error.pattern || noShipperForm.phNo2.$error.minlength) && !noShipperForm.phNo2.$focused && !util.phNo2">{{::erroMsg.invalidAlphanumeric}}</error>
+																			<!--ERR MSG--->
+																		</span>
+																		<span>)</span>
+																		<span class="eleShowErrorMsg">
+																			<input digit3 type="text" ng-trim="false" data-ng-pattern="/^[0-9]+$/" data-ng-focus-no-validate name="phNo3" onKeyup="autotab(this, document.noShipperForm.phNo4)" id="phNo3" ng-model="util.phNo3" maxlength="3" ng-minlength="3" required>
+																			<!--ERR MSG--->
+																			<error ng-if="(noShipperForm.phNo3.$error.pattern || noShipperForm.phNo3.$error.minlength)&& !noShipperForm.phNo3.$focused && !util.phNo3">{{::erroMsg.invalidAlphanumeric}}</error>
+																			<!--ERR MSG--->
+																		</span>
+																		<span>-</span>
+																		<span class="eleShowErrorMsg">
+																			<input digit4 type="text" ng-trim="false" data-ng-pattern="/^[0-9]+$/" data-ng-focus-no-validate name="phNo4" id="phNo4" ng-model="util.phNo4" ng-minlength="4" maxlength="4" required>
+																			<!--ERR MSG--->
+																			<error ng-if="(noShipperForm.phNo4.$error.pattern || noShipperForm.phNo4.$error.minlength) && !noShipperForm.phNo4.$focused && !util.phNo4">{{::erroMsg.invalidAlphanumeric}}</error>
+																			<!--ERR MSG--->
+																		</span>
+																	</span>
+																	<div ng-if="address.ShipperAddress.country!=='US' && address.ShipperAddress.country!=='CA'">
+																		<span class="eleShowErrorMsg">
+																			<input widthFormEle3 type="text" ng-model="util.phoneNumber" data-ng-focus-no-validate data-ng-pattern="/^[0-9]+$/" maxlength="14" name="phoneNumber" id="phoneNumber" required>
+																			<!--ERR MSG--->
+																			<error ng-if="noShipperForm.phoneNumber.$error.pattern && !noShipperForm.phoneNumber.$focused && !util.phoneNumber">{{::erroMsg.invalidAlphanumeric}}</error>
+																			<!--ERR MSG--->
+																		</span>
+																	</div>
+																</div>
+															</div>
+															</div>
+															<div class="popup-footer">
+																<div class="row Margin0">
+																	<button data-dismiss="modal" class="swc_button pull-right" ng-click="noShipperForm.$setUntouched();saveMofiyedAddress('shipper');" ng-disabled="noShipperForm.$invalid">Save</button>
+																	<a data-dismiss="modal" class="buttonLink pull-right" ng-click="noShipperForm.$setUntouched();clearAdressData('shipper');" event-focus="click" event-focus-id="masterActNumber">Cancel</a>
+																</div>
+															</div>
+														</form>
+													</div>
+												</div>
+												<!-- No shipper ID pop up end -->
+												
+												<!-- #shipperAddress pop up start -->
+												<div class="modal fade" id="shipperAddress" tabindex="-1" role="dialog" aria-hidden="true" >
+													<form name="addressForm" novalidate>
+														<div class="popup_1 modal-dialog">
+															<div class="popup-header"><h2>FROM (SHIPPER) - Address</h2></div>
+															<div class="popup-body">
+																<div class="combinedWrapper width198">
+																	<label required="">Country</label>
+																	<div class="ddSingle">
+																		<select selectpickercountry ng-model="address.ShipperAddress.country" ng-options="country.key as country.value for country in country" 
+																		ng-change="pickStateData(address.ShipperAddress.country);reSetData();addressForm.$setUntouched();" required>
+																			<option value=""></option>
+																		</select>
+																	</div>	
+																</div>
+																<div class="combinedWrapper pull-left width198 marginR20">
+																	<label required >Street Address Line 1</label> 
+																	<span class="eleShowErrorMsg">
+																		<input type="text" ng-model="address.ShipperAddress.addressLine" data-ng-focus-no-validate name="shipperAddressLine1" id="shipperAddressLine1" maxlength="35" required>
+																	</span>
+																</div>
+																<div class="combinedWrapper pull-left width198">
+																	<label>Street Address Line 2</label>
+																	<input type="text" ng-model="address.ShipperAddress.addressLine2" name="addressLine2" maxlength="35" id="addressLine2">
+																</div>
+																
+																<div class="clear"></div>
+																<div class="combinedWrapper pull-left width198 marginR20">
+																	<label required >City</label>
+																	<span class="eleShowErrorMsg">
+																		<input type="text" ng-model="address.ShipperAddress.city" data-ng-focus-no-validate maxlength="17" name="addressCity" id="addressCity" required>
+																	</span>
+																</div>
+																<div class="combinedWrapper pull-left marginR20">
+																	<label required="">State/Prov</label>
+																	<span ng-if="address.ShipperAddress.country==='US' || address.ShipperAddress.country==='CA'">
+																		<div class="ddSingle">
+																			<!-- <select selectpicker ng-model="address.ShipperAddress.state" ng-options="state.code as state.name for state in stateOptions" required>
+																				<option value=""></option>
+																			</select> -->
+																			<!-- <select selectpicker class="reinitializeDD" ng-model="address.ShipperAddress.state" ng-options="state.key as state.value for state in stateOptions" required>
+																				<option value=""></option>
+																			</select> -->
+																			<select  n-drop-down list-option="stateOptions" ng-model="address.ShipperAddress.state" ng-options="state.key as state.value for state in stateOptions" required>
+																				<option value=""></option>
+																			</select>
+																		</div> 
+																	</span>
+																	<span ng-if="address.ShipperAddress.country!=='US' && address.ShipperAddress.country!=='CA'">
+																		<span class="eleShowErrorMsg">
+																			<input widthformele1 maxlength="35" type="text" ng-model="address.ShipperAddress.state" name="addState" id="addState" required>
+																		</span>
+																	</span>
+																</div>
+																<div class="combinedWrapper pull-left">
+																	<label required>Zip Code</label>
+																	<span ng-if="address.ShipperAddress.country==='US'">
+																		<div>
+																			<span class="eleShowErrorMsg">
+																				<input digit5 type="text" ng-trim="false" ng-model="util.zip1" id="zip1" name="zip1" data-ng-focus-no-validate onKeyup="autotab(this, document.addressForm.zip2)" data-ng-pattern="/^[0-9]+$/" ng-minlength="5" maxlength="5" required>
+																				<!--ERR MSG--->
+																				<error ng-if="(addressForm.zip1.$error.pattern || addressForm.zip1.$error.minlength) && (!addressForm.zip1.$focused)">{{::erroMsg.invalidAlphanumeric}}</error>
+																				<!--ERR MSG--->
+																			</span>
+																			<span>-</span>
+																			<span class="eleShowErrorMsg">
+																				<input digit4 type="text" ng-minlength="4" ng-trim="false" ng-model="util.zip2" id="zip2" name="zip2" data-ng-focus-no-validate data-ng-pattern="/^[0-9]+$/" maxlength="4">
+																				<!--ERR MSG--->
+																				<error ng-if="(addressForm.zip2.$error.pattern || addressForm.zip2.$error.minlength) && !addressForm.zip2.$focused && !util.zip2">{{::erroMsg.invalidAlphanumeric}}</error>
+																				<!--ERR MSG--->
+																			</span>
+																		</div>
+																	</span>
+																	<span ng-if="address.ShipperAddress.country==='CA'">
+																		<span class="eleShowErrorMsg">
+																			<input widthformele1 type="text" ng-trim="false" ng-model="util.zipCode" name="zipCode" id="zipCode" data-ng-focus-no-validate capitalize 
+																			data-ng-pattern="/^[A-Z]\d[A-Z] \d[A-Z]\d$/" maxlength="7" required>
+																			<!--ERR MSG--->
+																			<error ng-if="addressForm.zipCode.$error.pattern && !addressForm.zipCode.$focused && !util.zipCode">{{::erroMsg.invalidAlphanumeric}}</error>
+																			<!--ERR MSG--->
+																		</span>
+																	</span>
+																	<span ng-if="address.ShipperAddress.country!=='US' && address.ShipperAddress.country!=='CA'">
+																		<span class="eleShowErrorMsg">
+																			<input widthformele1 type="text" ng-model="util.zipCode" name="zipCode" data-ng-focus-no-validate id="zipCode" maxlength="9" required>
+																			<!--ERR MSG--->
+																			<error ng-if="addressForm.zipCode.$error.pattern && !addressForm.zipCode.$focused && !util.zipCode">{{::erroMsg.invalidAlphanumeric}}</error>
+																			<!--ERR MSG--->
+																		</span>
+																	</span>
+																</div>
+																<div class="clear"></div>
+																
+																<div class="combinedWrapper">
+																	<label class="required">Phone</label>
+																	<div>
+																		<span ng-if="address.ShipperAddress.country==='US' || address.ShipperAddress.country==='CA'">
+																			<span>+</span>
+																			<span class="eleShowErrorMsg">
+																				<input digit1 type="text" ng-trim="false" data-ng-pattern="/^[0-9]+$/" data-ng-focus-no-validate onKeyup="autotab(this, document.addressForm.phNo2)" name="phNo1" id="phNo1" ng-model="util.phNo1" maxlength="1" ng-minlength="1" required ng-readonly="true">
+																				<!--ERR MSG--->
+																				<error ng-if="(addressForm.phNo1.$error.pattern || addressForm.phNo1.$error.minlength)&& !addressForm.phNo1.$focused">{{::erroMsg.invalidAlphanumeric}}</error>
+																				<!--ERR MSG--->
+																			</span>
+																			<span>(</span>
+																			<span class="eleShowErrorMsg">
+																				<input digit3 type="text" ng-trim="false" data-ng-pattern="/^[0-9]+$/" data-ng-focus-no-validate onKeyup="autotab(this, document.addressForm.phNo3)" name="phNo2" id="phNo2" ng-model="util.phNo2" maxlength="3" ng-minlength="3" required>
+																				<!--ERR MSG--->
+																				<error ng-if="(addressForm.phNo2.$error.pattern || addressForm.phNo2.$error.minlength) && !addressForm.phNo2.$focused && !util.phNo2">{{::erroMsg.invalidAlphanumeric}}</error>
+																				<!--ERR MSG--->
+																			</span>
+																			<span>)</span>
+																			<span class="eleShowErrorMsg">
+																				<input digit3 type="text" ng-trim="false" data-ng-pattern="/^[0-9]+$/" data-ng-focus-no-validate onKeyup="autotab(this, document.addressForm.phNo4)" name="phNo3" id="phNo3" ng-model="util.phNo3" maxlength="3" ng-minlength="3" required>
+																				<!--ERR MSG--->
+																				<error ng-if="(addressForm.phNo3.$error.pattern || addressForm.phNo3.$error.minlength)&& !addressForm.phNo3.$focused && !util.phNo3">{{::erroMsg.invalidAlphanumeric}}</error>
+																				<!--ERR MSG--->
+																			</span>
+																			<span>-</span>
+																			<span class="eleShowErrorMsg">
+																				<input digit4 type="text" ng-trim="false" data-ng-pattern="/^[0-9]+$/" data-ng-focus-no-validate name="phNo4" id="phNo4" ng-model="util.phNo4" ng-minlength="4" maxlength="4" required>
+																				<!--ERR MSG--->
+																				<error ng-if="(addressForm.phNo4.$error.pattern || addressForm.phNo4.$error.minlength)&& !addressForm.phNo4.$focused && !util.phNo4">{{::erroMsg.invalidAlphanumeric}}</error>
+																				<!--ERR MSG--->
+																			</span>
+																		</span>
+																		<div ng-if="address.ShipperAddress.country!=='US' && address.ShipperAddress.country!=='CA'">
+																			<span class="eleShowErrorMsg">
+																				<input widthFormEle3 type="text" data-ng-pattern="/^[0-9]+$/" data-ng-focus-no-validate ng-model="util.phoneNumber" maxlength="14" name="phoneNumber" id="phoneNumber" required>
+																				<!--ERR MSG--->
+																				<error ng-if="addressForm.phoneNumber.$error.pattern && !util.phoneNumber 
+																				&& !addressForm.phoneNumber.$focused">{{::erroMsg.invalidAlphanumeric}}</error>
+																				<!--ERR MSG--->
+																			</span>
+																		</div>
+																	</div>
+																</div>			
+															</div>
+															<div class="popup-footer">
+																<div class="row Margin0">
+																	<button data-dismiss="modal" class="swc_button pull-right" data-ng-click="saveMofiyedAddress('editAddress');addressForm.$setUntouched();" ng-disabled="addressForm.$invalid">Save</button>
+																	<a data-dismiss="modal" class="buttonLink pull-right" ng-click="addressForm.$setUntouched();clearAdressData('editAddress');">Cancel</a>				
+																</div>
+															</div>
+														</form>
+													</div>
+												</div> 
+												<!-- #shipperAddress pop up end -->
+												
+												<!-- Agent pop up start -->
+												<div class="modal fade" id="agentAlert" tabindex="-1" role="dialog" aria-hidden="true" >
+													<div class="popup_1 modal-dialog">
+														<div class="popup-header"><h2>Agent Alert at Customer Level</h2><div class="borderWrapper"></div></div>
+														<div class="popup-body">
+															<p class="lineHeight" ng-bind="ShipperTmpData.agentData"></p>
+														</div>
+														<div class="popup-footer">
+															<div class="row Margin0">
+																<button data-dismiss="modal" class="swc_button pull-right" ng-click="callLocationPopUp();focusTargetNow();">OK</button>
+															</div>
+														</div>
+													</div>
+												</div> 
+												
+												<div class="modal fade" id="agentAlert2" tabindex="-1" role="dialog" aria-hidden="true" >
+													<div class="popup_1 modal-dialog">
+														<div class="popup-header"><h2>Agent Alert at Location Level</h2><div class="borderWrapper"></div></div>
+														<div class="popup-body">
+															<p class="lineHeight" ng-bind="ShipperTmpData.locAgentData"></p>
+														</div>
+														<div class="popup-footer">
+															<div class="row Margin0">
+																<button data-dismiss="modal" class="swc_button pull-right" ng-click="focusTargetNow();">OK</button>
+															</div>
+														</div>
+													</div>
+												</div> 
+												<!-- Agent pop up end -->	
+												<!-- locationPop start -->
+												<div class="modal fade" id="locationPop" tabindex="-1" role="dialog" aria-hidden="true">
+													<form name="locationForm" novalidate>
+														<div class="popup_1 modal-dialog">
+															<div class="popup-header"><h3>Location Details</h3></div>{{locationId}}
+															<div class="popup-body">
+																<div class="row">
+																	<div class="col-md-12">
+																		<div class="tableWrapper locationDetails customerProfileSearch tableOutlined2 overflow-x-auto">
+																			<!-- table header -->
+																			<div class="tableHeaderFixedHead">	
+																				<table class="tbl type2 tableBordered tableFixedLayout">
+																					<thead>
+																						<tr>
+																							<td class="columnRadioWidth">&nbsp;</td>
+																							<td width60>Location ID</td>
+																							<td>Location Name</td>
+																							<td>Location Address Line&nbsp;1</td>	
+																							<td>Location Address Line&nbsp;2</td>
+																							<td>City</td>	
+																							<td width60>State/ Prov</td>	
+																							<td>Postal Code</td> 
+																							<td width60>Country</td>	
+																							<td>Mlg Phone</td>	
+																							<td>Location Status</td>
+																						</tr>
+																					</thead>
+																				</table>
+																			</div>
+																			<!-- table body --> 
+																			<div class="tableHeaderFixedBody tableTdSingleLine">	
+																				<table class="tbl type2 tableBordered tableFixedLayout">
+																					<tbody>
+																						<tr bindonce ng-repeat ="loc in ShipperTmpData.location track by $index">
+																							<td class="columnRadioWidth">
+																								<div class="checkboxRadio">
+																									<span ng-if="loc.shippingStatus=='ACTIVE'"> 
+																										<input name="locSearchRes" type="radio" ng-model="data.locationSelection" ng-click="selectedRow($index)" value="{{$index}}"><span class="innerCheck"></span>
+																									</span>
+																									<span ng-if="loc.shippingStatus!='ACTIVE'"> 
+																										<input name="locSearchRes" disabled type="radio" ng-click="selectedRow($index)" value="{{$index}}"><span class="innerCheck"></span>
+																									</span>
+																								</div>
+																							</td>
+																							<td width60 ng-controller="CustProfileController"><a ng-click="removeModalBox();updateCustomer(ShipperTmpData.masterAcctNbr+'-'+loc.locationID);">{{loc.locationID |tel}}</a></td>
+																							<td ng-bind="loc.locationName"></td>
+																							<td ng-bind="loc.streetAddressLine1"></td>	
+																							<td>
+																							{{((loc.streetAddressLine2!="null")?loc.streetAddressLine2:'')}}</td>	
+																							<td ng-bind="loc.city"></td>	
+																							<td width60 ng-bind="loc.stateProvince"></td>	
+																							<td ng-bind="loc.postalCode |tel"></td> 
+																							<td width60 ng-bind="loc.country"></td>	
+																							<td ng-bind="loc.phone |tel"></td>	
+																							<td>{{loc.shippingStatus}}</td>
+																						</tr>
+																					</tbody>
+																				</table>
+																			</div>	
+																		</div>
+																	</div>
+																</div>					
+															</div>
+															<div class="popup-footer">
+																<div class="row Margin0">
+																	<button data-dismiss="modal" class="swc_button pull-right" data-ng-click="locationPopulate();" data-ng-disabled="!data.enable">Ok</button>
+																	<a data-dismiss="modal" class="buttonLink pull-right">Cancel</a>				
+																</div>
+															</div>
+														</form>
+													</div>
+												</div> 
+												<!-- locationPop end -->
+											</div>	
+									
