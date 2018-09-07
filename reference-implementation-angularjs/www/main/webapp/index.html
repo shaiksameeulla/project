@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+		<title>Angular.js Reference Implementation</title>
+
+		<!-- BOOTSTRAP Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="modules/styles/css/bootstrap.min.css">
+		<!-- <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
+		<!-- BOOTSTRAP Optional theme -->
+		<link rel="stylesheet" href="modules/styles/css/bootstrap-theme.min.css">
+		<!-- <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"> -->
+
+		<!-- Bootstrap Select Angular Styles -->
+
+		<!-- Angular UI -->
+		<link href="modules/libraries/angular-ui-bootstrap/ui-bootstrap-csp.css"></link>
+		<link href="modules/libraries/angular-ui-bootstrap/select.min.css"></link>
+
+		<!-- Cargo App CSS -->
+		<link href="modules/styles/css/style.css" rel="stylesheet">
+		<link href="modules/styles/css/style2.css" rel="stylesheet">
+		<!-- Add on style sheet specific to this implementation -->
+		<link href="modules/styles/css/style_addon.css" rel="stylesheet">
+
+		<base href="/">
+
+		<!-- JQUERY -->
+		<script src="modules/libraries/jquery/jquery-2.2.3.min.js"></script>
+
+		<script src="modules/libraries/ng/angular.js"></script>
+		<script src="modules/libraries/angular-messages/angular-messages.js"></script>
+		<script src="modules/libraries/ng/angular-animate.js"></script>
+		<script src="modules/libraries/ng/angular-sanitize.js"></script>
+		<script src="modules/libraries/ng/angular-ui-router.js"></script>
+		
+		<!-- UI Bootstrap -->
+		<script src="modules/libraries/angular-ui-bootstrap/ui-bootstrap-tpls.js"></script>
+		<script src="modules/libraries/angular-ui-bootstrap/ui-bootstrap.js"></script>
+
+		<!-- UI Select -->
+		<script src="modules/libraries/angular-ui-select/select.js"></script>
+
+		<script src="modules/libraries/moment/moment.js"></script>
+
+		<!-- Bootstrap Libraries -->
+		<script src="modules/libraries/bootstrap/bootstrap-datetimepicker.js"></script>
+
+		<!-- ngStorage -->
+		<script src="modules/libraries/ngstorage/ngstorage.js"></script>
+
+		<!-- App Files -->
+		<script src="modules/app.js"></script>
+		<script src="modules/modules/manageawb/js/manageawb.shipper.controller.js"></script>
+		<script src="modules/modules/manageawb/js/manageawb.consignee.controller.js"></script>
+		<script src="modules/modules/manageawb/js/manageawb.manageAWB.service.js"></script>
+		<script src="modules/modules/manageawb/js/manageawb.validateAWBService.service.js"></script>
+		<script src="modules/modules/manageawb/js/manageawb.validateShipperMasterAccount.directive.js"></script>
+        <script src="modules/modules/common-services/common.template.service.js"></script>
+
+		<script src="modules/modules/manageawb/js/manageawb.authService.service.js"></script>
+		<script src="modules/modules/manageawb/js/manageawb.cargoRoles.value.js"></script>
+		<script src="modules/modules/manageawb/js/manageawb.blockUserInputService.service.js"></script>
+		<script src="modules/modules/manageawb/js/manageawb.swaFocusNoValidate.directive.js"></script>
+		<script src="modules/modules/manageawb/js/manageawb.data.service.js"></script>
+		<script src="modules/modules/manageawb/js/manageawb.header.controller.js"></script>		
+
+		<!-- Custom Components -->
+		<script src="modules/swa-common-components/swa.customComponents.module.js"></script>
+		<script src="modules/swa-common-components/mandatory-input/swa.mandatory-input.directive.js"></script>
+		<script src="modules/swa-common-components/zipcode/swa.zipcode.directive.js"></script>
+		<script src="modules/swa-common-components/drop-down/swa.drop-down.directive.js"></script>
+		<script src="modules/swa-common-components/state-drop-down/swa.state-drop-down.directive.js"></script>
+		<script src="modules/swa-common-components/phone-number/swa.phone-number.directive.js"></script>
+		
+		<script src="modules/swa-common-components/military-time/swa.military-time.directive.js"></script>
+		<script src="modules/swa-common-components/email-directive-parent-scope/swa.email.directive.js"></script>
+
+		<script src="modules/swa-common-components/calendar-component/swa.date-picker.directive.js"></script>
+
+		<!-- POC Directive -->
+		<script src="modules/modules/manageawb/js/manageawb.validateShipperMasterAccount.directive.js"></script>
+		<script src="modules/modules/manageawb/js/manageawb.swaTabOutHandler.directive.js"></script>
+
+
+	</head>
+
+	<body>
+
+		<div class="container-fluid">
+			<h1>Cargo AWB Reference Implementation</h1>
+		</div>
+
+		<main ng-app="CargoApp" class="container-fluid">
+		    <section ui-view="header"></section>
+			<section ui-view="shipper"></section>
+			<!-- <section>Shipper JSON: <br>{{ AWB.Shipper | json }}</section> -->
+			<section ui-view="consignee"></section>
+			<section>Consignee JSON: <br>{{ AWB.Consignee | json }}</section>
+		</main>
+
+	</body>
+
+</html>

@@ -1,0 +1,242 @@
+<section id="awb-consignee" class="panel panel-info">
+	<div class="panel-heading" ng-click="sectionsActive.consignee = !sectionsActive.consignee">
+		(2) Consignee
+		<span class="glyphicon pull-right" 
+			ng-class="{ 'glyphicon-chevron-down' : !sectionsActive.consignee, 'glyphicon-chevron-up' : sectionsActive.consignee }">
+		</span>
+	</div>
+	<div class="panel-body" ng-show="sectionsActive.consignee">
+
+		<form name="consigneeForm" id="consigneeForm" form-on-change form-on-focus novalidate ng-class="(isSectionHaveRWPermission(sectionPrivilege[1],'consigneeForm'))?'icon':'disableOtherIcon'" class="applyDisabled">
+			
+			<!-- Row 1 -->
+			<div class="row" id="toConsigneeSectionBody">
+				<!-- Consignee ID -->
+				<div class="col-md-2">
+					<div class="combinedWrapper">
+						<label>Consignee ID</label>
+						<div class="desWrap">
+							<span class="eleShowErrorMsg">
+								<input 
+									type="text" 
+									digit9 
+									ng-model="AWB.Consignee.consigneeId" 
+									name="consigneeId" 
+									id="consigneeId"  
+									swa-focus-no-validate
+									maxlength="9" 
+									size="5"
+									ng-pattern="/^(\d)+$/">
+								<span ng-if="!consigneeForm.consigneeId.$focused" 
+									ng-messages="consigneeForm.consigneeId.$error"> 
+									<error ng-message="pattern">Consignee ID must be a number</error>
+								</span>
+							</span>
+							<span>-</span>
+							<span class="eleShowErrorMsg">
+								<input 
+									type="text" 
+									digit3 
+									ng-model="AWB.Consignee.locationId" 
+									only-digits 
+									name="locationId" 
+									id="locationId" 
+									ng-pattern="/^(\d)+$/"
+									swa-focus-no-validate 
+									maxlength="3" 
+									ng-blur="locationIdEntered()"
+									size="1">
+								<span ng-if="!consigneeForm.locationId.$focused" 
+									ng-messages="consigneeForm.locationId.$error"> 
+									<error ng-message="pattern">Location ID must be a number</error>
+								</span>
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Consignee Name -->
+				<div class="col-md-2">
+					<div class="combinedWrapper inputWidthFull">
+						<label required>Consignee Name</label>
+						<span>
+							<input type="text" 
+								id="consigneeName" 
+								name="consigneeName" 
+								maxlength="70" 
+								ng-model="AWB.Consignee.consigneeName" 
+								ng-blur="consigneeNameEntered()" 
+								swa-focus-no-validate 
+								required 
+								ng-keydown="findKeyEventConsName($event);" 
+								ng-keypress="clearInvalidId();"
+								size="15">
+							<button 
+								type="button" 
+								data-toggle="modal" 
+								tabindex="-1" 
+								data-target="#searchConsignee" 
+								id="findKeyEvent" 
+								name="findKeyEvent" 
+								data-backdrop="static" 
+								data-keyboard="false" 
+								ng-keydown="findKeyEvent($event);" 
+								data-ng-click="focusSearchConsigneeName(searchConsigneeForm);"
+							class="glyphicon glyphicon-search"></button>
+						</span>
+					</div>
+				</div>
+
+				<!-- Consignee Address -->
+				<span ng-if="addressEnabled">
+					<div class="col-md-2 col-md-offset-1">
+						<div class="combinedWrapper">
+							<div><label required class="displayInline">Consignee Address</label>
+								<span 
+									class="iPopup" 
+									data-toggle="modal" 
+									data-target="#consigneeAddress" 
+									data-backdrop="static" 
+									data-keyboard="false" 
+									data-ng-click="populateData()">
+								</span>
+							</div>
+							<div Caps>
+								<div>{{AWB.Consignee.consigneeAddress.addressLine1 | uppercase}}</div>
+								<div>{{(AWB.Consignee.consigneeAddress.addressLine2!='')?AWB.Consignee.consigneeAddress.addressLine2:'' | uppercase}}</div>	
+								<div>
+									<span ng-if="AWB.Consignee.consigneeAddress.city">{{AWB.Consignee.consigneeAddress.city | uppercase}},</span>&nbsp;<span>{{AWB.Consignee.consigneeAddress.state | uppercase}}</span> <span>{{AWB.Consignee.consigneeAddress.zipCode | tel}}</span>
+								</div>
+								<div>{{AWB.Consignee.consigneeAddress.country}}</div>
+								<div>{{AWB.Consignee.consigneeAddress.phoneNumber | tel}}</div>
+							</div>
+						</div>
+					</div>
+				</span>
+
+				<!-- Consignee Phone -->
+				<span ng-if="!addressEnabled">
+					<div class="col-md-2">
+						<input swa-phone-number ng-required="true" ng-model="AWB.Consignee.consigneeAddress.phoneNumber" country-code="AWB.Consignee.consigneeAddress.country">
+					</div>
+				</span>
+
+				<!-- Consignee Reference -->
+				<div class="col-md-2 pull-right">
+					<div class="combinedWrapper inputWidthFull">
+						<label>Consignee Reference</label>
+						<div >
+							<input type="text" ng-model="AWB.Consignee.consigneeReference" ng-keypress="clearInvalidId();" tabindex="-1" maxlength="35" >
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+
+			<!-- row 2 -->
+			<div class="row">
+				<!-- Country Input -->
+				<span ng-if="!addressEnabled">
+					<div class="col-md-2">
+						<div class="combinedWrapper selectWidthFull">
+							<label>Country</label>
+							<div class="ddSingle">
+								<!-- Original Implementation -->
+								<select 
+									selectpicker id="consigneeCountry" 
+									tabindex="-1" 
+									ng-model="AWB.Consignee.consigneeAddress.country" 
+									ng-options="country.key as country.value for country in countryList" 
+									ng-change="initializeStateList()" 
+									ng-blur="">
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<!-- Address Input -->
+					<div class="col-md-2">
+						<div class="combinedWrapper inputWidthFull">
+							<label>Street Address Line 1</label>
+							<input type="text" 
+								ng-model="AWB.Consignee.consigneeAddress.addressLine1" 
+								maxlength="35" 
+								name="addressLine1" 
+								id="addressLine1" 
+								ng-blur="streetAddressLineOneEntered()">
+						</div>
+					</div>
+					<div class="col-md-2">
+						<div class="combinedWrapper inputWidthFull">
+							<label>Street Address Line 2</label>
+							<input type="text" 
+								ng-model="AWB.Consignee.consigneeAddress.addressLine2" 
+								maxlength="35" 
+								name="addressLine2" 
+								tabindex="-1" 
+								id="addressLine2"
+								ng-blur="streetAddressLineTwoEntered()">
+						</div>
+					</div>
+					<div class="col-md-2">
+						<div class="combinedWrapper inputWidthFull">
+							<label>City</label>
+							<input type="text" 
+								ng-model="AWB.Consignee.consigneeAddress.city" 
+								maxlength="17" 
+								name="city" 
+								id="city" 
+								ng-keypress="clearInvalidId();" 
+								ng-blur="cityNameEntered()">
+						</div>
+					</div>
+					<div class="col-md-2">
+						<div class="combinedWrapper">
+							<label>State/Prov</label>
+							<div class="ddSingle">
+								<span ng-if="isUSorCA()">
+									<select selectpicker 
+										class="reinitializeDD" 
+										id="consigneeSectionAddress" 
+										ng-model="AWB.Consignee.consigneeAddress.state"
+										ng-blur="stateNameEntered()"
+										ng-options="state.key as state.value for state in stateList" >
+									</select>
+								</span>
+								<span ng-if="!isUSorCA()">
+									<input 
+										widthformele1 
+										type="text" 
+										ng-model="AWB.Consignee.consigneeAddress.state" 
+										name="state" 
+										id="state" 
+										ng-blur="stateNameEntered()" 
+										maxlength="35">
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Postal Code Input -->
+					<div class="col-md-2">
+						<div class="combinedWrapper">
+							<span class="eleShowErrorMsg">
+								<swa-zipcode 
+									ng-model="AWB.Consignee.consigneeAddress.zipCode" 
+									name="zipCode" 
+									label-name="Postal Code"
+									country-code="AWB.Consignee.consigneeAddress.country"></swa-zipcode>
+							</span>
+
+						</div>
+					</div>
+
+				</span>
+			</div>
+
+		</form>
+	</div>
+</section>
+<!-- <section>ConsigneeForm JSON: <br>{{ consigneeForm | json }}</section> -->
+<!-- <section>ConsigneeForm JSON: <br>{{ consigneeForm.zipCode | json }}</section> -->

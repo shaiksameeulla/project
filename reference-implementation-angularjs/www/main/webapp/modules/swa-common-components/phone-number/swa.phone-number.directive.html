@@ -1,0 +1,72 @@
+<div class="combinedWrapper">
+	<label class="required">{{ labelName || "Phone" }}</label>
+	<form name="phoneNumberForm"> 
+	<div class="eleShowErrorMsg">
+		<span ng-if="countryCode === 'CA' || countryCode === 'US'" class="eleShowErrorMsg">
+			<span>+</span>
+				<input 
+					digit1 
+					type="text" 
+					tabindex="-1" 
+					name="countryCode" 
+					ng-model="phoneNumber.countryCode" 
+					maxlength="1" 
+					swa-focus-no-validate
+					ng-disabled="true">
+			<span>(</span>
+				<input 
+					digit3 
+					type="text" 
+					data-ng-pattern="VALIDATIONS.US.AREACODE" 
+					name="areaCode" 
+					ng-model="phoneNumber.areaCode" 
+					maxlength="3" 
+					swa-focus-no-validate 
+					ng-change="inputValidate()">
+				<span ng-if="!phoneNumberForm.areaCode.$focused" ng-messages="phoneNumberForm.areaCode.$error">
+					<error ng-message="pattern">{{ERROR_MESSAGE.US}}</error>
+				</span>
+			<span>)</span>
+				<input 
+					digit3 
+					type="text" 
+					data-ng-pattern="VALIDATIONS.US.PHONE_PART_ONE" 
+					name="phonePartOne" 
+					ng-model="phoneNumber.phonePartOne" 
+					maxlength="3" 
+					swa-focus-no-validate 
+					ng-change="inputValidate()">
+				<span ng-if="!phoneNumberForm.phonePartOne.$focused" ng-messages="phoneNumberForm.phonePartOne.$error">
+					<error ng-message="pattern">{{ERROR_MESSAGE.US}}</error>
+				</span>
+			<span>-</span>
+				<input 
+					digit4 
+					type="text" 
+					data-ng-pattern="VALIDATIONS.US.PHONE_PART_TWO" 
+					name="phonePartTwo" 
+					ng-model="phoneNumber.phonePartTwo" 
+					maxlength="4" 
+					swa-focus-no-validate 
+					ng-change="inputValidate()">
+				<span ng-if="!phoneNumberForm.phonePartTwo.$focused" ng-messages="phoneNumberForm.phonePartTwo.$error">
+					<error ng-message="pattern">{{ERROR_MESSAGE.US}}</error>
+				</span>
+		</span>
+		<span ng-if="countryCode !== 'CA' && countryCode !== 'US'">
+			<input 
+				widthFormEle3 
+				type="text" 
+				data-ng-pattern="VALIDATIONS.INT.NUMBER" 
+				name="phoneNumber" 
+				ng-model="phoneNumber.internationalPhoneNumber" 
+				maxlength="14" 
+				swa-focus-no-validate 
+				ng-change="inputValidate()">
+			<span ng-if="!phoneNumberForm.phoneNumber.$focused" ng-messages="phoneNumberForm.phoneNumber.$error">
+				<error ng-message="pattern">{{ERROR_MESSAGE.INT}}</error>
+			</span>
+		</span>
+	</div>
+	</form>
+</div>

@@ -1,0 +1,17 @@
+<div>
+<label style="font-weight: bold">{{"Email"}}</label>
+	<form name="emailForm"> 
+		<div class="eleShowErrorMsg">
+			<input 
+				ng-model="email"
+				type="text" 
+				name="email"
+				ng-maxlength="60" 
+				ng-change="inputValidate(emailForm)" 
+				placeholder="Email"
+				ng-model-options="{ updateOn: 'blur' }">
+			</input>
+			<error ng-if="emailForm.email.$error.invalidEmail">{{ERROR_MESSAGE}}</error>
+		</div>
+	</form>
+</div>

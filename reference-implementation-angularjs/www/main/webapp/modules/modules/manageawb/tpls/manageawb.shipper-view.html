@@ -1,0 +1,352 @@
+<div style="background-color: red; padding: 5px">
+	<h3 style="color: white"> DEBUG AREA: Select LOGIN ROLE </h3>
+	<button style="padding: 5px" ng-click="loginAs_MANAGEGROUPPRIVILEGE()">Login with MANAGEGROUPPRIVILEGE</button>
+	<button style="padding: 5px" ng-click="loginAs_VIEWREFERENCEDATA()">Login with VIEWREFERENCEDATA</button>
+</div>
+<section id="awb-shipper" class="panel panel-danger">
+	<div class="panel-heading" ng-click="sectionsActive.shipper = !sectionsActive.shipper">
+		(1) Shipper
+		<!-- <span class="glyphicon pull-right" ng-if="shipperForm.$invalid">INVALID</span> -->
+	</div>
+	<div class="panel-body" ng-show="sectionsActive.shipper">
+	<form name="shipperForm" id="shipperForm">
+
+		<div class="row">
+			<!-- Shipper ID -->
+			<div class="col-md-2">
+				<span class="combinedWrapper">
+					<label>Shipper ID &nbsp;</label>
+
+					<div class="desWrap" ng-init="setFocus('masterActNumber')";>
+						<span class="eleShowErrorMsg">
+							<input type="text" 
+								digit9 
+								only-digits 
+								ng-model="AWB.Shipper.masterActNumber" 
+								name="masterActNumber" 
+								id="masterActNumber" 
+								maxlength="9" 
+								autofocus
+								ng-pattern="/^(\d)+$/" 
+								swa-focus-no-validate 
+								swa-validate-shipper-master-account 
+								ng-blur="shipperIdEntered(shipperForm.masterActNumber, '#locationId')">
+							<!-- <error ng-if="shipperForm.masterActNumber.$pending">Pending Validation...</error> -->
+							<span ng-if="!shipperForm.masterActNumber.$focused" ng-messages="shipperForm.masterActNumber.$error">
+								<error ng-message="pattern">Shipping ID must be a number</error>
+								<error ng-message="shipperIdExists">Shipper ID Does Not Exist</error>
+							</span>
+						</span>
+						<span>-</span>
+						<span class="eleShowErrorMsg">
+							<input 
+								type="text" 
+								digit3 
+								only-digits 
+								ng-model="Shipper.locationId" 
+								name="locationId"
+								id="locationId" 
+								ng-pattern="/^(\d)+$/" 
+								swa-focus-no-validate 
+								ng-blur="locationIdEntered(
+									shipperForm.masterActNumber, 
+									shipperForm.locationId, 
+									'#iacNumber', 
+									'#iacNumber'
+								)" 
+								maxlength="3">
+							<span ng-if="!shipperForm.locationId.$focused" ng-messages="shipperForm.locationId.$error">
+								<error ng-message="pattern">Shipping ID must be a number</error>
+							</span>
+						</span>
+						<div class="desTxt">ID will pre-populate form</div>
+					</div>
+
+				</span>
+			</div>
+
+			<!-- Shipper Name -->
+			<div class="col-md-2">
+				<div class="combinedWrapper inputWidthFull applyDisabled">
+					<label class="required">Shipper Name</label>
+					<span class="eleShowErrorMsg">
+						<input 
+							type="text" 
+							id="shipperName" 
+							name="shipperName" 
+							ng-focus="" 
+							maxlength="70" 
+							swa-focus-no-validate 
+							ng-disabled="AWB.Shipper.primarySecurityType=='KNOWN SHIPPER' || 
+								AWB.Shipper.primarySecurityType=='IAC' || 
+								(AWB.Shipper.primarySecurityType=='ESP' && disableEmpHire)" 
+							ng-model="AWB.Shipper.shipperName" 
+							tabindex="-1" 
+							ng-required="false">
+					</span>
+				</div>
+			</div>
+
+			<!-- Shipper Address -->
+			<div class="col-md-2 col-md-offset-2">
+				<div class="combinedWrapper">
+					<label class="displayInline">Shipper Address</label>
+					<span ng-if="AWB.Shipper.primarySecurityType!='KNOWN SHIPPER' && AWB.Shipper.primarySecurityType!='DECLARED KNOWN'">
+						<span class="iPopup" data-toggle="modal" data-target="#shipperAddress" data-ng-click="populateData()" data-backdrop="static" data-keyboard="false">
+						</span>
+					</span>
+					<div Caps>
+						<div ng-if="AWB.Shipper.shipperAddress.addressLine">
+							<div class="ellipsis" title="{{AWB.Shipper.shipperAddress.addressLine}}">{{AWB.Shipper.shipperAddress.addressLine}}</div>
+							<div class="ellipsis" title="{{AWB.Shipper.shipperAddress.addressLine2}}">{{(AWB.Shipper.shipperAddress.addressLine2!='' && AWB.Shipper.shipperAddress.addressLine2!="NULL")?AWB.Shipper.shipperAddress.addressLine2:''}}</div>	
+							<div class="ellipsis" title="{{AWB.Shipper.shipperAddress.city}},{{AWB.Shipper.shipperAddress.state}}">
+								<span>{{AWB.Shipper.shipperAddress.city}}</span>,&nbsp;<span>{{AWB.Shipper.shipperAddress.state}}</span>
+							</div>	
+							<span>{{AWB.Shipper.shipperAddress.zipCode}}</span>
+						</div>
+						<div>{{AWB.Shipper.shipperAddress.country}}</div>
+						<div>{{AWB.Shipper.shipperAddress.phoneNumber}}</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Shipper Reference -->
+			<div class="col-md-2 col-md-offset-2">
+				<div class="combinedWrapper inputWidthFull">
+					<label>Shipper Reference</label>
+					<input 
+						type="text" 
+						id="shipperReference" 
+						name="shipperReference" 
+						maxlength="35" 
+						ng-model="AWB.Shipper.shipperReference" 
+						tabindex="-1" 
+						ng-blur="shipperReferenceEntered()">
+				</div>
+			</div>
+
+		</div>
+
+		<div class="row">
+
+			<!-- Security Type -->
+			<div class="col-md-2">
+				<div class="combinedWrapper inputWidthFull applyDisabled">
+					<label class="required">Security Type</label>
+					<input id="primarySecurityTypeText" disabled="disabled" class="noDisabled" type="text" ng-model="AWB.Shipper.primarySecurityType" ng-required="false" ng-blur="securityTypeEntered()">
+				</div>
+			</div>
+
+			<!-- IAC# -->
+			<div class="col-md-2 col-md-offset-2">
+				<div class="combinedWrapper inputWidthFull applyDisabled">
+					<!--IF SEC-TYPE IS IAC IT'S MANDAOTRY-->
+					<span ng-if="AWB.Shipper.primarySecurityType!='IAC'">
+						<label class="required">IAC #</label>
+						<span class="eleShowErrorMsg">
+							<input 
+								type="text" 
+								ng-disabled="false" 
+								ng-model="AWB.Shipper.iacNumber" 
+								maxlength="9" 
+								swa-focus-no-validate 
+								name="iacNumber" 
+								id="iacNumber" 
+								ng-required="false">
+							<span ng-if="!shipperForm.iacNumber.$focused && shipperForm.iacNumber.$touched" 
+								ng-messages="shipperForm.iacNumber.$error">
+								<error ng-message="required">IAC Number Required</error>
+								<error ng-message="touched">IAC Number Required</error>
+							</span>
+						</span>
+					</span>
+					<!--IF SEC-TYPE IS IAC IT'S MANDATORY-->
+					<!--IF SEC-TYPE IS NOT IAC-->
+					<span ng-if="AWB.Shipper.primarySecurityType=='IAC'">
+						<label>IAC #</label>
+						<input 
+							type="text" 
+							ng-disabled="false" 
+							class="noDisabled" 
+							ng-model="AWB.Shipper.iacNumber" 
+							name="iacNumber" 
+							id="iacNumber" >
+					</span>
+					<!--IF SEC-TYPE IS NOT IAC-->
+				</div>
+			</div>
+
+			<!-- CCF ID -->
+			<div class="col-md-2">
+				<div class="combinedWrapper inputWidthFull applyDisabled">
+					<label>CCSF ID</label>
+					<span class="eleShowErrorMsg">
+					    <input type="text" disabled="disabled" class="noDisabled" name="ccsf" id="ccsf">
+					</span>
+				</div>
+			</div>
+
+			<!-- COC Failure Toggle -->
+			<div class="col-md-2">
+				<div class="combinedWrapper">
+					<label>&nbsp;</label>
+					<div>
+						<label class="pull-left marginR20">&nbsp;&nbsp;&nbsp;COC Failure</label>
+						<div class="radioSwitch pull-left">
+							<input 
+								type="checkbox" 
+								ng-model="AWB.Shipper.cocFailure" 
+								tabindex="-1" 
+								ng-true-value="'YES'" 
+								ng-false-value="'NO'" 
+								ng-change="updateComments();">
+							<label><i></i></label>
+						</div>
+					</div>	
+				</div>
+			</div>
+
+			<!-- COC Failure Reason -->
+			<div class="col-md-2">
+				<div class="combinedWrapper selectWidthFull inputWidthFull applyDisabled">
+					<div class="ddSingle">
+						<div ng-show="AWB.Shipper.cocFailure!='YES'">
+							<label>COC Failure Reason</label>
+							<input 
+								type="text" 
+								disabled="disabled" 
+								class="noDisabled" 
+								ng-model="AWB.Shipper.cocFailureReason.value">
+						</div>
+						<div ng-if="AWB.Shipper.cocFailure=='YES'">
+							<!--FORM VALIDATION-->
+							<input 
+								eleInvisible 
+								style="display:none" 
+								type="text" 
+								name="cocFailure" 
+								ng-model="AWB.Shipper.cocFailureReason.key" 
+								ng-required"false">
+							<!--FORM VALIDATION-->
+						</div>
+						<div ng-show="AWB.Shipper.cocFailure=='YES'">
+							<label class="required">COC Failure Reason</label>
+							<div class="selectWidthFull">
+								<code-name-drop-down name="cocFailure" ng-change="cocFailureReasonEntered();" items="cocFailure" ng-model="AWB.Shipper.cocFailureReason" id="cocFailureId" ></code-name-drop-down>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="row">
+			<!-- Employee ID Verification -->
+			<div class="col-md-2">
+				<div class="combinedWrapper inputWidthFull">
+					<!--IF SEC-TYPE IS ESP IT'S MANDAOTRY-->
+					<span ng-if="AWB.Shipper.primarySecurityType=='ESP'">
+						<label class="required">Employee #</label>
+						<span class="eleShowErrorMsg">
+							<input 
+								type="text" 
+								ng-model="AWB.Shipper.employeeNumber" 
+								swa-focus-no-validate 
+								maxlength="8" 
+								name="employeeNumber" 
+								id="employeeNumber" 
+								ng-keydown="empIdVerifiy($event);" 
+								ng-required="false">
+						</span>
+					</span>
+					<!--IF SEC-TYPE IS ESP IT'S MANDAOTRY-->
+				</div>
+			</div>
+
+			<!-- Hire Date -->
+			<div class="col-md-2">
+				<div class="combinedWrapper inputWidthFull applyDisabled">
+					<!--IF SEC-TYPE IS ESP IT'S MANDAOTRY-->
+					<span ng-if="AWB.Shipper.primarySecurityType=='ESP'">
+						<label class="required">Hire Date</label>
+						<span class="eleShowErrorMsg input-group dateAlone">
+							<input 
+								type="text" 
+								ng-model="AWB.Shipper.employeeHireDate" 
+								name="employeeHireDate" 
+								id="employeeHireDate" 
+								ng-required="false"
+								ng-disabled="true">
+						</span>
+					</span>
+					<!--IF SEC-TYPE IS ESP IT'S MANDAOTRY-->
+				</div>
+			</div>
+
+		</div>
+
+		<div class="row">
+			<!-- ID Verification -->
+			<div class="col-md-2">
+				<div class="combinedWrapper inputWidthFull"  ng-if="AWB.Shipper.primarySecurityType!='SWA-INT'">
+					<label required>ID Verification #</label>
+					<span class="eleShowErrorMsg">
+						<input 
+							type="text" 
+							maxlength="12" 
+							tabindex="-1" 
+							id="idVerificationNumber" 
+							name="idVerificationNumber" 
+							ng-paste="enableAssignButton();" 
+							ng-blur="idVerificationTxtKey();" 
+							ng-model="AWB.Shipper.idVerificationNumber" 
+							ng-required="false">
+					</span>
+				</div>
+				
+				<div class="combinedWrapper inputWidthFull"  ng-if="AWB.Shipper.primarySecurityType=='SWA-INT'">
+					<label>ID Verification #</label>
+					<input 
+						type="text" 
+						maxlength="12" 
+						id="idVerificationNumber" 
+						tabindex="-1" 
+						name="idVerificationNumber" 
+						ng-paste="enableAssignButton();"
+						ng-blur="idVerificationTxt();" 
+						ng-model="AWB.Shipper.idVerificationNumber">
+				</div>
+			</div>
+			<!-- ID Buttons -->
+			<div class="col-md-2 btnLabelTop">
+				<button 
+					type='button' 
+					class="pull-left swc_button MrgL_0 widthAuto" 
+					id="idVerificationAssignButton" 
+					tabindex="-1" 
+					ng-click="assignClick()" 
+					ng-disabled="dispAssign" 
+					ng-keydown="openConsignee($event);">Assign </button>
+				<button 
+					type='button' 
+					class="pull-left swc_button widthAuto" 
+					tabindex="-1" 
+					id="viewBtn" 
+					ng-click="viewClick()" 
+					ng-disabled="dispView">View</button>
+			</div>
+		</div>
+
+		<div class="row" name="secured-view" ng-if="PRIVILEGES.role_MANAGEGROUPPRIVILEGE" style="border: 1px solid red; padding: 5px;">
+
+			<p> This area is only accessible to Users that hold Privilege MANAGEGROUPPRIVILEGE</p>
+			<span>
+				<label> This input is only accessible to Users that hold Privilege VIEWREFERENCEDATA</label>
+				<input ng-disabled="!PRIVILEGES.role_VIEWREFERENCEDATA" ng-model="role_VIEWREFERENCEDATA">
+			</span>
+		</div>
+	</form>
+	</div>
+</section>
+<!-- <section ng-init="SHOW_ME = true" ng-show="SHOW_ME" ng-click="SHOW_ME = !SHOW_ME"><pre>PRIVILEGES {{PRIVILEGES | json }}</pre></section> -->

@@ -1,0 +1,114 @@
+.checkboxRadio{
+	position:relative;
+}
+.checkboxRadio.center{
+	left: 50%;
+	margin-left: -10px;
+}
+
+.checkboxRadio input{
+	opacity:0;
+	margin:0;
+	position:absolute;
+	z-index:12;
+	width: 20px;
+	height: 20px;
+	left:0;
+}
+.checkboxRadio .innerCheck{
+	display:table;
+}
+.checkboxRadio .innerCheck::before{
+	content: " ";
+	background:url(../images/CheckboxUnchecked.png) -2px -1px no-repeat;
+	background-size:23px;
+	margin:0;
+	display:table-cell;
+	width: 20px;
+	height: 20px;
+	vertical-align:top;
+}
+/* .checkboxRadio input:hover+.innerCheck::before{
+    background-image:url(../images/CheckboxHover.png);
+}	
+
+.checkboxRadio input:checked+.innerCheck::before{
+	background-image:url(../images/CheckboxChecked.png);
+}
+.checkboxRadio input[disabled]+.innerCheck::before{
+	background-image:url(../images/CheckboxDisabled.png);
+} */
+.checkboxRadio input[type=radio]+.innerCheck::before{
+	background:url(../images/RadioDarkOff.png) -2px -1px no-repeat;
+	background-size:24px;
+}
+.checkboxRadio input[type=radio]:hover+.innerCheck::before{
+    background-image:url(../images/RadioDarkHover.png);
+}	
+.checkboxRadio input[type=radio]:checked+.innerCheck::before{
+	background-image:url(../images/RadioDarkHoverBlue.png);
+}
+.checkboxRadio input[type=radio][disabled]+.innerCheck::before{
+	background-image:url(../images/RadioDisabled.png);
+}
+.disabledSelect .checkboxRadio input[disabled]:checked+.innerCheck::before{
+	background-image:url(../images/RadioDarkHoverBlue.png);
+}
+/** label color based on radio,checkbox **/
+.checkboxRadio label{
+	margin-left:6px;
+}
+input+.innerCheck label{
+    color:#2C3E50 !important;;
+}
+input:checked+.innerCheck label, .disabledSelect .checkboxRadio input[disabled]:checked+.innerCheck label{
+    color:#2683F0 !important;;
+}
+input[disabled]+.innerCheck label{
+    color:#BDC3C7 !important;;
+}
+.shippingLocations .checkboxCustom .innerCheck::before{
+	border-color:#BDC3C7;
+}
+
+
+
+/* Buttons group modifying */
+.btnGroup .caret{
+	display:block !important;
+	border-top: 8px solid;
+	border-right: 6px solid transparent;
+	border-left: 6px solid transparent
+}
+.btnGroup .btn{
+	background:#2683F0;
+	color:#fff;
+	font-family: 'open_sanssemibold';
+	padding:4px 20px;
+}
+.btnGroup.btn-group > .btn + .dropdown-toggle{
+	height:30px;
+	border-left:2px solid #3868B2;
+}
+
+.checkboxRadio input[type=checkbox]+.innerCheck::before{
+	background-position:center;
+	background-size:20px;
+}
+.checkboxRadio input[type=checkbox]:hover+.innerCheck::before{
+    background-image:url(../images/CheckboxHover.png);
+	background-size:28px;
+}	
+.checkboxRadio input[type=checkbox]:checked+.innerCheck::before{
+	background-image:url(../images/CheckboxChecked.png);
+	background-size:28px;
+}
+.checkboxRadio input[type=checkbox][disabled]+.innerCheck::before{
+	background-image:url(../images/CheckboxDisabled.png);
+}
+
+
+
+
+
+

@@ -1,0 +1,18 @@
+<div>
+<label style="font-weight: bold">{{"Time"}}</label>
+	<form name="timeForm"> 
+		<div class="eleShowErrorMsg">
+			<input 
+				ng-model="time"
+				name = "time"
+				type="text" 
+				maxlength="5" 
+				ng-keyup="inputValidate($event, timeForm)" 
+				placeholder="Time"
+				ng-required="{{mandatory}}"
+				ng-model-options="{ updateOn: 'blur' }">
+			</input>
+			<error ng-if="timeForm.time.$error.invalidTime">{{ERROR_MESSAGE}}</error>
+		</div>
+	</form>
+</div>

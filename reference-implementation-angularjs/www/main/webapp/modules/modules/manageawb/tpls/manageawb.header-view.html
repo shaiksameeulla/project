@@ -1,0 +1,93 @@
+<section id="AwbHeaderParent">
+    <div ng-if="$root.showLoading" >
+		<div id="loadingWrapper">
+			<div class="loadingIcon"><span>Loading</span></div>
+		</div>
+	</div>
+
+	<div class="AwbTop">
+		<div class="row">
+
+			<div class="col-md-2">
+				<div class="title">AIR WAYBILL PREFIX</div>
+				<b class="value" ng-bind="AWB.Header.awbPrefix"></b>
+			</div>
+
+			<div class="col-md-2">
+				<div class="title">AIR WAYBILL NUMBER</div>
+				<b class="value">{{AWB.Header.awbNumber}}</b>
+			</div>
+
+			<div class="col-md-2">
+				<div class="title">TENDER DATE & TIME</div>
+				<span ng-if="tenderDateGeneration">
+				  <b class="value">{{AWB.Header.tenderDateGeneration | colonFilter}}</b>
+				</span>		
+			</div>
+
+			<div class="col-md-2">
+				<div class="title">ORIGIN (FROM)</div>
+				<b class="value">{{AWB.Header.origin}}</b>
+			</div>
+
+			<div class="col-md-2">
+				<div class="title">DESTINATION (TO)</div>
+				<b class="value">{{AWB.Header.destination}}</b>
+			</div>
+
+			<div class="col-md-2">
+				<div class="title">SERVICE LEVEL </div>
+				<div class="ellipsis" title="{{headerData.serviceLevel}}">
+					<b class="value">{{AWB.Header.serviceLevel}}</b>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="AwbTopStatus">
+
+		<div class="row">
+
+			<div class="col-md-4">
+				<span class="normal txtStatusOne">STATUS - </span>
+				<span class="status txtStatusOne" ng-bind="AWB.Header.Fullstatus | uppercase"></span>
+			</div>
+
+			<div class="col-md-2">
+				<span class="normal">CUSTOMS STATUS</span>
+			</div>
+
+			<div class="col-md-2">
+			  <span ng-if="!screeningStatus || (AWB.Header.screeningStatus && AWB.Inspection.totalScreenData.screeningFailed) || displayDivErrorBarCS">
+				<span class="status">CARGO SCREENING</span>
+			  </span>
+			  <span ng-if="displayDivErrorBarCS==false && AWB.Header.screeningStatus && !AWB.Inspection.totalScreenData.screeningFailed">
+				<span class="status txtStatusOne iconTick">CARGO SCREENING</span>
+			  </span>
+			</div>
+
+			<div class="col-md-2">
+			 	<span ng-if="!AWB.Header.printState">
+					<span class="status">LOT LABELS PRINTED</span>
+				</span>
+				<span ng-if="AWB.Header.printState">
+					<span class="status txtStatusOne iconTick">LOT LABELS PRINTED</span>
+				</span>
+			</div>
+
+			<div class="col-md-2">
+			  <span ng-if="!AWB.Header.commentsStatus">
+				<span class="status">COMMENTS</span>
+			  </span>
+			  <span ng-if="AWB.Header.commentsStatus">
+				<span class="status txtStatusOne iconTick">COMMENTS</span>
+			  </span>
+			</div>
+
+		</div>
+
+	</div>
+
+</section>
+
