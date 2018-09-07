@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<!-- Basic Page Needs
+  ================================================== -->
+	<meta charset="utf-8">
+<TITLE>ExampleSharedData</TITLE>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+
+  <meta name="author" content="">
+
+	<!-- Mobile Specific Metas
+  ================================================== -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- CSS
+  ================================================== -->
+	<link rel="stylesheet" href="css/normalize.css">
+	<link rel="stylesheet" href="css/grid.css">
+	<link rel="stylesheet" href="css/style.css">
+	
+
+	<style>
+		body {
+		background: #fff;
+		font: 14px/21px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+		color: #444;
+		-webkit-font-smoothing: antialiased; /* Fix for webkit rendering */
+		-webkit-text-size-adjust: 100%;
+		-webkit-user-select: none;
+		-webkit-touch-callout:none;
+		-webkit-user-callout:none;
+        }
+	</style>
+
+
+	<!-- Scripts
+	================================================== -->
+	<script src="angular/angular.js"></script>
+
+	<script src="app.js"></script>
+	<script src="common/set-focus-if.js"></script>
+	<script src="models/ShipData.js"></script>
+	<script src="ShipFrom/ShipFrom.js"></script>
+	<script src="ShipTo/ShipTo.js"></script>
+	
+	<link rel="shortcut icon" href="favicon.ico">
+
+</head>
+
+<!-- ================================================== -->
+<body ng-app="app" ng-controller="MainController" style="background-color: #EFEFF4">
+	
+<!-- ================================================== -->
+	<div class="Header">
+		<img class="asis" src="images/Logo.png">
+	</div>
+	
+	<div style="height: 70px"></div>
+
+<!-- ================================================== -->
+ 	<div class="Forms">
+ 	
+		<div ng-include="'ShipFrom/ShipFrom.html'" ng-controller="ShipFromController"></div>
+		<div ng-if="ShipData.ShipTo.visible" ng-include="'ShipTo/ShipTo.html'" ng-controller="ShipToController"></div>
+		
+	</div>
+		
+<!-- ================================================== -->
+ 	<div class="Data">
+ 		<h1>DATA: SHIP DATA</h1>
+		<div class="Code">
+			<pre>ShipData={{ShipData | json}}</pre>
+		</div>
+		
+	</div>
+		
+<!-- ================================================== -->
+	
+</body>
+</html>
