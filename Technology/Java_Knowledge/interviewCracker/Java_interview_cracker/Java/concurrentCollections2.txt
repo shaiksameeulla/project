@@ -78,5 +78,53 @@ The Biggest Difference between ArrayBlockingQueue and LinkedBlockingQueue is cle
 
 Two Lock Queue algorithm is being used by LinkedBlockingQueue Implementation.Thus LinkedBlockingQueue's take and put can work concurrently, but this is not the case with ArrayBlockingQueue. The reason for using a single lock in ArrayBlockingQueue is ,ArrayBlockingQueue has to avoid overwriting entries so that it needs to know where the start and the end is. A LinkedBlockQueue doesn't need to know this as it lets the GC worry about cleaning up Nodes in the queue.
 
+ TransferQueue vs SynchronousQueue
+ ========================
  
+TransferQueue is more generic and useful than SynchronousQueue however as it allows you to flexibly decide whether to use normal BlockingQueue semantics or a guaranteed hand-off. In the case where items are already in the queue, calling transfer will guarantee that all existing queue items will be processed before the transferred item.
 
+SynchronousQueue implementation uses dual queues (for waiting producers and waiting consumers) and protects both queues with a single lock. The LinkedTransferQueue implementation uses CAS operations to form a nonblocking implementation and that is at the heart of avoiding serialization bottlenecks.
+
+
+
+PriorityQueue in Java
+======================
+
+
+A PriorityQueue is used when the objects are supposed to be processed based on the priority. It is known that a Queue follows the First-In-First-Out algorithm, but sometimes the elements of the queue are needed to be processed according to the priority, that’s when the PriorityQueue comes into play. The PriorityQueue is based on the priority heap. The elements of the priority queue are ordered according to the natural ordering, or by a Comparator provided at queue construction time, depending on which constructor is used.  
+
+Few important points on Priority Queue are as follows: 
+
+PriorityQueue doesn’t permit null.
+We can’t create PriorityQueue of Objects that are non-comparable
+PriorityQueue are unbound queues.
+The head of this queue is the least element with respect to the specified ordering. If multiple elements are tied for least value, the head is one of those elements — ties are broken arbitrarily.
+Since PriorityQueue is not thread-safe, so java provides PriorityBlockingQueue class that implements the BlockingQueue interface to use in java multithreading environment.
+The queue retrieval operations poll,  remove,  peek, and element access the element at the head of the queue.
+
+Constructors:
+
+1. PriorityQueue(): Creates a PriorityQueue with the default initial capacity (11) that orders its elements according to their natural ordering.
+
+PriorityQueue<E> pq = new PriorityQueue<E>();
+
+2. PriorityQueue(Collection<E> c): Creates a PriorityQueue containing the elements in the specified collection.
+
+PriorityQueue<E> pq = new PriorityQueue<E>(Collection<E> c);
+
+3. PriorityQueue(int initialCapacity): Creates a PriorityQueue with the specified initial capacity that orders its elements according to their natural ordering.
+
+
+It provides O(log(n)) time for add and poll methods.
+It inherits methods from AbstractQueue, AbstractCollection, Collection and Object class.
+
+An unbounded priority queue based on a priority heap. The elements of the priority queue are ordered according to their natural ordering, or by a Comparator provided at queue construction time, depending on which constructor is used. A priority queue does not permit null elements. A priority queue relying on natural ordering also does not permit insertion of non-comparable objects (doing so may result in ClassCastException).
+The head of this queue is the least element with respect to the specified ordering. If multiple elements are tied for least value, the head is one of those elements -- ties are broken arbitrarily. The queue retrieval operations poll, remove, peek, and element access the element at the head of the queue.
+
+A priority queue is unbounded, but has an internal capacity governing the size of an array used to store the elements on the queue. It is always at least as large as the queue size. As elements are added to a priority queue, its capacity grows automatically. The details of the growth policy are not specified.
+
+This class and its iterator implement all of the optional methods of the Collection and Iterator interfaces. The Iterator provided in method iterator() is not guaranteed to traverse the elements of the priority queue in any particular order. If you need ordered traversal, consider using Arrays.sort(pq.toArray()).
+
+Note that this implementation is not synchronized. Multiple threads should not access a PriorityQueue instance concurrently if any of the threads modifies the queue. Instead, use the thread-safe PriorityBlockingQueue class.
+
+Implementation note: this implementation provides O(log(n)) time for the enqueing and dequeing methods (offer, poll, remove() and add); linear time for the remove(Object) and contains(Object) methods; and constant time for the retrieval methods (peek, element, and size).

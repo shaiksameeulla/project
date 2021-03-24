@@ -1,0 +1,122 @@
+https://docs.oracle.com/javase/tutorial/essential/concurrency/exinter.html
+
+
+Is java ExecutorService newSingleThreadExecutor performs all the tasks using only one Thread?
+
+The ThreadPoolExecutor maintains some Worker threads, which work like this:
+
+public class Demo {
+
+    public class Worker implements Runnable {
+        @Override
+        public void run() {
+            Runnable task = getTaskFromQueue();
+            while (task != null) {
+                task.run();
+                task = getTaskFromQueue();  // This might get blocked if the queue is empty, so the worker thread will not terminate
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Worker worker = new Worker();
+        Thread thread = new Thread(worker);
+        thread.start();
+    }
+
+}
+When you submit a task to ThreadPoolExecutor which has a single Worker thread, the calling threads will put the task into a BlockingQueue on below condition:
+
+the single Worker is busy
+the BlockingQueue is not full
+And when the Worker is free, it will retrieve new task from this BlockingQueue.
+
+
+    /**
+     * Creates an Executor that uses a single worker thread operating
+     * off an unbounded queue. (Note however that if this single
+     * thread terminates due to a failure during execution prior to
+     * shutdown, a new one will take its place if needed to execute
+     * subsequent tasks.)  Tasks are guaranteed to execute
+     * sequentially, and no more than one task will be active at any
+     * given time. Unlike the otherwise equivalent
+     * {@code newFixedThreadPool(1)} the returned executor is
+     * guaranteed not to be reconfigurable to use additional threads.
+     *
+     * @return the newly created single-threaded Executor
+     */
+    public static ExecutorService newSingleThreadExecutor() {
+        return new FinalizableDelegatedExecutorService
+            (new ThreadPoolExecutor(1, 1,
+                                    0L, TimeUnit.MILLISECONDS,
+                                    new LinkedBlockingQueue<Runnable>()));
+    }
+
+    /**
+     * Creates an Executor that uses a single worker thread operating
+     * off an unbounded queue, and uses the provided ThreadFactory to
+     * create a new thread when needed. Unlike the otherwise
+     * equivalent {@code newFixedThreadPool(1, threadFactory)} the
+     * returned executor is guaranteed not to be reconfigurable to use
+     * additional threads.
+     *
+     * @param threadFactory the factory to use when creating new
+     * threads
+     *
+     * @return the newly created single-threaded Executor
+     * @throws NullPointerException if threadFactory is null
+     */
+    public static ExecutorService newSingleThreadExecutor(ThreadFactory threadFactory) {
+        return new FinalizableDelegatedExecutorService
+            (new ThreadPoolExecutor(1, 1,
+                                    0L, TimeUnit.MILLISECONDS,
+                                    new LinkedBlockingQueue<Runnable>(),
+                                    threadFactory));
+    }
+
+    /**
+     * Creates a thread pool that creates new threads as needed, but
+     * will reuse previously constructed threads when they are
+     * available.  These pools will typically improve the performance
+     * of programs that execute many short-lived asynchronous tasks.
+     * Calls to {@code execute} will reuse previously constructed
+     * threads if available. If no existing thread is available, a new
+     * thread will be created and added to the pool. Threads that have
+     * not been used for sixty seconds are terminated and removed from
+     * the cache. Thus, a pool that remains idle for long enough will
+     * not consume any resources. Note that pools with similar
+     * properties but different details (for example, timeout parameters)
+     * may be created using {@link ThreadPoolExecutor} constructors.
+     *
+     * @return the newly created thread pool
+     */
+    public static ExecutorService newCachedThreadPool() {
+        return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                                      60L, TimeUnit.SECONDS,
+                                      new SynchronousQueue<Runnable>());
+    }
+
+the SynchronousQueue is more of a handoff, whereas the LinkedBlockingQueue just allows a single element. The difference being that the put() call to a SynchronousQueue will not return until there is a corresponding take() call, but with a LinkedBlockingQueue of size 1, the put() call (to an empty queue) will return immediately.
+
+
+
+I can't say that i have ever used the SynchronousQueue directly myself, but it is the default BlockingQueue used for the Executors.newCachedThreadPool() methods. It's essentially the BlockingQueue implementation for when you don't really want a queue (you don't want to maintain any pending data).
+
+
+Future task
+
+Prerequisite: Future and callable
+
+Future:
+A Future interface provides methods to check if the computation is complete, to wait for its completion and to retrieve the results of the computation. The result is retrieved using Future’s get() method when the computation has completed, and it blocks until it is completed.
+
+Future and FutureTask both are available in java.util.concurrent package from Java 1.5.
+
+FutureTask:
+FutureTask implementation Future interface and RunnableFuture Interface, means one can use FutureTask as Runnable and can be submitted to ExecutorService for execution.
+When one call Future.submit() Callable or Runnable objects then most of time ExecutorService creates FutureTask, and one can create it manually also.
+FutureTask acts like a latch.
+Computation represent by FutureTask is implemented with Callable interface.
+It implements Future or Callable interface.
+Behaviour of get() method depends on the state of the task. If tasks are not completed get() method waits or blocks till the task is completed. Once task completed, it returns the result or throws an ExecutionException.
+An example of using Future is working with Thread pools. When one submit a task to ExecutorService which is take a long running time, then it returns a Future object immediately. This Future object can be used for task completion and getting result of computation.
