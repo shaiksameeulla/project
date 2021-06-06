@@ -8,3 +8,15 @@ The clearfix allows a container to wrap its floated children. Without a clearfix
 There are several versions of the clearfix,
 
  although more modern browsers are coming with even more useful layout mechanisms under names like flexbox, grid layout, etc.
+ 
+ .group::before,
+.group::after {
+  content: " ";
+  display: table;
+}
+.group::after {
+  clear: both;
+}
+.group {
+  zoom: 1; /** for backward compatability*/
+}
