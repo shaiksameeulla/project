@@ -1,0 +1,200 @@
+java-8-watchservice-api-tutorial
+
+In this example, we will learn to watch a directory along with all sub-directories and files inside it, using java 8 WatchService API.
+
+How to register Java 8 WatchService
+To Register WatchService, get the directory path and use path.register() method.
+
+Path path = Paths.get(".");
+WatchService watchService =  path.getFileSystem().newWatchService();
+path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+Watching for change events
+To get the changes occured on directory and files inside it, use watchKey.pollEvents() method which return the collection of all change events in form of stream.
+
+WatchKey watchKey = null;
+while (true) {
+    watchKey = watchService.poll(10, TimeUnit.MINUTES);
+    if(watchKey != null) {
+        watchKey.pollEvents().stream().forEach(event -> System.out.println(event.context()));
+    }
+    watchKey.reset();
+}
+The key remains valid until:
+
+It is cancelled, explicitly, by invoking its cancel method, or
+Cancelled implicitly, because the object is no longer accessible, or
+By closing the watch service.
+If you are reusing the same key to get change events multiple times inside a loop, then don’t forget to call watchKey.reset() method which set the key in ready state again.
+
+Please note that several things such as how events are detected, their timeliness, and whether their ordering is preserved are highly dependent of underlying operating system. Some changes may result in single entry in one OS, while similar changes may result into multiple events in another OS.
+
+Watch Directory, Sub-directories and Files for Changes Example
+In this example, we will see an example of watching a directory with all sub-directories and files inside it. We will maintain a map of watch keys and directories Map<WatchKey, Path> keys to correctly identify which directory has been modified.
+
+Below method will register a single directory to watcher and then store the directory and key inside a map.
+
+private void registerDirectory(Path dir) throws IOException 
+{
+    WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+    keys.put(key, dir);
+}
+We will call this method recursively while walking down a directory structure and calling this for each directory we encounter.
+
+private void walkAndRegisterDirectories(final Path start) throws IOException {
+    // register directory and sub-directories
+    Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            registerDirectory(dir);
+            return FileVisitResult.CONTINUE;
+        }
+    });
+}
+Please note that at any time a new directory is created, we will register it with watchservice and a new key will be added to map.
+
+WatchEvent.Kind kind = event.kind();
+if (kind == ENTRY_CREATE) {
+    try {
+        if (Files.isDirectory(child)) {
+            walkAndRegisterDirectories(child);
+        }
+    } catch (IOException x) {
+        // do something useful
+    }
+}
+Putting all above together along with logic to process the events, complete example look like this:
+
+package com.howtodoinjava.examples;
+ 
+import static java.nio.file.StandardWatchEventKinds.*;
+ 
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashMap;
+import java.util.Map;
+ 
+public class Java8WatchServiceExample {
+ 
+    private final WatchService watcher;
+    private final Map<WatchKey, Path> keys;
+ 
+    /**
+     * Creates a WatchService and registers the given directory
+     */
+    Java8WatchServiceExample(Path dir) throws IOException {
+        this.watcher = FileSystems.getDefault().newWatchService();
+        this.keys = new HashMap<WatchKey, Path>();
+ 
+        walkAndRegisterDirectories(dir);
+    }
+ 
+    /**
+     * Register the given directory with the WatchService; This function will be called by FileVisitor
+     */
+    private void registerDirectory(Path dir) throws IOException 
+    {
+        WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+        keys.put(key, dir);
+    }
+ 
+    /**
+     * Register the given directory, and all its sub-directories, with the WatchService.
+     */
+    private void walkAndRegisterDirectories(final Path start) throws IOException {
+        // register directory and sub-directories
+        Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                registerDirectory(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+ 
+    /**
+     * Process all events for keys queued to the watcher
+     */
+    void processEvents() {
+        for (;;) {
+ 
+            // wait for key to be signalled
+            WatchKey key;
+            try {
+                key = watcher.take();
+            } catch (InterruptedException x) {
+                return;
+            }
+ 
+            Path dir = keys.get(key);
+            if (dir == null) {
+                System.err.println("WatchKey not recognized!!");
+                continue;
+            }
+ 
+            for (WatchEvent<?> event : key.pollEvents()) {
+                @SuppressWarnings("rawtypes")
+                WatchEvent.Kind kind = event.kind();
+ 
+                // Context for directory entry event is the file name of entry
+                @SuppressWarnings("unchecked")
+                Path name = ((WatchEvent<Path>)event).context();
+                Path child = dir.resolve(name);
+ 
+                // print out event
+                System.out.format("%s: %s\n", event.kind().name(), child);
+ 
+                // if directory is created, and watching recursively, then register it and its sub-directories
+                if (kind == ENTRY_CREATE) {
+                    try {
+                        if (Files.isDirectory(child)) {
+                            walkAndRegisterDirectories(child);
+                        }
+                    } catch (IOException x) {
+                        // do something useful
+                    }
+                }
+            }
+ 
+            // reset key and remove from set if directory no longer accessible
+            boolean valid = key.reset();
+            if (!valid) {
+                keys.remove(key);
+ 
+                // all directories are inaccessible
+                if (keys.isEmpty()) {
+                    break;
+                }
+            }
+        }
+    }
+ 
+    public static void main(String[] args) throws IOException {
+        Path dir = Paths.get("c:/temp");
+        new Java8WatchServiceExample(dir).processEvents();
+    }
+}
+After running this program, and making changes in files and directories in given input, you will notice the captured events in console.
+
+Output:
+
+ENTRY_CREATE: c:\temp\New folder
+ENTRY_DELETE: c:\temp\New folder
+ENTRY_CREATE: c:\temp\data
+ENTRY_CREATE: c:\temp\data\New Text Document.txt
+ENTRY_MODIFY: c:\temp\data
+ENTRY_DELETE: c:\temp\data\New Text Document.txt
+ENTRY_CREATE: c:\temp\data\tempFile.txt
+ENTRY_MODIFY: c:\temp\data
+ENTRY_MODIFY: c:\temp\data\tempFile.txt
+ENTRY_MODIFY: c:\temp\data\tempFile.txt
+ENTRY_MODIFY: c:\temp\data\tempFile.txt
+That’s all for this simple example of using Java 8 WatchService API to watch for file changes and handling them.
