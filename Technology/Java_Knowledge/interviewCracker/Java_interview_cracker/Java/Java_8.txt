@@ -35,6 +35,23 @@ Java 8 features
 11 Java IO improvements
 12 Miscellaneous Core API improvements
 
+
+Lambda expression is a new feature which is introduced in Java 8. A lambda expression is an anonymous function. A function that doesn’t have a name and doesn’t belong to any class. The concept of lambda expression was first introduced in LISP programming language.
+
+Java Lambda Expression Syntax
+To create a lambda expression, we specify input parameters (if there are any) on the left side of the lambda operator ->, and place the expression or block of statements on the right side of lambda operator. For example, the lambda expression (x, y) -> x + y specifies that lambda expression takes two arguments x and y and returns the sum of these.
+
+//Syntax of lambda expression
+(parameter_list) -> {function_body}
+
+Where to use the Lambdas in Java
+To use lambda expression, you need to either create your own functional interface or use the pre defined functional interface provided by Java. An interface with only single abstract method is called functional interface(or Single Abstract method interface), for example: Runnable, callable, ActionListener etc.
+
+To use function interface:
+Pre Java 8: We create anonymous inner classes.
+Post Java 8: You can use lambda expression instead of anonymous inner classes.
+
+
 Inside anonymous inner class we can define variable that is called as instance variable  and this must be accessed by this keyword, to accesses enclosing class variable then we need to access as Outerclassname.this.instancevariable.
 However in case of lambda express, we can define varible inside lambda expression but we call this as local variable. If you want to access enclosing variables then you can use this keyword
 
@@ -48,4 +65,65 @@ System.out::println
 "abc"::length
 ArrayList::new
 int[]::new
+
+1. What is a Boxed Stream?
+
+	n Java 8, if we want to convert a stream of objects to a collection then we can use one of the static methods in the Collectors class.
+
+//It works perfectly!!
+List<String> strings = Stream.of("how", "to", "do", "in", "java")
+                    .collect(Collectors.toList());
+		However, the same process doesn’t work on streams of primitives.
+		//Compilation Error !!
+IntStream.of(1,2,3,4,5)
+    .collect(Collectors.toList());
+	To convert a stream of primitives, we must first box the elements in their wrapper classes and then collect the wrapped objects in a collection. This type of stream is called boxed stream.
+IntStream (Example to convert int stream to List of Integers.) similarly LongStream,DoubleStream
+Let’s look at a few examples of boxed streams in Java.
+//Get the collection and later convert to stream to process elements
+List<Integer> ints = IntStream.of(1,2,3,4,5)
+                .boxed()
+                .collect(Collectors.toList());
+         
+System.out.println(ints);
+ 
+//Stream operations directly
+Optional<Integer> max = IntStream.of(1,2,3,4,5)
+                .boxed()
+                .max(Integer::compareTo);
+
+
+					
+
+1. Stream.distinct() to remove duplicates
+	The distinct() method returns a stream consisting of the distinct elements of given stream. The element equality is checked according to element’s equals() method.
+
+
+  // ArrayList with duplicate elements
+ArrayList<Integer> numbersList 
+    = new ArrayList<>(Arrays.asList(1, 1, 2, 3, 3, 3, 4, 5, 6, 6, 6, 7, 8));
+  
+List<Integer> listWithoutDuplicates = numbersList.stream()
+            .distinct()
+            .collect(Collectors.toList());
+  
+System.out.println(listWithoutDuplicates);
+
+2. Collectors.toSet() to remove duplicates
+  Another simple and very useful way is to store all the elements in a Set. Sets, by definition, store only distinct elements.
+
+	  
+	ArrayList<Integer> numbersList 
+    = new ArrayList<>(Arrays.asList(1, 1, 2, 3, 3, 3, 4, 5, 6, 6, 6, 7, 8));
+  
+Set<Integer> setWithoutDuplicates = numbersList.stream()
+            .collect(Collectors.toSet());
+  
+System.out.println(setWithoutDuplicates);
+
+3. Collectors.toMap() to count occurances
+	Sometimes, we are interested in finding out that which all elements are duplicates and how many times they appeared in the original list. We can use a Map to store this information.
+
+
+We can use predicate.negate() function to reverse a condition so that each condition may serve true and false – both scenarios.
 

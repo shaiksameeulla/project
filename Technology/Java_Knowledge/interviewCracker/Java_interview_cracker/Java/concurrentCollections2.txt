@@ -81,9 +81,43 @@ Two Lock Queue algorithm is being used by LinkedBlockingQueue Implementation.Thu
  TransferQueue vs SynchronousQueue
  ========================
  
+ BlockingQueue expresses the concept of a queue that:
+
+1. a producer can block when adding items to a queue until there is space available.
+
+2. a consumer can block when removing an item from the queue until an item exists.
+
+
+
+ TransferQueue:
+ ============
 TransferQueue is more generic and useful than SynchronousQueue however as it allows you to flexibly decide whether to use normal BlockingQueue semantics or a guaranteed hand-off. In the case where items are already in the queue, calling transfer will guarantee that all existing queue items will be processed before the transferred item.
 
-SynchronousQueue implementation uses dual queues (for waiting producers and waiting consumers) and protects both queues with a single lock. The LinkedTransferQueue implementation uses CAS operations to form a nonblocking implementation and that is at the heart of avoiding serialization bottlenecks.
+TransferQueue takes this one step further and blocks on put until the item is actually consumed by a consumer (not just added to the queue). This new constraint is expressed in the key new method called transfer(). The name is very descriptive – because the blocking occurs until a hand-off is complete from one thread to another, you are effectively transferring the item between threads (in a way that properly creates happens-before relationships in the Java Memory Model).
+
+
+
+The TransferQueue can be very useful when we do not want an over-producing producer that will flood the queue with messages, resulting in the OutOfMemory errors. In such design, the consumer will be dictating the speed at which the producer will produce messages.
+
+When a producer reaches to TransferQueue to transfer a message and there are consumers waiting to take message, then producer directly transfers the message to consumer.
+
+If there is no consumer waiting, then producer will NOT directly put the message and return, rather it will wait for any consumer to be available to consume the message.
+
+TransferQueue goes further, and blocks Producer threads until the items consumed by Consumer threads. New method — transfer — blocking occurs until item moves from one thread to another.
+
+There are additional methods — two forms of tryTransfer — one is blocking with time-out, other is non-blocking but transfer only if Consumer thread is waiting. Also there are a couple helper methods hasWaitingConsumer and getWaitingConsumerCount.
+
+Implementation class : LinkedTransferQueue
+
+ The LinkedTransferQueue implementation uses CAS operations to form a nonblocking implementation and that is at the heart of avoiding serialization bottlenecks.
+SynchronousQueue:
+===============
+
+SynchronousQueue implementation uses dual queues (for waiting producers and waiting consumers) and protects both queues with a single lock.
+
+We remember about SynchronousQueue from Java 5, which provides queue with size 0 and quite good for transfer items between threads. This queue works on the principle «one came in — one went out». Each put operation blocks Producer thread until Consumer thread fetch element from queue and vice versa, Consumer thread is waiting until Producer thread puts element to queue.
+
+SynchronousQueue is more specialized in comparison with TransferQueue but it allows developers decide whether to use general blocking queue, or guaranteed hand-off.
 
 
 

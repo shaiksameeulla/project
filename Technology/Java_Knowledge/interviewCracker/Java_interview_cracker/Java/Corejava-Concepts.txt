@@ -15,8 +15,65 @@ The string is final by design in Java, some of the points which make sense why S
 
 	Since Strings are immutable in Java if you store password as plain text it will be available in memory until Garbage collector clears it and since String are used in String pool for reusability there is pretty high chance that it will be remain in memory for long duration, which pose a security threat. Since any one who has access to memory dump can find the password in clear text and that's another reason you should always used an encrypted password than plain text. Since Strings are immutable there is no way contents of Strings can be changed because any change will produce new String, while if you char[] you can still set all his element as blank or zero. So Storing password in character array clearly mitigates security risk of stealing password
 
+Is it necessary that each try block must be followed by a catch block?
+
+No it is not mandatory that there should be a catch block after a try block. try block can have only a matching finally block. So there are these valid combinations try-catch-finally, try-catch, try-finally.
+
+Read more about try-catch block here.
+
+What is the difference between error and exception?
+
+Exception- An Exception indicates that a problem has occurred, but it is not a serious system problem. The user programs you write will throw and catch Exceptions.
+
+Error- It defines exceptions that are not expected to be caught by your program. Exceptions of type Error are used by the Java run-time system to indicate errors having to do with the run-time environment, itself.
+Examples of error are StackOverflowError, OutOfMemoryError etc.
+
+Explain the exception hierarchy in Java?
+
+Throwable class is the super class of all the exception types. Below Throwable class there are two subclasses which denotes two distinct branches of exceptions-
+
+Exception- An Exception indicates that a problem has occurred, but it is not a serious system problem. The user programs you write will throw and catch Exceptions.
+Error- It defines exceptions that are not expected to be caught by your program. Exceptions of type Error are used by the Java run-time system to indicate errors having to do with the run-time environment, itself.
+Examples of error are StackOverflowError, OutOfMemoryError etc.
+Below Exception there is a distinct subclass RunTimeExcpetion- RunTimeExcpetion and its descendants denote the exceptional conditions that are external to the application, and the application usually cannot anticipate or recover from them.
+
+Read more about exception hierarchy in Java here.
+
+What is try-with-resources or ARM in Java 7?
+
+Java 7 introduced a new form of try known as try-with-resources for Automatic Resource Management (ARM). Here resource is an object that must be closed after the program is finished with it. Example of resources would be an opened file handle or database connection etc.
+
+Before the introduction of try-with-resources we had to explicitly close the resources once the try block completes normally or abruptly.
+
+try {
+    br = new BufferedReader(new FileReader("C:\\test.txt"));
+    System.out.println(br.readLine());
+} catch (IOException e) {
+    e.printStackTrace();
+} finally {
+  try {
+    if (br != null){
+      System.out.println("Closing the file");
+      br.close();
+    }                
+  } catch (IOException ex) {
+    ex.printStackTrace();
+  }
+}
+try-with-resources helps in reducing such boiler plate code. Let's see the same example using try-with-resources.
+
+try(BufferedReader br = new BufferedReader(new FileReader("C:\\test.txt"))) {            
+  System.out.println(br.readLine());
+} catch (IOException e) {
+  e.printStackTrace();
+} 
 
 
+are you aware of any scenario when finally will not be executed?
+
+According to Java docs. If the JVM exits (By explicitly using System.exit() or a JVM crash) while the try or catch code is being executed, then the finally block may not execute. Likewise, if the thread executing the try or catch code is interrupted or killed, the finally block may not execute even though the application as a whole continues.
+
+Read more about finally here.
 
 
 Immutable :

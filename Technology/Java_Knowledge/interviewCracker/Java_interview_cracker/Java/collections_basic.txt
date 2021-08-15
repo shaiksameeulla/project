@@ -261,10 +261,30 @@ BlockingQueue in Java doesn't allow null elements, various implementation of Blo
 	ArrayBlockingQueue — a bounded FIFO blocking queue backed by an array
 	PriorityBlockingQueue — an unbounded blocking priority queue backed by a heap
 	DelayQueue — a time-based scheduling queue backed by a heap
-	SynchronousQueue — a simple rendezvous mechanism that uses the BlockingQueue interface
-	In JDK 7, TransferQueue is a specialized BlockingQueue in which code that adds an element to the queue has the option of waiting (blocking) for code in another thread to retrieve the element. TransferQueue has a single implementation:
+	SynchronousQueue(class) — a simple rendezvous(a meeting at an agreed time and place)mechanism that uses the BlockingQueue interface
+	In JDK 7, TransferQueue(I) is a specialized BlockingQueue in which code that adds an element to the queue has the option of waiting (blocking) for code in another thread to retrieve the element. TransferQueue has a single implementation: (super interface blockingqueue)
 
-LinkedTransferQueue — an unbounded TransferQueue based on linked nodes
+      LinkedTransferQueue — an unbounded TransferQueue based on linked nodes
 
+LinkedTransferQueue:: An unbounded TransferQueue based on linked nodes. This queue orders elements FIFO (first-in-first-out) with respect to any given producer. The head of the queue is that element that has been on the queue the longest time for some producer. The tail of the queue is that element that has been on the queue the shortest time for some producer.
+Beware that, unlike in most collections, the size method is NOT a constant-time operation. Because of the asynchronous nature of these queues, determining the current number of elements requires a traversal of the elements, and so may report inaccurate results if this collection is modified during traversal. Additionally, the bulk operations addAll, removeAll, retainAll, containsAll, equals, and toArray are not guaranteed to be performed atomically. For example, an iterator operating concurrently with an addAll operation might view only some of the added elements
+---
 BlockingQueue are thread-safe. All queuing method uses concurrency control and internal locks to perform operation atomically. Since BlockingQueue also extend Collection, bulk Collection operations like addAll(), containsAll() are not performed atomically until any BlockingQueue implementation specifically supports it. So call to addAll() may fail after inserting couple of elements.
 ----------------------
+
+SynchronousQueue :: A blocking queue in which each insert operation must wait for a corresponding remove operation by another thread, and vice versa. A synchronous queue does not have any internal capacity, not even a capacity of one. You cannot peek at a synchronous queue because an element is only present when you try to remove it; you cannot insert an element (using any method) unless another thread is trying to remove it; you cannot iterate as there is nothing to iterate. The head of the queue is the element that the first queued inserting thread is trying to add to the queue; if there is no such queued thread then no element is available for removal and poll() will return null. For purposes of other Collection methods (for example contains), a SynchronousQueue acts as an empty collection. This queue does not permit null elements.
+Synchronous queues are similar to rendezvous channels used in CSP and Ada. They are well suited for handoff designs, in which an object running in one thread must sync up with an object running in another thread in order to hand it some information, event, or task.
+
+This class supports an optional fairness policy for ordering waiting producer and consumer threads. By default, this ordering is not guaranteed. However, a queue constructed with fairness set to true grants threads access in FIFO order.
+
+This class and its iterator implement all of the optional methods of the Collection and Iterator interfaces.
+
+TransferQueue is more generic and useful than SynchronousQueue however as it allows you to flexibly decide whether to use normal BlockingQueue semantics or a guaranteed hand-off. In the case where items are already in the queue, calling transfer will guarantee that all existing queue items will be processed before the transferred item.
+
+SynchronousQueue implementation uses dual queues (for waiting producers and waiting consumers) and protects both queues with a single lock. The LinkedTransferQueue implementation uses CAS operations to form a nonblocking implementation and that is at the heart of avoiding serialization bottlenecks.
+
+BlockingQueue expresses the concept of a queue that:
+	a producer can block when adding items to a queue until there is space available.
+	a consumer can block when removing an item from the queue until an item exists.
+
+TransferQueue takes this one step further and blocks on put until the item is actually consumed by a consumer (not just added to the queue). This new constraint is expressed in the key new method called transfer(). The name is very descriptive – because the blocking occurs until a hand-off is complete from one thread to another, you are effectively transferring the item between threads (in a way that properly creates happens-before relationships in the Java Memory Model).
