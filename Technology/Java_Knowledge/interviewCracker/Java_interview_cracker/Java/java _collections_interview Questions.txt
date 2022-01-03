@@ -166,7 +166,7 @@ Default concurrency level is 16 and can be changed, by providing a number which 
 The concurrent hash map divides its contents into segments, to reduce writer lock contention.
 
 The concurrencyLevel parameter defines the number of segments. It's 16 by default
-As no concurrency level has been set explictity, the ConcurrentHashMap gets divided into 16 segments. And each segment acts as an independent HashMap. During right operation the Lock is obtained on this particular segment and not on the entire HashMap 
+As no concurrency level has been set explictity, the ConcurrentHashMap gets divided into 16 segments. And each segment acts as an independent HashMap. During wright operation the Lock is obtained on this particular segment and not on the entire HashMap 
 
 The main idea is that when the number of items in a hash is larger than a certain value, the hash will change from using a linked list of elements or entries to a balanced tree, this will improve the worst case performance from O(n) to O(log n).
 
@@ -178,9 +178,16 @@ The table buckets are initialized lazily, upon the first insertion. Each bucket 
 
 The number of segments required is relative to the number of threads accessing the table so that the update in progress per segment would be no more than one most of time.
 
-Before Java 8, the number of “segments” required was relative to the number of threads accessing the table so that the update in progress per segment would be no more than one most of time.
+Before Java 8,
+=============== the number of “segments” required was relative to the number of threads accessing the table so that the update in progress per segment would be no more than one most of time.
 However, since Java 8, the constructors are only present for backward compatibility: the parameters can only affect the initial size of the map.
 The casTabAt() method is used to atomically set a map entry using compare-and-swap operation for object references. You can still see the typical CAS loop in practically all places where casTabAt() is used - you construct the object that you want to put and then try to CAS it in its rightful place. If it feels weird that a complex construction can precede the CAS attempt, you can take a look at Jeff Preshing's You Can Do Any Kind of Atomic Read-Modify-Write Operation.
+
+The table buckets are initialized lazily, upon the first insertion. Each bucket can be independently locked by locking the very first node in the bucket. Read operations do not block, and update contentions are minimized.
+
+The number of segments required is relative to the number of threads accessing the table so that the update in progress per segment would be no more than one most of time.
+
+Before Java 8, the number of “segments” required was relative to the number of threads accessing the table so that the update in progress per segment would be no more than one most of time.
 
 In a sense, ConcurrentHashMap still uses striped locking, but with finer lock granularity (the contended area is now minimized from multi-bin segments to individual bins) and with locks being almost entirely replaced by CAS operations.
 
