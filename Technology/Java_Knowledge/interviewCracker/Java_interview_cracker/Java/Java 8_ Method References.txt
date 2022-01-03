@@ -4,6 +4,21 @@ Method references are a special type of lambda expressions. They're often used t
 they are compact, easy-to-read lambda expressions for methods that already have a name.
 Method reference is used refer method of functional interface. It is nothing but compact way of lambda expression.You can simply replace lambda expression with method reference.
 
+@FunctionalInterface
+interface MyFunctionalInterface {
+   Student getStudent(String name);
+}
+
+MyFunctionalInterface mf = Student::new;
+	       MyFunctionalInterface mf = Student::new;
+	      System.out.println(mf.getStudent("Adithya").getName());
+	      Function<String, Student> f1 = Student::new;    // Constructor Reference
+	      Function<String, Student> f2 = (name) -> new Student(name); // single constructor
+	      BiFunction<Integer,String, Student> f3 = (studentNo,studentName) -> new Student(studentNo,studentName); // two param constructor
+}
+	      
+		  
+
 Notice that the interface Comparator is a functional interface. Therefore, you could use a lambda expression instead of defining and then creating a new instance of a class that implements Comparator:
 
 Arrays.sort(rosterAsArray,
@@ -219,3 +234,27 @@ Output
 [7] = 46
 [8] = 60
 [9] = 77
+
+Reference to constructor – Class::new
+=====================================
+The first method can be updated to create a list of integers from 1 to 100. Using lambda expression is rather easy. 
+To create a new instance of ArrayList, we have use ArrayList::new.
+
+List<Integer> integers = IntStream
+                .range(1, 100)
+                .boxed()
+                .collect(Collectors.toCollection( ArrayList::new ));
+ 
+Optional<Integer> max = integers.stream().reduce(Math::max); 
+
+Method reference to instance method from instance – ClassInstance::instanceMethodName
+==========================================================================
+In above example, we use System.out.println(value) to print the max value found. We can use System.out::println to print the value.
+
+List<Integer> integers = Arrays.asList(1,12,433,5);
+         
+Optional<Integer> max = integers.stream().reduce( Math::max ); 
+ 
+max.ifPresent( System.out::println ); 
+ 
+max.ifPresent(System.out::println); 

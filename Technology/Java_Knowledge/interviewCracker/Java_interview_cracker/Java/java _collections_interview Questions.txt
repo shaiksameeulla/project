@@ -45,6 +45,25 @@ When we pass an both key and value to put() method to store on HashMap ,
  HashMap  uses linked list in case of collision and object will be stored in next node of linked list.
  Also HashMap stores both key and value tuple in every node of linked list in form of Map.Entry object. 
 
+Hash collisions have negative impact on the lookup time of HashMap. When multiple keys end up in the same bucket, then values along with their keys are placed in a linked list. In case of retrieval, linked list has to be traversed to get the entry. In worst case scenario, when all keys are mapped to the same bucket, the lookup time of HashMap increases from O(1) to O(n).
+
+Java 8 has come with the following improvements/changes of HashMap objects in case of high collisions.
+
+The alternative String hash function added in Java 7 has been removed.
+Buckets containing a large number of colliding keys will store their entries in a balanced tree instead of a linked list after certain threshold is reached.
+Above changes ensure performance of O(log(n)) in worst case scenarios (hash function is not distributing keys properly) and O(1) with proper hashCode().
+
+How linked list is replaced with binary tree?
+
+In Java 8, HashMap replaces linked list with a binary tree when the number of elements in a bucket reaches certain threshold. While converting the list to binary tree, hashcode is used as a branching variable. If there are two different hashcodes in the same bucket, one is considered bigger and goes to the right of the tree and other one to the left. But when both the hashcodes are equal, HashMap assumes that the keys are comparable, and compares the key to determine the direction so that some order can be maintained. It is a good practice to make the keys of HashMap comparable.
+
+This JDK 8 change applies only to HashMap, LinkedHashMap and ConcurrentHashMap.
+
+The hashing algorithm changed. This means that you cannot rely on the iteration order of java.util.HashMap. This shouldn't come as a surprise, the JDK never gave any such guarantees in the first place. If order is important to you, use TreeMap or LinkedHashMap.
+And in Java 8 the hashing algorithm changed back to the Java 5 version again! A bit of history: The Java 7 algorithm was a fix for a vulnerability where an attacker could cause really bad performance of the HashMap by causing a lot of collisions. In Java 8 another fix was introduced, using search trees for bins with a lot of collisions. – 
+
+
+Based on a simple experiment of creating HashMaps of different sizes and performing put and get operations by key, the following results have been recorded.
 
 What is difference between fail-fast and fail-safe Iterators?
 This is relatively new collection interview questions and can become trick if you hear the term fail-fast and fail-safe first time. Fail-fast Iterators throws ConcurrentModificationException when one Thread is iterating over collection object and other thread structurally modify Collection either by adding, removing or modifying objects on underlying collection. They are called fail-fast because they try to immediately throw Exception when they encounter failure. On the other hand fail-safe Iterators works on copy of collection instead of original collection
@@ -144,8 +163,37 @@ In case of putAll() or clear(), which operates on whole Map, concurrent read may
 
 Default concurrency level is 16 and can be changed, by providing a number which make sense and work for you while creating ConcurrentHashMap. Since concurrency level is used for internal sizing and indicate number of concurrent update without contention, so, if you just have few writers or thread to update Map keeping it low is much better. ConcurrentHashMap also uses ReentrantLock to internally lock its segments.
 
+The concurrent hash map divides its contents into segments, to reduce writer lock contention.
+
+The concurrencyLevel parameter defines the number of segments. It's 16 by default
+As no concurrency level has been set explictity, the ConcurrentHashMap gets divided into 16 segments. And each segment acts as an independent HashMap. During right operation the Lock is obtained on this particular segment and not on the entire HashMap 
+
+The main idea is that when the number of items in a hash is larger than a certain value, the hash will change from using a linked list of elements or entries to a balanced tree, this will improve the worst case performance from O(n) to O(log n).
+
+ConcurrentHashMap is the out-of-box ready ConcurrentMap implementation.
+
+For better performance, it consists of an array of nodes as table buckets (used to be table segments prior to Java 8) under the hood, and mainly uses compare-and-swap  operations during updating.
+
+The table buckets are initialized lazily, upon the first insertion. Each bucket can be independently locked by locking the very first node in the bucket. Read operations do not block, and update contentions are minimized.
+
+The number of segments required is relative to the number of threads accessing the table so that the update in progress per segment would be no more than one most of time.
+
+Before Java 8, the number of “segments” required was relative to the number of threads accessing the table so that the update in progress per segment would be no more than one most of time.
+However, since Java 8, the constructors are only present for backward compatibility: the parameters can only affect the initial size of the map.
+The casTabAt() method is used to atomically set a map entry using compare-and-swap operation for object references. You can still see the typical CAS loop in practically all places where casTabAt() is used - you construct the object that you want to put and then try to CAS it in its rightful place. If it feels weird that a complex construction can precede the CAS attempt, you can take a look at Jeff Preshing's You Can Do Any Kind of Atomic Read-Modify-Write Operation.
+
+In a sense, ConcurrentHashMap still uses striped locking, but with finer lock granularity (the contended area is now minimized from multi-bin segments to individual bins) and with locks being almost entirely replaced by CAS operations.
 
 
+compare-and-swap CAS is generally much faster than locking, but it does depend on the degree of contention. Because CAS may force a retry if the value changes between reading and comparing, a thread can theoretically get stuck in a busy-wait if the variable in question is being hit hard by many other threads (or if it is expensive to compute a new value from the old value (or both)).
+
+The main issue with CAS is that it is much more difficult to program with correctly than locking. Mind you, locking is, in turn, much harder to use correctly than message-passing or STM, so don't take this as a ringing endorsement for the use of locks.
+
+But Java 8 has come with the following new strategy for HashMap objects in case of high collisions.
+
+To address this issue, Java 8 hash elements use balanced trees instead of linked lists after a certain threshold (TREEIFY_THRESHOLD = 8) is reached. Which means HashMap starts with storing Entry objects in a linked list but after the number of items in a hash becomes larger than a certain threshold. The hash will change from using a linked list to a balanced tree.
+Above changes ensure the performance of O(log(n)) in worst case scenarios and O(1) with proper hashCode().
+The alternative String hash function added in Java 7 has been removed.
 
 ----------------------
 Difference between ConcurrentHashMap and Hashtable
@@ -222,7 +270,10 @@ Note that the fail-fast behavior of an iterator cannot be guaranteed as it is, g
 interface BlockingQueue<E>
 extends Queue<E>
 
+All Known Subinterfaces: BlockingDeque<E>, TransferQueue<E>
+
 various implementation of BlockingQueue like ArrayBlockingQueue, LinkedBlockingQueue 
+ArrayBlockingQueue, DelayQueue, LinkedBlockingDeque, LinkedBlockingQueue, LinkedTransferQueue, PriorityBlockingQueue, SynchronousQueue
 
 A Queue that additionally supports operations that wait for the queue to become non-empty when retrieving an element, and wait for space to become available in the queue when storing an element.
 BlockingQueue methods come in four forms, with different ways of handling operations that cannot be satisfied immediately, but may be satisfied at some point in the future: one throws an exception, the second returns a special value (either null or false, depending on the operation), the third blocks the current thread indefinitely until the operation can succeed, and the fourth blocks for only a given maximum time limit before giving up. 
@@ -276,6 +327,7 @@ Usage example, based on a typical producer-consumer scenario. Note that a Blocki
 Memory consistency effects: As with other concurrent collections, actions in a thread prior to placing an object into a BlockingQueue happen-before actions subsequent to the access or removal of that element from the BlockingQueue in another thread.
 
 1) BlockingQueue in Java doesn't allow null elements, various implementation of BlockingQueue like ArrayBlockingQueue, LinkedBlockingQueue throws NullPointerException when you try to add null on queue.
+A bounded {@linkplain BlockingQueue blocking queue} backed by an  array.  This queue orders elements FIFO (first-in-first-out).  The head of the queue is that element that has been on the queue the longest time.  
 
 BlockingQueue<String> bQueue = new ArrayBlockingQueue<String>(10);
 //bQueue.put(null); //NullPointerException - BlockingQueue in Java doesn't allow null
@@ -286,7 +338,23 @@ bQueue.put(null);
 Exception in thread "main" java.lang.NullPointerException
         at java.util.concurrent.LinkedBlockingQueue.put(LinkedBlockingQueue.java:288)
 
+ An optionally-bounded {@linkplain BlockingQueue blocking queue} based on 
+ * linked nodes.
+ * This queue orders elements FIFO (first-in-first-out).
+ * The <em>head</em> of the queue is that element that has been on the
+ * queue the longest time.
+ * The <em>tail</em> of the queue is that element that has been on the
+ * queue the shortest time. New elements
+ * are inserted at the tail of the queue, and the queue retrieval
+ * operations obtain elements at the head of the queue.
+ * Linked queues typically have higher throughput than array-based queues but
+ * less predictable performance in most concurrent applications.
 
+The optional capacity bound constructor argument serves as a
+ * way to prevent excessive queue expansion. The capacity, if unspecified,
+ * is equal to {@link Integer#MAX_VALUE}.  Linked nodes are
+ * dynamically created upon each insertion unless this would bring the
+ * queue above capacity.
 2) BlockingQueue can be bounded or unbounded. A bounded BlockingQueue is one which is initialized with initial capacity and call to put() will be blocked if BlockingQueue is full and size is equal to capacity. This bounding nature makes it ideal to use a shared queue between multiple threads like in most common Producer consumer solutions in Java. An unbounded Queue is one which is initialized without capacity, actually by default it initialized with Integer.MAX_VALUE. most common example of BlockingQueue uses bounded BlockingQueue as shown in below example.
 
 BlockingQueue<String> bQueue = new ArrayBlockingQueue<String>(2);

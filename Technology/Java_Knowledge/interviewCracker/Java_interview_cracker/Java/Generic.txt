@@ -43,6 +43,7 @@ This feature, known as type inference, allows you to invoke a generic method as 
 
 Generics :
 
+PECS (short for Producer extends and Consumer super)
 "PECS" is from the collection's point of view. If you are only pulling items from a generic collection, it is a producer and you should use extends; if you are only stuffing items in, it is a consumer and you should use super. If you do both with the same collection, you shouldn't use either extends or super.
 
 Suppose you have a method that takes as its parameter a collection of things, but you want it to be more flexible than just accepting a Collection<Thing>.
@@ -56,6 +57,141 @@ Case 2: You want to add things to the collection.
 Then the list is a consumer, so you should use a Collection<? super Thing>.
 
 The reasoning here is that unlike Collection<? extends Thing>, Collection<? super Thing> can always hold a Thing no matter what the actual parameterized type is. Here you don't care what is already in the list as long as it will allow a Thing to be added; this is what ? super Thing guarantees.
+
+
+Arrays Are Covariant
+==============
+Arrays are said to be covariant which basically means that, given the subtyping rules of Java, an array of type T[] may contain elements of type T or any subtype of T. For instance:
+
+Number[] numbers = newNumber[3];
+numbers[0] = newInteger(10);
+numbers[1] = newDouble(3.14);
+numbers[2] = newByte(0);
+But not only that, the subtyping rules of Java also state that an array S[] is a subtype of the array T[] if S is a subtype of T, therefore, something like this is also valid:
+
+Integer[] myInts = {1,2,3,4};
+Number[] myNumber = myInts;
+Because according to the subtyping rules in Java, an array Integer[] is a subtype of an array Number[] because Integer is a subtype of Number.
+
+But this subtyping rule can lead to an interesting question: what would happen if we try to do this?
+
+myNumber[0] = 3.14; //attempt of heap pollution
+This last line would compile just fine, but if we run this code, we would get an ArrayStoreException because we’re trying to put a double into an integer array. The fact that we are accessing the array through a Number reference is irrelevant here, what matters is that the array is an array of integers.
+
+This means that we can fool the compiler, but we cannot fool the run-time type system. And this is so because arrays are what we call a reifiable type. This means that at run-time Java knows that this array was actually instantiated as an array of integers which simply happens to be accessed through a reference of type Number[].
+
+So, as we can see, one thing is the actual type of the object, an another thing is the type of the reference that we use to access it, right?
+
+The Problem with Java Generics
+==============================
+Now, the problem with generic types in Java is that the type information for type parameters is discarded by the compiler after the compilation of code is done; therefore this type information is not available at run time. This process is called type erasure. There are good reasons for implementing generics like this in Java, but that’s a long story, and it has to do with binary compatibility with pre-existing code.
+
+The important point here is that since at run-time there is no type information, there is no way to ensure that we are not committing heap pollution.
+
+Let’s consider now the following unsafe code:
+
+List<Integer> myInts = newArrayList<Integer>();
+myInts.add(1);
+myInts.add(2);
+List<Number> myNums = myInts; //compiler error
+myNums.add(3.14); //heap polution
+If the Java compiler does not stop us from doing this, the run-time type system cannot stop us either, because there is no way, at run time, to determine that this list was supposed to be a list of integers only. The Java run-time would let us put whatever we want into this list, when it should only contain integers, because when it was created, it was declared as a list of integers. That’s why the compiler rejects line number 4 because it is unsafe and if allowed could break the assumptions of the type system.
+
+As such, the designers of Java made sure that we cannot fool the compiler. If we cannot fool the compiler (as we can do with arrays) then we cannot fool the run-time type system either.
+
+As such, we say that generic types are non-reifiable, since at run time we cannot determine the true nature of the generic type.
+
+Evidently this property of generic types in Java would have a negative impact on polymorphism. Let’s consider now the following example:
+
+staticlongsum(Number[] numbers) {
+longsummation = 0;
+for(Number number : numbers) {
+summation += number.longValue();
+}
+returnsummation;
+}
+Now we could use this code as follows:
+
+Integer[] myInts = {1,2,3,4,5};
+Long[] myLongs = {1L, 2L, 3L, 4L, 5L};
+Double[] myDoubles = {1.0, 2.0, 3.0, 4.0, 5.0};
+System.out.println(sum(myInts));
+System.out.println(sum(myLongs));
+System.out.println(sum(myDoubles));
+
+But if we attempt to implement the same code with generic collections, we would not succeed:
+
+staticlongsum(List<Number> numbers) {
+longsummation = 0;
+for(Number number : numbers) {
+summation += number.longValue();
+}
+returnsummation;
+}
+Because we we would get compiler errors if you try to do the following:
+
+List<Integer> myInts = asList(1,2,3,4,5);
+List<Long> myLongs = asList(1L, 2L, 3L, 4L, 5L);
+List<Double> myDoubles = asList(1.0, 2.0, 3.0, 4.0, 5.0);
+System.out.println(sum(myInts)); //compiler error
+System.out.println(sum(myLongs)); //compiler error
+System.out.println(sum(myDoubles)); //compiler error
+The problem is that now we cannot consider a list of integers to be subtype of a list of numbers, as we saw above, that would be considered unsafe for the type system and compiler rejects it immediately.
+
+Evidently, this is affecting the power of polymorphism and it needs to be fixed. The solution consists in learning how to use two powerful features of Java generics known as covariance and contravariance.
+
+
+
+Covariance
+==========
+For this case, instead of using a type T as the type argument of a given generic type, we use a wildcard declared as ? extends T, where T is a known base type.
+
+With covariance we can read items from a structure, but we cannot write anything into it. All these are valid covariant declarations.
+
+List<? extendsNumber> myNums = newArrayList<Integer>();
+List<? extendsNumber> myNums = newArrayList<Float>();
+List<? extendsNumber> myNums = newArrayList<Double>();
+And we can read from our generic structure myNums by doing:
+
+Number n = myNums.get(0);
+Because we can be sure that whatever the actual list contains, it can be upcasted to a Number (after all anything that extends Number is a Number, right?)
+
+However, we are not allowed to put anything into a covariant structure.
+
+myNumst.add(45L); //compiler error
+This would not be allowed because the compiler cannot determine what is the actual type of the object in the generic structure. It can be anything that extends Number (like Integer, Double, Long), but the compiler cannot be sure what, and therefore any attempt to retrieve a generic value is considered an unsafe operation and it is immediately rejected  by the compiler. So we can read, but not write.
+
+Contravariance
+=========
+For contravariance we use a different wildcard called ? super T, where T is our base type. With contravariance we can do the opposite. We can put things into a generic structure, but we cannot read anything out of it.
+
+In this case, the actual nature of the object is  List of Object, and through contravariance, we can put a Number in it, basically because a Number has Object as its common ancestor. As such, all numbers are also objects, and therefore this is valid.
+
+However, we cannot safely read anything from this contravariant structure assuming that we will get a number.
+
+Number myNum = myNums.get(0); //compiler-error
+As we can see, if the compiler allowed us to write this line, we would get a ClassCastException at run time. So, once again, the compiler does not run the risk of allowing this unsafe operation and rejects it immediately.
+
+Get/Put Principle
+In summary, we use covariance when we only intend to take generic values out of a structure. We use contravariance when we only intend to put generic values into a structure and we use an invariant when we intend to do both.
+
+The best example I have is the following that copies any kind of numbers from one list into another list. It only gets items from the source, and it only puts items in the destiny.
+
+publicstaticvoidcopy(List<? extendsNumber> source,
+List<? superNumber> destiny) {
+for(Number number : source) {
+destiny.add(number);
+}
+}
+Thanks to the powers of covariance and contravariance this works for a case like this:
+
+List<Integer> myInts = asList(1,2,3,4);
+List<Integer> myDoubles = asList(3.14, 6.28);
+List<Object> myObjs = newArrayList<Object>();
+copy(myInts, myObjs);
+copy(myDoubles, myObjs);
+
+
 
 Erasure of Generic Types
 

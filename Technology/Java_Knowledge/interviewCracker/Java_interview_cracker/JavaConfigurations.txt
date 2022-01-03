@@ -7,6 +7,17 @@ Servlet 3.0 java configuration :
 To provide enhanced pluggability, Servlet 3.0 provides support for the programmatic declaration and registration of servlet, filter and listener components via new methods added to ServletContext. We can call these methods from within "ServletContextListener#contextInitialized" method or "ServletContainerInitializer#onStartup" method.
 
 1. ServletContainerInitializer 
+ServletContainerInitializer is that it's based on the service provider pattern. 
+
+Well, technically, the ServletContainerInitializer is not a listener – it is an initializer and it’s executed before any servlet context will even be ready. You can use this initializer to do some programmatic servlet/filters/listeners addition (which is also possible in Servlets 3.0!).
+
+SCIs register an interest in annotations (class, method or field) and/or types via the HandlesTypes annotation which is added to the class.
+
+@Target(value=TYPE)
+@Retention(value=RUNTIME)
+public @interface HandlesTypes
+This annotation is used to declare an array of application classes which are passed to a ServletContainerInitializer.
+
 
 	Interface which allows a library/runtime to be notified of a web application's startup phase and perform any required programmatic registration of servlets, filters, and listeners in response to it.
 	
@@ -30,7 +41,11 @@ ServletException - if an error has occurred
 
  (https://www.logicbig.com/tutorials/java-ee-tutorial/java-servlet/servlet-container-initializer-example.html)
  
+
+ 
  -->The ServletContainerInitializer implementation is intented to be bundled in a JAR file which is in turn been dropped in /WEB-INF/lib of the webapp. The JAR file itself should have a /META-INF/services/javax.servlet.ServletContainerInitializer file containing the FQN of the ServletContainerInitializer implementation in the JAR. Please note that this file should thus not be placed in the webapp itself!
+ Please note that the META-INF/services/javax.servlet.ServletContainerInitializer is a file (not a directory) which has to contain the fully qualified name of the initalizer, like:
+  com.example.MyServletContainerInitializer
 
 -->This allows webapp module developers to let their JAR file hook on webapp's startup and shutdown cycle. It's true that they could also have used a ServletContextListener with @WebListener for this, but this won't work if the webapp's own web.xml file has a metadata-complete="true" attribute set in <web-app> which means that the webapp shouldn't scan JARs for annotations (which saves startup time).
 
