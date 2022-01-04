@@ -1,0 +1,167 @@
+Java 8 Constructor Refernce
+<Class Name>::new
+
+Example :
+
+String::new;
+Integer::new;
+ArrayList::new;
+UserDetail::new;
+2. Example with no arguments
+The constructor reference for all the following lambdas are Student::new and type of the constructor invocation will be decided based on the target type. To understand it better, we will see a use case whose goal is to return a Student instance but the String and int type will be supplied as method argument(s). These use cases are not better programming standards but to understand how Constructor reference work.
+
+
+@FunctionalInterface
+interface MyFunctionalInterface1 {
+    
+    Student getStudent();
+}
+class Student {
+    
+    private String name;
+    
+    public String getName() {
+        return name;
+    }
+ 
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+Following example shows you create Supplier function with constructor reference.
+
+
+public class ConstructorReferenceDemo {
+    
+    public static void main(String[] args) {
+        
+        MyFunctionalInterface1 mf = Student::new;
+        
+        Supplier<Student> s1 = Student::new;// Supplier Example
+        Supplier<Student> s2 = () -> new Student();// equals to above line
+            
+        System.out.println(mf.getStudent());//Student class toString() call
+        System.out.println(s1.get());//Student class toString() call
+    }
+}
+3. Example with one argument
+@FunctionalInterface
+interface MyFunctionalInterface1 {
+    
+    Student getStudent(String name);
+}
+class Student {
+    
+    private String name;
+    
+    public Student(String name) {
+        this.name = name;
+    }
+ 
+    public String getName() {
+        return name;
+    }
+ 
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+Following example shows you create java Function by using reference to one argument constructor.
+
+public class ConstructorReferenceDemo {
+    
+    public static void main(String[] args) {
+        
+        MyFunctionalInterface1 mf = Student::new;
+        
+        Function<String, Student> f1 = Student::new;// Function Example
+        Function<String, Student> f2 = (name) -> new Student(name);// equals to above line
+            
+        System.out.println(mf.getStudent("Peter").getName());//Peter
+        System.out.println(f1.apply("Gerhard").getName());//Gerhard
+        System.out.println(f2.apply("Gerhard").getName());//Gerhard
+    }
+}
+4. Example with two arguments
+@FunctionalInterface
+interface MyFunctionalInterface1 {
+    
+    Student getStudent(int id, String name);
+}
+class Student {
+    
+    private int id;
+    private String name;
+ 
+    public Student(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+ 
+    public int getId() {
+        return id;
+    }
+ 
+    public void setId(int id) {
+        this.id = id;
+    }
+ 
+    public String getName() {
+        return name;
+    }
+ 
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+Following example shows you create java BiFunction by using reference to 2 argument constructor.
+
+public class ConstructorReferenceDemo {
+    
+    public static void main(String[] args) {
+        
+        MyFunctionalInterface1 mf = Student::new;
+        
+        BiFunction<Integer, String, Student> f1 = Student::new;// Function Example
+        BiFunction<Integer, String, Student> f2 = (id, name) -> new Student(id,name);// equals to above line
+            
+        System.out.println(mf.getStudent(10, "Peter").getName());//Peter
+        System.out.println(f1.apply(20, "Gerhard").getName());//Gerhard
+        System.out.println(f2.apply(30, "Gerhard").getName());//Gerhard
+    }
+}
+5. Reference to constructor with var args example
+@FunctionalInterface
+interface MyFunctionalInterface {
+    
+    College getStudents(int id, String... names);
+}
+class College {
+  private int id;
+  private List<String> names;
+  public College(int id, String... names) {
+      this.id=id;
+      this.names = Arrays.asList(names);
+  }
+  // getters and setters
+}
+Following example shows you reference to a Constructor with var args using BiFunction.
+
+public class ConstructorReferenceDemo4 {
+  public static void main(String[] args) {
+        
+        MyFunctionalInterface4 mf = College::new;
+        
+        BiFunction<Integer, String[], College> f1 = College::new;// BiFunction Example
+        BiFunction<Integer, String[], College> f2 = (id, names) -> new College(id,names);// equals to above line
+            
+        System.out.println(mf.getStudents(10, "Peter", "John", "Mike").getNames());
+        System.out.println(f1.apply(20, "Ram,Laxhman,Ravan".split(",")).getNames());
+        System.out.println(f2.apply(30, "Rahim,Akbar,Ismail".split(",")).getNames());
+    }
+}
+Output :
+
+[Peter, John, Mike]
+[Ram, Laxhman, Ravan]
+[Rahim, Akbar, Ismail]

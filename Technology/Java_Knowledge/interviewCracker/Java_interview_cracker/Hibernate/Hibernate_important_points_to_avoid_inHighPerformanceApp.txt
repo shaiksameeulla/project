@@ -1,0 +1,84 @@
+N+1 problem:
+---------
+although we explicitly call the repository to get the entities only one time, we, in fact, are doing a much greater number of reading operations. If we have n buildings, we will have n+1 selections (the general and one extra for each building) and that is from where the name of the problem comes.
+
+avoid eager fetch, use lazy but have joinfetch or criteria
+Useing Join Fetch / Entity Graphs
+We can use JOIN FETCH in our queries whenever we need to fetch an entity with all of its children at the same time. This results in a much less database traffic resulting in an improved performance.
+
+JPA 2.1 specification introduced Entity Graphs which allows us to create static/dynamic query load plans.
+Thorben Janssen has written a couple of posts (here and here) detailing their usage which are worth checking out.
+Some example code for this post can be found at Github.
+
+Hibernate :
+============
+avoid doing following for high performance application
+1. avoid FetchType.EAGER
+2.Dont use many to many association to list instead use Set as it wont work correctly when you remove one element from list, it may delete all and then reinsert again
+3. Dont use bidirectional one to one association 
+  .FetchType  defined  by fetch attribute
+  . Special case : to-one without foreign key
+     . Query checks if association exists
+	  .Fetches association
+	  . No lazy loading
+. only  unidirection one to one association , share primary key]
+4. Avoid @Formula annotation
+		useful for small application
+5. Avoid  the@orderby annotation
+6.Avoid CascadeType.Remove for large association
+  instead JPA delete, Criteria Delete (it does not trigger any lifecycle events, it triggers only one delete query in the backend)
+  
+ Hibernate Performance Tuning: 10 Common Hibernate Mistakes That Cripple Your Performance
+ =====================================================================================
+ 1.Use EagerFetching
+    FetchType.LAZY  when needed
+	FetchType.EAGER loads immediately
+	 1.you define with for one-to-many, many-to-one,many-to-many,one-to-one
+	 2.JPA defaults FetchType.LAZY for all" to many" association but that not the case for "to one" association
+2.	  "to-one"
+	 Default : FetchType.EAGER
+	  set it to LAZY
+3.  Dont initialize  Required Associations.	
+	N+1 select problem (can easily identify using development configuration that activate hibernate statistics components and monitors number of executed statements)
+	 . caused by lazily  fetched associations.
+	 . 1 Query to load entities
+	 . additional query to initialize  association of each entity.
+	  there are several ways to do that.
+	   i. easiest way is to use JOIN FETCH  (ex: AUTHOR a JOIN FETCH  a.books)
+4. Select more records than you really required.
+     JPA does not support  OFFSET and LIMIT in JPQL but you can apply   methods on  Query and TypedQuery Interface.
+	 .setMaxResults(5).setFirstResults(0).getResultList().
+5.  DONT use bind parameters.
+     you can use named bind parameters.
+6. call FLUSH method without reason.
+    .Forces to Hibernate to
+		i. perform dirty checks
+		ii.write all  changes  to db  that slows down your application
+	. Dont call Flush method
+	  .Exception : see mistake # 8
+7. Dont use Hibernate for everything.
+  . USE Hibernate for CRUD operation
+  .Dont use Hibernate for 
+	.very complex queries
+	.update or remove many records at once.
+8. Mistake: Update or delete  HUGE list of entities one by one
+    use JPQL,SQL,Criteria API as these does not perfrorm lifecycle operation. and Does not update cache.
+
+JPA vs Hibernate : The difference between save, persist, merge and update
+=======================================================================
+transient: new created entity, it's not mapped to db record. once saved then it will go to managed	
+Managed : if entity has attached to persistant state (mapped to db), have in first level, find,get load,all queries
+Detach: detatch(entity), clear,close,evict
+remove: remove(entity)
+
+persist(JPA), save(hibernate) : when you attach to persistant context. both are same.
+  save: retuns pk, persist:  not specified. recomended to use persist
+  
+ Update (hibernate), merge(JPA): 
+ Merge (JPA) : Jpas merge method copies the sate of a detached  entity to the managed instance of same entity. hibernate there fore, executes an SQL select statement to retrieve the  managed entity from db. if the persistant context has alread has managed entity then it use existing one instead, then it copies all the values to managed instance.
+  hibernate takes the changes which we are merging into the db instead of changes available in db.(meaning it just takes we use during merge)
+		
+Update (hibernate) : Attach entity to persistance context, no Select query . it throws an exception if managed entity already exist int the persistance context.
+
+SaveOrUpdate : This method appears only in the Hibernate API and does not have its standardized counterpart. Similar to update, it also may be used for reattaching instances.
+          Actually, the internal DefaultUpdateEventListener class that processes the update method is a subclass of DefaultSaveOrUpdateListener, just overriding some functionality. The main difference of saveOrUpdate method is that it does not throw exception when applied to a transient instance; instead, it makes this transient instance persistent. 
