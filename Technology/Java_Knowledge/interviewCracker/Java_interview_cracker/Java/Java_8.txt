@@ -36,6 +36,23 @@ Java 8 features
 12 Miscellaneous Core API improvements
 
 
+----
+Difference between Collections and Streams
+Collections are in-memory data structures which hold elements within it. Each element in the collection is computed before it actually becomes a part of that collection. On the other hand Streams are fixed data structures which computes the elements on-demand basis.
+
+The Java 8 Streams can be seen as lazily constructed Collections, where the values are computed when user demands for it. Actual Collections behave absolutely opposite to it and they are set of eagerly computed values (no matter if the user demands for a particular value or not).
+
+Java Collections offer efficient mechanisms to store and process the data by providing data structures like List, Set, and Map.
+However, the Stream API is useful for performing various operations on the data without the need for intermediate storage. Therefore, a Stream works similarly to directly accessing the data from the underlying storage like collections and I/O resources.
+
+Additionally, the collections are primarily concerned with providing access to the data and ways to modify it. On the other hand, streams are concerned with transmitting data efficiently.
+
+int sum = widgets.stream()
+                      .filter(b -> b.getColor() == RED)
+                      .mapToInt(b -> b.getWeight())
+                      .sum();
+---
+
 Lambda expression is a new feature which is introduced in Java 8. A lambda expression is an anonymous function. A function that doesn’t have a name and doesn’t belong to any class. The concept of lambda expression was first introduced in LISP programming language.
 
 Java Lambda Expression Syntax
@@ -65,6 +82,15 @@ System.out::println
 "abc"::length
 ArrayList::new
 int[]::new
+
+
+
+String::new;
+Integer::new;
+ArrayList::new;
+UserDetail::new;
+
+
 
 1. What is a Boxed Stream?
 

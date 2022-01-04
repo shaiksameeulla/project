@@ -49,14 +49,16 @@ ForEach and ForEachOrdered
 ============================
 A possible use case of a stream could be to update a property of some, or all, elements or why not just print them out for debugging purposes. In either way, we are not interested in collecting or counting the output, but rather by generating a side-effect without returning value.
 
-This is the purpose of forEach() or forEachOrdered(). They both take a Consumer and terminates the Stream without returning anything. The difference between these operations simply being that forEachOrdered() promises to invoke the provided Consumer in the order the elements appear in the Stream whereas forEach() only promises to invoke the Consumer but in any order. The latter variant is useful for parallel Streams.
+This is the purpose of forEach() or forEachOrdered(). They both take a Consumer and terminates the Stream without returning anything. The difference between these operations simply being that forEachOrdered() promises to invoke the provided Consumer in the order the elements appear in the Stream whereas forEach() only promises to invoke the Consumer but in any order. The latter variant is useful for "*****parallel Streams*****".
 
 In the simple case below, we print out every element of the Stream in one single line.
 Stream.of("Monkey", "Lion", "Giraffe", "Lemur", "Lion").forEachOrdered(System.out::print);
 
 This will produce the following output:
 MonkeyLionGiraffeLemurLion
-
+Stream.of("AAA","BBB","CCC").parallel().forEach(s->System.out.println("Output:"+s));
+Stream.of("AAA","BBB","CCC").parallel().forEachOrdered(s->System.out.println("Output:"+s));
+hereas the first one is not guaranted since the order is not kept. forEachOrdered will processes the elements of the stream in the order specified by its source, regardless of whether the stream is sequential or parallel.
 
 Collect to Array
 =============
