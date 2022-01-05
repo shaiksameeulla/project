@@ -1,0 +1,306 @@
+Spring cloud
+============
+
+Spring Cloud Config:
+------------------
+Centralized external configuration management backed by a git repository. The configuration resources map directly to Spring Environment but could be used by non-Spring applications if desired.
+Spring Cloud Config provides server and client-side support for externalized configuration in a distributed system. With the Config Server you have a central place to manage external properties for applications across all environments. The concepts on both client and server map identically to the Spring Environment and PropertySource abstractions, so they fit very well with Spring applications, but can be used with any application running in any language. 
+
+Spring Cloud Config Client 
+
+A Spring Boot application can take immediate advantage of the Spring Config Server (or other external property sources provided by the application developer), and it will also pick up some additional useful features related to Environment change events.
+
+Config First Bootstrap  :
+
+This is the default behaviour for any application which has the Spring Cloud Config Client on the classpath. When a config client starts up it binds to the Config Server (via the bootstrap configuration property spring.cloud.config.uri) and initializes Spring Environment with remote property sources.
+
+The net result of this is that all client apps that want to consume the Config Server need a bootstrap.yml (or an environment variable) with the server address in spring.cloud.config.uri (defaults to "http://localhost:8888").
+
+
+	Spring Cloud Config Server features:
+
+		HTTP, resource-based API for external configuration (name-value pairs, or equivalent YAML content)
+
+		Encrypt and decrypt property values (symmetric or asymmetric)
+
+		Embeddable easily in a Spring Boot application using @EnableConfigServer
+
+Config Client features (for Spring applications):
+
+		Bind to the Config Server and initialize Spring Environment with remote property sources
+
+		Encrypt and decrypt property values (symmetric or asymmetric)
+
+1.Git Backend
+	application.properties. 
+	server.port: 8888
+	spring.cloud.config.server.git.uri: file://${user.home}/config-repo
+2. Version Control Backend Filesystem Use
+3. File System Backend
+	There is also a “native” profile in the Config Server that does not use Git but loads the config files from the local classpath or file system (any static URL you want to point to with spring.cloud.config.server.native.searchLocations). To use the native profile, launch the Config Server with spring.profiles.active=native.
+
+ 4. Spring Cloud Config Server also supports Vault as a backend.
+	Vault is a tool for securely accessing secrets. A secret is anything that to which you want to tightly control access, such as API keys, passwords, certificates, and other sensitive information. Vault provides a unified interface to any secret while providing tight access control and recording a detailed audit log.
+
+5. JDBC Backend...etc 
+
+
+Spring cloud cirtcuit breaker
+----------------------------
+
+Spring Cloud Circuit breaker provides an abstraction across different circuit breaker implementations. It provides a consistent API to use in your applications allowing you the developer to choose the circuit breaker implementation that best fits your needs for your app.
+
+Supported Implementations
+The following starters are available with the Spring Cloud BOM
+
+Hystrix - org.springframework.cloud:spring-cloud-starter-netflix-hystrix
+
+Resilience4J - org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j
+
+Reactive Resilience4J - org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j
+
+Spring Retry - org.springframework.cloud:spring-cloud-starter-circuitbreaker-spring-retry
+
+Sentinal - org.springframework.cloud:spring-cloud-starter-circuitbreaker-sentinal
+
+
+
+Service registry  (Service Discovery: Eureka Server)
+===================
+A service registry is useful because it enables client-side load-balancing and decouples service providers from consumers without the need for DNS.
+To include Eureka Server in your project, use the starter with a group ID of org.springframework.cloud and an artifact ID of spring-cloud-starter-netflix-eureka-server
+
+select Eureka Server for the service application and Eureka Server and Eureka Discovery Client for the client application.
+You can use Spring Cloud’s @EnableEurekaServer to stand up a registry with which other applications can communicate. This is a regular Spring Boot application with one annotation (@EnableEurekaServer) added to enable the service registry. 
+
+server.port=8761
+
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false
+
+logging.level.com.netflix.eureka=OFF
+logging.level.com.netflix.discovery=OFF
+
+
+JDK 11 Support
+--------------
+The JAXB modules which the Eureka server depends upon were removed in JDK 11. If you intend to use JDK 11 when running a Eureka server you must include these dependencies in your POM or Gradle file.
+
+<dependency>
+    <groupId>org.glassfish.jaxb</groupId>
+    <artifactId>jaxb-runtime</artifactId>
+</dependency>
+
+
+Service Discovery: Eureka Clients
+++++++++++++++++++++++++++++++++
+Talking to the Registry
+-----------------------
+Now that you have started a service registry, 
+you can stand up a client that both registers itself with the registry and uses the Spring Cloud DiscoveryClient abstraction to interrogate the registry for its own host and port. 
+
+The @EnableDiscoveryClient activates the Netflix Eureka DiscoveryClient implementation. 
+(There are other implementations for other service registries, such as Hashicorp’s Consul or Apache Zookeeper).
+ 
+ By having spring-cloud-starter-netflix-eureka-client on the classpath, your application automatically registers with the Eureka Server. Configuration is required to locate the Eureka server, as shown in the following example:
+
+application.yml
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+
+
+
+Alternatives to the Native Netflix EurekaClient
+--------------------------
+You need not use the raw Netflix EurekaClient. Also, it is usually more convenient to use it behind a wrapper of some sort. Spring Cloud has support for Feign (a REST client builder) and Spring RestTemplate through the logical Eureka service identifiers (VIPs) instead of physical URLs.
+
+You can also use the org.springframework.cloud.client.discovery.DiscoveryClient, which provides a simple API (not specific to Netflix) for discovery clients, as shown in the following example:
+
+@Autowired
+private DiscoveryClient discoveryClient;
+
+public String serviceUrl() {
+    List<ServiceInstance> list = discoveryClient.getInstances("STORES");
+    if (list != null && list.size() > 0 ) {
+        return list.get(0).getUri();
+    }
+    return null;
+}
+
+
+
+whats-the-difference-between-enableeurekaclient-and-enablediscoveryclient
+========================================================================
+Discovery Clients:
+
+@EnableDiscoveryClient
+     Commons provides the @EnableDiscoveryClient annotation.
+	 This looks for implementations of the DiscoveryClient interface via META-INF/spring.factories. 
+	 Implementations of Discovery Client will add a configuration class to spring.factories 
+	 under the org.springframework.cloud.client.discovery.EnableDiscoveryClient key.
+	 Examples of DiscoveryClient implementations: 
+			are Spring Cloud Netflix Eureka, 
+				Spring Cloud Consul Discovery 
+				and Spring Cloud Zookeeper Discovery.
+
+By default, implementations of DiscoveryClient will auto-register the local Spring Boot server with the remote discovery server. This can be disabled by setting autoRegister=false in @EnableDiscoveryClient.
+
+@EnableEurekaClient : 
+	lives in spring-cloud-netflix and only works for eureka. If eureka is on your classpath, they are effectively the same.
+
+@EnableEurekaClient works only for Eureka if we use @EnableDiscoveryClient we can use any discovery client like Consul other than Eureka
+
+
+Spring Cloud Sleuth
+===================
+Spring Cloud Sleuth provides Spring Boot auto-configuration for distributed tracing.spring-cloud-starter-sleuth
+
+Specifically, Spring Cloud Sleuth…​
+
+	-->Adds trace and span ids to the Slf4J MDC, so you can extract all the logs from a given trace or span in a log aggregator.
+
+	-->Instruments common ingress and egress points from Spring applications (servlet filter, rest template, scheduled actions, message channels, feign client).
+
+	-->If spring-cloud-sleuth-zipkin is available then the app will generate and report Zipkin-compatible traces via HTTP. By default it sends them to a Zipkin collector service on localhost (port 9411). Configure the location of the service using spring.zipkin.baseUrl.
+
+Sample log:
+2017-01-10 22:36:38.254  INFO   [Baeldung Sleuth Tutorial,4e30f7340b3fb631,4e30f7340b3fb631,false] 12516   --- [nio-8080-exec-1] c.b.spring.session.SleuthController : Hello Sleuth
+
+This looks like a normal log, except for the part in the beginning between the brackets. This is the core information that Spring Sleuth has added. This data follows the format of:
+ Format : [application name, traceId, spanId, export]
+
+	-->Application name – This is the name we set in the properties file and can be used to aggregate logs from multiple instances of the same application.
+	-->TraceId – This is an id that is assigned to a single request, job, or action. Something like each unique user initiated web request will have its own traceId.
+	-->SpanId – Tracks a unit of work. Think of a request that consists of multiple steps. Each step could have its own spanId and be tracked individually. By default, any application flow will start with same TraceId and SpanId.
+	-->Export – This property is a boolean that indicates whether or not this log was exported to an aggregator like Zipkin. Zipkin is beyond the scope of this article but plays an important role in analyzing logs created by Sleuth.
+
+how-is-spring-cloud-gateway-different-from-zuul
+=======================================
+
+Zuul is built on servlet 2.5 (works with 3.x), using blocking APIs. It doesn't support any long lived connections, like websockets.
+
+Gateway is built on Spring Framework 5, Project Reactor and Spring Boot 2 using non-blocking APIs. Websockets are supported and it's a much better developer experience since it's tightly integrated with Spring.
+
+The major architectural difference between Zuul 2 and Zuul 1 is that Zuul 2 is running on an asynchronous and non-blocking framework, using Netty. – 
+They have not released zuul 2, they announced it. The current development is being done on the 2.1 branch.
+Spring Cloud will not integrate zuul 2 
+
+spring-cloud-gateway:
+-------------------
+
+The nety underlying environment provided by spring boot and spring Webflux cannot be used with traditional servlet containers, nor can it be packaged into a war package. It uses non blocking API and supports websocket.
+Zuul1 is different from spring cloud gateway:
+
+1. Compared with zuul, gateway relies more on spring weblux, internally implements flow restriction, load balancing, etc., and has stronger scalability, but it also limits the application only to spring cloud suite.
+
+
+
+
+Spring REST with a Zuul Proxy
+----------------------------
+Spring Cloud Netflix includes an embedded Zuul proxy, which you can enable with the @EnableZuulProxy annotation. This will turn the Gateway application into a reverse proxy that forwards relevant calls to other services — such as our book application.
+   To forward requests from the Gateway application, you need to tell Zuul the routes that it should watch and the services to which to forward requests that are made to those routes. We specify routes by setting properties under zuul.routes. Each of our microservices can have an entry under zuul.routes.NAME, where NAME is the application name (as stored in the spring.application.name property).
+
+	Add the application.properties file to a new directory (src/main/resources) in the Gateway application. It should match the following listing (from gateway/src/main/resources/application.properties):
+
+	zuul.routes.books.url=http://localhost:8090
+
+	ribbon.eureka.enabled=false
+
+	server.port=8080COPY
+	Spring Cloud Zuul automatically sets the path to the application name. In this sample, set zuul.routes.books.url so that Zuul will proxy requests to /books to this URL.
+
+	Notice the second property in the application.properties file, Spring Cloud Netflix Zuul uses Netflix’s Ribbon to perform client-side load balancing. By default, Ribbon would use Netflix Eureka for service discovery. For this simple example, you can skip service discovery, so set ribbon.eureka.enabled to false. Since Ribbon now cannot use Eureka to look up services, we must specify a url for the book service.
+    
+	Add a Filter
+	-------------------
+	Now you can see how to filter requests through your proxy service. Zuul has four standard filter types:
+
+	pre filters run before the request is routed.
+
+	route filters can handle the actual routing of the request.
+
+	post filters run after the request has been routed.
+
+	error filters run if an error occurs in the course of handling the request.
+
+	You are going to write a pre filter. Spring Cloud Netflix picks up, as a filter, any @Bean that extends com.netflix.zuul.ZuulFilter and is available in the application context. The following listing (from gateway/src/main/java/com/example/routingandfilteringgateway/filters/pre/SimpleFilter.java) shows the filter you need:
+
+	package com.example.routingandfilteringgateway.filters.pre;
+
+	import javax.servlet.http.HttpServletRequest;
+	import com.netflix.zuul.context.RequestContext;
+	import com.netflix.zuul.ZuulFilter;
+
+	import org.slf4j.Logger;
+	import org.slf4j.LoggerFactory;
+
+	public class SimpleFilter extends ZuulFilter {
+
+	  private static Logger log = LoggerFactory.getLogger(SimpleFilter.class);
+
+	  @Override
+	  public String filterType() {
+		return "pre";
+	  }
+
+	  @Override
+	  public int filterOrder() {
+		return 1;
+	  }
+
+	  @Override
+	  public boolean shouldFilter() {
+		return true;
+	  }
+
+	  @Override
+	  public Object run() {
+		RequestContext ctx = RequestContext.getCurrentContext();
+		HttpServletRequest request = ctx.getRequest();
+
+		log.info(String.format("%s request to %s", request.getMethod(), request.getRequestURL().toString()));
+
+		return null;
+	  }
+
+	}COPY
+	Filter classes implement four methods:
+
+	filterType(): Returns a String that stands for the type of the filter — in this case, pre. (It would be route for a routing filter.)
+
+	filterOrder(): Gives the order in which this filter is to be run, relative to other filters.
+
+	shouldFilter(): Contains the logic that determines when to run this filter (this particular filter is always run).
+
+	run(): Contains the functionality of the filter.
+
+	Zuul filters store request and state information in (and share it by means of) the RequestContext. You can use that to get at the HttpServletRequest and then log the HTTP method and URL of the request before it is sent on its way.
+
+	The GatewayApplication class is annotated with @SpringBootApplication, which includes (among others) the @Configuration annotation that tells Spring to look in a given class for @Bean definitions. Put the filter in the application class, as shown in the following listing (from gateway/src/main/java/com/example/routingandfilteringgateway/RoutingAndFilteringGatewayApplication.java):
+
+	package com.example.routingandfilteringgateway;
+
+	import org.springframework.boot.SpringApplication;
+	import org.springframework.boot.autoconfigure.SpringBootApplication;
+	import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
+	import org.springframework.context.annotation.Bean;
+	import com.example.routingandfilteringgateway.filters.pre.SimpleFilter;
+
+	@EnableZuulProxy
+	@SpringBootApplication
+	public class RoutingAndFilteringGatewayApplication {
+
+	  public static void main(String[] args) {
+		SpringApplication.run(RoutingAndFilteringGatewayApplication.class, args);
+	  }
+
+	  @Bean
+	  public SimpleFilter simpleFilter() {
+		return new SimpleFilter();
+	  }
+
+	}

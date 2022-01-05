@@ -411,6 +411,7 @@ What is difference between volatile and synchronized is another popular core Jav
 In Summary volatile keyword in Java is not a replacement of synchronized block or method but in some situation is very handy and can save performance overhead which comes with use of synchronization in Java
 
 Read more: http://javarevisited.blogspot.com/2011/06/volatile-keyword-java-example-tutorial.html#ixzz3ozfU0tjr
+
 here are some more differences between Serializable and Externalizable interface in Java:
 
 1. In case of Serializable, default serialization process is used. while in case of Externalizable custom Serialization process is used which is implemented by application.
@@ -422,6 +423,30 @@ here are some more differences between Serializable and Externalizable interface
 4. readExternal() and writeExternal() supersede any specific implementation of writeObject and readObject methods.
 
 Though Externalizable provides complete control, it also presents challenges to serialize super type state and take care of default values in case of transient variable and static variables in Java. If used correctly Externalizable interface can improve performance of serialization process.
+
+
+Object Serialization with Inheritance in Java
+============================================
+Serialization is a mechanism of converting the state of an object into a byte stream. The byte array can be the class, version, and internal state of the object
+Deserialization is the reverse process where the byte stream is used to recreate the actual Java object in memory. This mechanism is used to persist the object.
+
+There are some cases of Serialization with respect to inheritance:
+------------------------------------------------
+
+Case 1: If the superclass is serializable, then subclass is automatically serializable
+If the superclass is Serializable, then by default, every subclass is serializable. Hence, even though subclass doesn’t implement Serializable interface( and if its superclass implements Serializable), then we can serialize subclass object.
+
+Case 2: If a superclass is not serializable, then subclass can still be serialized 
+Even though the superclass doesn’t implement a Serializable interface, we can serialize subclass objects if the subclass itself implements a Serializable interface. So we can say that to serialize subclass objects, superclass need not be serializable. But what happens with the instances of superclass during serialization in this case. The following procedure explains this.
+
+Case 2(a): What happens when a class is serializable, but its superclass is not?
+Serialization: At the time of serialization, if any instance variable inherits from the non-serializable superclass, then JVM ignores the original value of that instance variable and saves the default value to the file.
+
+Case 3: If the superclass is serializable, but we don’t want the subclass to be serialized
+There is no direct way to prevent sub-class from serialization in java. One possible way by which a programmer can achieve this is by implementing the writeObject() and readObject() methods in the subclass and needs to throw NotSerializableException from these methods. These methods are executed during serialization and de-serialization, respectively. By overriding these methods, we are just implementing our custom serialization.
+
+De- Serialization: At the time of de-serialization, if any non-serializable superclass is present, then JVM will execute instance control flow in the superclass. To execute instance control flow in a class, JVM will always invoke the default(no-arg) constructor of that class. So every non-serializable superclass must necessarily contain a default constructor. Otherwise, we will get a runtime exception.
+
 
 
 
