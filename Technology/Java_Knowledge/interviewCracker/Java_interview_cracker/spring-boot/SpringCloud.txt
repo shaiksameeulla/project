@@ -57,12 +57,68 @@ Hystrix - org.springframework.cloud:spring-cloud-starter-netflix-hystrix
 
 Resilience4J - org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j
 
-Reactive Resilience4J - org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j
-
 Spring Retry - org.springframework.cloud:spring-cloud-starter-circuitbreaker-spring-retry
 
 Sentinal - org.springframework.cloud:spring-cloud-starter-circuitbreaker-sentinal
 
+
+To create a circuit breaker in your code you can use the CircuitBreakerFactory API. When you include a Spring Cloud Circuit Breaker starter on your classpath a bean implementing this API will automatically be created for you. A very simple example of using this API is given below
+
+Hystrix sample
+-------------
+
+@Bean
+	public Customizer<HystrixCircuitBreakerFactory> defaultConfig() {
+		return factory -> factory.configureDefault(id -> HystrixCommand.Setter
+				.withGroupKey(HystrixCommandGroupKey.Factory.asKey(id))
+				.andCommandPropertiesDefaults(HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(3000)));
+	}
+	
+@Service
+public static class DemoControllerService {
+	private RestTemplate rest;
+	private CircuitBreakerFactory cbFactory;
+
+	public DemoControllerService(RestTemplate rest, CircuitBreakerFactory cbFactory) {
+		this.rest = rest;
+		this.cbFactory = cbFactory;
+	}
+
+	public String slow() {
+		return cbFactory.create("slow").run(() -> rest.getForObject("/slow", String.class), throwable -> "fallback");
+	}
+
+}
+
+another example
+
+resilience4j sample
+-------------------
+
+@Bean
+	public Customizer<Resilience4JCircuitBreakerFactory> defaultCustomizer() {
+		return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
+				.timeLimiterConfig(TimeLimiterConfig.custom().timeoutDuration(Duration.ofSeconds(3)).build())
+				.circuitBreakerConfig(CircuitBreakerConfig.ofDefaults())
+				.build());
+	}
+}
+
+public Map delay(@PathVariable int seconds) {
+		return circuitBreakerFactory.create("delay").run(httpBin.delaySuppplier(seconds), t -> {
+			LOG.warn("delay call failed error", t);
+			Map<String, String> fallback = new HashMap<>();
+			fallback.put("hello", "world");
+			return fallback;
+		});
+	}
+	
+The CircuitBreakerFactory.create API will create an instance of a class called CircuitBreaker.
+ The run method takes a Supplier and a Function. 
+	The Supplier is the code that you are going to wrap in a circuit breaker. 
+	The Function is the fallback that will be executed if the circuit breaker is tripped.
+	The function will be passed the Throwable that caused the fallback to be triggered.
+	You can optionally exclude the fallback if you do not want to provide one.
 
 
 Service registry  (Service Discovery: Eureka Server)
