@@ -1,0 +1,156 @@
+
+
+How to call stored procedures in JPA – 
+=================================
+
+Since the JPA 2.1 release, JPA supports two different ways to call stored procedures,
+	the dynamic StoredProcedureQuery, 
+	and the declarative @NamedStoredProcedureQuery. 
+
+In this article, I will show you how to define a @NamedStoredProcedureQuery and how to use it to call a stored procedure in the database. And next week, I will tell you more about the StoredProcedureQuery.
+
+In JPA, @NamedStoredProcedureQuery can be used on entities to declare reuseable database stored procedures.
+
+Parameter modes
+------------------
+Before I show you how to call your first stored procedure with JPA, I have to tell you something about the different parameter modes. You can use 4 different modes of parameters to implement a stored procedure:
+
+IN: for input parameters,
+OUT: for output parameters,
+INOUT: for parameters which are used for input and output and
+REF_CURSOR: for cursors on a result set.
+I will use IN and OUT parameters in the first and REF_CURSOR in the second example. INOUT parameters are used similarly as the IN and OUT parameters.
+
+
+1.NamedStoredProcedureQuery
+
+@NamedStoredProcedureQuery(
+    name = "calculate", 
+    procedureName = "calculate", 
+    parameters = { 
+        @StoredProcedureParameter(mode = ParameterMode.IN, type = Double.class, name = "x"), 
+        @StoredProcedureParameter(mode = ParameterMode.IN, type = Double.class, name = "y"), 
+        @StoredProcedureParameter(mode = ParameterMode.OUT, type = Double.class, name = "sum")
+    }
+)
+
+So lets see how we can call it.
+
+StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("calculate");
+query.setParameter("x", 1.23d);
+query.setParameter("y", 4.56d);
+query.execute();
+Double sum = (Double) query.getOutputParameterValue("sum");
+
+Stored procedures with REF_CURSOR
+Simple input and output parameters are often not enough, and the stored procedure returns the result of a query. This can be done with an REF_CURSOR parameter as it is done in the following example.
+
+CREATE OR REPLACE FUNCTION get_reviews(bookid bigint)
+  RETURNS refcursor AS
+$BODY$
+    DECLARE
+      reviews refcursor;           – Declare cursor variables                         
+    BEGIN
+      OPEN reviews FOR SELECT id, comment, rating, version, book_id FROM review WHERE book_id = bookId;
+      RETURN reviews;
+    END;
+  $BODY$
+  LANGUAGE plpgsql
+As you can see in the following code snippet, the definition of the @NamedStoredProcedureQuery is similar to the previous example. The main differences are the different parameter mode and the definition of the result class returned by this stored procedure call. And I use the positional parameter mapping instead of the name based one we used in the previous example.
+
+@NamedStoredProcedureQuery(
+    name = "getReviews", 
+    procedureName = "get_reviews", 
+    resultClasses = Review.class, 
+    parameters = {
+        @StoredProcedureParameter(mode = ParameterMode.REF_CURSOR, type = void.class), 
+        @StoredProcedureParameter(mode = ParameterMode.IN, type = Long.class)
+    }
+)
+The usage of the query is also a little bit different. This time, we need to call getResultList() to get the result of the query. This method implicitly calls the execute() method we used before to call the stored procedure in the database.
+
+List<Book> books = (List<Book>) this.em.createNamedStoredProcedureQuery("getBooks").getResultList();
+for (Book b : books) {
+    StoredProcedureQuery q = this.em.createNamedStoredProcedureQuery("getReviews");
+    q.setParameter(2, b.getId());
+    List<Review> reviews = q.getResultList();
+    for (Review r : reviews) {
+        // do something
+    }
+}
+
+
+
+StoredProcedureQueries
+=======================
+
+Up to Version 2.1, JPA was missing real support for stored procedures. The only available option was to use a native query.
+
+This changed with JPA 2.1, when @NamedStoredProcedureQuery and StoredProcedureQuery were introduced as two of the new features. I wrote about @NamedStoredProcedureQuery and how to use it to define stored procedure calls in the previous post. This time, I will have a look at the StoredProcedureQuery and show you how to use it to call the same stored procedures via a Java API.
+
+// define the stored procedure
+StoredProcedureQuery query = this.em.createStoredProcedureQuery("calculate");
+query.registerStoredProcedureParameter("x", Double.class, ParameterMode.IN);
+query.registerStoredProcedureParameter("y", Double.class, ParameterMode.IN);
+query.registerStoredProcedureParameter("sum", Double.class, ParameterMode.OUT);
+Now you can use this definition of the stored procedure call to set your input parameters and finally execute it in the database. This is done in the same way for a StoredProcedureQuery defined by annotations as for one defined by the Java API. You use one of the setParameter methods to set the input parameters, call the execute() method to call the stored procedure in the database and get the output parameters via one of the getParameter methods.
+
+// set input parameter
+query.setParameter("x", 1.23d);
+query.setParameter("y", 4.56d);
+ 
+// call the stored procedure and get the result
+query.execute();
+Double sum = (Double) query.getOutputParameterValue("sum");
+
+Stored procedures with REF_CURSOR
+If you want to call a stored procedure that returns the resultset of a query, you can use a REF_CURSOR parameter for it. The following listing shows a stored procedure that uses a REF_CURSOR to return the result of query.
+
+CREATE OR REPLACE FUNCTION get_reviews(bookid bigint)
+  RETURNS refcursor AS
+$BODY$
+    DECLARE
+      reviews refcursor;           – Declare cursor variables                         
+    BEGIN
+      OPEN reviews FOR SELECT id, comment, rating, version, book_id FROM review WHERE book_id = bookId;
+      RETURN reviews;
+    END;
+  $BODY$
+  LANGUAGE plpgsql
+The definition of the stored procedure call is similar to the previous one. You create a StoredProcedureQuery object via the createStoredProcedureQuery method and define the parameters. You probably already spotted the main difference in the query creation in this case. We have to define a mapping for the elements in the REF_CURSOR. In this case, I only provided the Book.class and Hibernate will determine the mapping automatically. If need be, you could also define multiple result classes or a result set mapping here.
+
+The usage of the query is also a little bit different. This time, we need to call getResultList() to get the result of the query. This method implicitly calls the execute() method we used before to call the stored procedure in the database. If the stored procedure returns more than one REF_CURSOR, you have to call getResultList() again to access the next REF_CURSOR.
+
+StoredProcedureQuery query = this.em.createStoredProcedureQuery("get_reviews", Book.class);
+query.registerStoredProcedureParameter(1, void.class, ParameterMode.REF_CURSOR);
+query.execute();
+List<Book> books = (List<Book>) query.getResultList();
+for (Book b : books) {
+    // do something useful
+}
+
+Stored procedure query execution may be controlled in accordance with the following:
+
+The setParameter methods are used to set the values of all required IN and INOUT parameters. It is not required to set the values of stored procedure parameters for which default values have been defined by the stored procedure.
+ When getResultList and getSingleResult are called on a StoredProcedureQuery object, the provider will call execute on an unexecuted stored procedure query before processing getResultList or getSingleResult.
+
+When executeUpdate is called on a StoredProcedureQuery object, the provider will call execute on an unexecuted stored procedure query followed by getUpdateCount. The results of executeUpdate will be those of getUpdateCount.
+
+The execute method supports both the simple case where scalar results are passed back only via INOUT and OUT parameters as well as the most general case (multiple result sets and/or update counts, possibly also in combination with output parameter values).
+
+The execute method returns true if the first result is a result set, and false if it is an update count or there are no results other than through INOUT and OUT parameters, if any.
+If the execute method returns true, the pending result set can be obtained by calling getResultList or getSingleResult.
+
+The hasMoreResults method can then be used to test for further results.
+
+If execute or hasMoreResults returns false, the getUpdateCount method can be called to obtain the pending result if it is an update count. The getUpdateCount method will return either the update count (zero or greater) or -1 if there is no update count (i.e., either the next result is a result set or there is no next update count).
+
+For portability, results that correspond to JDBC result sets and update counts need to be processed before the values of any INOUT or OUT parameters are extracted.
+
+After results returned through getResultList and getUpdateCount have been exhausted, results returned through INOUT and OUT parameters can be retrieved.
+
+The getOutputParameterValue methods are used to retrieve the values passed back from the procedure through INOUT and OUT parameters.
+
+When using REF_CURSOR parameters for result sets the update counts should be exhausted before calling getResultList to retrieve the result set. Alternatively, the REF_CURSOR result set can be retrieved through getOutputParameterValue. Result set mappings will be applied to results corresponding to REF_CURSOR parameters in the order the REF_CURSOR parameters were registered with the query.
+
+In the simplest case, where results are returned only via INOUT and OUT parameters, execute can be followed immediately by calls to getOutputParameterValue.

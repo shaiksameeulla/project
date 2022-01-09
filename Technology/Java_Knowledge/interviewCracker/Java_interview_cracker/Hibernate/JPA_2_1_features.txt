@@ -1,0 +1,184 @@
+JPA 2.1 Features
+---------------
+
+1 Features and Enhancements in JPA 2.1
+1.1 Named Stored Procedure Query
+1.2 Stored Procedure Query
+1.3 Attribute Converter
+1.4 Constructor Result Mapping
+1.5 Programmatic Named Queries
+1.6 Named Entity Graph
+1.7 Entity Graph
+1.8 JPQL Enhancements
+1.9 Criteria API Bulk Operations
+1.10 Unsynchronized Persistence Context
+1.11 Generating DB Schema
+1.12 CDI-Support in Entity Listener
+
+
+Named Stored Procedure Query
+------------------------------
+Sometimes it is easier or more efficient to use a stored procedure to perform the operations within the database. Before JPA 2.1 the only way to call a stored procedure was to use a native query. The newly introduced @NamedStoredProcedureQuery can now be used to annotate a query to call the stored procedure.
+
+Stored Procedure Query
+-----------------------
+The Stored Procedure Query is an alternative way to implement a stored procedure call without using annotations. For this purpose, the EntityManager was extended by the createStoredProcedureQuery(String procedureName, Class… resultClasses) method.
+
+Attribute Converter
+-----------------------
+Attribute Converter provide a nice and easy way to define a custom mapping between your property on the entity and the database column. The only thing that is needed is a class that implements the AttributeConverter interface and is annotated with @Converter. You can find a more detailed introduction to Attribute Converter in JPA 2.1 – How to implement an Attribute Converter.
+
+One of the most obvious ways to use an Attribute Converter is to implement a custom type mapping to persist a not supported data type like the new Java Date and Time API:  How to persist LocalDate and LocalDateTime with JPA.
+
+Or you can use it to change an existing default mapping, as it was done in JPA 2.1 Attribute Converter – The better way to persist enums.
+
+You could also keep the type and change the stored value to implement some business requirements like encryption: How to use a JPA Attribute Converter to encrypt your data.
+
+How to implement a Converter?
+A Converter must implement the javax.persistence.AttributeConverter<X, Y> interface, where X is the class of the entity representation and Y the class of the database representation of the attribute. Additionally a Converter has to be annotated with the javax.persistence.Converter annotation.
+
+public interface AttributeConverter<X,Y> {
+    /**
+     * Converts the value stored in the entity attribute into the 
+     * data representation to be stored in the database.
+     *
+     * @param attribute  the entity attribute value to be converted
+     * @return  the converted data to be stored in the database 
+     *          column
+     */
+    public Y convertToDatabaseColumn (X attribute);
+    /**
+     * Converts the data stored in the database column into the 
+     * value to be stored in the entity attribute.
+     * Note that it is the responsibility of the converter writer to
+     * specify the correct <code>dbData</code> type for the corresponding 
+     * column for use by the JDBC driver: i.e., persistence providers are 
+     * not expected to do such type conversion.
+     *
+     * @param dbData  the data from the database column to be 
+     *                converted
+     * @return  the converted value to be stored in the entity 
+     *          attribute
+     */
+    public X convertToEntityAttribute (Y dbData);
+
+Constructor Result Mapping
+-----------------------
+The @ConstructorResult annotation is a handy addition to the already existing @SqlResultSetMapping and can be used to map the result of a query to a constructor call.
+
+You can read more about it in the constructor result mappings part of the result set mapping series.
+
+Programmatic Named Queries
+-----------------------
+Before JPA 2.1 the @NamedQuery annotation was the only way to define named queries. A programmatic creation was not supported. This was changed with JPA 2.1. The EntityManager now provides the addNamedQuery(String name, Query query) method to do this.
+Learn more about it in How to define named queries at runtime with JPA 2.1.
+
+Named Entity Graph
+-----------------------
+Lazy loading of relations between entities is a common pattern to load only the required information from the database and to improve the performance of the application. While this is a great feature as long as the related entities are not required, it creates additional load when the relations need to be initialized. There are multiple ways to initialize these lazy relations and using Named Entity Graphs is one of the better ones. 
+The annotations @NamedEntityGraph, @NamedAttributeNode and @NamedSubGraph allow us to define a graph of entities that will be loaded from the database. You can find a more detailed description on how to do this in JPA 2.1 Entity Graph – Part 1: Named entity graphs.
+
+Entity Graph
+-----------------------
+Entity Graphs are the second option introduced with JPA 2.1 to define a graph of entities that shall be loaded from the database and their usage is similar to Named Entity Graphs. The only difference is that Entity Graphs are defined via a Java API and not via annotations. Therefore the EntityManager was extended by the createEntityGraph(Class rootType) method. This is explained in more detail in JPA 2.1 Entity Graph – Part 2: Define lazy/eager loading at runtime.
+
+JPQL Enhancements
+-----------------------
+
+There were several enhancements to the JPQL which can come in handy. You can now use the keyword ON to define additional join parameters, call database functions by using FUNCTION and downcast entities with TREAT.
+
+Criteria API Bulk Operations
+-----------------------
+Up to JPA 2.1 the Criteria API did not provide any support for update or delete operations. The only options available were to perform the update on an entity or to write a native query to update multiple records at once. As described in Criteria Update/Delete – The easy way to implement bulk operations with JPA2.1, the Criteria API was extended with CriteriaUpdate and CriteriaDelete to also support bulk write operations.
+
+Unsynchronized Persistence Context
+-----------------------
+Using a synchronized persistence context to propagate every change to the database is the default approach in JPA. If you need more control about the database propagation, you can now use the unsynchronized persistence context. Therefore you need to provide the synchronization mode to the injection with @PersistenceContext(synchronization=SynchronizationType.UNSYNCHRONIZED). You then need to call EntityManager.joinTransaction() manually to synchronize the changes.
+
+Generating DB Schema
+-----------------------
+Up to JPA 2.1 you needed to use vendor specific configuration parameter to define the database setup in the persistence.xml file. Starting from version 2.1 there is also a standard way to do this. Therefore the specification defines the following long list of parameters:
+
+javax.persistence.schema-generation.database.action
+javax.persistence.schema-generation.scripts.action
+javax.persistence.schema-generation.create-source
+javax.persistence.schema-generation.drop-source
+javax.persistence.schema-generation.create-database-schemas
+javax.persistence.schema-generation.scripts.create-target
+javax.persistence.schema-generation.scripts.drop-target
+javax.persistence.database-product-name
+javax.persistence.database-major-version
+javax.persistence.database-minor-version
+javax.persistence.schema-generation.create-script-source
+javax.persistence.schema-generation.drop-script-source
+javax.persistence.schema-generation.connection
+javax.persistence.sql-load-script-source
+You can get a more detailed description of the different parameters and some examples how to use them to setup your database in Standardized schema generation and data loading with JPA 2.1.
+
+CDI-Support in Entity Listener
+-----------------------
+The integration with CDI was improved with JPA 2.1. You can now use CDI to inject beans into EntityListeners and to implement the @PreDestroy and @PostConstruct methods.
+
+JPA 2.2 Release:
+-----------------
+-------------------
+
+1 Stream query results
+2 Make annotations @Repeatable
+3 Support Java 8 Date and Time API
+4 Support CDI Injection in AttributeConverters
+5 Change Persistence Provider Discovery Mechanism for Java 9 Modules
+
+
+
+Hibernate made their annotations @Repeatable.
+----------------------------------------
+
+@Repeatable(NamedQueries.class)
+@Target({TYPE}) 
+@Retention(RUNTIME)
+public @interface NamedQuery { ... }
+
+
+From 
+@Entity
+@NamedQueries({
+    @NamedQuery(name = “Book.findByTitle”, query = “SELECT b FROM Book b WHERE b.title = :title”),
+    @NamedQuery(name = “Book.findByPublishingDate”, query = “SELECT b FROM Book b WHERE b.publishingDate = :publishingDate”)
+})
+public class Book {
+    ...
+}
+To
+you no longer need to wrap any of these annotations in a container annotation. As you can see in the following code snippet, the code becomes easier to write and read.
+
+@Entity
+@NamedQuery(name = “Book.findByTitle”, query = “SELECT b FROM Hibernate5Book b WHERE b.title = :title”)
+@NamedQuery(name = “Book.findByPublishingDate”, query = “SELECT b FROM Hibernate5Book b WHERE b.publishingDate = :publishingDate”)
+public class Book {
+    ...
+}
+
+
+JPA 3.0  Relese: Renamed to Jakarta Persistence API (JPA)
+================
+================
+As part of the transformation from Java EE to Jakarta EE, the Java Persistence API (JPA) was renamed to Jakarta Persistence API (JPA). The first step of that process happened with JPA 2.2 and was now completed with JPA 3.0. Let’s take a closer look at the changes introduced in JPA 3.0 and the required migration steps.
+
+If you take a closer look at JPA 3.0, it might seem like nothing has changed. And that’s not entirely wrong. JPA 3.0 brings no new features. It only changes the prefix of all API classes’ package names, the prefix of some configuration properties, and the schema namespaces for all XML-based configuration files. The goal of these changes was to replace the word “java” to avoid legal issues.
+
+he prefix of the package names and configuration parameter names changes from javax.persistence.* to jakarta.persistence.*, e.g., the import required for the @Entity annotation changes from javax.persistence.Entity to jakarta.persistence.Entity
+
+Frameworks Implementing JPA 3.0
+The 2 most popular implementations of the JPA specification support version 3.0. If you want to use EclipseLink, you need to use at least version 3.0.
+<dependency>
+    <groupId>org.eclipse.persistence</groupId>
+    <artifactId>org.eclipse.persistence.jpa</artifactId>
+    <version>3.0.1</version>
+</dependency>
+Hibernate started to support JPA 3.0 in version 5.5. All Hibernate artifacts that support the new JPA 3.0 APIs have the suffix “-jakarta” in their name. If you still want to use the old APIs, you can stick to the old artifact names.
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-core-jakarta</artifactId>
+    <version>5.5.2</version>
+</dependency>

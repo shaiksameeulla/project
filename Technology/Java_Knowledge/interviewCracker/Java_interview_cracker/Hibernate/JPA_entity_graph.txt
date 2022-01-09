@@ -1,0 +1,205 @@
+JPA Entity Graph
+==============
+
+Programmatic Named Queries
+===============================
+Before JPA 2.1 the @NamedQuery annotation was the only way to define named queries. A programmatic creation was not supported. This was changed with JPA 2.1. The EntityManager now provides the addNamedQuery(String name, Query query) method to do this.
+3 steps to define a named query at runtime
+There are three things you need to do to create a named query at runtime:
+
+Create a Query. This can be done as a JPQL, native or criteria query. You can also define additional hints and settings for the query.
+Find a name for your query that is unique within your persistence unit. If there is already a named query defined for the name, the query will be updated.
+Use the Query and name to call the addNamedQuery(String name, Query query) method on the EntityManagerFactory.
+Define a simple named query
+The following code snippet shows how to create a simple named query which selects all authors who have written a book with a title that contains a specific String.
+// define the named query
+	Query q = this.em.createQuery("SELECT a FROM Book b JOIN b.authors a WHERE b.title LIKE :title GROUP BY a");
+	this.em.getEntityManagerFactory().addNamedQuery("selectAuthorOfBook", q);
+As you can see, the query looks similar to a query that you provide in a @NamedQuery annotation. It defines a JPQL query and uses a named query parameter. Setting the parameter value is not part of the definition.
+
+The named query is called in the same way as any other query defined by a @NamedQuery annotation. The createNamedQuery method is called with the name of the query, the required parameters are set by calling the setParameter method and the result of the query is requested by calling the getResultList method.
+	// call the named query
+	TypedQuery<Author> nq = this.em.createNamedQuery("selectAuthorOfBook", Author.class);
+	nq.setParameter("title", "%Java%");
+	List<Author> authors = nq.getResultList()
+Named Entity Graph
+===============================
+Lazy loading of relations between entities is a common pattern to load only the required information from the database and to improve the performance of the application. While this is a great feature as long as the related entities are not required, it creates additional load when the relations need to be initialized. There are multiple ways to initialize these lazy relations and using Named Entity Graphs is one of the better ones. 
+The annotations @NamedEntityGraph, @NamedAttributeNode and @NamedSubGraph allow us to define a graph of entities that will be loaded from the database. You can find a more detailed description on how to do this in JPA 2.1 Entity Graph – Part 1: Named entity graphs.
+
+Entity Graph
+===============================
+Entity Graphs are the second option introduced with JPA 2.1 to define a graph of entities that shall be loaded from the database and their usage is similar to Named Entity Graphs. The only difference is that Entity Graphs are defined via a Java API and not via annotations. Therefore the EntityManager was extended by the createEntityGraph(Class rootType) method. This is explained in more detail in JPA 2.1 Entity Graph – Part 2: Define lazy/eager loading at runtime.
+
+
+JPA Entity Graphs: How to Define and Use a @NamedEntityGraph
+============================================================
+Lazy loading is often an issue with JPA. 
+-->You have to define at the entity if you want to use FetchType.LAZY (default) or FetchType.EAGER to load the relation and this mode is always used. 
+FetchType.EAGER is only used if we want to always load the relation. 
+-->FetchType.LAZY is used in almost all of the cases to get a well performing and scalable application.
+But this is not without drawbacks. 
+
+Option :1->If you have to use an element of the relation, you need to make sure, that the relation gets initialized within the transaction that load the entity from the database. This can be done by using a specific query that reads the entity and the required relations from the database. But this will result in use case specific queries.
+
+Option :2-> Another option is to access the relation within your business code which will result in an additional query for each relation.
+ Both approaches are far from perfect.
+ 
+ 
+ JPA 2.1 entity graphs are a better solution for it.
+ The definition of an entity graph is independent of the query and defines which attributes to fetch from the database.
+ 
+ ********An entity graph can be used as a fetch or a load graph. *************8
+ ====>If a fetch graph is used, only the attributes specified by the entity graph will be treated as FetchType.EAGER. 
+ All other attributes will be lazy.
+ ====>If a load graph is used, all attributes that are not specified by the entity graph will keep their default fetch type.
+ 
+ 
+ The example entities
+For this example, we will use an order with a list of items and each item has a product. All relations are lazy.
+
+The Order entity:
+
+@Entity
+@Table(name = "purchaseOrder")
+public class Order {
+ 
+   @Id
+   @GeneratedValue
+   private Long id;
+ 
+   @Version
+   private int version;
+ 
+   private String orderNumber;
+ 
+   @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+   private Set<OrderItem> items = new HashSet<OrderItem>();
+ 
+   ...
+}
+The OrderItem entity:
+
+@Entity
+public class OrderItem {
+ 
+   @Id
+   @GeneratedValue
+   private Long id;
+ 
+   @Version
+   private int version;
+ 
+   private int quantity;
+ 
+   @ManyToOne
+   private Order order;
+ 
+   @ManyToOne(fetch = FetchType.LAZY)
+   private Product product;
+ 
+   ...
+}
+The Product entity:
+
+@Entity
+public class Product implements Serializable
+{
+ 
+   @Id
+   @GeneratedValue
+   private Long id;
+ 
+   @Version
+   private int version;
+ 
+   private String name;
+ 
+   ...
+}
+Named entity graph
+
+The definition of a named entity graph is done by the @NamedEntityGraph annotation at the entity. It defines a unique name and a list of attributes (the attributeNodes) that shall be loaded.
+
+The following example shows the definition of the entity graph graph.Order.items which will load the list of OrderItem of an Order.
+
+@Entity
+@Table(name = "purchase_order")
+@NamedEntityGraph(name = "graph.Order.items", 
+      attributeNodes = @NamedAttributeNode("items"))
+public class Order { ... }
+
+Now that we have defined the entity graph, we can use it in a query. Therefore we need to create a Map with query hints and set it as an additional parameter on a find or query method call.
+
+The following code snippet shows how to use a named entity graph as a fetch graph in a find statement.
+
+EntityGraph graph = this.em.getEntityGraph("graph.Order.items");
+ 
+Map hints = new HashMap();
+hints.put("javax.persistence.fetchgraph", graph);
+ 
+return this.em.find(Order.class, orderId, hints);
+
+Named sub graph
+
+We used the entity graph to define the fetch operation of the Order entity. If we want to do the same for the OrderItem entity, we can do this with an entity sub graph. The definition of a named sub graph is similar to the definition of an named entity graph and can be referenced as an attributeNode.
+The following code snippets shows the definition of a sub graph to load the Product of each OrderItem. The defined entity graph will fetch an Order with all OrderItems and their Products.
+
+@Entity
+@Table(name = "purchase_order")
+@NamedEntityGraph(name = "graph.Order.items", 
+               attributeNodes = @NamedAttributeNode(value = "items", subgraph = "items"), 
+               subgraphs = @NamedSubgraph(name = "items", attributeNodes = @NamedAttributeNode("product")))
+public class Order { ... }
+
+What’s happening inside?
+
+OK, from a development point of view entity graphs are great. They are easy to use and we do not need to write additional code to avoid lazy loading issues. But what is happening inside? How many queries are send to the database? Lets have a look at the hibernate debug log.
+
+21:56:08,285 DEBUG [org.hibernate.loader.plan.build.spi.LoadPlanTreePrinter] (pool-2-thread-1) LoadPlan(entity=blog.thoughts.on.java.jpa21.entity.graph.model.Order) - Returns - EntityReturnImpl(entity=blog.thoughts.on.java.jpa21.entity.graph.model.Order, querySpaceUid=<gen:0>, path=blog.thoughts.on.java.jpa21.entity.graph.model.Order) - CollectionAttributeFetchImpl(collection=blog.thoughts.on.java.jpa21.entity.graph.model.Order.items, querySpaceUid=<gen:1>, path=blog.thoughts.on.java.jpa21.entity.graph.model.Order.items) - (collection element) CollectionFetchableElementEntityGraph(entity=blog.thoughts.on.java.jpa21.entity.graph.model.OrderItem, querySpaceUid=<gen:2>, path=blog.thoughts.on.java.jpa21.entity.graph.model.Order.items.<elements>) - EntityAttributeFetchImpl(entity=blog.thoughts.on.java.jpa21.entity.graph.model.Product, querySpaceUid=<gen:3>, path=blog.thoughts.on.java.jpa21.entity.graph.model.Order.items.<elements>.product) - QuerySpaces - EntityQuerySpaceImpl(uid=<gen:0>, entity=blog.thoughts.on.java.jpa21.entity.graph.model.Order) - SQL table alias mapping - order0_ - alias suffix - 0_ - suffixed key columns - {id1_2_0_} - JOIN (JoinDefinedByMetadata(items)) : <gen:0> -> <gen:1> - CollectionQuerySpaceImpl(uid=<gen:1>, collection=blog.thoughts.on.java.jpa21.entity.graph.model.Order.items) - SQL table alias mapping - items1_ - alias suffix - 1_ - suffixed key columns - {order_id4_2_1_} - entity-element alias suffix - 2_ - 2_entity-element suffixed key columns - id1_0_2_ - JOIN (JoinDefinedByMetadata(elements)) : <gen:1> -> <gen:2> - EntityQuerySpaceImpl(uid=<gen:2>, entity=blog.thoughts.on.java.jpa21.entity.graph.model.OrderItem) - SQL table alias mapping - items1_ - alias suffix - 2_ - suffixed key columns - {id1_0_2_} - JOIN (JoinDefinedByMetadata(product)) : <gen:2> -> <gen:3> - EntityQuerySpaceImpl(uid=<gen:3>, entity=blog.thoughts.on.java.jpa21.entity.graph.model.Product) - SQL table alias mapping - product2_ - alias suffix - 3_ - suffixed key columns - {id1_1_3_} 
+ 
+21:56:08,285 DEBUG [org.hibernate.loader.entity.plan.EntityLoader] (pool-2-thread-1) Static select for entity blog.thoughts.on.java.jpa21.entity.graph.model.Order [NONE:-1]: select order0_.id as id1_2_0_, order0_.orderNumber as orderNum2_2_0_, order0_.version as version3_2_0_, items1_.order_id as order_id4_2_1_, items1_.id as id1_0_1_, items1_.id as id1_0_2_, items1_.order_id as order_id4_0_2_, items1_.product_id as product_5_0_2_, items1_.quantity as quantity2_0_2_, items1_.version as version3_0_2_, product2_.id as id1_1_3_, product2_.name as name2_1_3_, product2_.version as version3_1_3_ from purchase_order order0_ left outer join OrderItem items1_ on order0_.id=items1_.order_id left outer join Product product2_ on items1_.product_id=product2_.id where order0_.id=?
+The log shows that only one query is created. Hibernate uses the entity graph to create a load plan with all 3 entities (Order, OrderItem and Product) and load them with one query.
+
+Conclusion
+We defined an entity graph that tells the entity manager to fetch a graph of 3 related entities from the database (Order, OrderItem and Product). The definition and usage of the entity graph is query independent and results in only one select statement. So the main drawbacks of the JPA 2.0 approaches (mentioned in the beginning) are solved.
+
+JPA Entity Graphs: How to Dynamically Define and Use an EntityGraph
+===============================================================
+==============================================================
+
+Previus approach Described the usage of named entity graphs. 
+These can be used to define a graph of entities and/or attributes at compile time that shall be fetched with a find or query method.
+ Dynamic entity graphs do to the same but in a dynamic way. This means you can use the EntityGraph API to define your entity graph at runtime.
+ 
+ we use the createEntityGraph(Class rootType) method of the entity manager to create an entity graph for the Order entity. In the next step, we create a list of all attributes of the Order entity that shall be fetched with this entity graph. We only need to add the attribute items, because we will use this entity graph as a loadgraph and all other attributes are eager by default.
+If we would use this entity graph as a fetchgraph, we would need to add all attributes to the list that should be fetched from the database.
+
+
+EntityGraph<Order> graph = this.em.createEntityGraph(Order.class);
+graph.addAttributeNodes("items");
+ 
+Map<String, Object> hints = new HashMap<String, Object>();
+hints.put("javax.persistence.loadgraph", graph);
+ 
+this.em.find(Order.class, orderId, hints);
+OK, dynamically defining which attributes of an entity shall be fetched from the database is nice. But what if we need a graph of entities? Like fetching an Order with all its OrderItems and their Product?
+This can be done with a sub graph. A sub graph is basically an entity graph that is embedded into another entity graph or entity sub graph. The definition of a sub graph is similar to the definition of an entity graph. To create and embed the sub graph into an entity graph, we need to call the addSubgraph(String attributeName) method on an EntityGraph object. This will create a sub graph for the attribute with the given name. In the next step, we need to define the list of attributes that shall be fetched with this sub graph.
+The following snippet shows the definition of an entity graph with an entity sub graph which tell the entity manager to fetch an Order with its OrderItems and their Product.
+EntityGraph<Order> graph = this.em.createEntityGraph(Order.class);
+Subgraph<OrderItem> itemGraph = graph.addSubgraph("items");
+itemGraph.addAttributeNodes("product");
+ 
+Map<String, Object> hints = new HashMap<String, Object>();
+hints.put("javax.persistence.loadgraph", graph);
+ 
+return this.em.find(Order.class, orderId, hints);
+
+
+
+whats-the-difference-between-fetchgraph-and-loadgraph-in-jpa-2-1
+================================================================
+
+When using fetchgraph all relationships are considered to be lazy regardless of annotation, and only the elements of the provided graph are loaded. This particularly useful when running reports on certain objects and you don't want a lot of the stuff that's normally flagged to load via eager annotations.
+
+If you want to eagerly load entities that are normally loaded via lazy annotation, you may use loadgraph to add entities to the query results that would normally be loaded later, thereby avoiding specific N+1 cases. Relationships that were already flagged as eager will continue to be loaded as usual.
