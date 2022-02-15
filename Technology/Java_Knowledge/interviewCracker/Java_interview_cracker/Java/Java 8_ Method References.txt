@@ -1,0 +1,260 @@
+Java 8: Method References
+
+Method references are a special type of lambda expressions. They're often used to create simple lambda expressions by referencing existing methods.
+they are compact, easy-to-read lambda expressions for methods that already have a name.
+Method reference is used refer method of functional interface. It is nothing but compact way of lambda expression.You can simply replace lambda expression with method reference.
+
+@FunctionalInterface
+interface MyFunctionalInterface {
+   Student getStudent(String name);
+}
+
+MyFunctionalInterface mf = Student::new;
+	       MyFunctionalInterface mf = Student::new;
+	      System.out.println(mf.getStudent("Adithya").getName());
+	      Function<String, Student> f1 = Student::new;    // Constructor Reference
+	      Function<String, Student> f2 = (name) -> new Student(name); // single constructor
+	      BiFunction<Integer,String, Student> f3 = (studentNo,studentName) -> new Student(studentNo,studentName); // two param constructor
+}
+	      
+		  
+
+Notice that the interface Comparator is a functional interface. Therefore, you could use a lambda expression instead of defining and then creating a new instance of a class that implements Comparator:
+
+Arrays.sort(rosterAsArray,
+    (Person a, Person b) -> {
+        return a.getBirthday().compareTo(b.getBirthday());
+    }
+);
+However, this method to compare the birth dates of two Person instances already exists as Person.compareByAge. You can invoke this method instead in the body of the lambda expression:
+
+Arrays.sort(rosterAsArray,
+    (a, b) -> Person.compareByAge(a, b)
+);
+Because this lambda expression invokes an existing method, you can use a method reference instead of a lambda expression:
+
+Arrays.sort(rosterAsArray, Person::compareByAge);
+The method reference Person::compareByAge is semantically the same as the lambda expression (a, b) -> Person.compareByAge(a, b). Each has the following characteristics:
+
+Its formal parameter list is copied from Comparator<Person>.compare, which is (Person, Person).
+Its body calls the method Person.compareByAge.
+Kinds of Method References
+There are four kinds of method references:
+
+HashSet::new
+String::compareToIgnoreCase
+String::concat
+Person::compareByAge
+MethodReferencesExamples::appendStrings
+myComparisonProvider::compareByName
+myApp::appendStrings2
+
+List<String> messages = Arrays.asList("hello", "baeldung", "readers!");
+We can achieve this by leveraging a simple lambda expression calling the StringUtils.capitalize() method directly:
+
+messages.forEach(word -> StringUtils.capitalize(word));
+Or, we can use a method reference to simply refer to the capitalize static method:
+
+messages.forEach(StringUtils::capitalize);
+Notice that method references always utilize the :: operator.
+
+For e.g.: 
+Integer::parseInt(str) \\ method reference
+str -> Integer.ParseInt(str); \\ equivalent lambda
+types of method references
+
+Java 8 allows four types of method references.
+
+METHOD REFERENCE	DESCRIPTION	METHOD REFERENCE EXAMPLE
+Reference to static method	Used to refer static methods from a class	Math::max equivalent to Math.max(x,y)
+Reference to instance method from instance	Refer to an instance method using a reference to the supplied object	System.out::println equivalent to System.out.println(x)
+Reference to instance method from class type	Invoke the instance method on a reference to an object supplied by the context	String::length equivalent to str.length()
+Reference to constructor	Reference to a constructor	ArrayList::new equivalent to new ArrayList()
+
+
+
+
+method references are a special form of the lambda expression. Since your lambda expressions are doing nothing other than invoking existing behavior (methods), you can achieve the same result by referring to it by name.
+
+:: is used to refer to a method.
+Method type arguments are inferred by JRE at runtime from the context it is defined.
+Types of Method References
+	Static method reference
+	Instance method reference of a particular object
+	Instance method reference of an arbitrary object of a particular type
+	Constructor reference
+	Static Method Reference
+When you refer to the static method of Containing a class, e.g. ClassName::someStaticMethodName
+
+1
+class MethodReferenceExample {
+2
+  public static int compareByAge(Employee first, Employee second) {
+3
+    return Integer.compare(first.age, second.age);
+4
+  }
+5
+}
+6
+​
+7
+Comparator compareByAge = MethodReferenceExample::compareByAge;
+
+
+Instance Method Reference of a Particular Object
+When you refer to the instance method of the particular object, you will use the containingObjectReference::someInstanceMethodName
+
+1
+static class MyComparator {
+2
+  public int compareByFirstName(User first, User second) {
+3
+    return first.getFirstName().compareTo(second.getFirstName());
+4
+  }
+5
+​
+6
+  public int compareByLastName(User first, User second) {
+7
+    return first.getLastName().compareTo(second.getLastName());
+8
+}
+9
+​
+10
+private static void instanceMethodReference() {
+11
+  System.err.println("Instance method reference");
+12
+  List<User> users = Arrays.asList(new User("Gaurav", "Mazra"),
+13
+      new User("Arnav", "Singh"), new User("Daniel", "Verma"));
+14
+  MyComparator comparator = new MyComparator();
+15
+  System.out.println(users);
+16
+  Collections.sort(users, comparator::compareByFirstName);
+17
+  System.out.println(users);
+18
+}
+
+
+Instance Method Reference of an Arbitrary Object 
+When you refer to the instance method of a class with the ClassName , you will get the instance method reference of an arbitrary object of a particular type, such asClassName::someInstanceMethod;
+
+1
+Comparator<String> stringIgnoreCase = String::compareToIgnoreCase;
+2
+//this is equivalent to
+3
+Comparator<String> stringComparator = (first, second) -> first.compareToIgnoreCase(second);
+
+
+Constructor Reference
+When you refer to a constructor of a class in lambda, you will get a constructor reference, such as ClassName::new.
+
+1
+Function<String, Job> jobCreator = Job::new;
+2
+//the above function is equivalent to
+3
+Function<String, Job> jobCreator2 = (jobName) -> return new Job(jobName);
+
+
+Example of Constructor Reference with Two Arguments
+============================================
+import java.util.function.*;
+
+@FunctionalInterface
+interface MyFunctionalInterface {
+   Student getStudent(int id, String name);
+}
+public class ConstructorReferenceTest2 {
+   public static void main(String[] args) {
+      MyFunctionalInterface mf = Student::new;    //  Constructor Reference
+
+      BiFunction<Integer, String, Student> f1 = Student::new;
+      BiFunction<Integer, String, Student> f2 = (id, name) -> new Student(id,name);
+	  
+	   Function< String, Student> f3 = ( name) -> new Student(name);
+
+      System.out.println(mf.getStudent(101, "Adithya").getId());// calling functional interface method
+      System.out.println(f1.apply(111, "Jai").getId()); //invoking object method using Function funtional interface
+      System.out.println(f2.apply(121, "Jai").getId());
+	  System.out.println(f3.apply("Jai").getName());
+   }
+}
+
+// Student class
+class Student {
+   private int id;
+   private String name;
+   public Student(int id, String name) {
+      this.id = id;
+      this.name = name;
+   }
+   public Student(String name) {
+      
+      this.name = name;
+   }
+}
+Arrays method reference
+
+A constructor reference is similar to method reference except that the name of a method is new. We can also create a constructor reference with an array type. For instance, if we need to create an integer array by using the constructor reference: int[]:: new, where the parameter is a length of an array.
+
+Syntax
+ArrayTypeName[]::new
+Example
+@FunctionalInterface
+interface ArrayCreator {
+   int[] makeArray(int number);
+}
+public class ArrayConstructorRefTest {
+   public static void main(String[] args) {
+      ArrayCreator arrayCreator = int[]::new;   // Constructor Reference for an Array
+      int[] intArray = arrayCreator.makeArray(10);
+      for(int i = 0; i < intArray.length; i++) {
+         intArray[i] = i * i - i / 2;
+         System.out.println("[" + i + "] = " + intArray[i]);
+      }
+   }
+}
+Output
+[0] = 0
+[1] = 1
+[2] = 3
+[3] = 8
+[4] = 14
+[5] = 23
+[6] = 33
+[7] = 46
+[8] = 60
+[9] = 77
+
+Reference to constructor – Class::new
+=====================================
+The first method can be updated to create a list of integers from 1 to 100. Using lambda expression is rather easy. 
+To create a new instance of ArrayList, we have use ArrayList::new.
+
+List<Integer> integers = IntStream
+                .range(1, 100)
+                .boxed()
+                .collect(Collectors.toCollection( ArrayList::new ));
+ 
+Optional<Integer> max = integers.stream().reduce(Math::max); 
+
+Method reference to instance method from instance – ClassInstance::instanceMethodName
+==========================================================================
+In above example, we use System.out.println(value) to print the max value found. We can use System.out::println to print the value.
+
+List<Integer> integers = Arrays.asList(1,12,433,5);
+         
+Optional<Integer> max = integers.stream().reduce( Math::max ); 
+ 
+max.ifPresent( System.out::println ); 
+ 
+max.ifPresent(System.out::println); 

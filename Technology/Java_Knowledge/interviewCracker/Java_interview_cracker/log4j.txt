@@ -1,0 +1,43 @@
+SLF4J vs Log4j :
+--------------
+
+Which one to use in my project either SLF4J or Log4j or both? Its been long since SLF4J came into picture and adopted heavily by projects all around. But certain things never get over. Like the difference between abstract class and interface in Java. Difference between SLF4j and Log4j is still a popular questions among ‘loggers’, should I say newbie loggers? In SO, still there are questions raised on this topic. So now its time we deal with it in Java Papers.
+
+However we elaborate this question deserves only a one line answer. The question itself is wrong. SLF4J and Log4J focus on different areas and they are not similar components. SLF4 is a logging facade. The name says it all. SLF4J is Simple Logging Facade for Java. It is not a logging component and it does not do the actual logging. It is only an abstraction layer to an underlying logging component.
+
+In the case of Log4j, it is a logging component and it does the logging instructed to do. Logically these are entirely two different things. So what would be the right question. Do I need an abstraction logging layer in my project. That is, should I use SLF4J. If you want to compare SLF4J, then the right comparison would be to compare with Apache Commons Logging.
+
+Should I use SLF4J (Logging Abstraction)?
+-----------------------------------------
+
+It is better to use abstraction, always!
+You can change the implementation as you wish and need not be tied to a dependency.
+To make it clear, if you are using SLF4J along with Log4j, if required Log4j can be swapped with another logging framework like Logback without compiling the source code. Logback is the reference implementation for SLF4J.
+Many comparisons in the web really under weigh the point that SLF4J is an abstraction. I see that as THE point for using it over Log4j. SLF4J is not a replacement for Log4j but it works along with it.
+Will there be any change in the performance? Since already using a logging API is seen as a overhead when comes to performance optimization. This abstraction layer will not add significant overhead to the performance. If you have any data, please share it.
+How about the syntax, does SLF4J provides simpler syntax over Log4J? Do not compare it like that. Once you get used to the syntax of SLF4J, then you need not worry about syntax for different logging frameworks.
+So in summary, if have option to decide, then I recommend you to go with SLF4J. Then, which logging implementation to use Log4J or Logback or Java Logging or … There is no certain winner between the logging components as of now and its purely based on choice
+-----------------------------------------
+Slf4j:
+------
+A simple logging interface abstracting logging APIs. In order to be instantiated successfully by LogFactory, classes that implement this interface must have a constructor that takes a single String parameter representing the "name" of this Log.
+
+The six logging levels used by Log are (in order):
+
+trace (the least serious)
+debug
+info
+warn
+error
+fatal (the most serious)
+The mapping of these log levels to the concepts used by the underlying logging system is implementation dependent. The implementation should ensure, though, that this ordering behaves as expected.
+Performance is often a logging concern. By examining the appropriate property, a component can avoid expensive operations (producing information to be logged).
+
+For example,
+
+    if (log.isDebugEnabled()) {
+        ... do something expensive ...
+        log.debug(theResult);
+    }
+ 
+Configuration of the underlying logging system will generally be done external to the Logging APIs, through whatever mechanism is supported by that system.

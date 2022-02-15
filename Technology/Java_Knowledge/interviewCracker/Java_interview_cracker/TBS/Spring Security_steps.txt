@@ -1,0 +1,219 @@
+Spring security steps :
+-------------------------
+1) web.xml :
+
+<filter>
+	   <filter-name>tbsSpringSecurityFilterChain</filter-name>
+	   <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+	   <filter-name>tbsSpringSecurityFilterChain</filter-name>
+	   <url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+2)  <bean id="tbsSpringSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy">
+      <constructor-arg name="filterChains">
+         <util:list>
+            <security:filter-chain pattern="/**/admin"
+               filters="none" />
+            <security:filter-chain pattern="/**/admin/*"
+               filters="none" />
+            <security:filter-chain pattern="/**/availability"
+               filters="none" />
+            <security:filter-chain pattern="/**"
+               filters="tbsAuthorizationFilter, tbsPentaVersionValidatorFilter" />
+         </util:list>
+      </constructor-arg>
+   </bean>
+3)
+Main Filter :
+<bean id="tbsAuthorizationFilter"
+      class="com.swacorp.tbs.security.service.penta.AuthorizationFilter">
+      
+      <constructor-arg name="tbsSecurityCoreServer"
+         ref="#{ ${tbs.service.supportAnonymousAuthentication:false} == true ? 'tbsPentaSecurityCoreServerAnonymous' : 'tbsPentaSecurityCoreServer'}" />
+      <constructor-arg name="appName" value="${tbs.applicationName}" />
+      <constructor-arg name="serviceVersion" value="${tbs.service.version}" />
+      <constructor-arg name="groupAuth"
+         value="${tbs.service.allowGroupAuthorization:false}" />
+      <constructor-arg name="secureWSDLExposure"
+         value="${tbs.service.requireSecurityForWSDLAccess:false}" />
+   </bean>
+
+
+i) public class AuthorizationFilter implements Filter
+ii)  public AuthorizationFilter(
+         final SecurityCoreServerImpl tbsSecurityCoreServer, String appName,
+         String serviceVersion, boolean groupAuth, boolean secureWSDLExposure)
+         throws UnknownHostException {
+      this.appName = appName;
+      this.serviceVersion = serviceVersion;
+      hostName = InetAddress.getLocalHost().getHostName();
+      this.tokenSecurityChecker = new SecurityChecker(tbsSecurityCoreServer,
+            true, groupAuth);
+      this.setSecureWSDLExposure(secureWSDLExposure);
+   }
+iii)/*
+    * enforces the token based security. This object is not injected via spring
+    * context, because the spring configuration has to be backwards compatible
+    * with a previous published configuration which expects the
+    * SecurityCoreServer to be injected.
+    */
+   private SecurityChecker tokenSecurityChecker; (tbsSecurityCoreServer)
+
+iv)call :tokenSecurityChecker.enforceSecurity(httpServletRequest, response,
+                  body);
+
+Further Dependencies:
+---------------------
+
+4)  <bean id="tbsPentaVersionValidatorFilter"
+      class="com.swacorp.tbs.security.service.penta.VersionValidationFilter">
+      <constructor-arg name="validator" ref="tbsPentaVersionValidator" />
+   </bean>
+5)
+ <bean id="tbsPentaVersionValidator" class="com.swacorp.tbs.security.penta.VersionValidator">
+      <constructor-arg name="version" value="${tbs.service.version}" />
+      <constructor-arg name="validation"
+         value="${tbs.service.validateVersion:false}" />
+   </bean>
+6)
+ <bean id="tbsPentaSecurityCoreServerAnonymous" class="com.swacorp.tbs.security.core.SecurityCoreServerImpl">
+      <constructor-arg name="isSecurityEnabled"
+         value="${tbs.service.enableSecurity:true}" />
+      <property name="authorizationInterceptor" ref="tbsSpringSecurityInterceptor" />
+      <property name="anonymousAuthenticationToken" ref="tbsAnonymousAuthentication" />
+   </bean>
+
+7) <bean id="tbsPentaSecurityCoreServer" class="com.swacorp.tbs.security.core.SecurityCoreServerImpl">
+      <constructor-arg name="isSecurityEnabled"
+         value="${tbs.service.enableSecurity:true}" />
+      <property name="authorizationInterceptor" ref="tbsSpringSecurityInterceptor" />
+   </bean>
+  
+8) Main Interceptor : (Providers)
+------------------------
+
+
+<bean id="tbsSpringSecurityInterceptor"
+      class="com.swacorp.tbs.security.providers.AuthorizationSecurityInterceptor">
+      <property name="validateConfigAttributes" value="${tbs.service.validateConfigAttributes:false}" />
+      <property name="authenticationManager" ref="tbsAuthenticationManager" />
+      <property name="accessDecisionManager" ref="tbsAccessDecisionManager" />
+      <property name="securityMetadataSource" ref="tbsAuthorizationObjectDefinitionSource" />
+      <property name="rejectPublicInvocations" value="${tbs.service.rejectPublicInovcations:true}" />
+      <property name="alwaysReauthenticate" value="${tbs.service.alwaysReauthenticate:true}" />
+   </bean>
+
+
+9)   <bean id="tbsAnonymousAuthentication"
+      class="org.springframework.security.authentication.AnonymousAuthenticationToken">
+      <constructor-arg ref="tbsAnonymousKey" />
+      <constructor-arg value="USER_ANONYMOUS" />
+      <constructor-arg>
+         <list>
+            <bean
+               class="org.springframework.security.core.authority.SimpleGrantedAuthority">
+               <constructor-arg value="ROLE_ANONYMOUS" />
+            </bean>
+         </list>
+      </constructor-arg>
+   </bean>
+
+10) <!-- TBS SECURED SERVICE CONFIGURATION -->
+   <bean name="tbsAuthenticationManager"
+      class="org.springframework.security.authentication.ProviderManager">
+      <constructor-arg name="providers"
+         ref="#{ ${tbs.service.supportAnonymousAuthentication:false} == true ? 'tbsAllAuthenticationProviders' : 'tbsRequiredAuthenticationProviders' }" />
+
+   </bean>
+
+
+11) <bean id="tbsAccessDecisionManager"
+      class="org.springframework.security.access.vote.AffirmativeBased">
+      <property name="decisionVoters">
+         <list
+            value-type="org.springframework.security.access.AcccessDecisionVoter">
+            <ref bean="tbsRoleVoter" />
+         </list>
+      </property>
+   </bean>
+<bean id="tbsRoleVoter" class="org.springframework.security.access.vote.RoleVoter">
+      <property name="rolePrefix" value="" />
+   </bean>
+
+12) <bean id="tbsAuthorizationObjectDefinitionSource"
+      class="com.swacorp.tbs.security.providers.AuthorizationSecurityMetadataSource">
+      <property name="authDefinitions" ref="tbsAuthorizationDefinitionsMap" />
+      <property name="patternFlags" value="${tbs.service.authorizationPatternFlags:0}" />
+   </bean>
+
+13) Application defines this :
+<util:map id="tbsAuthorizationDefinitionsMap">
+	   <entry key="(POST|GET|DELETE|PUT)/slimgmtservice.*"
+	      value="SF_CARGOSYSTEMSERVICES_S" />
+	  	</util:map>
+14) 
+
+
+ <util:list id="tbsAllAuthenticationProviders"
+      value-type="org.springframework.security.authentication.AuthenticationProvider">
+      <ref bean="tbsGroupAuthenticationProvider" />
+      <ref bean="tbsServerAuthenticationProvider" />
+      <ref bean="tbsAnonymousAuthenticationProvider" />
+   </util:list>
+
+<bean id="tbsGroupAuthenticationProvider"
+      class="com.swacorp.tbs.security.providers.GroupServerAuthenticationProvider" />
+   <bean id="tbsAnonymousKey" class="java.lang.String">
+      <constructor-arg value="ANONYMOUS_SUPPORT" type="java.lang.String" />
+   </bean>
+
+ <bean name="tbsServerAuthenticationProvider"
+      class="com.swacorp.tbs.security.providers.SecurityServiceServerAuthenticationProvider">
+      <constructor-arg>
+         <list value-type="com.swacorp.tbs.security.providers">
+            <ref bean="tbsTimestampVerifier" />
+         </list>
+      </constructor-arg>
+      <constructor-arg>
+         <list value-type="com.swacorp.tbs.security.providers">
+            <ref bean="tbsHeaderSignatureVerifier" />
+            <ref bean="tbsPayloadSignatureVerifier" />
+         </list>
+      </constructor-arg>
+      <constructor-arg name="cache" ref="tbsUserCache" />
+      <constructor-arg ref="tbsSecurityServiceAdapter" />
+   </bean>
+
+<bean id="tbsAnonymousAuthenticationProvider"
+      class="org.springframework.security.authentication.AnonymousAuthenticationProvider">
+      <property name="key" ref="tbsAnonymousKey" />
+   </bean>
+
+ <util:list id="tbsRequiredAuthenticationProviders"
+      value-type="org.springframework.security.authentication.AuthenticationProvider">
+      <ref bean="tbsGroupAuthenticationProvider" />
+      <ref bean="tbsServerAuthenticationProvider" />
+   </util:list>
+
+ <bean name="tbsSecurityServiceAdapter"
+      class="com.swacorp.tbs.security.securityservice.wrapper.JAXRSSecurityServiceAdapter">
+      <constructor-arg name="client" ref="tbsSecurityServiceClient" />
+      <constructor-arg name="interceptorList" ref="tbsSecurityServiceInterceptorList" />
+   </bean>
+
+<util:list id="tbsSecurityServiceInterceptorList" value-type="org.apache.cxf.interceptor.Interceptor">
+      <ref bean="tbsOutOfBandInterceptor" />
+   </util:list>
+
+   <bean id="tbsOutOfBandInterceptor"
+      class="com.swacorp.tbs.security.providers.OOBHeaderOutInterceptor">
+      <constructor-arg name="applId" value="${tbs.applicationName}" />
+   </bean>
+<!-- A JAXRS based client to a TBS Security Service -->
+   <bean id="tbsSecurityServiceClient" class="org.apache.cxf.jaxrs.client.WebClient"
+      factory-method="create">
+      <constructor-arg type="java.lang.String" value="${security.service.url}" /> <!-- URL to TBS Security Service -->
+      <constructor-arg type="boolean" value="true" />  <!-- Thread safe -->
+   </bean>

@@ -1,0 +1,74 @@
+Format of an HTTP Request::
+-----------------------------
+
+It has three main components, which are:-
+
+HTTP Request Method, URI, and Protocol Version - 
+
+this should always be the first line of an HTTP Request. 
+As it's quite evident from the name itself, it contains the HTTP Request method being used for that particular request, the URI, and the HTTP protocol name with the version being used. It may look like 'GET /servlet/jspName.jsp HTTP/1.1' where the request method being used is 'GET', the URI is '/servlet/jspName.jsp', and the protocol (with version) is 'HTTP/1.1'.
+
+HTTP Request Headers - this section of an HTTP Request contains the request headers, which are used to communicate information about the client environment. Few of these headers are: Content-Type, User-Agent, Accept-Encoding, Content-Length, Accept-Language, Host, etc. Very obvious to understand what info do these headers carry, isn't it? The names are quite self-explanatory.
+
+HTTP Request Body - this part contains the actual request being sent to the HTTP Server. The HTTP Request Header and Body are separated by a blank line (CRLF sequence, where CR means Carriage Return and LF means Line Feed). This blank line is a mandatory part of a valid HTTP Request.
+
+Format of an HTTP Response::
+----------------------------
+
+Similar to an HTTP Request, an HTTP Response also has three main components, which are:-
+
+Protocol/Version, Status Code, and its Description - the very first line of a valid HTTP Response is consists of the protocol name, it's version, status code of the request, and a short description of the status code. A status code of 200 means the processing of request was successful and the description in this case will be 'OK'. Similarly, a status code of '404' means the file requested was not found at the HTTP Server at the expected location and the description in this case is 'File Not Found'.
+HTTP Response Headers - similar to HTTP Request Headers, HTTP Response Headers also contain useful information. The only difference is that HTTP Request Headers contain information about the environment of the client machine whereas HTTP Response Headers contain information about the environment of the server machine. This is easy to understand as HTTP Requests are formed at the client machine whereas HTTP Responses are formed at the server machine. Few of these HTTP Response headers are: Server, Content-Type, Last-Modified, Content-Length, etc.
+HTTP Response Body - this the actual response which is rendered in the client window (the browser window). The content of the body will be HTML code. Similar to HTTP Request, in this case also the Body and the Headers components are separated by a mandatory blank line (CRLF sequence).
+
+______________
+
+
+1	1xx Informational responses : 100 Continue
+2	2xx Success : 200 ok, 201 Created,202 Accepted,204 No Content
+3	3xx Redirection :: 301 Moved Permanently
+4	4xx Client errors :: 400 Bad Request,401 Unauthorized,403 Forbidden,405 Method Not Allowed
+5	5xx Server errors :: 500 Internal Server Error ,502 Bad Gateway,503 Service Unavailable,507 Insufficient Storage,505 HTTP Version Not Supported
+
+
+--------------------------------
+9.5 POST ::
+---------
+The POST method is used to request that the origin server accept the entity enclosed in the request as a new subordinate of the resource identified by the Request-URI in the Request-Line. POST is designed to allow a uniform method to cover the following functions:
+
+      - Annotation of existing resources;
+      - Posting a message to a bulletin board, newsgroup, mailing list,
+        or similar group of articles;
+      - Providing a block of data, such as the result of submitting a
+        form, to a data-handling process;
+      - Extending a database through an append operation.
+The actual function performed by the POST method is determined by the server and is usually dependent on the Request-URI. The posted entity is subordinate to that URI in the same way that a file is subordinate to a directory containing it, a news article is subordinate to a newsgroup to which it is posted, or a record is subordinate to a database.
+
+The action performed by the POST method might not result in a resource that can be identified by a URI. In this case, either 200 (OK) or 204 (No Content) is the appropriate response status, depending on whether or not the response includes an entity that describes the result.
+
+If a resource has been created on the origin server, the response SHOULD be 201 (Created) and contain an entity which describes the status of the request and refers to the new resource, and a Location header (see section 14.30).
+
+Responses to this method are not cacheable, unless the response includes appropriate Cache-Control or Expires header fields. However, the 303 (See Other) response can be used to direct the user agent to retrieve a cacheable resource.
+
+POST requests MUST obey the message transmission requirements set out in section 8.2.
+
+See section 15.1.3 for security considerations.
+
+9.6 PUT ::
+-----------
+
+The PUT method requests that the enclosed entity be stored under the supplied Request-URI. If the Request-URI refers to an already existing resource, the enclosed entity SHOULD be considered as a modified version of the one residing on the origin server. If the Request-URI does not point to an existing resource, and that URI is capable of being defined as a new resource by the requesting user agent, the origin server can create the resource with that URI. If a new resource is created, the origin server MUST inform the user agent via the 201 (Created) response. If an existing resource is modified, either the 200 (OK) or 204 (No Content) response codes SHOULD be sent to indicate successful completion of the request. If the resource could not be created or modified with the Request-URI, an appropriate error response SHOULD be given that reflects the nature of the problem. The recipient of the entity MUST NOT ignore any Content-* (e.g. Content-Range) headers that it does not understand or implement and MUST return a 501 (Not Implemented) response in such cases.
+
+If the request passes through a cache and the Request-URI identifies one or more currently cached entities, those entries SHOULD be treated as stale. Responses to this method are not cacheable.
+
+The fundamental difference between the POST and PUT requests is reflected in the different meaning of the Request-URI. The URI in a POST request identifies the resource that will handle the enclosed entity. That resource might be a data-accepting process, a gateway to some other protocol, or a separate entity that accepts annotations. In contrast, the URI in a PUT request identifies the entity enclosed with the request -- the user agent knows what URI is intended and the server MUST NOT attempt to apply the request to some other resource. If the server desires that the request be applied to a different URI,
+
+it MUST send a 301 (Moved Permanently) response; the user agent MAY then make its own decision regarding whether or not to redirect the request.
+
+A single resource MAY be identified by many different URIs. For example, an article might have a URI for identifying "the current version" which is separate from the URI identifying each particular version. In this case, a PUT request on a general URI might result in several other URIs being defined by the origin server.
+
+HTTP/1.1 does not define how a PUT method affects the state of an origin server.
+
+PUT requests MUST obey the message transmission requirements set out in section 8.2.
+
+Unless otherwise specified for a particular entity-header, the entity-headers in the PUT request SHOULD be applied to the resource created or modified by the PUT.

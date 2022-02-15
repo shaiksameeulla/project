@@ -1,0 +1,81 @@
+Git Installation process :
+---------------------------
+1) Install latest chrome (to support few additional features as compared with IE)
+2) Install Notepad ++
+3) Install P4Merge
+   https://www.perforce.com/downloads/visual-merge-tool
+   
+   during the installation select only Merge & diff tool (P4Merge)
+4) download :  Git for Windows.
+	 https://git-scm.com/
+5)	During installation select Notepad ++ is your Text Editor.
+
+Configuration Steps:
+-------------------
+1) After successful installation configure user, email ,color,push 
+
+	git config --global user.name "Name of User"
+
+	git config --global user.email "email id of the user"
+
+
+2) to see list of configured details
+	git config --global --list   
+3) all these configuration details will be saved in gitConfig file, to open this run below command
+
+		cat .gitConfig
+4) Configure miscellaneous configuration
+
+	git config --global color.ui true
+	git config --global push.default true
+
+5) Add Notepad++ to git hub
+
+   a) get the path of Notepad++.exe
+   b)set to Path  in Environment variable  settings.
+   c)git config --global core.editor "\"c:\Program Files\Notepad++\notepad++.exe\""
+   d) Notepad .bashrc
+   alias npp='Notepad.exe - multiInst -nosession'
+6) Configure Merge & Diff tools
+
+	$ git config --global merge.tool p4merge
+	$ git config --global diff.tool p4merge
+	$ git config --global mergetool.p4merge.path "C:/Program Files/Perforce/p4merge.exe"
+	$ git config --global difftool.p4merge.path "C:/Program Files/Perforce/p4merge.exe"
+	git config --global --list
+7) Create SSh settings
+    a) mkdir .ssh
+	b) cd .ssh
+	c) ssh-keygen -t rsa -C "sami.mca3@gmail.com"
+	 it prompts location to save,press enter
+	 it prompts for  passphrase (minumum lengthe 5 chars)
+	 d) list down all
+	 	 $ ls -al
+	  shows id_rsa.pub it's public key
+8) below command copy .pub content to clipboard
+     $ clip < id_rsa.pub
+	 
+	 
+Login to GitHub :
+---------------
+ Open ssh key (https://github.com/settings/keys) paste to  key section. then
+ 
+ 9) Clear the github screen with clear command
+ 10) ssh -T  git@github.com
+ then "Yes"  then put your passphrase
+ 
+  you should see "Successfully Authenticated"
+  
+
+ 
+Prepare for Actual work:
+--------------------------
+1) Login to GitHub. (Browser)
+2) Select the Repository which you want to work  ie fork the repository (Browser)
+3) clone it (copy the URL) (Browser)
+4)Makesure you have selected "ssh", then copy the URL (Browser)
+5) Open gitbash (local machine)
+6) Creat directory if necessary (mkdir)
+7) clone the repository
+8) git clone git@github.com:samiDeveloper/Testing-1.git
+9) message shows 100% received objects

@@ -1,0 +1,164 @@
+Java Util.Concurrency collections:
+-----------------------------------
+
+public interface BlockingQueue<E>
+extends Queue<E>
+
+All Known Implementing Classes:
+ArrayBlockingQueue, DelayQueue, LinkedBlockingDeque, LinkedBlockingQueue, LinkedTransferQueue, PriorityBlockingQueue, SynchronousQueue
+
+
+A Queue that additionally supports operations that wait for the queue to become non-empty when retrieving an element, and wait for space to become available in the queue when storing an element.
+BlockingQueue methods come in four forms, with different ways of handling operations that cannot be satisfied immediately, but may be satisfied at some point in the future: one throws an exception, the second returns a special value (either null or false, depending on the operation), the third blocks the current thread indefinitely until the operation can succeed, and the fourth blocks for only a given maximum time limit before giving up. These methods are summarized in the following table:
+
+ArrayBlockingQueue:
+-----------------
+ArrayBlockingQueue is a bounded BlockingQueue backed by an array. This queue orders elements in FIFO (first-in-first-out). The head of the queue is the element which has been on the queue for the longest time. The tail of the queue is that element that has been on the queue for the shortest time. New elements are added at the tail of the queue, and the queue retrieval operations remove elements from the head of the queue.
+
+ArrayBlockingQueue is the classic example of a "bounded buffer". A fixed-sized array is the backing data structure for ArrayBlockingQueue. We need to pass the capacity of ArrayBlockingQueue while creating the object. Once created, the capacity cannot be changed. Remember array is a fixed size data structure that can not be altered once created. Attempts to put an element into a full queue will result in the operation blocking; attempts to take an element from an empty queue will similarly block.
+
+Following are the ways to adding elements to an ArrayBlockingQueue :
+
+We can add an element in an ArrayBlockingQueue by add () or offer() method. offer() inserts the specified element into this queue if it is possible to do so immediately without violating capacity restrictions, returning true upon success and false if no space is currently available. Where as add() throws an exception if it is not able to add the element in the queue due to capacity restrictions. When using a capacity-restricted queue, offer() method is generally preferable to add, which can fail to insert an element only by throwing an exception.
+
+BlockingQueue<String> blockingQueue1 = new ArrayBlockingQueue<>(5);
+BlockingQueue<String> blockingQueue2 = new ArrayBlockingQueue<>(5);
+
+Following are the ways to removing elements from an ArrayBlockingQueue :
+
+We can remove an element from an ArrayBlockingQueue by poll () or remove() method. poll() retrieves and removes the head of the queue and returns null when the queue is empty where as remove() also retrieves and removes the head of the queue but throws an exception if this queue is empty.
+
+LinkedBlockingQueue :
+-----------------------
+The LinkedBlockingQueue class implements the BlockingQueue interface. Read the BlockingQueue for more information about the interface. The LinkedBlockingQueue is an optionally-bounded blocking queue based on linked nodes. This queue orders elements FIFO (first-in-first-out). The head of the queue is the element that has been on the queue for the longest period of time. The tail of the queue is the element that has been on the queue for the shortest period of time. New elements are inserted at the tail of the queue, and the queue retrieval operations obtain elements at the head of the queue. Linked queues typically have higher throughput than array-based queues but less predictable performance in most concurrent applications.
+
+The LinkedBlockingQueue keeps the elements internally in a linked structure (linked nodes). This linked structure can optionally have an upper bound if desired. If no upper bound is specified, Integer.MAX_VALUE is used as the upper bound. Linked nodes are dynamically created upon each insertion unless this would bring the queue above capacity. This class and its iterator implement all of the optional methods of the Collection and Iterator interfaces.
+
+Following are some important methods and their behaviour for a LinkedBlockingQueue :
+
+a. offer(E e) : It inserts the element at the tail of queue without exceeding LinkedBlockingQueue size. On success it returns true otherwise false.
+b. put(E e) : Inserts the element at the tail of the queue and waits for space if necessary.
+c. peek() : It retrieves the head of the queue without deleting it and returns null if empty.
+d. poll() : It retrieves and removes the head of the queue and returns null if empty.
+e. remove(Object o) : Removes the specified element from the queue.
+f. take() : Retrieves and removes the head of the queue and waits if necessary.
+
+
+ArrayBlockingQueue  Vs LinkedBlockingQueue:
+----------------------------------------
+
+1 . LinkedBlockingQueue: This is a LinkedList Implementation but Not Exactly JDK Implementation of LinkedList It uses static inner class Node to maintain Links between elements. Check the following Constructor for LinkedBlockingQueue.
+
+public LinkedBlockingQueue(int capacity)
+{
+  if (capacity < = 0) throw new IllegalArgumentException();
+  this.capacity = capacity;
+  // Maintains a underlying linkedlist. ( Use when size is not known )
+  last = head = new Node< E >(null);   
+}
+The following static inner class Node Used to Maintain Links
+
+static class Node<E> {
+    E item;
+    Node<E> next;
+    Node(E x) { item = x; }
+}
+2. ArrayBlockingQueue: ArrayBlockingQueue is implemented using a backing array. Constructor for ArrayBlockingQueue
+
+public ArrayBlockingQueue(int capacity, boolean fair)
+{
+    if (capacity < = 0)
+        throw new IllegalArgumentException();
+    this.items = new Object[capacity]; // Maintains a underlying array
+    lock = new ReentrantLock(fair);
+    notEmpty = lock.newCondition();
+    notFull =  lock.newCondition();
+}
+The Biggest Difference between ArrayBlockingQueue and LinkedBlockingQueue is clear from constructor one has underlying data structure Array and other linkedList. LinkedBlockingQueue has a putLock and a takeLock for insertion and removal respectively but ArrayBlockingQueue uses only 1 lock. ArrayBlockingQueue uses single-lock double condition algorithm and LinkedBlockingQueue is variant of the "two lock queue" algorithm and it has 2 locks 2 conditions ( takeLock , putLock).
+
+Two Lock Queue algorithm is being used by LinkedBlockingQueue Implementation.Thus LinkedBlockingQueue's take and put can work concurrently, but this is not the case with ArrayBlockingQueue. The reason for using a single lock in ArrayBlockingQueue is ,ArrayBlockingQueue has to avoid overwriting entries so that it needs to know where the start and the end is. A LinkedBlockQueue doesn't need to know this as it lets the GC worry about cleaning up Nodes in the queue.
+
+ TransferQueue vs SynchronousQueue
+ ========================
+ 
+ BlockingQueue expresses the concept of a queue that:
+
+1. a producer can block when adding items to a queue until there is space available.
+
+2. a consumer can block when removing an item from the queue until an item exists.
+
+
+
+ TransferQueue:
+ ============
+TransferQueue is more generic and useful than SynchronousQueue however as it allows you to flexibly decide whether to use normal BlockingQueue semantics or a guaranteed hand-off. In the case where items are already in the queue, calling transfer will guarantee that all existing queue items will be processed before the transferred item.
+
+TransferQueue takes this one step further and blocks on put until the item is actually consumed by a consumer (not just added to the queue). This new constraint is expressed in the key new method called transfer(). The name is very descriptive – because the blocking occurs until a hand-off is complete from one thread to another, you are effectively transferring the item between threads (in a way that properly creates happens-before relationships in the Java Memory Model).
+
+
+
+The TransferQueue can be very useful when we do not want an over-producing producer that will flood the queue with messages, resulting in the OutOfMemory errors. In such design, the consumer will be dictating the speed at which the producer will produce messages.
+
+When a producer reaches to TransferQueue to transfer a message and there are consumers waiting to take message, then producer directly transfers the message to consumer.
+
+If there is no consumer waiting, then producer will NOT directly put the message and return, rather it will wait for any consumer to be available to consume the message.
+
+TransferQueue goes further, and blocks Producer threads until the items consumed by Consumer threads. New method — transfer — blocking occurs until item moves from one thread to another.
+
+There are additional methods — two forms of tryTransfer — one is blocking with time-out, other is non-blocking but transfer only if Consumer thread is waiting. Also there are a couple helper methods hasWaitingConsumer and getWaitingConsumerCount.
+
+Implementation class : LinkedTransferQueue
+
+ The LinkedTransferQueue implementation uses CAS operations to form a nonblocking implementation and that is at the heart of avoiding serialization bottlenecks.
+SynchronousQueue:
+===============
+
+SynchronousQueue implementation uses dual queues (for waiting producers and waiting consumers) and protects both queues with a single lock.
+
+We remember about SynchronousQueue from Java 5, which provides queue with size 0 and quite good for transfer items between threads. This queue works on the principle «one came in — one went out». Each put operation blocks Producer thread until Consumer thread fetch element from queue and vice versa, Consumer thread is waiting until Producer thread puts element to queue.
+
+SynchronousQueue is more specialized in comparison with TransferQueue but it allows developers decide whether to use general blocking queue, or guaranteed hand-off.
+
+
+
+PriorityQueue in Java
+======================
+
+
+A PriorityQueue is used when the objects are supposed to be processed based on the priority. It is known that a Queue follows the First-In-First-Out algorithm, but sometimes the elements of the queue are needed to be processed according to the priority, that’s when the PriorityQueue comes into play. The PriorityQueue is based on the priority heap. The elements of the priority queue are ordered according to the natural ordering, or by a Comparator provided at queue construction time, depending on which constructor is used.  
+
+Few important points on Priority Queue are as follows: 
+
+PriorityQueue doesn’t permit null.
+We can’t create PriorityQueue of Objects that are non-comparable
+PriorityQueue are unbound queues.
+The head of this queue is the least element with respect to the specified ordering. If multiple elements are tied for least value, the head is one of those elements — ties are broken arbitrarily.
+Since PriorityQueue is not thread-safe, so java provides PriorityBlockingQueue class that implements the BlockingQueue interface to use in java multithreading environment.
+The queue retrieval operations poll,  remove,  peek, and element access the element at the head of the queue.
+
+Constructors:
+
+1. PriorityQueue(): Creates a PriorityQueue with the default initial capacity (11) that orders its elements according to their natural ordering.
+
+PriorityQueue<E> pq = new PriorityQueue<E>();
+
+2. PriorityQueue(Collection<E> c): Creates a PriorityQueue containing the elements in the specified collection.
+
+PriorityQueue<E> pq = new PriorityQueue<E>(Collection<E> c);
+
+3. PriorityQueue(int initialCapacity): Creates a PriorityQueue with the specified initial capacity that orders its elements according to their natural ordering.
+
+
+It provides O(log(n)) time for add and poll methods.
+It inherits methods from AbstractQueue, AbstractCollection, Collection and Object class.
+
+An unbounded priority queue based on a priority heap. The elements of the priority queue are ordered according to their natural ordering, or by a Comparator provided at queue construction time, depending on which constructor is used. A priority queue does not permit null elements. A priority queue relying on natural ordering also does not permit insertion of non-comparable objects (doing so may result in ClassCastException).
+The head of this queue is the least element with respect to the specified ordering. If multiple elements are tied for least value, the head is one of those elements -- ties are broken arbitrarily. The queue retrieval operations poll, remove, peek, and element access the element at the head of the queue.
+
+A priority queue is unbounded, but has an internal capacity governing the size of an array used to store the elements on the queue. It is always at least as large as the queue size. As elements are added to a priority queue, its capacity grows automatically. The details of the growth policy are not specified.
+
+This class and its iterator implement all of the optional methods of the Collection and Iterator interfaces. The Iterator provided in method iterator() is not guaranteed to traverse the elements of the priority queue in any particular order. If you need ordered traversal, consider using Arrays.sort(pq.toArray()).
+
+Note that this implementation is not synchronized. Multiple threads should not access a PriorityQueue instance concurrently if any of the threads modifies the queue. Instead, use the thread-safe PriorityBlockingQueue class.
+
+Implementation note: this implementation provides O(log(n)) time for the enqueing and dequeing methods (offer, poll, remove() and add); linear time for the remove(Object) and contains(Object) methods; and constant time for the retrieval methods (peek, element, and size).

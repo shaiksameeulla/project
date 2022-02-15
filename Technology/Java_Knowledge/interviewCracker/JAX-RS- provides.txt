@@ -1,0 +1,169 @@
+Providers:
+----------
+
+Providers are a simply a way of extending and customizing the JAX-RS runtime. You can think of them as plugins that (potentially) alter the behavior of the runtime, in order to accomplish a set of (program defined) goals.
+
+Providers are not the same as resources classes, they exist, conceptually, at a level in-between resources classes and the JAX-RS implementation. If it helps, you can think of them in the same light as device drivers (existing between user and kernel space). This is a broad generalization.
+
+There are three classes of providers defined by the current JAX-RS specification. The commonality between them is that all providers must be identified by the @Provider annotation and follow certain rules for constructor declaration. Apart from that, different provider types may have additional annotations, and will implement different interfaces.
+
+Entity Providers:
+-----------------
+
+These providers control the mapping of data representations (like XML, JSON, CSV) to their Java object equivalents.
+	Entity providers come in two flavors: MessageBodyReader and MessageBodyWriter described below. In the
+absence of a suitable entity provider, JAX-RS implementations are REQUIRED to use to the JavaBeans
+Activation Framework[11] to try to obtain a suitable data handler to perform the mapping instead.
+
+	MessageBodyReader:
+	=================
+	Contract for a provider that supports the conversion of a stream to a Java type. To add a MessageBodyReader implementation, annotate the implementation class with @Provider. A MessageBodyReader implementation may be annotated with Consumes to restrict the media types for which it will be considered suitable
+	
+				Example : If you have a use case where you getting come custom format other than xml/json ,you want to provide your own UnMarshaller you can use messagebody reader
+
+			@Provider
+			@Consumes("customformat")
+			public class CustomUnmarshaller implements MessageBodyReader {
+
+				@Override
+				public boolean isReadable(Class aClass, Type type, Annotation[] annotations, MediaType mediaType) {
+					return true;
+				}
+
+
+						@Override
+						public Object readFrom(Class aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap multivaluedMap, InputStream inputStream) throws IOException, WebApplicationException {
+							Object result = null;
+							try {
+								result = unmarshall(inputStream, aClass); // un marshall custom format to java object here
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+
+							return result;
+
+
+				}
+				}
+				In webservice you can use this like ..
+
+					@POST    
+					@Path("/CreateAccount")
+					@Consumes("custom format")
+					public Response createAccount(@Context HttpServletRequest req,Account acc) {
+
+						saveAccount(acc); // here acc object is returned from your custom unmarshaller 
+						return Response.ok().build();
+					}
+					
+					
+					MessageBodyWriter :
+					==================
+						Contract for a provider that supports the conversion of a Java type to a stream. To add a MessageBodyWriter implementation, annotate the implementation class with @Provider. A MessageBodyWriter implementation may be annotated with Produces to restrict the media types for which it will be considered suitable.
+Context Providers:
+-----------------
+
+These providers control the context that resources can access via @Context annotations.
+
+Application, UriInfo, Request, HttpHeaders, SecurityContext
+
+Exception Providers:
+-----------------
+
+These providers control the mapping of Java exceptions to a JAX-RS Response instance.
+
+Your runtime will come with a number of predefined providers that will be responsible for implementing a base level of functionality (e.g for mapping to and from XML, translating the most common exceptions etc etc). You can also create your own providers as needed.
+
+The JAX-RS specification is a good reference for reading up on these different provider types and what they do (see Chapter 4).
+Exception mapping providers map a checked or runtime exception to an instance of Response. An exception
+mapping provider implements the ExceptionMapper<T> interface and may be annotated with
+@Provider for automatic discovery. When a resource class or provider method throws an exception for
+which there is an exception mapping provider, the matching provider is used to obtain a Response instance.
+The resulting Response is processed as if the web resource method matching the request had returned the
+Response, see Section 3.3.3. Exception mapping providers are not supported as part of the Client API.
+When choosing an exception mapping provider to map an exception, an implementation MUST use the
+provider whose generic type is the nearest superclass of the exception.
+To avoid a potentially infinite loop, a single exception mapper should be used during the processing of a request
+and its corresponding response
+
+=========================================
+Filters and Interceptors
+---------------------------
+Entity interceptors wrap around a method invocation at a specific extension point. Filters execute code at
+		an extension point but without wrapping a method invocation. There are four extension points for filters:
+		ClientRequest, ClientResponse, ContainerRequest and ContainerResponse. There are two extension points
+		for entity interceptors: ReadFrom and WriteTo. For each of these extension points, there is a corresponding
+		interface:
+		1 public interface ClientRequestFilter {
+		2 void filter(ClientRequestContext requestContext) throws IOException;
+		3 }
+		4 public interface ClientResponseFilter {
+		5 void filter(ClientRequestContext requestContext,
+		6 ClientResponseContext responseContext) throws IOException;
+		7 }
+		8 public interface ContainerRequestFilter {
+		9 void filter(ContainerRequestContext requestContext) throws IOException;
+		10 }
+		11 public interface ContainerResponseFilter {
+		12 void filter(ContainerRequestContext requestContext,
+		13 ContainerResponseContext responseContext) throws IOException;
+		14 }
+		1 public interface ReaderInterceptor {
+		2 Object aroundReadFrom(ReaderInterceptorContext context)
+		3 throws java.io.IOException, javax.ws.rs.WebApplicationException;
+		4 }
+		5 public interface WriterInterceptor {
+		6 void aroundWriteTo(WriterInterceptorContext context)
+		7 throws java.io.IOException, javax.ws.rs.WebApplicationException;
+		8 }
+
+
+A client filter is a class that implements ClientRequestFilter or ClientResponseFilter or both. A
+	container filter is a class that implements ContainerRequestFilter or ContainerResponseFilter,
+	or both. An entity interceptor is a class that implements ReaderInterceptor or WriterInterceptor,
+	or both. Filters and entity interceptors are providers and, as such, may be annotated with @Provider for
+	automatic discovery.
+In the Client API, a ClientRequestFilter is executed as part of the invocation pipeline, before the
+	HTTP request is delivered to the network; a ClientResponseFilter is executed upon receiving a server
+	response, before control is returned to the application. In the Server API, a ContainerRequestFilter is
+	executed upon receiving a request from a client; a ContainerResponseFilter is executed as part of the
+	response pipeline, before the HTTP response is delivered to the network.
+A globally-bound (see Section 6.5.1) ContainerRequestFilter is a container filter executed before
+	resource matching unless it is annotated with @PostMatching. The use of this annotation on this type
+	of filters defines a new extension point for applications to use, namely PostContainerRequest. Certain
+	ContainerRequestContext methods may not be available at this extension point.
+An entity interceptor implementing ReaderInterceptor wraps around calls to MessageBodyReader’s
+	method readFrom. An entity interceptor implementing WriterInterceptor wraps around calls to
+	MessageBodyWriter’s method writeTo. JAX-RS implementations are REQUIRED to call registered
+	interceptors when mapping representations to Java types and vice versa. See Section 4.2 for more information
+	on entity providers.
+
+--------------
+
+ Dynamic Binding
+----------------
+The annotation-based forms of binding presented thus far are static. Dynamic binding is also supported by
+	using dynamic binders. A dynamic binder is a provider that implements the DynamicBinder interface.
+	Dynamic binder providers are used to augment the set of filters and entity interceptors bound to a resource
+	method.
+The following example defines a dynamic binder that binds the filter LoggingFilter —assumed not globally
+bound for the purpose of this example— with all the resource methods in MyResourceClass that are
+annotated with @GET.
+	1 @Provider
+	2 class DynamicLoggingFilterBinder implements DynamicBinder<LoggingFilter> {
+	3
+	4 @Override
+	5 public LoggingFilter getBoundProvider(ResourceInfo resourceInfo) {
+	6 if (MyResourceClass.class.isAssignableFrom(
+	7 resourceInfo.getResourceClass()) &&
+	8 resourceInfo.getResourceMethod().isAnnotationPresent(GET.class)) {
+	9 return new LoggingFilter();
+	10 }
+	11 return null;
+	12 }
+	13 }
+The method getBoundProvider can return either an instance or a class. The parameter T in the type
+DynamicBinder<T> determines the return type. Returning a class, such as LoggingFilter.class in
+the example above, delegates the responsibility of instantiation (and injection) to the JAX-RS implementation.
+JAX-RS implementations SHOULD resolve dynamic binders for filters and interceptors once for each
+resource method. It is RECOMMENDED to process dynamic binders at application deployment time

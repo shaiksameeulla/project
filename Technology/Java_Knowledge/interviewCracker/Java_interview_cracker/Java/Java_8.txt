@@ -1,0 +1,221 @@
+Java 8 was released on 18th March 2014, 
+so it’s high time to look into Java 8 Features.
+ In this tutorial, we will look into Java 8 features with examples.
+
+https://www.journaldev.com/2763/java-8-functional-interfaces
+
+https://dzone.com/articles/introduction-java-8-compact
+
+Java 8 features
+
+1. lambda expression
+2. functional interfaces
+3. default methods
+4. static methods
+5. predefined functional interfaces	
+	a. predicate : returns boolean : boolean test(T)
+	b.Function : takes intput and return something  R apply(T)
+	c. Consumer :  takes input   void accept(T)
+	d. Supplier : return output  R get()
+6. :: double colon operator : method reference /constructor reference
+7. Time API (joda time)
+8. Streams  : collection.stream(),  Stream.of()
+	filter : condition
+	map : one to one mapping
+	collect :
+	count
+	min(comparator)
+	max(comparator)
+	sorted
+	sorted(comparator)
+	foreach
+	toArray
+9 Collection API improvements
+10 Concurrency API improvements
+11 Java IO improvements
+12 Miscellaneous Core API improvements
+
+
+----
+Difference between Collections and Streams
+Collections are in-memory data structures which hold elements within it. Each element in the collection is computed before it actually becomes a part of that collection. On the other hand Streams are fixed data structures which computes the elements on-demand basis.
+
+The Java 8 Streams can be seen as lazily constructed Collections, where the values are computed when user demands for it. Actual Collections behave absolutely opposite to it and they are set of eagerly computed values (no matter if the user demands for a particular value or not).
+
+Java Collections offer efficient mechanisms to store and process the data by providing data structures like List, Set, and Map.
+However, the Stream API is useful for performing various operations on the data without the need for intermediate storage. Therefore, a Stream works similarly to directly accessing the data from the underlying storage like collections and I/O resources.
+
+Additionally, the collections are primarily concerned with providing access to the data and ways to modify it. On the other hand, streams are concerned with transmitting data efficiently.
+
+int sum = widgets.stream()
+                      .filter(b -> b.getColor() == RED)
+                      .mapToInt(b -> b.getWeight())
+                      .sum();
+---
+
+Lambda expression is a new feature which is introduced in Java 8. A lambda expression is an anonymous function. A function that doesn’t have a name and doesn’t belong to any class. The concept of lambda expression was first introduced in LISP programming language.
+
+Java Lambda Expression Syntax
+To create a lambda expression, we specify input parameters (if there are any) on the left side of the lambda operator ->, and place the expression or block of statements on the right side of lambda operator. For example, the lambda expression (x, y) -> x + y specifies that lambda expression takes two arguments x and y and returns the sum of these.
+
+//Syntax of lambda expression
+(parameter_list) -> {function_body}
+
+Where to use the Lambdas in Java
+To use lambda expression, you need to either create your own functional interface or use the pre defined functional interface provided by Java. An interface with only single abstract method is called functional interface(or Single Abstract method interface), for example: Runnable, callable, ActionListener etc.
+
+To use function interface:
+Pre Java 8: We create anonymous inner classes.
+Post Java 8: You can use lambda expression instead of anonymous inner classes.
+
+
+Inside anonymous inner class we can define variable that is called as instance variable  and this must be accessed by this keyword, to accesses enclosing class variable then we need to access as Outerclassname.this.instancevariable.
+However in case of lambda express, we can define varible inside lambda expression but we call this as local variable. If you want to access enclosing variables then you can use this keyword
+
+Method and Constructor References
+
+A method reference is used to refer to a method without invoking it; a constructor reference is similarly used to refer to a constructor without creating a new instance of the named class or array type.
+
+
+System::getProperty
+System.out::println
+"abc"::length
+ArrayList::new
+int[]::new
+
+
+
+String::new;
+Integer::new;
+ArrayList::new;
+UserDetail::new;
+
+
+
+1. What is a Boxed Stream?
+
+	n Java 8, if we want to convert a stream of objects to a collection then we can use one of the static methods in the Collectors class.
+
+//It works perfectly!!
+List<String> strings = Stream.of("how", "to", "do", "in", "java")
+                    .collect(Collectors.toList());
+		However, the same process doesn’t work on streams of primitives.
+		//Compilation Error !!
+IntStream.of(1,2,3,4,5)
+    .collect(Collectors.toList());
+	To convert a stream of primitives, we must first box the elements in their wrapper classes and then collect the wrapped objects in a collection. This type of stream is called boxed stream.
+IntStream (Example to convert int stream to List of Integers.) similarly LongStream,DoubleStream
+Let’s look at a few examples of boxed streams in Java.
+//Get the collection and later convert to stream to process elements
+List<Integer> ints = IntStream.of(1,2,3,4,5)
+                .boxed()
+                .collect(Collectors.toList());
+         
+System.out.println(ints);
+ 
+//Stream operations directly
+Optional<Integer> max = IntStream.of(1,2,3,4,5)
+                .boxed()
+                .max(Integer::compareTo);
+
+
+					
+
+1. Stream.distinct() to remove duplicates
+	The distinct() method returns a stream consisting of the distinct elements of given stream. The element equality is checked according to element’s equals() method.
+
+
+  // ArrayList with duplicate elements
+ArrayList<Integer> numbersList 
+    = new ArrayList<>(Arrays.asList(1, 1, 2, 3, 3, 3, 4, 5, 6, 6, 6, 7, 8));
+  
+List<Integer> listWithoutDuplicates = numbersList.stream()
+            .distinct()
+            .collect(Collectors.toList());
+  
+System.out.println(listWithoutDuplicates);
+
+2. Collectors.toSet() to remove duplicates
+  Another simple and very useful way is to store all the elements in a Set. Sets, by definition, store only distinct elements.
+
+	  
+	ArrayList<Integer> numbersList 
+    = new ArrayList<>(Arrays.asList(1, 1, 2, 3, 3, 3, 4, 5, 6, 6, 6, 7, 8));
+  
+Set<Integer> setWithoutDuplicates = numbersList.stream()
+            .collect(Collectors.toSet());
+  
+System.out.println(setWithoutDuplicates);
+
+3. Collectors.toMap() to count occurances
+	Sometimes, we are interested in finding out that which all elements are duplicates and how many times they appeared in the original list. We can use a Map to store this information.
+
+
+We can use predicate.negate() function to reverse a condition so that each condition may serve true and false – both scenarios.
+
+Map vs Flat map
+===============
+
+map() does only mapping, but flatMap() performs mapping as well as flattening. Flattening means transforming data from Stream<Stream<T>> to Stream<T>. This is the main difference between map() and flatMap().
+
+flatMap() operation takes Stream<Stream<T> as input and produces a result Stream of type R. It’s mapper function produces multiple values for each value of input stream and those multiple values are flattened into a result Stream<R>.
+
+The map() method wraps the underlying sequence in a Stream instance, whereas the flatMap() method allows avoiding nested Stream<Stream<R>> structure.
+List<String> myList = Stream.of("a", "b")
+  .map(String::toUpperCase)
+  .collect(Collectors.toList());
+assertEquals(asList("A", "B"), myList);
+map() works pretty well in such a simple case. But what if we have something more complex, such as a list of lists as an input?
+
+Let's see how it works:
+List<List<String>> list = Arrays.asList(
+  Arrays.asList("a"),
+  Arrays.asList("b"));
+System.out.println(list);
+This snippet prints a list of lists [[a], [b]].
+
+Now let's use a flatMap():
+
+System.out.println(list
+  .stream()
+  .flatMap(Collection::stream)
+  .collect(Collectors.toList()));
+The result of such a snippet will be flattened to [a, b].
+
+The flatMap() method first flattens the input Stream of Streams to a Stream of Strings (for more about flattening, see this article). Thereafter, it works similarly to the map() method
+
+How Stream.map() works in Java 8
+The Stream.map() function performs map functional operation i.e. it take a Stream and transform it to another Stream. It applies a function on each element of Stream and store return value into new Stream. This way you can transform a Stream of String into a Stream of Integer where Integer could be length of String if you supply the length() function. This is a very powerful function which is very helpful while dealing with collection in Java.
+
+Here is an example of Stream.map() in Java 8:
+
+List listOfIntegers = Stream.of("1", "2", "3", "4")
+               .map(Integer::valueOf)
+               .collect(Collectors.toList());
+
+In this example, we have a Stream of String values which represent numbers, by using map() function we have converted this Stream to Stream of Integers. How? by applying Integer.valueOf() on each element of Stream. That's how "1" converted to intger 1 and so on. Once transformation is done, we have collected the result into a List by converting Stream to List using Collectors.
+
+How Stream.flatMap() works in Java 8
+=====================
+The Stream.flatMap() function, as the name suggests, is the combination of a map and a flat operation. This means you first apply map function and then flattens the result. The key difference is the function used by map operation returns a Stream of values or a list of values rather than a single value, that's why we need flattening. When you flat a Stream of Stream, it gets converted into Stream of values.
+
+To understand what flattening a stream consists in, consider a structure like [ [1,2,3],[4,5,6],[7,8,9] ] which has "two levels". It's basically a big List containing three more List.  Flattening this means transforming it in a "one level" structure e.g. [ 1,2,3,4,5,6,7,8,9 ] i.e. just one list.
+
+In short,
+Before flattening - Stream of List of Integer
+After flattening - Stream of Integer
+
+Here is a code example to understand the flatMap() function better:
+
+List evens = Arrays.asList(2, 4, 6);
+List odds = Arrays.asList(3, 5, 7);
+List primes = Arrays.asList(2, 3, 5, 7, 11);
+       
+List numbers = Stream.of(evens, odds, primes)
+               .flatMap(list -> list.stream())
+               .collect(Collectors.toList());
+       
+System.out.println("flattend list: " + numbers);
+
+
+Read more: https://javarevisited.blogspot.com/2016/03/difference-between-map-and-flatmap-in-java8.html#ixzz74B9Sd6Bs
