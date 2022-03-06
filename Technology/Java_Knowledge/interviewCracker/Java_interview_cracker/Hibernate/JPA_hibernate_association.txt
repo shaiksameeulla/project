@@ -1,0 +1,164 @@
+JPA Hibernate Association:
+-------------------------
+
+Associations describe how two or more entities form a relationship based on a database joining semantics.
+
+
+
+
+@RowId 
+If you annotate a given entity with the @RowId annotation and the underlying database supports fetching a record by ROWID (e.g. Oracle), then Hibernate can use the ROWID pseudo-column for CRUD operations.
+
+@ManyToOne:
+=========
+@ManyToOne is the most common association, having a direct equivalent in the relational database as well (e.g. foreign key), and so it establishes a relationship between a child entity and a parent.
+
+****************************************************************************************************************
+*@JoinColumn should be in owner of relationship (in a one to many it's the many side that's regarded the owner).*
+*****************************************************************************************************************
+So I will modify this in car
+
+ @ManyToOne(fetch=FetchType.EAGER)
+ @JoinColumn(name = "car_owner_id",insertable=false, updatable=false)
+ private CarOwner carOwner;
+
+And this in CarOwner
+@OneToMany(fetch = FetchType.EAGER,mappedBy = "carOwner")
+ private List<Car> cars;
+ 
+ otherway
+ 
+ 
+ @ManyToOne
+	@JoinColumn(name = "person_id",
+			foreignKey = @ForeignKey(name = "PERSON_ID_FK")
+	)
+	private Person person;
+PERSON_ID_FK : constraint
+
+Each entity has a lifecycle of its own. Once the @ManyToOne association is set, Hibernate will set the associated database foreign key column.
+
+@OneToMany:
+========
+
+The @OneToMany association links a parent entity with one or more child entities. 
+-->If the @OneToMany doesn’t have a mirroring @ManyToOne association on the child side, the @OneToMany association is unidirectional. 
+-->If there is a @ManyToOne association on the child side, the @OneToMany association is bidirectional and the application developer can navigate this relationship from both ends.
+
+-->Unidirectional @OneToMany
+	When using a unidirectional @OneToMany association, Hibernate resorts to using a link table between the two joining entities.
+	
+*******************************************************************************************************************************
+*When using a unidirectional @OneToMany association, Hibernate resorts to using a link table between the two joining entities.*
+*******************************************************************************************************************************
+	
+Bidirectional @OneToMany
+The bidirectional @OneToMany association also requires a @ManyToOne association on the child side. Although the Domain Model exposes two sides to navigate this association, behind the scenes, the relational database has only one foreign key for this relationship.
+
+Every bidirectional association must have one owning side only (the child side), the other one being referred to as the inverse (or the mappedBy) side.
+
+Example 176. @OneToMany association mappedBy the @ManyToOne side
+
+@OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Phone> phones = new ArrayList<>();
+	
+	@ManyToOne
+	private Person person;
+	
+	If you dont sepeciy join column at @manyToOne relationship, then Hibernate assume FK id is <Othertable_name>_<otherTable_PK_ID>
+	
+
+
+@OneToMany(mappedBy = "department",cascade = CascadeType.ALL, orphanRemoval = true)
+private Set<Employee> employees= new HashSet<>();
+
+@ManyToOne
+	@JoinColumn(name="emp_dep_id", nullable=false, updatable=false)
+	private Department department; 
+	
+Unidirectional One-to-Many Association
+----------------------------------
+
+@OneToMany
+    private List<OrderItem> items = new ArrayList<OrderItem>();
+ 
+ But this is most likely not the mapping you’re looking for because Hibernate uses an association table to map the relationship.
+
+ If you want to avoid that, you need to use a @JoinColumn annotation to specify the foreign key column.
+ 
+ 
+ The mapping definition consists of 2 parts:
+
+the to-many side of the association which owns the relationship mapping and
+the to-one side which just references the mapping
+
+inverse-true-in-jpa-annotations
+----------------------------
+
+The attribute mappedBy indicates that the entity in this side is the inverse of the relationship, and the owner resides in the other entity. Other entity will be having @JoinColumn annotaion and @ManyToOne relationship. Hence I think inverse = true is same as @ManyToOne annotation.
+
+Also inverse=”true” mean this is the relationship owner to handle the relationship.
+
+
+One-to-one:
+===========
+
+ PhoneDetails owns the association, and, like any bidirectional association, the parent-side can propagate its lifecycle to the child-side through cascading.
+
+
+The definition of the owning side of the mapping is identical to the unidirectional mapping. It consists of an attribute that models the relationship and is annotated with a @OneToOne annotation and an optional @JoinColumn annotation.
+
+ForeignKey side has following configurations.
+
+
+@Entity(name = "PhoneDetails")
+public static class PhoneDetails
+{
+@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "phone_id")
+	private Phone phone;
+}
+
+
+The referencing side of the association just links to the attribute that owns the relationship. Hibernate gets all information from the referenced mapping, and you don’t need to provide any additional information. You can define that with the mappedBy attribute of the @OneToOne annotation. The following code snippet shows an example of such a mapping.
+
+@Entity(name = "Phone")
+public static class Phone {
+
+	@Id
+	@GeneratedValue
+	private Long id;
+
+	@Column(name = "`number`")
+	private String number;
+
+	@OneToOne(
+		mappedBy = "phone",
+		cascade = CascadeType.ALL,
+		orphanRemoval = true,
+		fetch = FetchType.LAZY
+	)
+	private PhoneDetails details;
+	}
+
+
+how-does-jpa-orphanremoval-true-differ-from-the-on-delete-cascade-dml-clause
+==================================================
+
+
+orphanRemoval has nothing to do with ON DELETE CASCADE.
+
+orphanRemoval is an entirely ORM-specific thing. It marks "child" entity to be removed when it's no longer referenced from the "parent" entity, e.g. when you remove the child entity from the corresponding collection of the parent entity.
+
+ON DELETE CASCADE is a database-specific thing, it deletes the "child" row in the database when the "parent" row is deleted.
+
+
+When an Employee entity object is removed, the remove operation is cascaded to the referenced Address entity object. In this regard, orphanRemoval=true and cascade=CascadeType.REMOVE are identical, and if orphanRemoval=true is specified, CascadeType.REMOVE is redundant.
+
+The difference between the two settings is in the response to disconnecting a relationship. For example, such as when setting the address field to null or to another Address object.
+
+If orphanRemoval=true is specified the disconnected Address instance is automatically removed. This is useful for cleaning up dependent objects (e.g. Address) that should not exist without a reference from an owner object (e.g. Employee).
+
+If only cascade=CascadeType.REMOVE is specified, no automatic action is taken since disconnecting a relationship is not a remove operation.
+
+To avoid dangling references as a result of orphan removal, this feature should only be enabled for fields that hold private non shared dependent objects.
