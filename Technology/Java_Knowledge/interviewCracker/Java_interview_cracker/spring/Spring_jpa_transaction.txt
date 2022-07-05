@@ -1,0 +1,743 @@
+SPring-JPA Tranaction:
+In this post we will do a deep dive into Spring transaction management. We will go over on how does @Transactional really work under the hood. Other upcoming posts will include:
+
+how to use features like propagation and isolation
+what are the main pitfalls and how to avoid them
+JPA and Transaction Management
+It's important to notice that JPA on itself does not provide any type of declarative transaction management. When using JPA outside of a dependency injection container, transactions need to be handled programatically by the developer:
+
+UserTransaction utx = entityManager.getTransaction(); 
+
+try { 
+    utx.begin(); 
+    businessLogic();
+    utx.commit(); 
+} catch(Exception ex) { 
+    utx.rollback(); 
+    throw ex; 
+} 
+This way of managing transactions makes the scope of the transaction very clear in the code, but it has several disavantages:
+
+it's repetitive and error prone
+any error can have a very high impact
+errors are hard to debug and reproduce
+this decreases the readability of the code base
+What if this method calls another transactional method?
+Using Spring @Transactional
+With Spring @Transactional, the above code gets reduced to simply this:
+
+@Transactional
+public void businessLogic() {
+... use entity manager inside a transaction ...
+}
+This is much more convenient and readable, and is currently the recommended way to handle transactions in Spring.
+
+By using @Transactional, many important aspects such as transaction propagation are handled automatically. In this case if another transactional method is called by businessLogic(), that method will have the option of joining the ongoing transaction.
+
+One potential downside is that this powerful mechanism hides what is going on under the hood, making it hard to debug when things don't work.
+
+What does @Transactional mean?
+One of the key points about @Transactional is that there are two separate concepts to consider, each with it's own scope and life cycle:
+
+the persistence context
+the database transaction
+The transactional annotation itself defines the scope of a single database transaction. The database transaction happens inside the scope of apersistence context.
+
+The persistence context is in JPA the EntityManager, implemented internally using an Hibernate Session (when using Hibernate as the persistence provider).
+
+The persistence context is just a synchronizer object that tracks the state of a limited set of Java objects and makes sure that changes on those objects are eventually persisted back into the database.
+
+This is a very different notion than the one of a database transaction. One Entity Manager can be used across several database transactions, and it actually often is.
+
+When does an EntityManager span multiple database transactions?
+The most frequent case is when the application is using the Open Session In View pattern to deal with lazy initialization exceptions, see this previous blog post for it's pros and cons.
+
+In such case the queries that run in the view layer are in separate database transactions than the one used for the business logic, but they are made via the same entity manager.
+
+Another case is when the persistence context is marked by the developer as PersistenceContextType.EXTENDED, which means that it can survive multiple requests.
+
+What defines the EntityManager vs Transaction relation?
+This is actually a choice of the application developer, but the most frequent way to use the JPA Entity Manager is with the 
+"Entity Manager per application transaction" pattern. This is the most common way to inject an entity manager:
+
+@PersistenceContext
+private EntityManager em;
+Here we are by default in "Entity Manager per transaction" mode. In this mode, if we use this Entity Manager inside a @Transactional method, then the method will run in a single database transaction.
+
+How does @PersistenceContext work?
+One question that comes to mind is, how can @PersistenceContext inject an entity manager only once at container startup time, given that entity managers are so short lived, and that there are usually multiple per request.
+
+The answer is that it can't: EntityManager is an interface, and what gets injected in the spring bean is not the entity manager itself but a context aware proxy that will delegate to a concrete entity manager at runtime.
+
+Usually the concrete class used for the proxy is 
+SharedEntityManagerInvocationHandler, this can be confirmed with the help a debugger.
+
+How does @Transactional work then?
+The persistence context proxy that implements EntityManager is not the only component needed for making declarative transaction management work. Actually three separate components are needed:
+
+The EntityManager Proxy itself
+The Transactional Aspect
+The Transaction Manager
+Let's go over each one and see how they interact.
+
+The Transactional Aspect
+The Transactional Aspect is an 'around' aspect that gets called both before and after the annotated business method. The concrete class for implementing the aspect is TransactionInterceptor.
+
+The Transactional Aspect has two main responsibilities:
+
+At the 'before' moment, the aspect provides a hook point for determining if the business method about to be called should run in the scope of an ongoing database transaction, or if a new separate transaction should be started.
+At the 'after' moment, the aspect needs to decide if the transaction should be committed, rolled back or left running.
+At the 'before' moment the Transactional Aspect itself does not contain any decision logic, the decision to start a new transaction if needed is delegated to the Transaction Manager.
+
+The Transaction Manager
+The transaction manager needs to provide an answer to two questions:
+
+should a new Entity Manager be created?
+should a new database transaction be started?
+This needs to be decided at the moment the Transactional Aspect 'before' logic is called. The transaction manager will decide based on:
+
+the fact that one transaction is already ongoing or not
+the propagation attribute of the transactional method (for example REQUIRES_NEW always starts a new transaction)
+If the transaction manager decides to create a new transaction, then it will:
+
+create a new entity manager
+bind the entity manager to the current thread
+grab a connection from the DB connection pool
+bind the connection to the current thread
+The entity manager and the connection are both bound to the current thread using ThreadLocal variables.
+
+They are stored in the thread while the transaction is running, and it's up to the Transaction Manager to clean them up when no longer needed.
+
+Any parts of the program that need the current entity manager or connection can retrieve them from the thread. One program component that does exactly that is the EntityManager proxy.
+
+The EntityManager proxy
+The EntityManager proxy (that we have introduced before) is the last piece of the puzzle. When the business method calls for example 
+entityManager.persist(), this call is not invoking the entity manager directly.
+
+Instead the business method calls the proxy, which retrieves the current entity manager from the thread, where the Transaction Manager put it.
+
+Knowing now what are the moving parts of the @Transactionalmechanism, let's go over the usual Spring configuration needed to make this work.
+
+Putting It All Together
+Let's go over how to setup the three components needed to make the transactional annotation work correctly. We start by defining the entity manager factory.
+
+This will allow the injection of Entity Manager proxies via the persistence context annotation:
+
+@Configuration
+public class EntityManagerFactoriesConfiguration {
+    @Autowired
+    private DataSource dataSource;
+
+    @Bean(name = "entityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean emf() {
+        LocalContainerEntityManagerFactoryBean emf = ...
+        emf.setDataSource(dataSource);
+        emf.setPackagesToScan(new String[] {"your.package"});
+        emf.setJpaVendorAdapter(
+        new HibernateJpaVendorAdapter());
+        return emf;
+   }
+}
+The next step is to configure the Transaction Manager and to apply the Transactional Aspect in @Transactional annotated classes:
+
+@Configuration
+@EnableTransactionManagement
+public class TransactionManagersConfig {
+    @Autowired
+    EntityManagerFactory emf;
+    @Autowired
+    private DataSource dataSource;
+
+    @Bean(name = "transactionManager")
+    public PlatformTransactionManager transactionManager() {
+        JpaTransactionManager tm = new JpaTransactionManager();
+        tm.setEntityManagerFactory(emf);
+        tm.setDataSource(dataSource);
+        return tm;
+    }
+}
+The annotation @EnableTransactionManagement tells Spring that classes with the @Transactional annotation should be wrapped with the Transactional Aspect. With this the @Transactional is now ready to be used.
+
+Conclusion
+The Spring declarative transaction management mechanism is very powerful, but it can be misused or wrongly configured easily.
+
+Understanding how it works internally is helpful when troubleshooting situations when the mechanism is not at all working or is working in an unexpected way.
+
+The most important thing to bear in mind is that there are really two concepts to take into account: the database transaction and the persistence context, each with it's own not readily apparent life cycle.
+
+===================******************************************################################
+===================******************************************################################
+===================******************************************################################
+===================******************************************################################
+
+
+
+In this guide you are going to learn about the main pillars of Spring core’s transaction abstraction framework (a confusing term, isn’t it?) - described with a lot of code examples:
+
+@Transactional (Declarative Transaction Management) vs Programmatic Transaction Management.
+
+Physical vs Logical transactions.
+
+Spring @Transactional and JPA / Hibernate integration.
+
+Spring @Transactional and Spring Boot or Spring MVC integration.
+
+Rollbacks, Proxies, Common Pitfalls and much more.
+
+As opposed to, say, the official Spring documentation, this guide won’t confuse you by diving right into the topic Spring-first.
+
+Instead you are going to learn Spring transaction management the unconventional way: From the ground up, step by step. This means, starting with plain old JDBC transaction management.
+
+Why?
+
+Because everything that Spring does is based on these very JDBC basics. And you’ll save a ton of time with Spring’s @Transactional annotation later, if you grasp these basics.
+
+How plain JDBC Transaction Management works
+If you are thinking of skipping this section, without knowing JDBC transactions inside-out: don’t.
+
+How to start, commit or rollback JDBC transactions
+The first important take-away is this: It does not matter if you are using Spring’s @Transactional annotation, plain Hibernate, jOOQ or any other database library.
+
+In the end, they all do the very same thing to open and close (let’s call that 'manage') database transactions. Plain JDBC transaction management code looks like this:
+
+import java.sql.Connection;
+
+Connection connection = dataSource.getConnection(); // (1)
+
+try (connection) {
+    connection.setAutoCommit(false); // (2)
+    // execute some SQL statements...
+    connection.commit(); // (3)
+
+} catch (SQLException e) {
+    connection.rollback(); // (4)
+}
+You need a connection to the database to start transactions. DriverManager.getConnection(url, user, password) would work as well, though in most enterprise-y applications you will have a data source configured and get connections from that.
+
+This is the only way to 'start' a database transaction in Java, even though the name might sound a bit off. setAutoCommit(true) makes sure that every single SQL statement automatically gets wrapped in its own transaction and setAutoCommit(false) is the opposite: You are the master of the transaction(s) and you’ll need to start calling commit and friends. Do note, the autoCommit flag is valid for the whole time your connection is open, which means you only need to call the method once, not repeatedly.
+
+Let’s commit our transaction…​
+
+Or, rollback our changes, if there was an exception.
+
+Yes, these 4 lines are (oversimplified) everything that Spring does whenever you are using the @Transactional annotation. In the next chapter you’ll find out how that works. But before we go there, there’s a tiny bit more you need to learn.
+
+(A quick note for smarty-pants: Connection pool libraries like HikariCP might toggle the autocommit mode automatically for you, depending on the configuration. But that is an advanced topic.)
+
+How to use JDBC isolation levels and savepoints
+If you already played with Spring’s @Transactional annotation you might have encountered something like this:
+
+@Transactional(propagation=TransactionDefinition.NESTED,
+               isolation=TransactionDefinition.ISOLATION_READ_UNCOMMITTED)
+We will cover nested Spring transactions and isolation levels later in more detail, but again it helps to know that these parameters all boil down to the following, basic JDBC code:
+
+import java.sql.Connection;
+
+// isolation=TransactionDefinition.ISOLATION_READ_UNCOMMITTED
+
+connection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED); // (1)
+
+// propagation=TransactionDefinition.NESTED
+
+Savepoint savePoint = connection.setSavepoint(); // (2)
+...
+connection.rollback(savePoint);
+This is how Spring sets isolation levels on a database connection. Not exactly rocket science, is it?
+
+ISOLATION_READ_UNCOMMITTED: Allows dirty reads.
+ISOLATION_READ_COMMITTED: Does not allow dirty reads.
+ISOLATION_REPEATABLE_READ: If a row is read twice in the same transaction, the result will always be the same.
+ ISOLATION_SERIALIZABLE: Performs all transactions in a sequence.
+The different levels have different performance characteristics in a multi-threaded application. I think if you understand the dirty reads concept you will be able to select a good option
+
+
+Nested transactions in Spring are just JDBC / database savepoints. If you don’t know what a savepoint is, have a look at this tutorial, for example. Note that savepoint support is dependent on your JDBC driver/database.
+
+How Spring’s or Spring Boot’s Transaction Management works
+As you now have a good JDBC transaction understanding, let’s have a look at how plain, core Spring manages transactions. Everything here applies 1:1 to Spring Boot and Spring MVC, but more about that a bit later..
+
+What actually is Spring’s transaction management or its (rather confusingly named) transaction abstraction framework?
+
+Remember, transaction management simply means: How does Spring start, commit or rollback JDBC transactions? Does this sound in any way familiar from above?
+
+Here’s the catch: Whereas with plain JDBC you only have one way (setAutocommit(false)) to manage transactions, Spring offers you many different, more convenient ways to achieve the same.
+
+How to use Spring’s Programmatic Transaction Management?
+The first, but rather sparingly used way to define transactions in Spring is programmatically: Either through a TransactionTemplate or directly through the PlatformTransactionManager. Code-wise, it looks like this:
+
+@Service
+public class UserService {
+
+    @Autowired
+    private TransactionTemplate template;
+
+    public Long registerUser(User user) {
+        Long id = template.execute(status ->  {
+            // execute some SQL that e.g.
+            // inserts the user into the db and returns the autogenerated id
+            return id;
+        });
+    }
+}
+Compared with the plain JDBC example:
+
+You do not have to mess with opening or closing database connections yourself (try-finally). Instead you use Transaction Callbacks.
+
+You also do not have to catch SQLExceptions, as Spring converts these exceptions to runtime exceptions for you.
+
+And you have better integration into the Spring ecosystem. TransactionTemplate will use a TransactionManager internally, which will use a data source. All are beans that you have to specify in your Spring context configuration, but then don’t have to worry about anymore later on.
+
+While this counts as a minor improvement, programmatic transaction management is not what Spring’s transaction framework mainly is about. Instead, it’s all about declarative transaction management. Let’s find out what that is.
+
+How to use Spring’s XML Declarative Transaction Management?
+Back in the day, when XML configuration was the norm for Spring projects, you could configure transactions directly in XML. Apart from a couple of legacy, enterprise projects, you won’t find this approach anymore in the wild, as it has been superseded with the much simpler @Transactional annotation.
+
+We will not go into detail on XML configuration in this guide, but you can use this example as a starting point to dive deeper into it - if needed (taken straight from the official Spring documentation):
+
+<!-- the transactional advice (what 'happens'; see the <aop:advisor/> bean below) -->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <!-- the transactional semantics... -->
+        <tx:attributes>
+            <!-- all methods starting with 'get' are read-only -->
+            <tx:method name="get*" read-only="true"/>
+            <!-- other methods use the default transaction settings (see below) -->
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+You are specifying an AOP advice (Aspect Oriented Programming) with the above XML block, that you can then apply to your UserService bean like so:
+
+<aop:config>
+    <aop:pointcut id="userServiceOperation" expression="execution(* x.y.service.UserService.*(..))"/>
+    <aop:advisor advice-ref="txAdvice" pointcut-ref="userServiceOperation"/>
+</aop:config>
+
+<bean id="userService" class="x.y.service.UserService"/>
+Your UserService bean would then look like this:
+
+public class UserService {
+
+    public Long registerUser(User user) {
+        // execute some SQL that e.g.
+        // inserts the user into the db and retrieves the autogenerated id
+        return id;
+    }
+}
+From a Java code perspective, this declarative transaction approach looks a lot simpler than the programmatic approach. But it leads to a lot of complicated, verbose XML, with the pointcut and advisor configurations.
+
+So, this leads to the question: Is there a better way for declarative transaction management instead of XML? Yes, there is: The @Transactional annotation.
+
+How to use Spring’s @Transactional annotation ( Declarative Transaction Management )
+Now let’s have a look at what modern Spring transaction management usually looks like:
+
+public class UserService {
+
+    @Transactional
+    public Long registerUser(User user) {
+       // execute some SQL that e.g.
+        // inserts the user into the db and retrieves the autogenerated id
+        // userDao.save(user);
+        return id;
+    }
+}
+How is this possible? There is no more XML configuration and there’s also no other code needed. Instead, you now need to do two things:
+
+Make sure that your Spring Configuration is annotated with the @EnableTransactionManagement annotation (In Spring Boot this will be done automatically for you).
+
+Make sure you specify a transaction manager in your Spring Configuration (this you need to do anyway).
+
+And then Spring is smart enough to transparently handle transactions for you: Any bean’s public method you annotate with the @Transactional annotation, will execute inside a database transaction (note: there are some pitfalls).
+
+So, to get the @Transactional annotation working, all you need to do is this:
+
+@Configuration
+@EnableTransactionManagement
+public class MySpringConfig {
+
+    @Bean
+    public PlatformTransactionManager txManager() {
+        return yourTxManager; // more on that later
+    }
+
+}
+Now, when I say Spring transparently handles transactions for you. What does that really mean?
+
+Armed with the knowledge from the JDBC transaction example, the @Transactional UserService code above translates (simplified) directly to this:
+
+public class UserService {
+
+    public Long registerUser(User user) {
+        Connection connection = dataSource.getConnection(); // (1)
+        try (connection) {
+            connection.setAutoCommit(false); // (1)
+
+            // execute some SQL that e.g.
+            // inserts the user into the db and retrieves the autogenerated id
+            // userDao.save(user); <(2)
+
+            connection.commit(); // (1)
+        } catch (SQLException e) {
+            connection.rollback(); // (1)
+        }
+    }
+}
+This is all just standard opening and closing of a JDBC connection. That’s what Spring’s transactional annotation does for you automatically, without you having to write it explicitly.
+
+This is your own code, saving the user through a DAO or something similar.
+
+This example might look a bit magical, but let’s have a look at how Spring inserts this connection code for you.
+
+CGlib & JDK Proxies - @Transactional under the covers
+Spring cannot really rewrite your Java class, like I did above, to insert the connection code (unless you are using advanced techniques like bytecode weaving, but we are ignoring that for now).
+
+Your registerUser() method really just calls userDao.save(user), there’s no way to change that on the fly.
+
+But Spring has an advantage. At its core, it is an IoC container. It instantiates a UserService for you and makes sure to autowire that UserService into any other bean that needs a UserService.
+
+Now whenever you are using @Transactional on a bean, Spring uses a tiny trick. It does not just instantiate a UserService, but also a transactional proxy of that UserService.
+
+It does that through a method called proxy-through-subclassing with the help of the Cglib library. There are also other ways to construct proxies (like Dynamic JDK proxies), but let’s leave it at that for the moment.
+
+Let’s see proxies in action in this picture:
+
+document1
+As you can see from that diagram, the proxy has one job.
+
+Opening and closing database connections/transactions.
+
+And then delegating to the real UserService, the one you wrote.
+
+And other beans, like your UserRestController will never know that they are talking to a proxy, and not the real thing.
+
+Quick Exam
+
+Have a look at the following source code and tell me what type of UserService Spring automatically constructs, assuming it is marked with @Transactional or has a @Transactional method.
+
+@Configuration
+@EnableTransactionManagement
+public static class MyAppConfig {
+
+    @Bean
+    public UserService userService() {  // (1)
+        return new UserService();
+    }
+}
+Correct. Spring constructs a dynamic CGLib proxy of your UserService class here that can open and close database transactions for you. You or any other beans won’t even notice that it is not your UserService, but a proxy wrapping your UserService.
+
+ Spring Transactions Guide
+
+If you want to easily get a deep, practical understanding of real-world Spring TX management, including testing, best practices & avoiding common pitfalls: I'm currently writing a short guide for you.
+
+Interested in trying out the first chapter for free, as soon as it is available?
+
+Your email address
+Absolutely no spam, ever. Unsubscribe anytime. Yeah!
+For what do you need a Transaction Manager (like PlatformTransactionManager)?
+Now there’s only one crucial piece of information missing, even though we have mentioned it a couple of times already.
+
+Your UserService gets proxied on the fly, and the proxy manages transactions for you. But it is not the proxy itself handling all this transactional state (open, commit, close), the proxy delegates that work to a transaction manager.
+
+Spring offers you a PlatformTransactionManager / TransactionManager interface, which, by default, comes with a couple of handy implementations. One of them is the datasource transaction manager.
+
+It does exactly what you did so far to manage transactions, but first, let’s look at the needed Spring configuration:
+
+@Bean
+public DataSource dataSource() {
+    return new MysqlDataSource(); // (1)
+}
+
+@Bean
+public PlatformTransactionManager txManager() {
+    return new DataSourceTransactionManager(dataSource()); // (2)
+}
+You create a database-specific or connection-pool specific datasource here. MySQL is being used for this example.
+
+Here, you create your transaction manager, which needs a data source to be able to manage transactions.
+
+Simple as. All transaction managers then have methods like "doBegin" (for starting a transaction) or "doCommit", which look like this - taken straight from Spring’s source code and simplified a bit:
+
+public class DataSourceTransactionManager implements PlatformTransactionManager {
+
+    @Override
+    protected void doBegin(Object transaction, TransactionDefinition definition) {
+        Connection newCon = obtainDataSource().getConnection();
+        // ...
+        con.setAutoCommit(false);
+        // yes, that's it!
+    }
+
+    @Override
+    protected void doCommit(DefaultTransactionStatus status) {
+        // ...
+        Connection connection = status.getTransaction().getConnectionHolder().getConnection();
+        try {
+            con.commit();
+        } catch (SQLException ex) {
+            throw new TransactionSystemException("Could not commit JDBC transaction", ex);
+        }
+    }
+}
+So, the datasource transaction manager uses exactly the same code that you saw in the JDBC section, when managing transactions.
+
+With this in mind, let’s extend our picture from above:
+
+document2
+To sum things up:
+
+If Spring detects the @Transactional annotation on a bean, it creates a dynamic proxy of that bean.
+
+The proxy has access to a transaction manager and will ask it to open and close transactions / connections.
+
+The transaction manager itself will simply do what you did in the plain Java section: Manage a good, old JDBC connection.
+
+What is the difference between physical and logical transactions?
+Imagine the following two transactional classes.
+
+@Service
+public class UserService {
+
+    @Autowired
+    private InvoiceService invoiceService;
+
+    @Transactional
+    public void invoice() {
+        invoiceService.createPdf();
+        // send invoice as email, etc.
+    }
+}
+
+@Service
+public class InvoiceService {
+
+    @Transactional
+    public void createPdf() {
+        // ...
+    }
+}
+UserService has a transactional invoice() method. Which calls another transactional method, createPdf() on the InvoiceService.
+
+Now in terms of database transactions, this should really just be one database transaction. (Remember: getConnection(). setAutocommit(false). commit().) Spring calls this physical transaction, even though this might sound a bit confusing at first.
+
+From Spring’s side however, there’s two logical transactions happening: First in UserService, the other one in InvoiceService. Spring has to be smart enough to know that both @Transactional methods, should use the same underlying, physical database transaction.
+
+How would things be different, with the following change to InvoiceService?
+
+@Service
+public class InvoiceService {
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createPdf() {
+        // ...
+    }
+}
+Changing the propagation mode to requires_new is telling Spring that createPDF() needs to execute in its own transaction, independent of any other, already existing transaction. Thinking back to the plain Java section of this guide, did you see a way to "split" a transaction in half? Neither did I.
+
+Which basically means your code will open two (physical) connections/transactions to the database. (Again: getConnection() x2. setAutocommit(false) x2. commit() x2) Spring now has to be smart enough that the two logical transactional pieces (invoice()/createPdf()) now also map to two different, physical database transactions.
+
+So, to sum things up:
+
+Physical Transactions: Are your actual JDBC transactions.
+
+Logical Transactions: Are the (potentially nested) @Transactional-annotated (Spring) methods.
+
+This leads us to covering propagation modes in more detail.
+
+What are @Transactional Propagation Levels used for?
+When looking at the Spring source code, you’ll find a variety of propagation levels or modes that you can plug into the @Transactional method.
+
+  @Transactional(propagation = Propagation.REQUIRED)
+
+  // or
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  // etc
+The full list:
+
+REQUIRED
+
+SUPPORTS
+
+MANDATORY
+
+REQUIRES_NEW
+
+NOT_SUPPORTED
+
+NEVER
+
+NESTED
+
+Exercise:
+
+In the plain Java section, I showed you everything that JDBC can do when it comes to transactions. Take a minute to think about what every single Spring propagation mode at the end REALLY does to your datasource or rather, your JDBC connection.
+
+Then have a look at the following answers.
+
+Answers:
+
+Required (default): My method needs a transaction, either open one for me or use an existing one → getConnection(). setAutocommit(false). commit().
+
+Supports: I don’t really care if a transaction is open or not, i can work either way → nothing to do with JDBC
+
+Mandatory: I’m not going to open up a transaction myself, but I’m going to cry if no one else opened one up → nothing to do with JDBC
+
+Require_new: I want my completely own transaction → getConnection(). setAutocommit(false). commit().
+
+Not_Supported: I really don’t like transactions, I will even try and suspend a current, running transaction → nothing to do with JDBC
+
+Never: I’m going to cry if someone else started up a transaction → nothing to do with JDBC
+
+Nested: It sounds so complicated, but we are just talking savepoints! → connection.setSavepoint()
+
+As you can see, most propagation modes really have nothing to do with the database or JDBC, but more with how you structure your program with Spring and how/when/where Spring expects transactions to be there.
+
+Look at this example:
+
+public class UserService {
+
+     @Transactional(propagation = Propagation.MANDATORY)
+     public void myMethod() {
+        // execute some sql
+     }
+
+}
+In this case, Spring will expect a transaction to be open, whenever you call myMethod() of the UserService class. It does not open one itself, instead, if you call that method without a pre-existing transaction, Spring will throw an exception. Keep this in mind as additional points for "logical transaction handling".
+
+What are @Transactional Isolation Levels used for?
+This is almost a trick question at this point, but what happens when you configure the @Transactional annotation like so?
+
+@Transactional(isolation = Isolation.REPEATABLE_READ)
+Yes, it does simply lead to this:
+
+connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+Database isolation levels are, however, a complex topic, and you should take some time to fully grasp them. A good start is the official Postgres Documentation and their section on isolation levels.
+
+Also note, that when it comes to switching isolation levels during a transaction, you must make sure to consult with your JDBC driver/database to understand which scenarios are supported and which not.
+
+The most common @Transactional pitfall
+There is one pitfall that Spring beginners usually run into. Have a look at the following code:
+
+@Service
+public class UserService {
+
+    @Transactional
+    public void invoice() {
+        createPdf();
+        // send invoice as email, etc.
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createPdf() {
+        // ...
+    }
+}
+You have a UserService class with a transactional invoice method. Which calls createPDF(), which is also transactional.
+
+How many physical transactions would you expect to be open, once someone calls invoice()?
+
+Nope, the answer is not two, but one. Why?
+
+Let’s go back to the proxies' section of this guide. Spring creates that transactional UserService proxy for you, but once you are inside the UserService class and call other inner methods, there is no more proxy involved. This means, no new transaction for you.
+
+Let’s have a look at it with a picture:
+
+document3
+There’s some tricks (like self-injection), which you can use to get around this limitation. But the main takeaway is: always keep the proxy transaction boundaries in mind.
+
+ Spring Transactions Guide
+
+If you want to easily get a deep, practical understanding of real-world Spring TX management, including testing, best practices & avoiding common pitfalls: I'm currently writing a short guide for you.
+
+Interested in trying out the first chapter for free, as soon as it is available?
+
+Your email address
+Absolutely no spam, ever. Unsubscribe anytime. Yeah!
+How to use @Transactional with Spring Boot or Spring MVC
+So far, we have only talked about plain, core Spring. But what about Spring Boot? Or Spring Web MVC? Do they handle transactions any differently?
+
+The short answer is: No.
+
+With either frameworks (or rather: all frameworks in the Spring ecosystem), you will always use the @Transactional annotation, combined with a transaction manager and the @EnableTransactionManagement annotation. There is no other way.
+
+The only difference with Spring Boot is, however, that it automatically sets the @EnableTransactionManagement annotation and creates a PlatformTransactionManager for you - with its JDBC auto-configurations. Learn more about auto-configurations here.
+
+How Spring handles rollbacks (and default rollback policies)
+The section on Spring rollbacks will be handled in the next revision of this guide.
+
+How Spring and JPA / Hibernate Transaction Management works
+The goal: Syncing Spring’s @Transactional and Hibernate / JPA
+At some point, you will want your Spring application to integrate with another database library, such as Hibernate (a popular JPA-implementation) or Jooq etc.
+
+Let’s take plain Hibernate as an example (note: it does not matter if you are using Hibernate directly,or Hibernate via JPA).
+
+Rewriting the UserService from before to Hibernate would look like this:
+
+public class UserService {
+
+    @Autowired
+    private SessionFactory sessionFactory; // (1)
+
+    public void registerUser(User user) {
+
+        Session session = sessionFactory.openSession(); // (2)
+
+        // lets open up a transaction. remember setAutocommit(false)!
+        session.beginTransaction();
+
+        // save == insert our objects
+        session.save(user);
+
+        // and commit it
+        session.getTransaction().commit();
+
+        // close the session == our jdbc connection
+        session.close();
+    }
+}
+This is a plain, old Hibernate SessionFactory, the entry-point for all Hibernate queries.
+
+Manually managing sessions (read: database connections) and transactions with Hibernate’s API.
+
+There is one huge problem with the above code, however:
+
+Hibernate would not know about Spring’s @Transactional annotation.
+
+Spring’s @Transactional would not know anything about Hibernate’s transaction.
+
+But we’d actually love for Spring and Hibernate to integrate seamlessly, meaning that they know about each others' transactions.
+
+In plain code:
+
+@Service
+public class UserService {
+
+    @Autowired
+    private SessionFactory sessionFactory; // (1)
+
+    @Transactional
+    public void registerUser(User user) {
+        sessionFactory.getCurrentSession().save(user); // (2)
+    }
+
+}
+The same SessionFactory as before
+
+But no more manual state management. Instead, getCurrentSession() and @Transactional are in sync.
+
+How to get there?
+
+Using the HibernateTransactionManager
+There is a very simple fix for this integration problem:
+
+Instead of using a DataSourcePlatformTransactionManager in your Spring configuration, you will be using a HibernateTransactionManager (if using plain Hibernate) or JpaTransactionManager (if using Hibernate through JPA).
+
+The specialized HibernateTransactionManager will make sure to:
+
+Manage transactions through Hibernate, i.e. the SessionFactory.
+
+Be smart enough to allow Spring to use that very same transaction in non-Hibernate, i.e. @Transactional Spring code.
+
+As always, a picture might be simpler to understand (though note, the flow between the proxy and real service is only conceptually right and oversimplified).
+
+
+
+A future post will go over the most frequent pitfalls of the transactional annotation and how to avoid them

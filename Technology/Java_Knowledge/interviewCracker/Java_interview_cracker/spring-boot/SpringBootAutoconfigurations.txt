@@ -1,0 +1,126 @@
+Spring boot Autoconfiguration:
+==============================
+
+@SpringBootApplication=@ComponentScan+@EnableAutoConfiguration+@Configuration
+
+
+Exploring the Power of @Conditional 
+While developing Spring based applications we may come across a need to register beans conditionally.
+
+For example, you may want to register a DataSource bean pointing to the dev database while running application locally and point to a different production database while running in production. 
+
+You can externalize the database connection parameters into the properties file and use the file appropriate for the environment, but you need to change the configuration whenever you need to point to a different environment and build the application.
+
+To address this problem, Spring 3.1 introduced the concept of Profiles. You can register multiple beans of the same type and associate them with one or more profiles. When you run the application you can activate the desired profiles and beans associated with the activated profiles, and only those profiles will be registered.
+
+@Configuration
+public class AppConfig{
+@Bean @Profile("DEV")
+ public DataSource devDataSource() { }
+ @Bean @Profile("PROD") public DataSource prodDataSource() {}
+ }
+Then you can specify the active profile using System Property -Dspring.profiles.active=DEV.
+
+This approach works for simple cases like enable or disable bean registrations based on activated profiles. But if you want to register beans based on some conditional logic then the profiles approach itself is not sufficient.
+
+To provide more flexibility for registering Spring beans conditionally, Spring 4 introduced the concept of @Conditional. By using the @Conditional approach you can register a bean conditionally based on any arbitrary condition.
+
+For example, you may want to register a bean when:
+
+A specific class is present in classpath
+A Spring bean of certain type doesn’t already registered in ApplicationContext
+A specific file exists on a location
+A specific property value is configured in a configuration file
+A specific system property is present/absent
+These are just a few examples only and you can have any condition you want.
+
+
+How Spring Boot Autoconfiguration works?
+
+Recently we had to create a new library with a set of features that we needed to replicate across different systems within our architecture, nothing very hard, actually just some text transformation and normalization. But, while developing the project, we soon realized that the amount of configuration we would need to integrate was actually pretty big compared to the features the library delivers. This was because we needed to fetch data from many different datasources, and define and configure the transformation steps, among a bunch of other infrastructure details.
+
+We were not really happy with the development result, so we decided to have a look at one of the major characteristics of Spring Boot: Autoconfiguration. The goal was to provide default implementations for all of those infrastructure components (and they should fit perfectly well for most of our cases) but we also wanted to have the option to overwrite some of them if needed. These requirements made our project a great candidate to use the Spring Boot Autoconfiguration support.
+
+
+
+Autoconfiguration is a feature that allows library developers to automatically configure beans in the Spring context based on different conditions of the application, such as the presence of certain classes in the classpath, the existence of a bean or the activation of some property. It’s the Spring Boot approach to Convention over configuration paradigm, that is, to minimize the number of decisions a programmer has to make when using a framework, while providing sensible defaults but not losing flexibility. In this post, I’ll try to also make a small introduction on how the Autoconfiguration works.
+
+How to define an Autoconfiguration class
+The first thing to keep in mind is that an AutoConfiguration class looks like any regular Spring @Configuration class, but is enriched with @Conditional annotations that will activate or not a bean, or a set of them, only under certain circumstances. Let’s take a closer look at an extract of the KafkaAutoConfiguration class provided by Spring itself.
+
+@Configuration
+@ConditionalOnClass(KafkaTemplate.class)
+public class KafkaAutoConfiguration {
+ 
+   @Bean
+   @ConditionalOnMissingBean(KafkaTemplate.class)
+   public KafkaTemplate<?, ?> kafkaTemplate (
+        ProducerFactory<Object, Object> kafkaProducerFactory,
+        ProducerListener<Object, Object> kafkaProducerListener) {
+      KafkaTemplate<Object, Object> kafkaTemplate =
+            new KafkaTemplate<>(kafkaProducerFactory);
+      if (this.messageConverter != null) {
+          kafkaTemplate.setMessageConverter(this.messageConverter);
+      }
+      kafkaTemplate.setProducerListener(kafkaProducerListener);
+      kafkaTemplate.setDefaultTopic(
+            this.properties.getTemplate().getDefaultTopic());
+      return kafkaTemplate;
+   }
+ 
+   @Bean
+   @ConditionalOnProperty(
+     name = "spring.kafka.producer.transaction-id-prefix")
+   @ConditionalOnMissingBean
+   public KafkaTransactionManager<?, ?> kafkaTransactionManager (
+        ProducerFactory<?, ?> producerFactory) {
+      return new KafkaTransactionManager<>(producerFactory);
+   }
+   // More bean definitions here
+}
+We can see this configuration class would only be activated if the KafkaTemplate class is present in the application classpath (@ConditionalOnClass annotation), so if the developer added the specific Apache Kafka dependency, Spring will autoconfigure itself with the appropriate beans.
+
+Conditional annotations can also be used at the bean definition level, we can see a couple of them in the above example: @ConditionalOnMissingBean only registers the new component in absence of the required bean type or name and @ConditionalOnProperty can be leveraged to create a bean based on the presence of some property definition.
+
+Spring provides plenty of conditional annotations out-of-the-box, all of them well documented within its reference documentation and with mostly self-explanatory names:
+
+@ConditionalOnClass
+@ConditionalOnMissingBean
+@ConditionalOnBean
+@ConditionalOnJava
+@ConditionalOnJndi
+@ConditionalOnMissingClass
+@ConditionalOnExpression
+@ConditionalOnNotWebApplication
+@ConditionalOnWebApplication
+@ConditionalOnProperty
+@ConditionalOnResource
+@ConditionalOnSingleCandidate
+If these conditions are not enough for our use case, developers have the ability to create their own custom conditions, extending the SpringBootCondition class and using it with the @Conditional annotation.
+
+Register your own Autoconfiguration
+In order to use an Autoconfiguration class, Spring needs to know where to look for it. This step is done using the standard META-INF/spring.factories file, adding the full name of the configuration class under the entry org.springframework.boot.autoconfigure.EnableAutoConfiguration.
+
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+ com.empathybroker.samples.autoconfigure.SampleAutoConfiguration
+And that’s all. Package your library, deliver it to your preferred artifact manager and developers can reassure themselves of the dependency and that everything is autoconfigured with the provided defaults.
+
+But… couldn’t all this be done with the old and well-known @Import annotation?
+Well, not really. The Autoconfiguration mechanism is guaranteed to occur after all the user-defined beans have been registered. This ensures the @Conditional checking is done when the whole user configuration is available and so, makes sure user defined beans takes precedence over the autoconfiguration ones. Actually, the use of conditional annotations is only recommended in Autoconfiguration classes to avoid these ordering pitfalls.
+
+Disabling Auto-Configuration Classes
+==================
+Let's say we want to exclude the auto-configuration from loading.
+
+We could add the @EnableAutoConfiguration annotation with exclude or excludeName attribute to a configuration class:
+
+@Configuration
+@EnableAutoConfiguration(
+  exclude={MySQLAutoconfiguration.class})
+public class AutoconfigurationApplication {
+    //...
+}
+We can also set the spring.autoconfigure.exclude property:
+
+spring.autoconfigure.exclude=com.baeldung.autoconfiguration.MySQLAutoconfiguration
+

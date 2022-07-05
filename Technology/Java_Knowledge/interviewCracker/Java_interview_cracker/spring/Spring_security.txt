@@ -1,0 +1,12 @@
+Spring Security:
+================
+Spring Security comes into action here by adding filter classes before HTTP request hit the DispatcherServlet. This means any incoming request will visit these filter classes one by one. This way, I can check Authentication and Authorization states before the request hit DispatcherServlet and then controllers. In short, this is what Spring Security does.
+
+Before explaining Filter Chain, we need to understand Authentication and Authorization concepts.
+
+ 1. Authentication: Any incoming user has to be identified by our application. We basically need to know Who is the user? This is why we have login pages. We get username and password, then go and check if we have this person in our database as a user. If so, we authenticate the person.
+ 
+ 2. Authorization: Once we authenticate the user, we should also be able to limit what the user can see in our application. While Admin user should see everything on the application, basic user should only see certain pages.
+ 
+ 
+ https://docs.spring.io/spring-security/reference/servlet/architecture.html
