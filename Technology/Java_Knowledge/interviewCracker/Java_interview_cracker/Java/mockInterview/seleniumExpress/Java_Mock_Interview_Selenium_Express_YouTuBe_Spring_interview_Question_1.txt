@@ -1,0 +1,285 @@
+Spring :
+---------
+
+5 Exception in spring
+====================
+
+1. No Such bean definition exception : If a BeanB isn't found in the context, then the following exception will be thrown (Error Creating Bean):
+       if bean not avaible for @autowired object 
+2. nouniquebean exception : we have interface which is been implemented by multiple class , i have autowired interface in the other class.
+    here spring gets confused , to which implemented class to be intitialized to the autowired object. to avoid this we need to use Qualifier annotition. we can add @primery
+3. BeanInstantiationException :  bean that throws an exception during its creation process ,A simplified example to easily understand the problem is throwing an exception in the constructor of the bean
+ 
+ 
+4. java.lang.NoSuchMethodException
+If a bean has no default constructor, and Spring tries to instantiate it by looking for that constructor, this will result in a runtime exception:
+
+5. Cause: org.springframework.beans.NotWritablePropertyException
+Yet another possiblity is defining a bean, BeanA, with a reference to another bean, BeanB, without having the corresponding setter method in BeanA:
+
+6. Bean creation Exception :  Exception thrown when a BeanFactory encounters an error when attempting to create a bean from a bean definition.
+
+
+5 Annotions in spring ( stereo types)
+====================
+Annotation | Meaning                                             |
++------------+-----------------------------------------------------+
+| @Component | generic stereotype for any Spring-managed component |
+| @Repository| stereotype for persistence layer                    |
+| @Service   | stereotype for service layer                        |
+| @Controller| stereotype for presentation layer (spring-mvc)      
+  @Indexed	     | Indicate that the annotated element represents a stereotype for the index.
+
+
+5 Annotions in spring (excluding stereo types)
+====================================
+NoRepositoryBean : we dont want spring to create repository proxy for the interface which we have created.
+@DataJPATest, @ bean, @ Scope, ,
+Spring boot :  @SpringbootConfiguration,@springBootAplication
+Spring web mvc :  @GetMapping, @postmapping, @putMapping
+Spring aop :  @aspect, @pointcut @Transactional, @ around
+Spring security : @secured, @springwebsecurity, @enableSpringwebsecurity
+
+
+NoRepositoryBean:
+
+The annotation is used to avoid creating repository proxies for interfaces that actually match the criteria of a repo interface but are not intended to be one. It's only required once you start going into extending all repositories with functionality. Let me give you an example:
+
+Assume you'd like to add a method foo() to all of your repositories. You would start by adding a repo interface like this
+
+public interface com.foobar.MyBaseInterface<…,…> extends CrudRepository<…,…> {
+
+  void foo();
+}
+You would also add the according implementation class, factory and so on. You concrete repository interfaces would now extend that intermediate interface:
+
+public interface com.foobar.CustomerRepository extends MyBaseInterface<Customer, Long> {
+
+}
+Now assume you bootstrap - let's say Spring Data JPA - as follows:
+
+<jpa:repositories base-package="com.foobar" />
+You use com.foobar because you have CustomerRepository in the same package. The Spring Data infrastructure now has no way to tell that the MyBaseRepository is not a concrete repository interface but rather acts as intermediate repo to expose the additional method. So it would try to create a repository proxy instance for it and fail. You can now use @NoRepositoryBean to annotate this intermediate interface to essentially tell Spring Data: don't create a repository proxy bean for this interface.
+
+That scenario is also the reason why CrudRepository and PagingAndSortingRepository carry this annotation as well. If the package scanning picked those up by accident (because you've accidentally configured it this way) the bootstrap would fail.
+
+Long story short: use the annotation to prevent repository interfaces from being picked up as candidates to end up as repository bean instances eventually.
+
++===============
+@GetMapping annotation. The @GetMapping annotation assigns specified handler methods to HTTP GET requests. @RequestMapping(method = RequestMethod.GET) is a constructed annotation that serves as a shorthand for @RequestMapping(method = RequestMethod.GET).
+
+
+@GetMapping - shortcut for @RequestMapping(method = RequestMethod.GET)
+
+=============
+
+@SpringBootApplication: Configuration + ComponentScan+ EnableAutoConfgiuration
+
+	does much more than what @EnableAutoConfiguration does. It's actually a combination of three annotations: @Configuration, which is used in Java-based configuration on Spring framework, @ComponentScan to enable component scanning of components you write like @Controller classes, and @EnableAutoConfgiuration itself, which is used to allow for auto-configuration in Spring Boot application.
+	
+@SpringBootConfiguration  :
+
+	Most Spring Boot use @SpringBootConfiguration via @SpringBootApplication, an annotation that inherits from it. If an application uses @SpringBootApplication, it is already using @SpringBootConfiguration.
+	
+	@SpringBootConfiguration is an alternative to the @Configuration annotation. The main difference is that @SpringBootConfiguration allows configuration to be automatically located. This can be especially useful for unit or integration tests.
+
+Let's look at @SpringBootConfiguration's usage in an application.
+
+
+==================================================
+is it required to annotate the interface with @repository for below line?
+
+@repository is it required??
+public interface Studentrepo implements JpaRepository ?
+
+The reason it will be working is beacause, you would have specified to framework the packages to look for repositories using @EnableJpaRepositories("packagestoscan")
+
+It is indeed not necessary to put the @Repository annotation on interfaces that extend JpaRepository; Spring recognises the repositories by the fact that they extend one of the predefined Repository interfaces.
+
+The purpose of the @NoRepositoryBean annotation is to prevent Spring from treating that specific interface as a repository by itself. The JpaRepository interface has this annotation because it isn't a repository itself, it's meant to be extended by your own repository interfaces, and those are the ones that should be picked up.
+
+but this is needed when you have a class.
+
+
+@NoRepositoryBean
+public interface JpaRepository<T, ID> extends PagingAndSortingRepository<T, ID>, QueryByExampleExecutor<T> 
+@NoRepositoryBean
+public interface PagingAndSortingRepository<T, ID> extends CrudRepository<T, ID> {
+
+@NoRepositoryBean
+public interface CrudRepository<T, ID> extends Repository<T, ID> 
+
+@Indexed
+public interface Repository<T, ID>  : it's a marker interface
+
+
+Their main functions are:
+
+CrudRepository : mainly provides CRUD functions.
+
+PagingAndSortingRepository : provides methods to do pagination and sorting records.
+
+JpaRepository  : provides some JPA-related methods such as flushing the persistence context and deleting records in a batch.
+
+Because of the inheritance mentioned above, JpaRepository will have all the functions of CrudRepository and PagingAndSortingRepository. So if you don't need the repository to have the functions provided by JpaRepository and PagingAndSortingRepository , use CrudRepository.
+
+Pagination:
+
+Pageable firstPageWithTwoElements = PageRequest.of(0, 2);
+
+Pageable secondPageWithFiveElements = PageRequest.of(1, 5);
+
+Pageable pageable = PageRequest.of(0, 5, Sort.by(Order.asc("name"),Order.desc("id")));
+
+Page<Product> allProducts = productRepository.findAll(firstPageWithTwoElements);
+
+Pagination and Sorting
+======================
+Similarly, to just have our query results sorted, we can simply pass an instance of Sort to the method:
+
+Page<Product> allProductsSortedByName = productRepository.findAll(Sort.by("name"));
+However, what if we want to both sort and page our data?
+
+We can do that by passing the sorting details into our PageRequest object itself:
+
+Pageable sortedByName = 
+  PageRequest.of(0, 3, Sort.by("name"));
+
+Pageable sortedByPriceDesc = 
+  PageRequest.of(0, 3, Sort.by("price").descending());
+
+Pageable sortedByPriceDescNameAsc = 
+  PageRequest.of(0, 5, Sort.by("price").descending().and(Sort.by("name")));
+Based on our sorting requirements, we can specify the sort fields and the sort direction while creating our PageRequest instance.
+
+Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+ 
+        Page<EmployeeEntity> pagedResult = repository.findAll(paging);
+         
+        if(pagedResult.hasContent()) {
+            return pagedResult.getContent();
+        } else {
+            return new ArrayList<EmployeeEntity>();
+        }
+		
+Java config :
+------------
+it uses @configuration : we can defin  bean definition can be given @bean.
+ in xml, we can create bean tag id, name etc... but in javaconfig is not required. but in java config we can just use @bean
+ we can get a hold of bean creation using condition in java config.
+ in xml , error we come to know during runtime but java config is at compile time check
+ 
+ Limitation :
+ ---------
+ 1. Spring beans, config can not be final. methods also can not be final.
+ ------------------------------------
+ Java config bean will not be invoked directly but through proxys why?
+ ----------------------------------------
+ 
+ 1.proxy takes the control of creations of bean,since CGlibproxy can not override if they are final .
+ 
+ JDK Dynamic proxy can only proxy by interface (so your target class needs to implement an interface, which is then also implemented by the proxy class).
+ Dynamic proxy: Dynamic implementations of interfaces at runtime using JDK Reflection API.
+
+CGLIB (and javassist) can create a proxy by subclassing. In this scenario the proxy becomes a subclass of the target class. No need for interfaces.
+
+So Java Dynamic proxies can proxy: public class Foo implements iFoo where CGLIB can proxy: public class Foo
+
+
+ I should mention that because javassist and CGLIB use proxy by subclassing, that this is the reason you cannot declare final methods or make the class final when using frameworks that rely on this. That would stop these libraries from allowing to subclass your class and override your methods.
+ 
+ Spring uses JDK proxy when is class is implementing one or more interface
+Spring uses CGLib proxy when class in not implementing interface
+JDK dynamic proxy is bit slower than CGlib proxy.
+
+@Bean vs @ component
+-------------------
+
+It is used to explicitly declare a single bean, rather than letting Spring do it automatically. If any class is annotated with @Component it will be automatically detect by using classpath scan. We should use @bean, if you want specific implementation based on dynamic condition
+
+BeanFatory Post processor:
+---------------------
+example : PropertyPlaceholderConfigurer : For instance, the PropertyPlaceholderConfigurer is a post processor that allows to read properties from external files.
+BeanFatoryPostProcess -->BeanInitialization --> BeanPostProcessor
+
+BeanFatoryPostProcess: meta data processors, reading properties files
+
+1. Bean Detection:  (BeanFactoryPostProcessor)
+Xml file --> load xml bean definition 
+AnnotationConfig-->@componentScan
+JavaConfig -->Read Bean method signature
+2.  BeanCreation
+BeanInstation & depenency
+3. beanPostprocessor will be operate on created bean object
+
+BeanFactoryPostProcessor is an interface and beans that implement it are actually beans that undergo the Spring lifecycle (Example below) but these beans don't take part of the other declared beans' lifecycle.
+
+An ApplicationContext auto-detects BeanFactoryPostProcessor beans in its bean definitions and applies them before any other beans get created. A BeanFactoryPostProcessor may also be registered programmatically with a ConfigurableApplicationContext.
+
+public class CustomBeanFactory implements BeanFactoryPostProcessor {
+
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        for (String beanName : beanFactory.getBeanDefinitionNames()) {
+
+            BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
+
+            // Manipulate the beanDefiniton or whatever you need to do
+
+        }
+    }
+}
+The differences about BeanFactoryPostProcessor and BeanPostProcessor:
+
+A bean implementing BeanFactoryPostProcessor is called when all bean definitions will have been loaded, but no beans will have been instantiated yet. This allows for overriding or adding properties even to eager-initializing beans. This will let you have access to all the beans that you have defined in XML or that are annotated (scanned via component-scan).
+A bean implementing BeanPostProcessor operate on bean (or object) instances which means that when the Spring IoC container instantiates a bean instance then BeanPostProcessor interfaces do their work.
+BeanFactoryPostProcessor implementations are "called" during startup of the Spring context after all bean definitions will have been loaded while BeanPostProcessor are "called" when the Spring IoC container instantiates a bean (i.e. during the startup for all the singleton and on demand for the proptotypes one)
+
+
+BeanPostProcessor:
+
+This is a very basic example of implementing BeanPostProcessor, which prints a bean name before and after initialization of any bean. You can implement more complex logic before and after intializing a bean because you have access on bean object inside both the post processor methods.
+
+/**
+	 * Apply this {@code BeanPostProcessor} to the given new bean instance <i>before</i> any bean
+	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
+	 * or a custom init-method). The bean will already be populated with property values.
+	 * The returned bean instance may be a wrapper around the original.
+	 * <p>The default implementation returns the given {@code bean} as-is.
+	 * @param bean the new bean instance
+	 * @param beanName the name of the bean
+	 * @return the bean instance to use, either the original or a wrapped one;
+	 * if {@code null}, no subsequent BeanPostProcessors will be invoked
+	 * @throws org.springframework.beans.BeansException in case of errors
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
+	 */
+	@Nullable
+	default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		return bean;
+	}
+
+	/**
+	 * Apply this {@code BeanPostProcessor} to the given new bean instance <i>after</i> any bean
+	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
+	 * or a custom init-method). The bean will already be populated with property values.
+	 * The returned bean instance may be a wrapper around the original.
+	 * <p>In case of a FactoryBean, this callback will be invoked for both the FactoryBean
+	 * instance and the objects created by the FactoryBean (as of Spring 2.0). The
+	 * post-processor can decide whether to apply to either the FactoryBean or created
+	 * objects or both through corresponding {@code bean instanceof FactoryBean} checks.
+	 * <p>This callback will also be invoked after a short-circuiting triggered by a
+	 * {@link InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation} method,
+	 * in contrast to all other {@code BeanPostProcessor} callbacks.
+	 * <p>The default implementation returns the given {@code bean} as-is.
+	 * @param bean the new bean instance
+	 * @param beanName the name of the bean
+	 * @return the bean instance to use, either the original or a wrapped one;
+	 * if {@code null}, no subsequent BeanPostProcessors will be invoked
+	 * @throws org.springframework.beans.BeansException in case of errors
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
+	 * @see org.springframework.beans.factory.FactoryBean
+	 */
+	@Nullable
+	default Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		return bean;
+	}

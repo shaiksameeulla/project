@@ -41,6 +41,25 @@ Its body calls the method Person.compareByAge.
 Kinds of Method References
 There are four kinds of method references:
 
+Kinds of Method References
+There are four kinds of method references:
+
+     Kind																Syntax													Examples
+
+Reference to a static method							ContainingClass::staticMethodName								Person::compareByAge
+																														MethodReferencesExamples::appendStrings
+Reference to an instance method of a particular object	containingObject::instanceMethodName							myComparisonProvider::compareByName
+																														myApp::appendStrings2
+Reference to an instance method of an arbitrary          ContainingType::methodName										String::compareToIgnoreCase
+object of a particular type	                                                                                             String::concat
+
+Reference to a constructor								ClassName::new													HashSet::new
+
+Static methods
+Instance methods of particular objects
+Instance methods of an arbitrary object of a particular type
+Constructor
+
 HashSet::new
 String::compareToIgnoreCase
 String::concat
@@ -48,6 +67,9 @@ Person::compareByAge
 MethodReferencesExamples::appendStrings
 myComparisonProvider::compareByName
 myApp::appendStrings2
+
+Static methods:
+------------
 
 List<String> messages = Arrays.asList("hello", "baeldung", "readers!");
 We can achieve this by leveraging a simple lambda expression calling the StringUtils.capitalize() method directly:
@@ -61,7 +83,118 @@ Notice that method references always utilize the :: operator.
 For e.g.: 
 Integer::parseInt(str) \\ method reference
 str -> Integer.ParseInt(str); \\ equivalent lambda
+
+Reference to an Instance Method of a Particular Object
+---------------
+
+To demonstrate this type of method reference, let's consider two classes:
+
+public class Bicycle {
+
+    private String brand;
+    private Integer frameSize;
+    // standard constructor, getters and setters
+}
+
+public class BicycleComparator implements Comparator {
+
+    @Override
+    public int compare(Bicycle a, Bicycle b) {
+        return a.getFrameSize().compareTo(b.getFrameSize());
+    }
+
+}
+And, let's create a BicycleComparator object to compare bicycle frame sizes:
+
+BicycleComparator bikeFrameSizeComparator = new BicycleComparator();
+We could use a lambda expression to sort bicycles by frame size, but we'd need to specify two bikes for comparison:
+
+createBicyclesList().stream()
+  .sorted((a, b) -> bikeFrameSizeComparator.compare(a, b));
+Instead, we can use a method reference to have the compiler handle parameter passing for us:
+
+createBicyclesList().stream()
+  .sorted(bikeFrameSizeComparator::compare);
+The method reference is much cleaner and more readable, as our intention is clearly shown by the code
+
+
+Reference to an Instance Method of an Arbitrary Object of a Particular Type
+------------------------------------------------------------------------
+
+This type of method reference is similar to the previous example, but without having to create a custom object to perform the comparison.
+
+Let's create an Integer list that we want to sort:
+
+
+List<Integer> numbers = Arrays.asList(5, 3, 50, 24, 40, 2, 9, 18);
+If we use a classic lambda expression, both parameters need to be explicitly passed, while using a method reference is much more straightforward:
+
+numbers.stream()
+  .sorted((a, b) -> a.compareTo(b));
+numbers.stream()
+  .sorted(Integer::compareTo);
+  
+  Even though it's still a one-liner, the method reference is much easier to read and understand.
+
+
+Reference to a Constructor
+--------------------
+
+We can reference a constructor in the same way that we referenced a static method in our first example. The only difference is that we'll use the new keyword.
+
+Let's create a Bicycle array out of a String list with different brands:
+
+List<String> bikeBrands = Arrays.asList("Giant", "Scott", "Trek", "GT");
+First, we'll add a new constructor to our Bicycle class:
+
+public Bicycle(String brand) {
+    this.brand = brand;
+    this.frameSize = 0;
+}
+Next, we'll use our new constructor from a method reference and make a Bicycle array from the original String list:
+
+bikeBrands.stream()
+  .map(Bicycle::new)
+  .toArray(Bicycle[]::new);
+Notice how we called both Bicycle and Array constructors using a method reference, giving our code a much more concise and clear appearance.
+
+Additional Examples and Limitations
+--------------------
+As we've seen so far, method references are a great way to make our code and intentions very clear and readable. However, we can't use them to replace all kinds of lambda expressions since they have some limitations.
+
+
+Their main limitation is a result of what's also their biggest strength: the output from the previous expression needs to match the input parameters of the referenced method signature.
+
+Let's see an example of this limitation:
+
+createBicyclesList().forEach(b -> System.out.printf(
+  "Bike brand is '%s' and frame size is '%d'%n",
+  b.getBrand(),
+  b.getFrameSize()));
+This simple case can't be expressed with a method reference, because the printf method requires 3 parameters in our case, and using createBicyclesList().forEach() would only allow the method reference to infer one parameter (the Bicycle object).
+
+Finally, let's explore how to create a no-operation function that can be referenced from a lambda expression.
+
+In this case, we'll want to use a lambda expression without using its parameters.
+
+First, let's create the doNothingAtAll method:
+
+private static <T> void doNothingAtAll(Object... o) {
+}
+As it is a varargs method, it will work in any lambda expression, no matter the referenced object or number of parameters inferred.
+
+Now, let's see it in action:
+
+
+freestar
+createBicyclesList()
+  .forEach((o) -> MethodReferenceExamples.doNothingAtAll(o));
+
+++++++++++++++++++++++++++++----------
+
 types of method references
+
+
 
 Java 8 allows four types of method references.
 

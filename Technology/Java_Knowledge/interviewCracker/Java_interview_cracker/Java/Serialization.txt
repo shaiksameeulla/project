@@ -17,6 +17,23 @@ So this gives us a chance to write these two methods insided the Class that impl
 private void writeObject(ObjectOutputStream out) throws IOException;
 private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException;
 
+-----------------------
+ ANY-ACCESS-MODIFIER static final long serialVersionUID = 42L;
+ 
+  If a serializable class does not explicitly declare a serialVersionUID, then
+  the serialization runtime will calculate a default serialVersionUID value
+  for that class based on various aspects of the class, as described in the
+  Java(TM) Object Serialization Specification. 
+   However, it is <em>strongly
+  recommended</em> that all serializable classes explicitly declare
+  serialVersionUID values,
+  since the default serialVersionUID computation is
+  highly sensitive to class details that may vary depending on compiler
+  implementations, and can thus result in unexpected
+  <code>InvalidClassException</code>s during deserialization.
+
+
+
 
 /***99999******/
 If the superclass is serializable but we don’t want the subclass to be serialized.
@@ -88,6 +105,44 @@ public class SampleSerialization implements Serializable {
 
 }
 
+Inheritance:
+-----------
+
+Serialization is the process of changing the state of an object into the byte stream so that the byte stream can return back into a copy of the object
+
+In Java, an object is said to be serializable if its class or parent classes implement either the Serializable interface or the Externalizable interface.
+
+Deserialization is converting the serialized object back into a copy of the object.
+
+There are three cases of Object Serialization with inheritance.
+
+The child class is automatically serializable if the parent class is serializable
+
+A child class can still be serialized even if the parent class is not serializable
+
+If we want the child class not be serialized even if the parent class is serializable
+
+
+During deserialization, the fields of non-serializable classes will be initialized using the public or protected no-arg constructor of the class. A no-arg constructor must be accessible to the subclass that is serializable. The fields of serializable subclasses will be restored from the stream.
+
+Thus, default no-arg constructor of class Foo called of, resulted in initialization
+
+Yes if superclass does not implement Serializable, it will not be serialized, so when deserialized,its default constructor will be called and default values will be allocated to all of its variables. 
+
+
+Case 1:
+	When superclass executes a Serializable interface and the subclass does not.
+		In this case, the objects of the subclass get serialize directly due to serialization of the superclass, irrespective of subclass implements, or not implements the Serializable interface.
+
+Case 2:	
+	When the superclass is not implementing the Serializable interface and subclass implements.
+		During serialization, any variable belonging to the non-serializable superclass, the value of this variable is ignored by JVM and the default value is stored in the file. And during de-serialization, JVM will execute instance control flow in the superclass. For this purpose, JVM will call the default constructor of the superclass. So every non-serializable superclass must contain default constructor, otherwise, we will get a runtime error. Let’s analyze both of the cases.
+
+Case 3:
+	When we need to serialize superclass but not to the subclass.
+		This can be done by implementing the writeObject() during serialization and readObject()  during deserialization methods in the subclass and needs to throw NotSerializableException from these methods. So, we are actually overriding these methods to make custom serialization.
+
+---------------------------------------------------
 Externalizable ::
 
 @Override
@@ -117,3 +172,5 @@ Maintenance: If any new Non-Serializable is added to Serializable Object, Serial
 Backward Compatibility and Control: If you have to support multiple versions, you can have full control with Externalizable interface. You can support different versions of your object. If you implement Externalizable, it's your responsibility to serialize super class
 
 public No-arg constructor:  Serializable uses reflection to construct object and does not require no arg constructor. But Externalizable demands public no-arg constructor.
+
+

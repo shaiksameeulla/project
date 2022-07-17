@@ -1,0 +1,173 @@
+Interview FAQ:
+----------------
+1. marker interface?
+    A marker interface is an interface that has no methods or constants inside it. It provides run-time type information about objects, so the compiler and JVM have additional information about the object. A marker interface is also called a tagging interface
+   Serializable,Cloneable,repository(Spring data)
+   it's going check whether object is of instance of Interface(marker) then it performs specific operations.
+   
+   ex: interface IDDiscount{}   class Student implements IDDiscount {}  class Employee implements IDDiscount {}
+   
+   class IDDiscountUtil {  public boolean isDiscountEligible(Object obj) {  if (obj instanceof IDDiscount){}}}
+   
+   Cloneable:
+   
+   Cloning is the process of creating a copy of an Object. Java Object class comes with native clone() method that returns the copy of the existing instance.
+   If you want to use Java Object clone() method, you have to implement the java.lang.Cloneable marker interface. Otherwise, it will throw CloneNotSupportedException at runtime.
+   We are using Object clone() method, so we have implemented the Cloneable interface. We are calling the superclass clone() method i.e. Object clone() method.
+   
+   Object Cloning Types:
+   
+   1.Shallow Cloning
+		The default implementation of Java Object clone() method is using shallow copy. It’s using reflection API to create the copy of the instance. The below custom code snippet showcase the shallow cloning implementation.
+			@Override
+	 public Object clone() throws CloneNotSupportedException {
+	 
+		 Employee e = new Employee();
+		 e.setId(this.id);
+		 e.setName(this.name);
+		 e.setProps(this.props);
+		 return e;
+	}
+  2. Deep Cloning
+	In deep cloning, we have to copy fields one by one. If we have a field with nested objects such as List, Map, etc. then we have to write the code to copy them too one by one. That’s why it’s called deep cloning or deep copy.
+
+	We can override the Employee clone method like the following code for deep cloning.
+				 public Object clone() throws CloneNotSupportedException {
+
+						Object obj = super.clone(); //utilize clone Object method
+
+						Employee emp = (Employee) obj;
+
+						// deep cloning for immutable fields
+						emp.setProps(null);
+						Map<String, String> hm = new HashMap<>();
+						String key;
+						Iterator<String> it = this.props.keySet().iterator();
+						// Deep  of field by field
+						while (it.hasNext()) {
+							key = it.next();
+							hm.put(key, this.props.get(key));
+						}
+						emp.setProps(hm);
+						
+						return emp;
+					}
+	Cloning using Serialization?
+			One way to easily perform deep cloning is through serialization. But serialization is an expensive procedure and your class should implement Serializable interface. All the fields and superclasses must implement Serializable too.
+
+			Using Apache Commons Util
+			If you are already using Apache Commons Util classes in your project and your class is serializable, then use the below method.
+
+			Employee clonedEmp = org.apache.commons.lang3.SerializationUtils.clone(emp);
+			Copy Constructor for Cloning
+			We can define a copy constructor to create a copy of the object. Why to depend on the Object clone() method at all?
+
+			For example, we can have an Employee copy constructor like the following code.
+
+			public Employee(Employee emp) {
+				
+				this.setId(emp.getId());
+				this.setName(emp.getName());
+				
+				Map<String, String> hm = new HashMap<>();
+				String key;
+				Iterator<String> it = emp.getProps().keySet().iterator();
+				// Deep Copy of field by field
+				while (it.hasNext()) {
+					key = it.next();
+					hm.put(key, emp.getProps().get(key));
+				}
+				this.setProps(hm);
+
+			}
+			Whenever we need a copy of employee object, we can get it using Employee clonedEmp = new Employee(emp);.
+
+			However writing copy constructor can be a tedious job if your class has a lot of variables, especially primitive and immutable.
+			
+			
+Java Object Cloning Best Practices
+==================================
+Use default Object clone() method only when your class has primitives and immutable variables or you want shallow copy. In case of inheritance, you will have to check all the classes you are extending till the Object level.
+You can also define copy constructor if your class has mostly mutable properties.
+Utilize Object clone() method by calling super.clone() in overridden clone method, then make necessary changes for deep copying of mutable fields.
+If your class is serializable, you can use serialization for cloning. However, it will come with a performance hit, so do some benchmarking before using serialization for cloning.
+If you are extending a class and it has defined clone method properly using deep copy, then you can utilize default clone method. For example, we have properly defined clone() method in Employee class as follows.
+@Override
+public Object clone() throws CloneNotSupportedException {
+
+	Object obj = super.clone();
+
+	Employee emp = (Employee) obj;
+
+	// deep cloning for immutable fields
+	emp.setProps(null);
+	Map<String, String> hm = new HashMap<>();
+	String key;
+	Iterator<String> it = this.props.keySet().iterator();
+	// Deep Copy of field by field
+	while (it.hasNext()) {
+		key = it.next();
+		hm.put(key, this.props.get(key));
+	}
+	emp.setProps(hm);
+
+	return emp;
+}
+We can create a child class and utilize the superclass deep cloning as follows.
+
+package com.journaldev.cloning;
+
+public class EmployeeWrap extends Employee implements Cloneable {
+
+	private String title;
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String t) {
+		this.title = t;
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+
+		return super.clone();
+	}
+}
+The EmployeeWrap class doesn’t have any mutable properties and it’s utilizing superclass clone() method implementation. If there are mutable fields, then you will have to take care of deep copying of only those fields.
+
+Here is a simple program to test if this way of cloning works fine or not.
+
+package com.journaldev.cloning;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class CloningTest {
+
+	public static void main(String[] args) throws CloneNotSupportedException {
+
+		EmployeeWrap empWrap = new EmployeeWrap();
+
+		empWrap.setId(1);
+		empWrap.setName("Pankaj");
+		empWrap.setTitle("CEO");
+		
+		Map<String, String> props = new HashMap<>();
+		props.put("salary", "10000");
+		props.put("city", "Bangalore");
+		empWrap.setProps(props);
+
+		EmployeeWrap clonedEmpWrap = (EmployeeWrap) empWrap.clone();
+		
+		empWrap.getProps().put("1", "1");
+		
+		System.out.println("empWrap mutable property value = "+empWrap.getProps());
+
+		System.out.println("clonedEmpWrap mutable property value = "+clonedEmpWrap.getProps());
+		
+	}
+
+}
+Output:
