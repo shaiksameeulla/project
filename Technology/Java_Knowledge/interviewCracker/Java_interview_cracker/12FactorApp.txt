@@ -1,0 +1,128 @@
+The Twelve Factors
+========================
+
+
+The 12-Factor Principles
+Codebase (One codebase tracked in revision control, many deploys)
+Dependencies (Explicitly declare and isolate the dependencies)
+Config (Store configurations in an environment)
+Backing Services (treat backing resources as attached resources)
+Build, release, and Run (Strictly separate build and run stages)
+Processes (execute the app as one or more stateless processes)
+Port Binding (Export services via port binding)
+Concurrency (Scale out via the process model)
+Disposability (maximize the robustness with fast startup and graceful shutdown)
+Dev/prod parity (Keep development, staging, and production as similar as possible)
+Logs (Treat logs as event streams)
+Admin processes (Run admin/management tasks as one-off processes)
+
+
+
+I. Codebase
+	One codebase tracked in revision control, many deploys
+II. Dependencies
+	Explicitly declare and isolate dependencies
+III. Config
+	Store config in the environment
+IV. Backing services
+	Treat backing services as attached resources
+V. Build, release, run
+	Strictly separate build and run stages
+VI. Processes
+	Execute the app as one or more stateless processes
+VII. Port binding
+	Export services via port binding
+VIII. Concurrency
+	Scale out via the process model
+IX. Disposability
+	Maximize robustness with fast startup and graceful shutdown
+X. Dev/prod parity
+	Keep development, staging, and production as similar as possible
+XI. Logs
+	Treat logs as event streams
+XII. Admin processes
+	Run admin/management tasks as one-off processes
+	
+==============================
+the twelve-factor methodology is a set of twelve best practices to develop applications developed to run as a service.
+	This was originally drafted by Heroku for applications deployed as services on their cloud platform, back in 2011.
+		Over time, this has proved to be generic enough for any software-as-a-service (SaaS) development.
+		
+	Microservice is an architectural style to develop software as loosely coupled services. 
+++++++++++++
++Codebase  +
+++++++++++++
+
+The first best practice of twelve-factor apps is to track it in a version control system. Git is the most popular version control system in use today and is almost ubiquitous. The principle states that an app should be tracked in a single code repository and must not share that repository with any other apps.
+
+++++++++++++
++Dependencies  +
+++++++++++++
+Next, the twelve-factor app should always explicitly declare all its dependencies. We should do this using a dependency declaration manifest. Java has multiple dependency management tools like Maven and Gradle. We can use one of them to achieve this goal.
+
+So, our simple application depends on a few external libraries, like a library to facilitate REST APIs and to connect to a database. Let's see how can we declaratively define them using Maven.
+
+++++++++++++
++Configurations  +
+++++++++++++
+
+
+An application typically has lots of configuration, some of which may vary between deployments while others remain the same.
+
+In our example, we've got a persistent database. We'll need the address and credentials of the database to connect to. This is most likely to change between deployments.
+
+A twelve-factor app should externalize all such configurations that vary between deployments. The recommendation here is to use environment variables for such configurations. This leads to a clean separation of config and code.
+
+Spring provides a configuration file where we can declare such configurations and attach it to environment variables
+
+++++++++++++
++Backing Services  +
+++++++++++++
+As per 12 factor app principles, a backing service is an application/service the app consumes over the network as part of its normal operation.
+
+Database, Message Brokers, any other external systems that the app communicates is treated as Backing service.
+
+12-factor app can automatically swap the application from one provider to another without making any further modifications to the code base. Let us say, you would like to change the database server from MySQL to Aurora. To do so, you should not make any code changes to your application. Only configuration change should be able to take care of it.
+
+Microservices: In a microservice ecosystem, anything external to service is treated as attached resource. The resource can be swapped at any given point of time without impacting the service.
+
+
+++++++++++++++++++++++++++
++Build, Release, and Run  +
+++++++++++++++++++++++++++
+
+Build, Release, and Run (Strictly Separate Build and Run Stages)
+The application must have a strict separation between the build, release, and run stages. Let us understand each stage in more detail.
+
+Build stage: transform the code into an executable bundle/ build package.
+Release stage: get the build package from the build stage and combines with the configurations of the deployment environment and make your application ready to run.
+Run stage: It is like running your app in the execution environment.
+Microservices: You can use CI/CD tools to automate the builds and deployment process. Docker images make it easy to separate the build, release, and run stages more efficiently.
+
+
+
+++++++++++++++++++++++++++
++Processes  +
+++++++++++++++++++++++++++
+
+Processes (Execute the App as One or More Stateless Processes)
+The app is executed inside the execution environment as a process. An app can have one or more instances/processes to meet the user/customer demands.
+
+As per 12-factor principles, the application should not store the data in in-memory and it must be saved to a store and use from there. As far as the state concern, your application should store the state in the database instead of in memory of the process.
+
+++++++++++++++++++++++++++
++Port Binding +
+++++++++++++++++++++++++++
+
+Port Binding (Export Services Via Port Binding)
+The twelve-factor app is completely self-contained and doesn't rely on runtime injection of a webserver into the execution environment to create a web-facing service. The web app exports HTTP as a service by binding to a port, and listening to requests coming in on that port.
+
+In short, this is all about having your application as a standalone instead of deploying them into any of the external web servers.
+
+Microservices: Spring boot is one example of this one. Spring boot by default comes with embedded tomcat, jetty, or undertow.
+
+Avoid using sticky sessions, using sticky sessions are a violation of 12-factor app principles. If you would store the session information, you can choose redis or memcached or any other cache provider based on your requirements.
+
+By following these, your app can be highly scalable without any impact on the system
+
+Microservices: By adopting the stateless nature of REST, your services can be horizontally scaled as per the needs with zero impact. If your system still requires to maintain the state use the attached resources (redis, Memcached, or datastore) to store the state instead of in-memory.
