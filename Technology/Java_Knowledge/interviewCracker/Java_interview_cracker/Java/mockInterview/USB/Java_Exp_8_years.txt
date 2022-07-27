@@ -1,0 +1,165 @@
+UBS java Interview Experience |Exp 8 years
+
+--> Spring version :  spring boot : version
+--> how to create Spring boot project
+-->Spring boot flow
+--> How to enable Spring Security?
+-->How to skip specific api in spring boot?
+--> what happens if employe API does not have request employee id?
+Http status code:
+Informational responses (100–199)
+Successful responses (200–299)
+Redirection messages (300–399)
+Client error responses (400–499)  : 401 Unauthorized,402 Payment Required,403 Forbidden,404 Not Found,405 Method Not Allowed
+Server error responses (500–599)
+
+--> Spring Security, and how authorization in your project., method authorization
+
+--> Java8, what features used? Stream, OPtional, DatetimeAPI, current time in java 8, 
+expecting Instant.now();
+
+--> filter employee by age
+--> remove duplicate string using stream API.  distinct().collect(Collector
+--> Hibernate:
+	 how do i make db connection for the project.
+	 
+---> Spring boot & hibernate  : expecting entity manager Factory
+--> @ Transactional, how it works
+  propagation,isolation
+ --> connecting to two different DB in the application , how to achieve that.
+ 
+ 
+
+
+
+
+
+
+
+
+-->java 8 group by: 
+  ---------------
+10 employess EMPID, empname,firmName... o/p f1 ->e1,e2,e3,f2-e4,f5... group by Firm
+
+Map<BlogPostType, List<BlogPost>> postsPerType = posts.stream()
+  .collect(groupingBy(BlogPost::getType));
+  
+----> API development  
+    any recent thread, memory issues.
+    Performance of Rest API , challeges of API development
+	
+answer: The primary reason for using Secure Sockets Layer (SSL) certificates is to keep sensitive information sent across the internet encrypted so that only the intended recipient can understand it. This security is important because the information you send on the internet is passed from computer to computer to get to the recipient.
+
+  For more information about cryptographic algorithms and digital certificates, refer to the related information.
+
+In overview, the steps involved in the SSL handshake are as follows:
+The SSL or TLS client sends a “client hello” message that lists cryptographic information such as the SSL or TLS version and, in the client's order of preference, the CipherSuites supported by the client. The message also contains a random byte string that is used in subsequent computations. The protocol allows for the “client hello” to include the data compression methods supported by the client.
+The SSL or TLS server responds with a “server hello” message that contains the CipherSuite chosen by the server from the list provided by the client, the session ID, and another random byte string. The server also sends its digital certificate. If the server requires a digital certificate for client authentication, the server sends a “client certificate request” that includes a list of the types of certificates supported and the Distinguished Names of acceptable Certification Authorities (CAs).
+The SSL or TLS client verifies the server's digital certificate. For more information, see How SSL and TLS provide identification, authentication, confidentiality, and integrity.
+The SSL or TLS client sends the random byte string that enables both the client and the server to compute the secret key to be used for encrypting subsequent message data. The random byte string itself is encrypted with the server's public key.
+If the SSL or TLS server sent a “client certificate request”, the client sends a random byte string encrypted with the client's private key, together with the client's digital certificate, or a “no digital certificate alert”. This alert is only a warning, but with some implementations the handshake fails if client authentication is mandatory.
+The SSL or TLS server verifies the client's certificate. For more information, see How SSL and TLS provide identification, authentication, confidentiality, and integrity.
+The SSL or TLS client sends the server a “finished” message, which is encrypted with the secret key, indicating that the client part of the handshake is complete.
+The SSL or TLS server sends the client a “finished” message, which is encrypted with the secret key, indicating that the server part of the handshake is complete.
+For the duration of the SSL or TLS session, the server and client can now exchange messages that are symmetrically encrypted with the shared secret key.
+
+How Loadbalancer Works:
+-------------------
+
+In this manner, a load balancer performs the following functions:
+
+Distributes client requests or network load efficiently across multiple servers
+Ensures high availability and reliability by sending requests only to servers that are online
+Provides the flexibility to add or subtract servers as demand dictates
+
+Load Balancing Algorithms
+--------------
+Different load balancing algorithms provide different benefits; the choice of load balancing method depends on your needs:
+
+Round Robin — Requests are distributed across the group of servers sequentially.
+Least Connections — A new request is sent to the server with the fewest current connections to clients. The relative computing capacity of each server is factored into determining which one has the least connections.
+IP Hash — The IP address of the client is used to determine which server receives the request.
+
+
+sql 
+---------
+
+Joins
+
+INNER JOIN
+This JOIN returns all records from multiple tables that satisfy the specified join condition. It is the simple and most popular form of join and assumes as a default join. If we omit the INNER keyword with the JOIN query, we will get the same output.
+
+INNER JOIN Syntax
+
+The following syntax illustrates the use of INNER JOIN in SQL Server:
+
+SELECT columns    
+FROM table1    
+INNER JOIN table2 ON condition1    
+INNER JOIN table3 ON condition2    
+
+SELF JOIN
+A table is joined to itself using the SELF JOIN. It means that each table row is combined with itself and with every other table row. The SELF JOIN can be thought of as a JOIN of two copies of the same tables. We can do this with the help of table name aliases to assign a specific name to each table's instance. The table aliases enable us to use the table's temporary name that we are going to use in the query. It's a useful way to extract hierarchical data and comparing rows inside a single table.
+
+The following expression illustrates the syntax of SELF JOIN in SQL Server. It works the same as the syntax of joining two different tables. Here, we use aliases names for tables because both the table name are the same.
+
+SELECT T1.col_name, T2.col_name...    
+FROM table1 T1, table1 T2    
+WHERE join_condition;  
+
+
+OUTER JOIN
+OUTER JOIN in SQL Server returns all records from both tables that satisfy the join condition. In other words, this join will not return only the matching record but also return all unmatched rows from one or both tables.
+
+We can categories the OUTER JOIN further into three types:
+
+LEFT OUTER JOIN
+RIGHT OUTER JOIN
+FULL OUTER JOIN
+LEFT OUTER JOIN
+The LEFT OUTER JOIN retrieves all the records from the left table and matching rows from the right table. It will return NULL when no matching record is found in the right side table. Since OUTER is an optional keyword, it is also known as LEFT JOIN.
+
+The below visual representation illustrates the LEFT OUTER JOIN:
+
+SQL Server JOINS
+LEFT OUTER JOIN Syntax
+
+The following syntax illustrates the use of LEFT OUTER JOIN in SQL Server:
+
+SELECT column_lists  
+FROM table1    
+LEFT [OUTER] JOIN table2    
+ON table1.column = table2.column;    
+Example
+
+We can demonstrate the LEFT OUTER JOIN using the following command:
+
+SELECT Student.admission_no, Student.first_name, Student.last_name, Fee.course, Fee.amount_paid  
+FROM Student  
+LEFT OUTER JOIN Fee  
+ON Student.admission_no = Fee.admission_no;  
+This command gives the below result:
+
+SQL Server JOINS
+This output shows that the unmatched row's values are replaced with NULLs in the respective columns.
+
+RIGHT OUTER JOIN
+The RIGHT OUTER JOIN retrieves all the records from the right-hand table and matched rows from the left-hand table. It will return NULL when no matching record is found in the left-hand table. Since OUTER is an optional keyword, it is also known as RIGHT JOIN.
+
+
+CLOB vs varchar
+
+Generics:
+--------
+
+
+Reusability:
+------------
+third party API, multiple API, different response,
+
+
+Multithreading:
+----------------
+
+Executorservice :
+

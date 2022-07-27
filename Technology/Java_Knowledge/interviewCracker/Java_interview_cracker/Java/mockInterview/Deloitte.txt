@@ -1,0 +1,130 @@
+Deloitte:
+-----------
+1. how do you decide whether you decide Hibernate/jpa vs jdbc.
+2. difference between interface in java 8 vs abstract
+3.disadvanatages of ORM lib.
+4. multiple inheritance in interface  java 8
+5. streams : list of students , results would be map<String(name), int <count of names>>
+  occurence of names
+     Map<String, Long> counted = list.stream()
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+			
+	Map<String, Long> requirementCountMap = requirements.stream().collect(Collectors.groupingBy(Requirement::getRequirementType, Collectors.counting()));
+ 
+ Collectors.groupingBy() – this is the method of Collectors class to group objects by some property and store results in a Map instance
+Function.identity() – it is a functional interface in Java; the identity method returns a Function that always returns its input arguments
+Collectors.counting() – this Collectors class method counts the number of elements passed in the stream as a parameter
+
+
+6. list.stream().forloop to update the name object what happens (will stream throws concurrentmodificationexception)
+
+7.Java parallel stream how many threads
+ The number of threads in the common pool is equal to the number of processor cores. It's important to remember that this is a global setting and that it will affect all parallel streams and any other fork-join tasks that use the common pool
+ 
+   The number of threads in the common pool is equal to the number of processor cores.
+
+However, the API allows us to specify the number of threads it will use by passing a JVM parameter:
+
+-D java.util.concurrent.ForkJoinPool.common.parallelism=4
+
+ Parallel Stream takes the benefits of all available CPU cores and processes the tasks in parallel. If number of tasks exceeds the number of cores, then remaining tasks wait for currently running task to complete.
+ 
+ 
+ 8. Eexecutor framework
+  how does executor framework internally manages thread. (how thread lifecycle maintains in executor framework/thread pool)
+   how threads going back to thread pool once its done with it's work
+   
+ 9. Immutable class : why do we need immutable class ?
+ 
+ 10. String constant pool
+ 
+  String s= new String("abc");   // 2 objects
+  String s1="abc" 
+  String s2="abc" 
+  
+  String s = new String("xyz");
+
+The above line will create two object one is in heap and another is in String constant pool.
+
+now if we do this
+
+String s = new String("xyz");
+String s1 ="xyz";
+the above two statement will create two object. The first line String s = new String("xyz");will create two object as mentioned in 1st line and , When String s = "xyz";executes it checks in string constant pool if there is same content object is there or not, since the first line made an entry in string constant pool with "xyz" it returns the same reference and does not create other object.
+
+What if we have these four line together as mentioned bellow.
+
+String s2 = new String("xyz");
+String s3 ="xyz";
+String s4 = new String("xyz");
+String s5 ="xyz";
+If we execute the above line we will have three object.
+
+The first and as mentioned will create two object one in heap and another in String constant poll.
+When the second line executes it checks in the string constant poll
+and find with "xyz" so it returns the same object, so till second line we have two objects.
+when the third line executes it will create a new object in the heap since new operator creates object in the heap so till third line will have 3 objects.
+When the fourth line executes it checks in the string constant poll
+and find with "xyz" so it returns the same object, so fourth line we have three objects.
+Bonus about the intern() method
+
+When the intern() method is invoked on a String object it looks the string contained by this String object in the pool, if the string is found there then the string from the pool is returned. Otherwise, this String object is added to the pool and a reference to this String object is returned.
+
+
+11. where is string constant pool in jvm? or explain java memory model
+
+   In stack memory, only the primitive data types like- int, char, byte, short, boolean, long, float and double are stored.
+Whereas, in the heap memory, non-primitive data types like strings are stored. A reference to this location is held by the stack memory.
+
+The change has been done on java7 itself that the constant pool has been moved to typical heap space from permgen space(still the pool behaviour is same) where as permgen space completely removed in Java 8. Metaspace is nothing to do with constant pool specially, it is generic for all objects.
+
+12. outofmemory vs permgen
+
+ how to solve permgen space issue
+
+13. rest service vs soap
+
+rest service vs restful service
+
+  
+Representational state transfer (REST) is a style of software architecture. As described in a dissertation by Roy Fielding, REST is an "architectural style" that basically exploits the existing technology and protocols of the Web.
+
+RESTful is typically used to refer to web services implementing such an architecture
+
+14 . http rest method, post vs put
+
+15, how do you secure rest api  ?
+   authorization :  jwt, pubkey authentication, @enablewebsecurity, override websecurityadapter
+
+16.  how do you prevent  (redos attack prevention)
+   Regular expression Denial of Service - ReDoS
+ authenticated user continuously calling to API, how do you restrict repeatedly calls from API
+ 
+React JS:
+--------
+
+1. storage management :  redux/context api
+2.  context api vs redux/context
+3. ES6, difference var,let, const
+4. you are trying to access a variable before declaring then what happens 
+5. varaible  hosting 
+  JavaScript Hoisting refers to the process whereby the interpreter appears to move the declaration of functions, variables or classes to the top of their scope, prior to execution of the code. Hoisting allows functions to be safely used in code before they are declared.
+6. with redux , lifecycle of componet
+
+7. how redux works/ lifecycle. store/listener/
+8.  hours,mins, sec component, how do you design this clock component.
+
+   should have used 3 components
+9.higher order components
+   A higher-order component (HOC) is an advanced technique in React for reusing component logic. HOCs are not part of the React API, per se. They are a pattern that emerges from React’s compositional nature.
+  Whereas a component transforms props into UI, a higher-order component transforms a component into another component.
+  
+10. virtual dom :  react advantaged over angular , using virtual dom
+
+11. normal function vs arrow function
+
+ 
+
+ 
+  
+
