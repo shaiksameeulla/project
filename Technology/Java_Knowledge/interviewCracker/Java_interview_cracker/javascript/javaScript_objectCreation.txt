@@ -1,0 +1,111 @@
+Creating objects in JavaScript (4 Different Ways)
+------------------------------------------
+1. Using object literals:
+
+	Literals are smaller and simpler ways to define objects.We simple define the property and values inside curly braces as shown below:
+
+	//creating js objects with object literal
+	let car = {
+		name : 'GT',
+		maker : 'BMW',
+		engine : '1998cc',
+		start : function(){
+        console.log('Starting the engine...');
+    }
+	};
+	//property accessor
+	console.log(car.name); //dot notation
+	console.log(car['maker']); //bracket notation
+2.   factory functions 
+
+	function factoryFunction() {
+	   var obj = {
+		  someProp1 : "1",
+		  someProp2 : "2",
+		  someMethod: function() { /* whatever */ }
+	   };
+	   // other code to manipulate obj in some way here
+	   return obj;
+	}
+	
+	
+3.Creating object with Object.create() method:
+
+	The Object.create() method creates a new object, using an existing object as the prototype of the newly created object.
+	Example:
+
+	const coder = {
+		isStudying : false,
+		printIntroduction : function(){
+			console.log(`My name is ${this.name}. Am I studying?: ${this.isStudying}`);
+		}
+	};
+	const me = Object.create(coder);
+4.Creating object with a constructor:
+
+	One of the easiest way to instantiate an object in JavaScript. Constructor is nothing but a function and with help of new keyword, constructor function allows to create multiple objects of same flavor as shown below:
+
+	//simple function
+	function vehicle(name,maker,engine){
+		this.name = name;
+		this.maker = maker;
+		this.engine = engine;
+	}
+	//new keyword to create an object
+	let car  = new vehicle('GT','BMW','1998cc');
+	//property accessors
+	console.log(car.name);
+	console.log(car.maker);
+	console.log(car['engine']);
+5. Using es6 classes:
+
+	ES6 supports class concept like any other Statically typed or object oriented language. So, object can be created out of a class in javascript as well as shown below:
+
+	//using es6 classes
+	class Vehicle {
+	  constructor(name, maker, engine) {
+		this.name = name;
+		this.maker =  maker;
+		this.engine = engine;
+	  }
+	}
+	  
+	let car1 = new Vehicle('GT', 'BMW', '1998cc');
+	  
+	console.log(car1.name);  //GT
+	
+====================================================
+
+understanding-the-difference-between-object-create-and-new-somefunction
+----------------------------------------------------------------------
+
+Very simply said, new X is Object.create(X.prototype) with additionally running the constructor function. (And giving the constructor the chance to return the actual object that should be the result of the expression instead of this.)
+
+That’s it. :)
+
+The rest of the answers are just confusing, because apparently nobody else reads the definition of new either. ;)
+
+what happens with new :
+-----------------------
+
+new constructor[([arguments])]
+
+	When a function is called with the new keyword, the function will be used as a constructor. new will do the following things:
+
+	1.Creates a blank, plain JavaScript object. For convenience, let's call it newInstance.
+	2. Points newInstance's [[Prototype]] to the constructor function's prototype property
+	3. Executes the constructor function with the given arguments, binding newInstance as the this context (i.e. all references to this in the constructor function now refer to newInstance).
+	
+	4. If the constructor function returns a non-primitive, this return value becomes the result of the whole new expression. Otherwise, if the constructor function doesn't return anything or returns a primitive, newInstance is returned instead. (Normally constructors don't return a value, but they can choose to do so to override the normal object creation process.)
+	
+	
+	A function can know whether it is invoked with new by checking new.target. new.target is only undefined when the function is invoked without new. For example, you can have a function that behaves differently when it's called versus when it's constructed:
+
+function Car(color) {
+  if (!new.target) {
+    // Called as function.
+    return `${color} car`;
+  }
+  // Called with new.
+  this.color = color;
+}

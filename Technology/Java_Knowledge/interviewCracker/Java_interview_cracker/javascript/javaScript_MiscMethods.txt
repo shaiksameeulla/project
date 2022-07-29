@@ -1,0 +1,199 @@
+
+
+
+Closures
+A closure is the combination of a function bundled together (enclosed) with references to its surrounding state (the lexical environment). In other words, a closure gives you access to an outer function's scope from an inner function. In JavaScript, closures are created every time a function is created, at function creation time.
+
+blocks don't create scopes for var, the var statements here actually create a global variable. T
+
+In ES6, JavaScript introduced the let and const declarations, which, among other things like temporal dead zones, allow you to create block-scoped variables.
+
+
+
+Javascript bind,call,apply...etc
+-------------------------------
+1.What is the use of bind() in JavaScript?
+
+   Bind creates a new function that will force the this inside the function to be the parameter passed to bind().
+
+Here's an example that shows how to use bind to pass a member method around that has the correct this:
+
+var myButton = {
+  content: 'OK',
+  click() {
+    console.log(this.content + ' clicked');
+  }
+};
+
+myButton.click();
+
+		var looseClick = myButton.click;
+		looseClick(); // not bound, 'this' is not myButton - it is the global    This
+
+		var boundClick = myButton.click.bind(myButton);
+		boundClick(); // bound, 'this' is myButton
+		Which prints out:
+
+		OK clicked
+		undefined clicked
+		OK clicked
+		You can also add extra parameters after the 1st (this) parameter and bind will pass in those values to the original function. Any additional parameters you later pass to the bound function will be passed in after the bound parameters:
+
+		// Example showing binding some parameters
+		var sum = function(a, b) {
+		  return a + b;
+		};
+
+		var add5 = sum.bind(null, 5);
+		console.log(add5(10));
+		Which prints out:
+
+		15
+		
+	Update: ECMAScript 2015 adds support for => functions. => functions are more compact and do not change the this pointer from their defining scope, so you may not need to use bind() as often. For example, if you wanted a function on Button from the first example to hook up the click callback to a DOM event, the following are all valid ways of doing that:
+
+var myButton = {
+  ... // As above
+  hookEvent(element) {
+    // Use bind() to ensure 'this' is the 'this' inside click()
+    element.addEventListener('click', this.click.bind(this));
+  }
+};
+Or:
+
+var myButton = {
+  ... // As above
+  hookEvent(element) {
+    // Use a new variable for 'this' since 'this' inside the function
+    // will not be the 'this' inside hookEvent()
+    var me = this;
+    element.addEventListener('click', function() { me.click() });
+  }
+};    
+Or:
+
+var myButton = {
+  ... // As above
+  hookEvent(element) {
+    // => functions do not change 'this', so you can use it directly
+    element.addEventListener('click', () => this.click());
+  }
+};
+
+
++++++++++++++++++++++++++++++++++++++++
+Javascript call() & apply() vs bind()?
+==========================================
+
+I already know that apply and call are similar functions which set this (context of a function).
+
+The difference is with the way we send the arguments (manual vs array)
+
+Question:
+
+But when should I use the bind() method ?
+
+var obj = {
+  x: 81,
+  getX: function() {
+    return this.x;
+  }
+};
+
+alert(obj.getX.bind(obj)());
+alert(obj.getX.call(obj));
+alert(obj.getX.apply(obj));
+
+Use .bind() when you want that function to later be called with a certain context, useful in events. Use .call() or .apply() when you want to invoke the function immediately, and modify the context.
+
+Call/apply call the function immediately, whereas bind returns a function that, when later executed, will have the correct context set for calling the original function. This way you can maintain context in async callbacks and events.
+
+
+hey all attach this into function (or object) and the difference is in the function invocation (see below).
+
+call attaches this into function and executes the function immediately:
+
+var person = {  
+  name: "James Smith",
+  hello: function(thing) {
+    console.log(this.name + " says hello " + thing);
+  }
+}
+
+person.hello("world");  // output: "James Smith says hello world"
+person.hello.call({ name: "Jim Smith" }, "world"); // output: "Jim Smith says hello world"
+bind attaches this into function and it needs to be invoked separately like this:
+
+var person = {  
+  name: "James Smith",
+  hello: function(thing) {
+    console.log(this.name + " says hello " + thing);
+  }
+}
+
+person.hello("world");  // output: "James Smith says hello world"
+var helloFunc = person.hello.bind({ name: "Jim Smith" });
+helloFunc("world");  // output: Jim Smith says hello world"
+or like this:
+
+...    
+var helloFunc = person.hello.bind({ name: "Jim Smith" }, "world");
+helloFunc();  // output: Jim Smith says hello world"
+apply is similar to call except that it takes an array-like object instead of listing the arguments out one at a time:
+
+function personContainer() {
+  var person = {  
+     name: "James Smith",
+     hello: function() {
+       console.log(this.name + " says hello " + arguments[1]);
+     }
+  }
+  person.hello.apply(person, arguments);
+}
+personContainer("world", "mars"); // output: "James Smith says hello mars", note: arguments
+
+
+Function.prototype.call()
+
+The call() method calls the function with a given this value and arguments provided individually.
+
+Try it
+
+
+
+function Product(name, price) {
+  this.name = name;
+  this.price = price;
+}
+
+function Food(name, price) {
+  Product.call(this, name, price);
+  this.category = 'food';
+}
+
+console.log(new Food('cheese', 5).name);
+// expected output: "cheese"
+
+
+
+Using call() to chain constructors for an object
+You can use call to chain constructors for an object (similar to Java).
+
+In the following example, the constructor for the Product object is defined with two parameters: name and price.
+
+Two other functions, Food and Toy, invoke Product, passing this, name, and price. Product initializes the properties name and price, both specialized functions define the category.
+
+Using call() to invoke a function and specifying the context for 'this'
+In the example below, when we call greet, the value of this will be bound to object obj.
+
+function greet() {
+  const reply = [this.animal, 'typically sleep between', this.sleepDuration].join(' ');
+  console.log(reply);
+}
+
+const obj = {
+  animal: 'cats',
+  sleepDuration: '12 and 16 hours',
+};
+
+greet.call(obj);  // cats typically sleep between 12 and 16 hours
