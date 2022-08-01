@@ -1,0 +1,124 @@
+Java tricky questions:
+=======================
+
+1. class A {    A(){sop("A")}}  class B extends A {    B(){sop("B")}}   class C extends B {    C(){sop("C")}}
+   class problem1{   psvm(String s[])  { C c= new C();}}
+   o/p : prints A B C
+
+2. Class A {  A a = new A()}    class problem2{   psvm(String s[])  { A a= new A();}}
+
+  o/p : stack overflow  [goes infinite loop]
+  
+3.  class problem3{   psvm(String s[])  {  Integer i= new Integer (null);  String s= new String (null);}}
+
+o/p :  Integer:  null pointer exce runtime  Integer: ambiguity compilation error
+
+4. class A {    public void printdata(Object a){}     public void printdata(String a){}  }
+
+    class problem4{   psvm(String s[]) {  A a = new A();   a.printdata(null);}
+	
+	o/p : method printdata(String a) takes the precendence  as method with  Object will be ignored
+	
+	Whenever more than one overloaded methods can be applied to the argument list, the most specific method is used.
+
+   In this case either of the methods can be called when passing null, since the "null type" is assignable to both Object and to String. The method that takes String is more specific so it will be picked
+   
+5.   public class NullTest {
+
+   public static void method(Object obj){
+     System.out.println("method with param type - Object");
+   }
+ 
+   public static void method(String str){
+     System.out.println("method with param type - String");
+   }
+ 
+   public static void method(StringBuffer strBuf){
+     System.out.println("method with param type - StringBuffer");
+   }
+ 
+   public static void main(String [] args){
+     method(null); //... compile-time error!
+   }
+}
+
+  Why is the compiler not able to pick 'the most specific' here - because both String and StringBuffer are are sub-classes
+of the Object class, but without being in the same inheritance hierarchy. For finding 'the most specific' method, the compiler needs to find a method having the parameter type, which is a sub-class of the parameter types of all other overloaded methods.
+
+6.  This holds true for overloaded methods having more than one parameters as well. The compiler would pick 'the most specific' by looking which method is having at least one of its parameter types as a clear sub-class of the corresponding parameter type and other parameter types being either the same or clear sub-classes, in all other overloaded methods. If it can find one, good, otherwise it will throw a compile-time error. For example:
+
+
+public class NullTest {
+
+ public static void method(Object obj, Object obj1){
+   System.out.println("method with param types - Object, Object");
+ }
+
+ public static void method(String str, Object obj){
+   System.out.println("method with param types - String, Object");
+ }
+
+ public static void main(String [] args){
+   method(null, null);
+ }
+}
+
+Output
+
+method with param types - String, Object
+
+
+In this case the compiler can easily pick 'the most specific' as the method having parameter types (String, Object) as
+ the other overloaded method is having its parameter types as (Object, Object) - clearly 'String' is a subclass of 'Object' and the other parameter is of same type, so the method with parameter types (String, Object) can be picked with ease.
+ 
+8.  But, the below code would throw a compile-time error as none of the methods satisfy the condition for being picked as 'the most specific' method.
+
+
+public class NullTest {
+
+ public static void method(Object obj, String obj1){
+   System.out.println("method with param types - Object, String");
+ }
+
+ public static void method(String str, Object str1){
+   System.out.println("method with param types - String, Object");
+ }
+
+ public static void main(String [] args){
+   method(null, null); //... compile-time error!
+ }
+}
+
+9.   
+   class A {    public static void printdata(String a){}   }
+
+    class problem9{   psvm(String s[]) {  A a = null;   a.printdata(null);}
+	
+	o/p : static method does not need an object to call hence no error.
+	
+10.class problem10{   psvm(String s[]) {   Integer i1=128; Integer i2=128;  sop(i1==i2);// false
+ Integer i3=127; Integer i4=127;  sop(i3==i4); //true
+   }
+   
+   From the java 1.6 source code, line 621:
+
+public static Integer valueOf(int i) {
+    if(i >= -128 && i <= IntegerCache.high)
+        return IntegerCache.cache[i + 128];
+    else
+        return new Integer(i);
+}
+The value of high can be configured to another value, with the system property.
+
+-Djava.lang.Integer.IntegerCache.high=999
+
+If you run your program with that system property, it will output true!
+
+The obvious conclusion: never rely on two references being identical, always compare them with .equals() method.
+
+So b2.equals(b3) will print true for all logically equal values of b2,b3.
+
+Note that Integer cache is not there for performance reasons, but rather to conform to the JLS, section 5.1.7; object identity must be given for values -128 to 127 inclusive.
+
+
+11.  class problem11{   psvm(String s[]) { sop(null);}  o/p : ambiguity compiletime error
