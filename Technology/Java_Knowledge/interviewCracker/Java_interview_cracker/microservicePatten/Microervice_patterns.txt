@@ -1,0 +1,387 @@
+Microservices pattern:
+===========================
+1. API Gateway:
+-----------------------
+	
+Feature #1 Separate out cross cutting concerns
+Feature #2 Separate and consolidate cross cutting concerns across microservices
+Feature #3 Replacing multiple client calls with single API call. And, some features of reverse proxy
+Feature #4 Routing based on headers, paths and params etc. And, some features of Load Balancer component
+
+Self managed :
+	Apache, NGINX,Spring cloud gateway
+Cloud Service:
+	AWS API Gateway, AZURE API Gateway, GoogleCloudENdpoints, 	APIgee
+
+API Gateway
+This microservice architecture pattern is really good for large applications with multiple client apps and it is responsible for giving a single entry point for a certain group of microservices. 
+
+API gateway sits between the client apps and the microservices and it serves as a reverse proxy, forwarding client requests to services. Authentication, SSL termination, and caching are some of the other cross-cutting services it can provide.
+
+Why do we consider the API Gateway architecture instead of using direct client-to-microservice communication? We will discuss this with the following examples,
+   
+1. Security issues - All microservices must be exposed to the "external world" without a gateway, increasing the attack surface compared to hiding internal microservices that aren't directly accessed by client apps.
+ 
+2. Cross-cutting concerns - Authorization and SSL must be handled by each publicly published microservice. Those problems might be addressed in a single tier in many cases, reducing the number of internal microservices.
+
+3. Coupling - Client apps are tied to internal microservices without the API Gateway pattern. Client apps must understand how microservices decompose the application's various sections.
+
+
+
+
+2. CircuitBreaker: fault tolerance
+------------------
+    
+	Microservices architecture, a service usually calls other services to retrieve data, and there is the chance that the downstream service may be down. It may be cause by slow network connection, timeouts, or temporal unavailability. Therefore, retrying calls can solve the issue. However, if there is a severe issue on a particular microservice, then it will be unavailable for a longer time. In such case, the request will be continuously sent to that service, since the client doesn’t have any knowledge about a particular service being down. As a result, the network resources will be exhausted with low performance and bad user experience. Also, the failure of one service might lead to Cascading failures throughout the application.
+	
+	The Circuit Breaker Design pattern have three states:
+
+		1. Closed
+		2. Open
+		3. Half-Open
+		
+	Closed state
+		In this state, the Circuit Breaker routs the requests to the Microservice and counts the number of failures in each period of time. That means it work without any failures. But if the number of failures in a certain period of time exceeds a threshold, the circuit will trip and will move to an “Open” state.
+
+	Open state
+		When Circuit breaker moves to the “Open” state, requests from the Microservices will fail immediately, and an exception will be returned. However, after a timeout, the Circuit Breaker will go to the “Half-Open” state.
+
+
+	Half-Open state
+		In this state, the Circuit Breaker allows only a limited number of requests from the Microservice, to pass through and invoke the operation. If these requests are successful, the Circuit Breaker will go back to the “Closed” state. However, if any request fails again, it goes back to the “Open” state.
+		
+
+Supported Implementations
+  Resilience4J
+  Spring Retry
+  
+   private CircuitBreakerFactory circuitBreakerFactory;
+	private HttpBinService httpBin;
+
+	public DemoController(CircuitBreakerFactory circuitBreakerFactory, HttpBinService httpBinService) {
+		this.circuitBreakerFactory = circuitBreakerFactory;
+		this.httpBin = httpBinService;
+	}
+
+@GetMapping("/delay/{seconds}")
+	public Map delay(@PathVariable int seconds) {
+		return circuitBreakerFactory.create("delay").run(httpBin.delaySuppplier(seconds), t -> {
+			LOG.warn("delay call failed error", t);
+			Map<String, String> fallback = new HashMap<>();
+			fallback.put("hello", "world");
+			return fallback;
+		});
+	}
+	
+	Resilience4JCircuitbreakerDemoApplication.java
+	
+	@Bean
+	public Customizer<Resilience4JCircuitBreakerFactory> defaultCustomizer() {
+		return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
+				.timeLimiterConfig(TimeLimiterConfig.custom().timeoutDuration(Duration.ofSeconds(3)).build())
+				.circuitBreakerConfig(CircuitBreakerConfig.ofDefaults())
+				.build());
+	}
+	
+@Service
+public class HttpBinService {
+
+	private RestTemplate rest;
+
+	public HttpBinService(RestTemplate rest) {
+		this.rest = rest;
+	}
+
+	public Map get() {
+		return rest.getForObject("https://httpbin.org/get", Map.class);
+
+	}
+
+	public Map delay(int seconds) {
+		return rest.getForObject("https://httpbin.org/delay/" + seconds, Map.class);
+	}
+
+	public Supplier<Map> delaySuppplier(int seconds) {
+		return () -> this.delay(seconds);
+	}
+}
+
+
+another way examples
+
+
+Product Service:
+Product service is responsible for providing list of products based on the user search criteria. It is one of the core services which should be up & responsive even under critical load. If it is down, it will have a severe impact on the revenue. Since this service depends on rating-service, we do not want any network issues or rating-service unavailability affect this product-service. This is where resilience4j library comes into picture.
+
+Configuration
+I first create a configuration for resilience4j as shown below.
+We can have multiple service configuration as shown below.
+I use the COUNT_BASED sliding window in which we track the given number of requests.
+failureRateThreshold: I also set the failure threshold as 60 which means if the 60 requests are failing in the 100 requests, keep the circuit breaker in CLOSED state.
+waitDurationInOpenState: When the Circuit breaker is in OPEN state, wait for 10 seconds before sending any more requests to rating service.
+You can have default configuration and use that for all the services, override values for specific services as shown below.
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowType: COUNT_BASED
+      slidingWindowSize: 100
+      permittedNumberOfCallsInHalfOpenState: 10
+      waitDurationInOpenState: 10
+      failureRateThreshold: 60
+      recordExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+  instances:
+    ratingService:
+      baseConfig: default
+    someOtherService:
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      permittedNumberOfCallsInHalfOpenState: 3
+      slidingWindowType: TIME_BASED
+      minimumNumberOfCalls: 20
+      waitDurationInOpenState: 50s
+      failureRateThreshold: 50
+      eventConsumerBufferSize: 10
+	  
+	  
+	  his product-service acts as a client for the rating-service.
+	@CircuitBreaker indicates that resilience4j will apply circuit breaker logic for this method execution.
+	name=ratingService indicates that resilience4j will use the configuration for ratingService in the yaml.
+	fallbackMethod is used when the main method fails for some reason
+		@Service
+		public class RatingServiceClient {
+
+			private final RestTemplate restTemplate = new RestTemplate();
+
+			@Value("${rating.service.endpoint}")
+			private String ratingService;
+			
+			@CircuitBreaker(name = "ratingService", fallbackMethod = "getDefault")
+			public ProductRatingDto getProductRatingDto(int productId){
+				return this.restTemplate.getForEntity(this.ratingService + productId, ProductRatingDto.class)
+						.getBody();
+			}
+
+			public ProductRatingDto getDefault(int productId, Throwable throwable){
+				return ProductRatingDto.of(0, Collections.emptyList());
+			}
+
+		}
+
+3. Backend For Frontend (BFF)  : (a variant for api gateway)
+=======================
+A variation of API Gateway pattern is the Backends for frontends pattern. It defines a separate API gateway for each kind of client.
+
+
+This pattern is used to identify how the data is fetched between the server and clients. Ideally, the frontend team will be responsible for managing the BFF.
+
+A single BFF is responsible for handling the single UI and it will help us to keep the frontend simple and see a unified view data through the backend.
+
+
+Why BFF needs in our microservice application?
+The goal of this architecture is to decouple the front-end apps from the backend architecture.
+As a scenario, think about you have an application that consists of the mobile app, web app and needs to communicate with the backend services in a microservices architecture. 
+
+This can be done successfully but if you want to make a change to one of the frontend services, you need to deploy a new version instead of stick to updating the one service.
+
+So here comes the microservice architecture and this is able to understand what our apps need and how to handle the services.
+
+This is a big improvement in microservice architecture as this allows to isolate the backend of the application from the frontend. One other advantage that we can get from this BFF is that we can reuse the code as this allows all clients to use the code from the backend. 
+
+Between the client and other external APIs, services, and so on, BFF functions similarly to a proxy server. If the request must pass through another component, the latency will undoubtedly increase.
+
+
+Difference between API gateway vs BFF:
+--------------------------------
+
+In a micro-services architecture we can have:
+
+	A single API gateway providing a single API for all clients.
+
+	A single API gateway providing an API for each kind of client.
+
+	A per-client API gateway providing each client with an API. which is the BFF pattern
+
+
+The Gateway and BFF (Backend For Frontend) are not quite the same thing:
+
+	Gateway / API Gateway is part of the platform infrastructure. It exposes API endpoints to clients and mediates the traffic, i.e. authentication, rate limiting and so on.
+	BFF (specifically the API & supporting API's and/or services) is part of the software which you write. The API portion will sit on a gateway (as per your option 1).
+	What the API actually calls is up to you. The goals of BFF basically imply that something needs to pull together the data that the client needs, in a way that is convenient for the client - i.e. orchestration, maybe even some caching.
+
+Options:
+
+	For simplistic scenarios you might be able to do that on the gateway itself using an API end-point on the gateway coupled with whatever capabilities the gateway has.
+	For other cases you'll probably need to implement something a bit more substantial - such as a dedicated service that handles the orchestration which.
+	Keep in mind that "API" is a loaded term, which depends on the context:
+
+Sometimes it means just an end-point on a gateway (option 1).
+Sometimes it means an end-point on a gateway plus whatever service implements the logic the "API" delivers (option 2).
+In your cases I'm sayin the BFF could be implemented either way.
+
+You might also be interested in "Experience API" which is a similar idea (if not the same) as BFF.
+
+
+4. Saga Pattern for Distributed Transactions
+=========================================
+The saga design pattern is provide to manage data consistency across microservices in distributed transaction cases. Basically, saga patterns offers to create a set of transactions that update microservices sequentially,
+and publish events to trigger the next transaction for the next microservices.
+
+If one of the step is failed, than saga patterns trigger to rollback transactions which is basically do reverse operations with publishing rollback events to previous microservices.
+
+By this way it is manage Distributed Transactions across microservices.
+As you know that its used some principles inside of the Saga pattern like publish/subscribe pattern with brokers or API Composition patterns.
+
+
+The saga pattern provides transaction management with using a sequence of local transactions of microservices. Every microservices has its own database and it can able to manage local transaction in atomic way with strict consistency.
+
+So saga pattern grouping these local transactions and sequentially invoking one by one. Each local transaction updates the database and publishes an event to trigger the next local transaction.
+
+If one of the step is failed, than saga patterns trigger to rollback transactions that are a set of compensating transactions that rollback the changes on previous microservices and restore data consistency.
+
+There are two type of saga implementation ways, These are “choreography” and “orchestration”.
+
+Let me explain Choreography way of Saga pattern.
+
+Choreography Saga Pattern
+	Choreography provides to coordinate sagas with applying publish-subscribe principles. With choreography, each microservices run its own local transaction and publishes events to message broker system and that trigger local transactions in other microservices.
+
+     This way is good for simple workflows if they don’t require too much microservices transaction steps.
+
+	But if Saga Workflow steps increase, then it can become confusing and hard to manage transaction between saga microservices. Also Choreography way decouple direct dependency of microservices when managing transactions.
+	
+Orchestration Saga Pattern
+	Another Saga way is Orchestration. Orchestration provides to coordinate sagas with a centralized controller microservice. This centralized controller microservice, orchestrate the saga workflow and invoke to execute local microservices transactions in sequentially.
+	
+	The orchestrator microservices execute saga transaction and manage them in centralized way and if one of the step is failed, then executes rollback steps with compensating transactions.
+     Orchestration way is good for complex workflows which includes lots of steps. But this makes single point-of-failure with centralized controller microservices and need implementation of complex steps.
+
+
+5. Strangler Pattern
+ ======================
+The Strangler Pattern is a popular design pattern to incrementally transform your monolithic application into microservices by replacing a particular functionality with a new service. Once the new functionality is ready, the old component is strangled, the new service is put into use, and the old component is decommissioned altogether.
+
+Any new development is done as part of the new service and not part of the Mmonolith. This allows you to achieve high-quality code for the greenfield development. You can follow Test-Driven Development for your business logic and integrate SonarQube with your deployment pipeline to prevent any technical debt from accruing.
+
+In the below diagram, the Order Service is eventually strangled from the monolith into an independently deployable service with its own CI/CD pipeline. Team A is now not dependent upon any issues with other teams.
+   You need to have processes in place to streamline this transition from monolith to microservices. To implement the Strangler Pattern, you can follow three steps: Transform, Coexist, and Eliminate.
+
+
+6. Bulkhead Pattern:
+-----------------------
+
+
+	A ship is split into small multiple compartments using Bulkheads. Bulkheads are used to seal parts of the ship to prevent the entire ship from sinking in case of a flood. Similarly, failures should be expected when we design software. The application should be split into multiple components and resources should be isolated in such a way that failure of one component is not affecting the other.
+
+	For ex: let's assume that there are 2 services A and B. Some of the APIs of A depends on B. For some reason, B is very slow. So, When we get multiple concurrent requests to A which depends on B, A’s performance will also get affected. It could block A’s threads. Due to that A might not be able to serve other requests which do NOT depend on B. So, the idea here is to isolate resources / allocate some threads in A for B. So that We do not consume all the threads of A and prevent A from hanging for all the requests! 
+	
+	Bulkhead Implementation:
+I am using the Resilience4j library.
+application.yaml changes
+We allow max 10 concurrent requests to the rating service even when we have 15 threads.
+max wait duration is for when we get any additional requests for rating service when the existing 10 threads are busy, we wait for only 10 ms and fail the request immediately.
+YAML
+1
+server:
+2
+  tomcat:
+3
+    max-threads: 15
+4
+  port: 8082
+5
+rating:
+6
+  service:
+7
+    url: http://localhost:8081/v1/ratings
+8
+resilience4j.bulkhead:
+9
+  instances:
+10
+    ratingService:
+11
+      maxConcurrentCalls: 10
+12
+      maxWaitDuration: 10ms
+
+
+
+
+RatingServiceImpl changes
+
+@Bulkhead uses the instance we have defined in the application.yaml.
+fallBackMethod is optional. It will be used when we have more than 10 concurrent requests
+Java
+
+1
+@Service
+2
+public class RatingServiceImpl implements RatingService {
+3
+4
+    @Value("${rating.service.url}")
+5
+    private String ratingServiceUrl;
+6
+7
+    @Autowired
+8
+    private RestTemplate restTemplate;
+9
+10
+    @Override
+11
+    @Bulkhead(name = "ratingService", fallbackMethod = "getFallbackRatings", type = Bulkhead.Type.SEMAPHORE)
+12
+    public ProductRatingDTO getRatings(int productId) {
+13
+        String url = this.ratingServiceUrl + "/" + productId;
+14
+        ProductRatingDTO productRatingDTO = new ProductRatingDTO();
+15
+        try{
+16
+            productRatingDTO = this.restTemplate.getForObject(url, ProductRatingDTO.class);
+17
+        }catch (Exception e){
+18
+            e.printStackTrace();
+19
+        }
+20
+        return productRatingDTO;
+21
+    }
+22
+23
+    public ProductRatingDTO getFallbackRatings(int productId, Exception e) {
+24
+        System.out.println("Falling back : " + productId);
+25
+        return new ProductRatingDTO();
+26
+    }
+27
+28
+}
+
+
+
+
+Now after starting our services, running the same test produces the below result which is very very interesting.
+
+Products requests average response time is 106 milliseconds compared to 3.6 seconds without bulkhead implementation. This is because we do not exhaust the resources of product-service.
+By using the fallback method any additional requests for the product/1 are responded to with default response.
+performance 
+
+Summary:
+Using the bulkhead pattern, we allocate resources for a specific component so that we do not consume all the resources of the application unnecessarily. Our application remains functional even under unexpected load.
+
+Other design patterns could handle this better along with the bulkhead pattern. Please take a look at these articles.
+
+Resilient MicroService Design – Timeout Pattern
+Resilient MicroService Design – Retry Pattern
+Resilient MicroService Design – Circuit Breaker Pattern
+Resilient MicroService Design – Rate Limiter Pattern
