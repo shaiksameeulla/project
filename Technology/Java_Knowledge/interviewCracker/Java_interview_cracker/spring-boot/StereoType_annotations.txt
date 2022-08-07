@@ -1,0 +1,44 @@
+@Service vs @component vs @Repository
+-------------------------------------
+According to documentaion @Repository,@Service,@Controller are all synonyms. They all are just specializations of @Component annotation. So, generally, they can be used one instead of other. But ... you should not do this.
+
+First reason: any of these annotations make clear the role of your component in the application. Shows - is this component belongs to the controller, service, or data layer.
+
+Second reason: some of these annotations processed differently by different Spring modules. For example, Spring Data JPA will process @Repository and will try to replace with implementation any interface marked by this annotation. Spring also will apply automatic exception translation to such classes. Another example: Spring Web MVC processes @Controller, and uses classes marked with it in URL mappings.
+
+Actually, in future versions, some modules of Spring could process @Service in a particular way. Not as simple @Component. That's why documentation advises:
+
+It is also possible that @Repository, @Service, and @Controller may carry additional semantics in future releases of the Spring Framework. Thus, if you are choosing between using @Component or @Service for your service layer, @Service is clearly the better choice.
+
+
+They all inform Spring that the class is involved in the DI context. But they also have semantic meaning:
+
+@Controller = @Component belonging to Presentation Layer
+@Service = @Component belonging to Service/Use Case Layer
+@Repository = @Component belonging to Persistence Layer
+
+
+@Controller
+
+The @Controller annotation indicates that a particular class serves the role of a controller. The @Controller annotation acts as a stereotype for the annotated class, indicating its role.
+
+What’s special about @Controller?
+
+We cannot switch this annotation with any other like @Service or @Repository, even though they look same. The dispatcher scans the classes annotated with @Controller and detects methods annotated with @RequestMapping annotations within them. We can use @RequestMapping on/in only those methods whose classes are annotated with @Controller and it will NOT work with @Component, @Service, @Repository etc...
+
+@Controller: where your request mapping from presentation page done i.e. Presentation layer won't go to any other file it goes directly to @Controller class and checks for requested path in @RequestMapping annotation which written before method calls if necessary.
+
+Respository
+------------
+@Respository also has automatic exception translation feature. Like when an exception occurs in a @Repository there is usually a handler for that exception and there is no need to add try catch blocks in the DAO class. It is used along with PersistenceExceptionTranslationPostProcessor
+
+@Repository
+
+This is to indicate that the class defines a data repository.
+
+What’s special about @Repository?
+
+In addition to pointing out, that this is an Annotation based Configuration, @Repository’s job is to catch platform specific exceptions and re-throw them as one of Spring’s unified unchecked exception. For this, we’re provided with PersistenceExceptionTranslationPostProcessor, that we are required to add in our Spring’s application context like this:
+
+<bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+This bean post processor adds an advisor to any bean that’s annotated with @Repository so that any platform-specific exceptions are caught and then re-thrown as one of Spring’s unchecked data access exceptions.
