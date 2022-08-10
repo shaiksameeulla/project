@@ -1,0 +1,39 @@
+OAuth 2.0 (Open Authorization) is an authorization protocol that gives an API client limited access to user data on a web server
+
+OAuth is an authorization protocol that can use JWT as a token. 
+OAuth uses server-side and client-side storage. If you want to do real logout you must go with OAuth2. Authentication with JWT token can not logout actually. 
+
+--->ID token is for client, for validation and for authentication.
+--->Access token is for OAuth 2 protected endpoint.
+-->These JWT access tokens do contain claims about end user as well as JWT related validation details (eg:- Token expiration). Here is the link for Azure AD OAuth 2 success response which highlights access token to be a JWT. 
+
+OpenID is about verifying a person's identity (authentication).
+OAuth is about accessing a person's stuff (authorization).
+OpenID Connect does both.
+
+
+============
+JWT token has 3 parts, 
+Header : {typ:jwt,alg=RS256,x5t=-----,kid=-----}   : base64 encoded string: x5t: value of the certificate that need to able to validate  the certificate.
+payload/body : indicates jwt<Claim>, it has aud(audiance), iss(issuer),iat(issuedat)
+signature : to ensure access_token is not tampared.  this will be checked by public key, there are multiple certificates availables to validate the same.
+
+=====
+process:
+----------
+1. user hits the  application
+2. user is redirected to  login page
+  2.1 backed sends  client_id, redirect_uri,state(some string to make sure we retrun same),resource(server/application),response_type(code,id_token: this will be authorzation code returned after authentication)
+ 2.2 user enters login details.
+3. once authenticated then  code or id_token will be returned.
+4.backedn retrieves access_token by sending authenticated code.  (request payload : code:<code>,redirect_uri:....,grant_type:"authorization code")
+5. backend validates the acess_token
+	5.1 response has : "access_token":"a.b.c",token_type:"bearer",expires_in:100,id_token:
+"assd" (used for logout)
+6. saves in browser cookie (in browser to app connectivity)
+
+Every request would send this in the request Header (in app to app connectivity )
+
+Authorization: Bearer <token>
+
+if you send JWT tokens through HTTP headers, you should try to prevent them from getting too big. Some servers don't accept more than 8 KB in headers
