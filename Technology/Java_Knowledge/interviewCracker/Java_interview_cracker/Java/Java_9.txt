@@ -27,6 +27,41 @@ Milling Project Coin
 
 
 
+Java 9 JShell (Java Shell) – REPL
+--------------------------------
+
+JShell stands for java shell. It is also known as REPL (Read Evaluate Print Loop). The purpose of this tool is to provide a easy way to learn Java, but how? Lets look into it. We are aware that we have to write several lines of code to print something on screen, for example – To print “Hello World” on the screen we have to write the following code.
+
+To display the “Hello World” in JShell, all you have to write is this:
+
+jshell> System.out.println("Hello, World!")
+Hello, World!
+JShell - Java Shell Hello World
+
+Why use JShell?
+The main advantage of using jshell is that you can test your partial code (individual statements, methods etc.) here without writing the complete program and then check the various possible scenarios. Once you are satisfied with the code then you can copy it from jshell to your main program.
+
+This allows you to try multiple scenarios without breaking your main program and gives you an opportunity to try and learn.
+
+How to Start JShell?
+To start jshell, you must have java 9 installed on your system, if you have older version of java then you can upgrade it by downloading the latest version from here.
+
+To start the jshell, open command prompt (open terminal if you are on Mac OS X), type jshell and hit Enter.
+
+If you get the error like: jshell: Command Not found (as shown in the screenshot below) then you have to set the path on your System.
+jshell Command Not Found
+
+If everything is setup fine then you should see a screen like this.
+Starting JShell on your System
+
+How to exit JShell?
+To stop JShell, type /exit and hit Enter.
+
+
+
+Factory Methods for Immutable List, Set, Map and Map.Entry
+----------------------------------------------------
+
 List immutableList = List.of();
 List immutableList = List.of("one","two","three");
 
@@ -60,19 +95,6 @@ Here we are using ‘module’ to create a simple module. Each module has a name
 
 ====================
 
-In java modular programming-
-------------------------------
-A module is typically just a jar file that has a module-info.class file at the root.
-To use a module, include the jar file into modulepath instead of the classpath. A modular jar file added to classpath is normal jar file and module-info.class file will be ignored.
-Typical module-info.java classes looks like this:
-
-module helloworld {
-    exports com.howtodoinjava.demo;
-}
-  
-module test {
-    requires helloworld;
-}
 
 Interface Private Methods
 ------------------------------
@@ -223,4 +245,243 @@ Output:
  
 1
 0
+
+ Diamond Operator for Anonymous Inner Class
+ ------------------------------------------
+
+Problem with the diamond operator while working with Anonymous Inner classes
+Java 7 allowed us to use diamond operator in normal classes but it didn’t allow us to use them in anonymous inner classes. Lets take an example:
+
+abstract class MyClass<T>{  
+    abstract T add(T num, T num2);  
+}  
+public class JavaExample {  
+    public static void main(String[] args) {  
+        MyClass<Integer> obj = new MyClass<>() {  
+            Integer add(Integer x, Integer y) {  
+                return x+y;   
+            }  
+        };    
+        Integer sum = obj.add(100,101);  
+        System.out.println(sum);  
+    }  
+}
+Output:
+
+$javac JavaExample.java
+JavaExample.java:7: error: cannot infer type arguments for MyClass
+        MyClass obj = new MyClass<>() {  
+                                        ^
+  reason: cannot use '<>' with anonymous inner classes
+  where T is a type-variable:
+    T extends Object declared in class MyClass
+1 error
+We got a compilation error when we ran the above code in Java SE 8.
+
+Java 9 – Diamond operator enhancements
+Java 9 improved the use of diamond operator and allows us to use the diamond operator with anonymous inner classes. Lets take the same example that we have seen above.
+Running this code in Java SE 9
+
+abstract class MyClass<T>{  
+    abstract T add(T num, T num2);  
+}  
+public class JavaExample {  
+    public static void main(String[] args) {  
+        MyClass<Integer> obj = new MyClass<>() {  
+            Integer add(Integer x, Integer y) {  
+                return x+y;   
+            }  
+        };    
+        Integer sum = obj.add(100,101);  
+        System.out.println(sum);  
+    }  
+}
+Output:
+
+201
+
+Try-With-Resources Enhancements
+--------------------------------
+
+Problem with the Try-With-Resources in Java 7
+There were certain issues with the Try-With-Resource statement in Java 7. This statement didn’t allow the resources to be declared outside of the statement block (scope). Lets take an example to understand this.
+
+Java 7 – Resource declared outside the Try-With-Resources block
+
+import java.io.FileNotFoundException;  
+import java.io.FileOutputStream;  
+public class JavaExample {  
+    public static void main(String[] args) throws FileNotFoundException { 
+       FileOutputStream fileOutputStream = new FileOutputStream("beginnersbook.txt");
+       try(fileOutputStream){ 
+            String mystring = "We are writing this line in the output file."; 
+            byte bytes[] = mystring.getBytes();       
+            fileOutputStream.write(bytes);      
+            System.out.println("The given String is written in the file successfully");           
+        }catch(Exception e) {  
+            System.out.println(e);  
+        }         
+    }  
+}
+Output in Java 7:
+
+Compile-time error
+The above example throws compile-time error because the resource is declared outside the scope of Try-With-Resource statement.
+
+Java 7 – Resource declared outside – duplicate resource as workaround
+To solve the above error, we had to do a workaround in Java 7. We used to duplicate the resource reference like this:
+
+import java.io.FileNotFoundException;  
+import java.io.FileOutputStream;  
+public class JavaExample {  
+    public static void main(String[] args) throws FileNotFoundException { 
+       FileOutputStream fileOutputStream = new FileOutputStream("beginnersbook.txt");
+       try(FileOutputStream fileOutputStream2 = fileOutputStream){ 
+            String mystring = "We are writing this line in the output file."; 
+            byte bytes[] = mystring.getBytes();       
+            fileOutputStream2.write(bytes);      
+            System.out.println("The given String is written in the file successfully");           
+        }catch(Exception e) {  
+            System.out.println(e);  
+        }         
+    }  
+}
+This code would run fine in Java 7.
+Note the FileOutputStream fileOutputStream2 = fileOutputStream line in the try block. We created another reference to the already declared output stream within the scope of Try-With-Resource.
+
+Java 9 – Try-With-Resources Enhancements
+Java 9 provided a major enhancement to the traditional Try-With-Resource statement. Java 9 allows us to declare the resource outside of the Try-With-Resource block. We no longer need to create the local variable to access the resource. Lets take the same example that we have taken in Java 7 but got a compilation error. In Java 9, this code runs perfectly fine.
+
+import java.io.FileNotFoundException;  
+import java.io.FileOutputStream;  
+public class JavaExample {  
+    public static void main(String[] args) throws FileNotFoundException { 
+       FileOutputStream fileOutputStream = new FileOutputStream("beginnersbook.txt");
+       try(fileOutputStream){ 
+            String mystring = "We are writing this line in the output file."; 
+            byte bytes[] = mystring.getBytes();       
+            fileOutputStream.write(bytes);      
+            System.out.println("The given String is written in the file successfully");           
+        }catch(Exception e) {  
+            System.out.println(e);  
+        }         
+    }  
+}
+Output:
+
+The given String is written in the file successfully
+
+
+In java modular programming-
+------------------------------
+A module is typically just a jar file that has a module-info.class file at the root.
+To use a module, include the jar file into modulepath instead of the classpath. A modular jar file added to classpath is normal jar file and module-info.class file will be ignored.
+Typical module-info.java classes looks like this:
+
+module helloworld {
+    exports com.howtodoinjava.demo;
+}
+  
+module test {
+    requires helloworld;
+}
+
+
+What is Java 9 Module?
+A module is a set of packages. We have two types of packages in a module – 1) Exported packages 2) Concealed packages.
+
+Exported Packages: These packages are intended to be used outside of the module, which means any program residing in any other module can use these packages.
+
+Concealed Packages: These packages are not intended to be used outside, they are internal to the module and can be used inside the module only.
+
+Java 9 Module
+
+To further understand the concept of exported packages and concealed packages, lets take an example of “java.base” module.
+
+Lets understand this with the help of following diagram. In the following diagram, the green block in java.base represents “exported packages”, there are several number of exported packages but I have mentioned only few of them. These packages mentioned in the green block can be used by outside class.
+
+The packages in the yellow block are concealed packages, they are not accessible outside the module. These packages are meant to be used only inside the module.
+
+In java we define the module in module-info.java file and to mention any package as exported packages we mention the name of package after exports keyword as shown in the right side(grey) block in the diagram below.
+Module in Java 9 - exported packages & concealed packages
+
+Lets write programs in Eclipse IDE and use the concept of Module.
+
+Java 9 Module – Create and use modules in Eclipse IDE
+We will create a class in one module and use that class in another module.
+
+1. Creating a Java Project
+New Project in Java 9
+
+We are creating a java project in Eclipse IDE. The project name we are using is “beginnersbook.demo”.
+
+2. Create module-info.java file
+Once the project is created, right click on the project name, go to the “Configure” option and click “create module-info.java” option as shown in the following screenshot. Give the module name same as project name “beginnersbook.demo“.
+Create module-info.java file in Eclipse IDE
+
+For now leave the file empty. We will come to it later.
+
+3. Create a package and a class
+We are creating a class in this module and we will use this class in another module. We are creating a class “BeginnersBook” in the package “beginnersbook.demo“.
+
+Source code of the class BeginnersBook:
+
+package beginnersbook.demo;
+
+public class BeginnersBook {
+   public String welcomeMessage() {
+      return "Welcome to BeginnersBook";
+   }
+
+}
+4. Export the package that we have created
+Since we are planning to use the class “BeginnersBook” in another module, lets make this package exported so that it can be used outside of the module. To do this, write this code in module-info.java file –
+module-info.java file
+
+module beginnersbook.demo {
+   exports beginnersbook.demo;
+}
+Final Structure of project beginnersbook.demo looks like this:
+Project Structure in Java 9 after creating module-info.java file
+
+5. Lets create another module
+Lets create a new java project, name it as “beginnersbook.user” and create the module-info.java file the same way that we have created above and name it as “beginnersbook.user”. The module-info.java file of this project has this code:
+
+//module-info.java file
+module beginnersbook.user {
+   exports beginnersbook.user;
+   requires beginnersbook.demo;
+}
+Since we are planning to use the beginnersbook.demo package, we mention the package name after requires keyword as shown in the above code.
+
+Note: You will most likely get an error message saying that the package name is not resolved, this is because the other module is not in the build path. To resolve this error, right click on the project beginnersbook.user, go to Build Path -> Configure Build Path as shown in the following screenshot:
+Build Path - Modules in Java9
+
+Go to Projects tab, click on Modulepath then click on “Add” button on the right side and add the previous java project “beginnersbook.demo” that we have created. Your final screen should look like this:
+Add Project to the Module Path - Java 9 Eclipse Oxygen
+
+Your error should be resolved now.
+
+6. Lets create a class in second module
+Create a class “BeginnersBookUser” in this project under package “beginnersbook.user“.
+
+Source code of the class BeginnersBookUser:
+
+package beginnersbook.user;
+import beginnersbook.demo.BeginnersBook;
+public class BeginnersBookUser {
+   public static void main (String arg[]) {
+      BeginnersBook obj = new BeginnersBook();
+      System.out.println(obj.welcomeMessage());
+   }
+}
+Final Structure of both projects looks like this:
+Java 9 Module Final project structure
+
+7. Final Step
+Lets run the BeginnersBookUser class, you should get the following output:
+
+Welcome to BeginnersBook
+Thats it guys. To give a brief, we have created a class in a module and exported the package so that the class can be used outside the module.
+To test it, we have created another class in a different module and used the exported package and finally used that class that we have created first.
 

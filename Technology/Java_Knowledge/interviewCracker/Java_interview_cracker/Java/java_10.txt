@@ -37,6 +37,22 @@ $FEATURE.$INTERIM.$UPDATE.$PATCH
 
 There are Long Term Releases (LTS) as well. It is mainly for enterprise customers. LTS version of the products will offer premier and sustained support from Oracle and it will be targeted every 3 years. Also, updates for these releases will be available for at least three years.
 
+
+Time-Based Release Versioning
+Starting with Java 10, Oracle has moved to the time-based release of Java. This has following implications:
+
+A new Java release every six months. The March 2018 release is JDK 10, the September 2018 release is JDK 11, and so forth. These are called feature releases and are expected to contain at least one or two significant features
+Support for the feature release will last only for six months, i.e., until next feature release
+Long-term support release will be marked as LTS. Support for such release will be for three years
+Java 11 will be an LTS release
+java -version will now contain the GA date, making it easier to identify how old the release is:
+
+$ java -version
+openjdk version "10" 2018-03-20
+OpenJDK Runtime Environment 18.3 (build 10+46)
+OpenJDK 64-Bit Server VM 18.3 (build 10+46, mixed mode)
+10. Conclusion
+
 JEP 304: Garbage-Collector Interface
 --------------------------------------
 In earlier JDK structure, the components that made up a Garbage Collector (GC) implementation were scattered throughout various parts of the code base. It’s changed in Java 10. Now, it is a clean interface within the JVM source code to allow alternative collectors to be quickly and easily integrated. It will improve source-code isolation of different garbage collectors.
