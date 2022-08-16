@@ -1,0 +1,76 @@
+Java 10 features:
+------------------
+java 10 is a major release in Java release cadence and it was releasd on March 10, 2018. With Java 10, Oracle has changed the java release cadence to a new model, a 6 month release cadence and LTS model for Oracle Java SE products. LTS model stands for Long Term Support model.
+
+From Java 10 onwards, Oracle releases a new version of Java after every 6 month where each version contains one or two major features. Oracle uses a release train concept. Each release train is scheduled for 6 months. Features which are developed within this timeline are shipped in the release otherwise the features are moved to next release train.
+
+
+JEP 286: Local Variable Type Inference
+JEP 322: Time-Based Release Versioning
+JEP 304: Garbage-Collector Interface
+JEP 307: Parallel Full GC for G1
+JEP 316: Heap Allocation on Alternative Memory Devices
+JEP 296: Consolidate the JDK Forest into a Single Repository
+JEP 310: Application Class-Data Sharing
+JEP 314: Additional Unicode Language-Tag Extensions
+JEP 319: Root Certificates
+JEP 317: Experimental Java-Based JIT Compiler
+JEP 312: Thread-Local Handshakes
+JEP 313: Remove the Native-Header Generation Tool
+New Added APIs and Options
+Removed APIs and Options
+
+JEP 286: Local Variable Type Inference
+---------------------------------------
+Java has now var style declarations. It allows you to declare a local variable without specifying its type. The type of variable will be inferred from type of actual object created. It claims to be the only real feature for developers in JDK 10. e.g.
+
+Application.java
+var str = "Hello world"; 
+//or  
+String str = "Hello world";
+
+JEP 322: Time-Based Release Versioning
+------------------------------------
+Starting from Java 10, Oracle has adapted time based version-string scheme. The new format of the version number is:
+
+$FEATURE.$INTERIM.$UPDATE.$PATCH
+
+There are Long Term Releases (LTS) as well. It is mainly for enterprise customers. LTS version of the products will offer premier and sustained support from Oracle and it will be targeted every 3 years. Also, updates for these releases will be available for at least three years.
+
+JEP 304: Garbage-Collector Interface
+--------------------------------------
+In earlier JDK structure, the components that made up a Garbage Collector (GC) implementation were scattered throughout various parts of the code base. It’s changed in Java 10. Now, it is a clean interface within the JVM source code to allow alternative collectors to be quickly and easily integrated. It will improve source-code isolation of different garbage collectors.
+
+This is purely refactoring. Everything that worked before needs to work afterwards, and performance should not regress.
+
+
+JEP 307: Parallel Full GC for G1
+-------------------------------
+Java 9 introduced G1 (garbage first) garbage collector. The G1 garbage collector is designed to avoid full collections, but when the concurrent collections can’t reclaim memory fast enough. With this change, a fall back full GC will occur.
+
+The current implementation of the full GC for G1 uses a single threaded mark-sweep-compact algorithm. This change will parallelize the mark-sweep-compact algorithm and use the same number of threads. It will be triggered when concurrent threads for collection can’t revive the memory fast enough.
+
+The number of threads can be controlled by the -XX:ParallelGCThreads option.
+
+
+JEP 316: Heap Allocation on Alternative Memory Devices
+-------------------------------------------------
+The goal of this change is to enable the HotSpot VM to allocate the Java object heap on an alternative memory device, such as an NV-DIMM, specified by the user.
+
+To allocate the heap in such memory we can add a new option, -XX:AllocateHeapAt=<path>. This option would take a path to the file system and use memory mapping to achieve the desired result of allocating the object heap on the memory device. The existing heap related flags such as -Xmx, -Xms, etc., and garbage-collection related flags would continue to work as before.
+
+
+
+New Added APIs and Options
+=====================
+73 new API’s has been added in Java 10. Let’s go through few of them:
+
+API                     					Description
+Optional.orElseThrow()	   					A new method orElseThrow has been added to the Optional class. It is synonymous with and is now the preferred alternative to the existing get method.
+List.copyOf, Set.copyOf, and Map.copyOf	    These methods create new collection instances from existing instances.
+Collectors.toUnmodifiableList, Collectors.toUnmodifiableSet, Collectors.toUnmodifiableMap	
+											These methods allow the elements of a Stream to be collected into an unmodifiable collection
+--jdk.disableLastUsageTracking				To disable JRE last usage tracking for a running VM.
+--add-stylesheet							Provides support for the use of multiple stylesheets in the generated documentation.
+--main-stylesheet							To help distinguish the main stylesheet from any additional stylesheets.
+@summary Tag	                            Added to explicitly specify the text used as the summary of the API description. By default, the summary of an API description is inferred from the first sentence.

@@ -55,3 +55,172 @@ Simple Module Example
 
 module com.foo.bar { }
 Here we are using ‘module’ to create a simple module. Each module has a name, related code, and other resources.
+
+
+
+====================
+
+In java modular programming-
+------------------------------
+A module is typically just a jar file that has a module-info.class file at the root.
+To use a module, include the jar file into modulepath instead of the classpath. A modular jar file added to classpath is normal jar file and module-info.class file will be ignored.
+Typical module-info.java classes looks like this:
+
+module helloworld {
+    exports com.howtodoinjava.demo;
+}
+  
+module test {
+    requires helloworld;
+}
+
+Interface Private Methods
+------------------------------
+
+These private methods will improve code re-usability inside interfaces. Foe example, if two default methods needed to share code, a private interface method would allow them to do so, but without exposing that private method to it’s implementing classes.
+Since java 9, you will be able to add private methods and private static method in interfaces.
+
+Using private methods in interfaces have four rules :
+
+Private interface method cannot be abstract.
+Private method can be used only inside interface.
+Private static method can be used inside other static and non-static interface methods.
+Private non-static methods cannot be used inside private static methods.
+An example of using private methods in interfaces –
+
+HTTP/2 Client
+------------------
+
+HTTP/1.1 client was released on 1997. A lot has changed since. So for Java 9 a new API been introduced that is cleaner and clearer to use and which also adds support for HTTP/2. New API uses 3 major classes i.e. HttpClient, HttpRequest and HttpResponse.
+
+To make a request, it is as simple as getting your client, building a request and sending it as shown below.
+
+HttpClient httpClient = HttpClient.newHttpClient(); 
+HttpRequest httpRequest = HttpRequest.newBuilder().uri(new URI("//howtodoinjava.com/")).GET().build(); 
+HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandler.asString()); 
+System.out.println( httpResponse.body() ); 
+Above code looks much cleaner and readable.
+
+New API also support Async HTTP requests using httpClient.sendAsync() method. It returns CompletableFuture object which can be used to determine whether the request has been completed or not. It also provide you access to the HttpResponse once request is completed. Best part is that if you desire you can even cancel the request before it completes. e.g.
+
+if(httpResponse.isDone()) {
+    System.out.println(httpResponse.get().statusCode());
+    System.out.println(httpResponse.get().body());
+} else {
+    httpResponse.cancel(true);
+}
+
+Collection API Updates
+------------------------
+Since Java 9, you can create immutable collections such as immutable list, immutable set and immutable map using new factory methods. e.g.
+
+import java.util.List;
+  
+public class ImmutableCollections 
+{
+    public static void main(String[] args) 
+    {
+        List<String> namesList = List.of("Lokesh", "Amit", "John");
+ 
+        Set<String> namesSet = Set.of("Lokesh", "Amit", "John");
+ 
+        Map<String, String> namesMap = Map.ofEntries(
+                          Map.entry("1", "Lokesh"),
+                          Map.entry("2", "Amit"),
+                          Map.entry("3", "Brian"));
+    }
+}
+
+
+Java 9 Stream API Improvements
+------------------------------
+new java 9 improvements in Stream API i.e. takeWhile / dropWhile methods, ofNullable and iterate methods
+Limiting Stream with takeWhile() and dropWhile() methods
+
+The new methods takeWhile and dropWhile allow you to get portions of a stream based on a predicate. Here a stream can be either ordered or unordered, so :
+	On an ordered stream, takeWhile returns the “longest prefix” of elements taken from the stream that match the given predicate, starting at the beginning of the stream.
+	On an un-ordered stream, takeWhile returns a subset of the stream’s elements that match the given predicate (but not all), starting at the beginning of the stream.
+
+The dropWhile method does the opposite of takeWhile method.
+
+	On an ordered stream, dropWhile returns remaining items after the “longest prefix” that match the given predicate.
+	On an un-ordered stream, dropWhile returns remaining stream elements after dropping subset of elements that match the given predicate.
+takeWhile and dropWhile Example
+In this example, we have list of chars from ‘a’ to ‘i’. I want all chars which may appear before char ‘d’ in iteration.
+
+
+List<String> alphabets = List.of("a", "b", "c", "d", "e", "f", "g", "h", "i");
+ 
+List<String> subset1 = alphabets
+        .stream()
+        .takeWhile(s -> !s.equals("d"))
+        .collect(Collectors.toList());
+ 
+System.out.println(subset1);
+ 
+Output:
+ 
+[a, b, c]
+As stated before, dropWhile acts opposite to takeWhile method so in above example, if used, it will return all characters which were left by takeWhile predicate.
+
+List<String> alphabets = List.of("a", "b", "c", "d", "e", "f", "g", "h", "i");
+ 
+List<String> subset2 = alphabets
+        .stream()
+        .dropWhile(s -> !s.equals("d"))
+        .collect(Collectors.toList());
+ 
+System.out.println(subset2);
+ 
+Output:
+ 
+[d, e, f, g, h, i]
+
+Overloaded Stream iterate method
+----------------------------
+The iterate method in Java 8 has the signature: 
+		static Stream iterate(final T seed, final UnaryOperator f)
+In Java 9, new overloaded version of iterate takes a Predicate as the second argument:  
+		static Stream iterate(T seed, Predicate hasNext, UnaryOperator next)
+
+
+Let’s see the difference is use of iterate method from java 8 to java 9.
+
+iterate method in Java 8
+List<Integer> numbers = Stream.iterate(1, i -> i+1)
+                            .limit(10)
+                            .collect(Collectors.toList());
+         
+System.out.println(numbers);
+ 
+Output:
+ 
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+iterate method in Java 9
+List<Integer> numbers = Stream.iterate(1, i -> i <= 10 ,i -> i+1)
+                                .collect(Collectors.toList());
+ 
+System.out.println(numbers);
+ 
+Output:
+ 
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+New Stream ofNullable() method
+--------------------------------
+
+Until Java 8, you cannot have null value in a stream. It would have caused NullPointerException.
+
+In Java 9, the ofNullable method lets you create a single-element stream which wraps a value if not null, or is an empty stream otherwise.
+
+Stream<String> stream = Stream.ofNullable("123");
+System.out.println(stream.count());
+ 
+stream = Stream.ofNullable(null);
+System.out.println(stream.count());
+ 
+Output:
+ 
+1
+0
+

@@ -25,6 +25,124 @@ Testing
 	In the cloud, you get extra points for having reliable, trustworthy, stable APIs—but getting there can be a journey. Contract-based testing is one technique that high-performing teams often use to stay on track. It helps by formalizing the content of APIs and building tests around them to ensure code remains in check.
 
 	Spring Cloud Contract provides contract-based testing support for REST and messaging-based APIs with contracts written in Groovy, Java, or Kotlin.
+	
+	
+	
+Resilience is a fundamental property of software applications, especially in distributed systems like microservices and cloud native applications.
+A graceful degradation should be provided in the worst-case scenario, for example, by implementing a fallback logic.
+	
+Resilience4J is a library implementing the most common resilience patterns for Java applications, including
+				time limiters, 
+				bulkheads, 
+				circuit breakers, 
+				rate limiters,
+				retries,
+				and cache.
 
+	This article will show you how to use Resilience4J to include retries, bulkheads, and rate limiters in your Spring applications. Resilience4J provides integration with Spring Boot, including auto-configuration and metrics exported through Spring Boot Actuator.
+
+
+in this example, I’m using Resilience4J 1.6.1 and Spring Boot 2.3.6.
+
+		implementation 'org.springframework.boot:spring-boot-starter-actuator'
+		implementation 'org.springframework.boot:spring-boot-starter-aop'
+		implementation 'io.github.resilience4j:resilience4j-reactor:1.6.1'
+		implementation 'io.github.resilience4j:resilience4j-spring-boot2:1.6.1'
+If your application is using Project Reactor, for example, when working with Spring Web Flux, then you need an extra dependency to support objects like Mono and Flux.
+
+		implementation 'io.github.resilience4j:resilience4j-reactor:1.6.1'
+The resilience patterns I’ll show you in the next sections will be applied to a REST call to a service downstream that returns holiday greetings. The reactive WebClient object is used for the purpose.
+
+public Mono<String> getHolidayGreetings(String url) {
+    return webClient.get().uri(url)
+            .retrieve()
+            .bodyToMono(String.class);
+}
+For all the patterns, Resilience4J lets you define a fallback method to run whenever an operation is unrecoverable. In this case, the fallback
+behavior is logging an error message and return a default holiday greeting.
+public Mono<String> fallback(String url, Throwable throwable) {
+    log.error("Fallback executed for {} with {}", url, throwable.toString());
+    return Mono.just("Happy holidays!");
+}
+
+
+RETRY
+--------
+When your client doesn’t receive a response from a service downstream within a specific time window or replies with an error, you can use the retry pattern to attempt the request again. It’s a useful pattern for when the called service is experiencing some temporary issues, perhaps it’s overloaded, and it’s momentarily unable to process new requests. In that scenario, start an immediate sequence of retry attempts would only make things worse.
+
+A better solution is to increasingly add some delay between retry attempts to guarantee the service downstream some time to recover, without being flooded with requests.
+
+Resilience4J provides a Retry component that lets you retry an operation. You can configure it either programmatically or in your application.yml file. Exponential backoff is a common strategy for increasing the delay between retry attempts, and Resilience4J comes with an implementation for it.
+
+resilience4j.retry:
+  instances:
+    holidayClient:
+      # The maximum number of retry attempt
+      maxRetryAttempts: 3
+      # Initial interval between retry attempts
+      waitDuration: 1s
+      # Use exponential backoff strategy
+      enableExponentialBackoff: true
+      # Multiplier for the exponential backoff
+      exponentialBackoffMultiplier: 2
+The Retry configuration is applied to a holidayClient instance. The delay is computed as the waitDuration multiplied by the exponentialBackoffMultiplier.
+
+When configuring the Retry component through properties, you can leverage the Resilience4J @Retry annotation to apply the pattern to a specific operation. The name parameter has to be the same as the instance name defined in the configuration. Optionally, you can pass the name of a fallback method. After the third and last attempt, an exception is thrown. If a fallback method is defined, it’s executed; otherwise, the exception is sent to the caller.
+
+@Retry(name = "holidayClient", fallbackMethod = "fallback")
+public Mono<String> getHolidayGreetingWithRetries(String url) {
+  return getHolidayGreetings(url);
+}
+
+
+BULKHEAD
+
+	Bulkheads are partitions in a ship containing water in case of a breach, preventing the whole boat from sinking. Within an application, bulkheads can be implemented as partitions of threads preventing problems in one area to affect the entire service.
+
+	In practice, it relies on an isolated resource pool and sets a limit on the number of concurrent requests that the threads can execute in that pool. Resilience4J provides a Bulkhead component that lets you isolate an operation inside a bulkhead that you can configure either programmatically or in your application.yml file.
+
+	resilience4j.bulkhead:
+	  instances:
+		holidayClient:
+		  # Max amount of time a thread should be blocked
+		  # when attempting to enter a saturated bulkhead.
+		  maxWaitDuration: 100ms
+		  # Max amount of parallel executions allowed by the bulkhead.
+		  maxConcurrentCalls: 10
+	The Bulkhead configuration is applied to a holidayClient instance. There can only be 10 concurrent calls. When the bulkhead is saturated, a thread is allowed to block for a maximum of 100ms before the request is dropped.
+
+	When configuring the Bulkhead component through properties, you can leverage the Resilience4J @Bulkhead annotation to apply the pattern to a specific operation. The name parameter has to be the same as the instance name defined in the configuration. Optionally, you can pass the name of a fallback method.
+
+	When the bulkhead is saturated and the wait duration expired, the fallback method is executed if present, otherwise the request is dropped, and an exception is thrown.
+
+	@Bulkhead(name = "holidayClient", fallbackMethod = "fallback")
+	public Mono<String> getHolidayGreetingWithBulkhead(String url) {
+	  return getHolidayGreetings(url);
+	}
+	In reactive applications, for example, when using Spring Web Flux and Project Reactor, the risk of exhausting and blocking all threads available is lower, but it’s still a good pattern in your toolbox for building resilient applications.
+
+RATE LIMITER
+	Rate limiters constraint the number of requests you can make in a given time interval. If you expose an API, rate limiters help to protect your application against request flooding. In a client, you can leverage rate limiters to control the number of requests done to a service downstream, useful to don’t DDoS other applications in your system, or to limit the usage of an API in case of pay-per-use services.
+
+	Resilience4J provides a RateLimiter component that lets you apply a constraint on how many requests can be done for a given operation in a specific interval of time. You can configure it either programmatically or in your application.yml file.
+
+	resilience4j.ratelimiter:
+	  instances:
+		holidayClient:
+		  # The number of permissions available during one limit refresh period.
+		  limitForPeriod: 10
+		  # After each period, the rate limiter sets its permissions count
+		  # back to the limitForPeriod value.
+		  limitRefreshPeriod: 1s
+		  # The default wait time a thread waits for permission.
+		  timeoutDuration: 500ms
+	The RateLimiter configuration is applied to a holidayClient instance. For each period, only 10 requests can be processed. Every second, the RateLimiter resets the permissions count to 10, and a new period is started. Each request will wait 500ms at most to get permission to execute the operation; otherwise, it’s rejected.
+
+Optionally, you can pass the name of a fallback method. If a request is rejected because it exceeds the rate-limiting and a fallback method is defined, it’s executed; otherwise, the exception is sent to the caller.
+
+@RateLimiter(name = "holidayClient", fallbackMethod = "fallback")
+public Mono<String> getHolidayGreetingWithRateLimiter(String url) {
+  return getHolidayGreetings(url);
+}
 
 
