@@ -1,0 +1,180 @@
+What is Hoisting in JavaScript?
+
+
+In JavaScript, hoisting allows you to use functions and variables before they're declared. In this post, we'll learn what hoisting is and how it works.
+
+What is hoisting?
+Take a look at the code below and guess what happens when it runs:
+
+console.log(foo);
+var foo = 'foo';
+It might surprise you that this code outputs undefined and doesn't fail or throw an error – even though foo gets assigned after we console.log it!
+
+This is because the JavaScript interpreter splits the declaration and assignment of functions and variables: it "hoists" your declarations to the top of their containing scope before execution.
+
+This process is called hoisting, and it allows us to use foo before its declaration in our example above.
+
+Let's take a deeper look at functions and variable hoisting to understand what this means and how it works.
+
+Variable hoisting in JavaScript
+As a reminder, we declare a variable with the var, let, and const statements. For example:
+
+var foo;
+let bar;
+We assign a variable a value using the assignment operator:
+
+// Declaration
+var foo;
+let bar;
+
+// Assignment
+foo = 'foo';
+bar = 'bar';
+In many cases, we can combine declaration and assignment into one step:
+
+var foo = 'foo';
+let bar = 'bar';
+const baz = 'baz';
+Variable hoisting acts differently depending on how the variable is declared. Let's begin by understanding the behavior for  var variables.
+
+Variable hoisting with var
+When the interpreter hoists a variable declared with var, it initializes its value to undefined. The first line of code below will output undefined:
+
+console.log(foo); // undefined
+
+var foo = 'bar';
+
+console.log(foo); // "bar"
+As we defined earlier, hoisting comes from the interpreter splitting variable declaration and assignment. We can achieve this same behavior manually by splitting the declaration and assignment into two steps:
+
+var foo;
+
+console.log(foo); // undefined
+
+foo = 'foo';
+
+console.log(foo); // "foo"
+Remember that the first console.log(foo) outputs undefined because foo is hoisted and given a default value (not because the variable is never declared). Using an undeclared variable will throw a ReferenceError instead:
+
+console.log(foo); // Uncaught ReferenceError: foo is not defined
+Using an undeclared variable before its assignment will also throw a ReferenceError because no declaration was hoisted:
+
+console.log(foo); // Uncaught ReferenceError: foo is not defined
+foo = 'foo';      // Assigning a variable that's not declared is valid
+By now, you may be thinking, "Huh, it's kind of weird that JavaScript lets us access variables before they're declared." This behavior is an unusual part of JavaScript and can lead to errors. Using a variable before its declaration is usually not desirable.
+
+Thankfully the let and const variables, introduced in ECMAScript 2015, behave differently.
+
+Variable hoisting with let and const
+Variables declared with let and const are hoisted but not initialized with a default value. Accessing a let or const variable before it's declared will result in a ReferenceError:
+
+console.log(foo); // Uncaught ReferenceError: Cannot access 'foo' before initialization
+
+let foo = 'bar';  // Same behavior for variables declared with const
+Notice that the interpreter still hoists foo: the error message tells us the variable is initialized somewhere.
+
+The temporal dead zone
+The reason that we get a reference error when we try to access a let or const variable before its declaration is because of the temporal dead zone (TDZ).
+
+The TDZ starts at the beginning of the variable's enclosing scope and ends when it is declared. Accessing the variable in this TDZ throws a ReferenceError.
+
+Here's an example with an explicit block that shows the start and end of foo's TDZ:
+
+{
+ 	// Start of foo's TDZ
+  	let bar = 'bar';
+	console.log(bar); // "bar"
+
+	console.log(foo); // ReferenceError because we're in the TDZ
+
+	let foo = 'foo';  // End of foo's TDZ
+}
+The TDZ is also present in default function parameters, which are evaluated left-to-right. In the following example, bar is in the TDZ until its default value is set:
+
+function foobar(foo = bar, bar = 'bar') {
+  console.log(foo);
+}
+foobar(); // Uncaught ReferenceError: Cannot access 'bar' before initialization
+But this code works because we can access foo outside of its TDZ:
+
+function foobar(foo = 'foo', bar = foo) {
+  console.log(bar);
+}
+foobar(); // "foo"
+typeof in the temporal dead zone
+Using a let or const variable as an operand of the typeof operator in the TDZ will throw an error:
+
+console.log(typeof foo); // Uncaught ReferenceError: Cannot access 'foo' before initialization
+let foo = 'foo';
+This behavior is consistent with the other cases of let and const in the TDZ that we've seen. The reason that we get a ReferenceError here is that foo is declared but not initialized – we should be aware that we're using it before initialization (source: Axel Rauschmayer).
+
+However, this isn't the case when using a var variable before declaration because it is initialized with undefined when it is hoisted:
+
+console.log(typeof foo); // "undefined"
+var foo = 'foo';
+Furthermore, this is surprising because we can check the type of a variable that doesn't exist without an error. typeof safely returns a string:
+
+console.log(typeof foo); // "undefined"
+In fact, the introduction of let and const broke typeof's guarantee of always returning a string value for any operand.
+
+Function hoisting in JavaScript
+Function declarations are hoisted, too. Function hoisting allows us to call a function before it is defined. For example, the following code runs successfully and outputs "foo":
+
+foo(); // "foo"
+
+function foo() {
+	console.log('foo');
+}
+Note that only function declarations are hoisted, not function expressions. This should make sense: as we just learned, variable assignments aren't hoisted.
+
+If we try to call the variable that the function expression was assigned to, we will get a TypeError or ReferenceError, depending on the variable's scope:
+
+foo(); // Uncaught TypeError: foo is not a function
+var foo = function () { }
+
+bar(); // Uncaught ReferenceError: Cannot access 'bar' before initialization
+let bar = function () { }
+
+baz(); // Uncaught ReferenceError: Cannot access 'baz' before initialization
+const baz = function () { }
+This differs from calling a function that is never declared, which throws a different ReferenceError:
+
+foo(); // Uncaught ReferenceError: baz is not defined
+How to use hoisting in JavaScript
+Variable hoisting
+Because of the confusion that var hoisting can create, it's best to avoid using variables before they're declared. If you're writing code in a greenfield project, you should use let and const to enforce this.
+
+If you are working in an older codebase or have to use var for another reason, MDN recommends that you write var declarations as close to the top of their scope as possible. This will make the scope of your variables more clear.
+
+You can also consider using the no-use-before-define ESLint rule which will ensure you don't use a variable before its declaration.
+
+Function hoisting
+Function hoisting is useful because we can hide function implementation farther down in the file and let the reader focus on what the code is doing. In other words, we can open up a file and see what the code does without first understanding how it's implemented.
+
+Take the following contrived example:
+
+resetScore();
+drawGameBoard();
+populateGameBoard();
+startGame();
+
+function resetScore() {
+	console.log("Resetting score");
+}
+
+function drawGameBoard() {
+	console.log("Drawing board");
+}
+
+function populateGameBoard() {
+	console.log("Populating board");
+}
+
+function startGame() {
+	console.log("Starting game");
+}
+We immediately have an idea of what this code does without having to read all the function declarations.
+
+However, using functions before their declaration is a matter of personal preference. Some developers, such as Wes Bos, prefer to avoid this and put functions into modules that can be imported as needed (source: Wes Bos)
+
+

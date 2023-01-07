@@ -1,0 +1,167 @@
+ReactJs Interviews:
+------------------
+1.What is Hoisting in JS? How it works?
+   JavaScript Hoisting refers to the process whereby the interpreter appears to move the declaration of functions, variables or classes to the top of their scope, prior to execution of the code.
+
+    Hoisting is not a term normatively defined in the ECMAScript specification
+	
+	The JavaScript engine doesn’t hoist the function expressions
+		( let result = add(x,y); let add = function(x, y) {  return x + y;}) 
+and arrow functions(let add = (x, y) => x + y; ).
+
+      The javascript mechanism in which variables and function declarations are moved to the top of their scope before code execution is called Hoisting.
+		Hoisting gives us an advantage that variables and functions can be accessed before they are declared.
+		Function expressions and arrow functions cannot be hoisted.
+		The sequence of variable declaration and initialization or the lifecycle of a variable is as follows: Declaration -> Initialization -> Assignment.
+		All variables in javascript are hoisted, but var variables are hoisted in one way and let , const are hoisted in another way.
+
+
+
+2. What is difference between let and var?
+   var, let, and const Variable Declaration in JavaScript
+	The differences between var, let, and const variable declaration in JavaScript include:
+	Variables declared with var and const are scoped to the immediate function body.
+	Variables declared with the var keyword are hoisted. Hoisting means that the variable can be accessed in their enclosing scope even before they are declared.
+	Variables declared with the let keyword are block-scoped, which means the variables will have scope to the immediate enclosing block.
+
+3. What is Event Loop? 
+
+Function call stack: The function stack is a function which keeps track of all other functions executed in run time. Ever seen a stack trace being printed when you ran into an error in JavaScript. That is nothing but a snapshot of the function stack at that point when the error occurred.
+Event loop: An event loop is something that pulls stuff out of the queue and places it onto the function execution stack whenever the function stack becomes empty.
+The event loop is the secret by which JavaScript gives us an illusion of being multithreaded even though it is single-threaded. The below illusion demonstrates the functioning of event loop well:
+
+Here the callback function in the event queue has not yet run and is waiting for its time into the stack when the SetTimeOut() is being executed and the Web API is making the mentioned wait. When the function stack becomes empty, the function gets loaded onto the stack as shown below:
+
+That is where the event loop comes into picture, it takes the first event from the Event Queue and places it onto the stack i.e in this case the callback function. From here, this function executes calling other functions inside it, if any.
+
+This cycle is called the event loop and this how JavaScript manages its events.
+
+
+
+
+What is precedence in Event Loop? 
+
+   Does javascript event queue have priority?
+  Sort of. 
+  The event loop is actually composed of one or more event queues. In each queue, events are handled in a FIFO order.
+
+	It's up to the browser to decide how many queues to have and what form of prioritisation to give them. There's no Javascript interface to individual event queues or to send events to a particular queue.
+
+What is difference between setTimeout and setInterval?
+
+	Scheduling: setTimeout and setInterval
+	We may decide to execute a function not right now, but at a certain time later. That’s called “scheduling a call”.
+
+	There are two methods for it:
+
+	setTimeout allows us to run a function once after the interval of time.
+	setInterval allows us to run a function repeatedly, starting after the interval of time, then repeating continuously at that interval.
+	
+	 function sayHi(phrase, who) {
+  alert( phrase + ', ' + who );
+}
+	setTimeout(sayHi, 1000, "Hello", "John"); // Hello, John
+	If the first argument is a string, then JavaScript creates a function from it.
+
+	So, this will also work:
+
+	setTimeout("alert('Hello')", 1000);
+	But using strings is not recommended, use arrow functions instead of them, like this:
+
+	setTimeout(() => alert('Hello'), 1000);
+	
+	setInterval
+		The setInterval method has the same syntax as setTimeout:
+
+		let timerId = setInterval(func|code, [delay], [arg1], [arg2], ...)
+		All arguments have the same meaning. But unlike setTimeout it runs the function not only once, but regularly after the given interval of time.
+
+		To stop further calls, we should call clearInterval(timerId).
+
+ Where do you use Rest Operator?
+ the rest operator is used to put the rest of some specific user-supplied values into a JavaScript array. So, for instance, here is the rest syntax: ... yourValues
+ The main difference between rest and spread is that the rest operator puts the rest of some specific user-supplied values into a JavaScript array. But the spread syntax expands iterables into individual elements.
+eval ?
+	eval() is a global function in JavaScript that evaluates a specified string as JavaScript code and executes it.
+
+	Example: eval
+	eval("alert('this is executed by eval()')");
+
+ Have you heard of array.reverse?
+ The reverse() method reverses an array in place and returns the reference to the same array, the first array element now becoming the last, and the last array element becoming the first. In other words, elements order in the array will be turned towards the direction opposite to that previously stated.
+ 
+ he reverse() method reverses an array in place and returns the reference to the same array, the first array element now becoming the last, 
+
+ What is meant by Shallow copy and Deep copy?
+ 
+	Shallow Copy: When a reference variable is copied into a new reference variable using the assignment operator, a shallow copy of the referenced object is created. In simple words, a reference variable mainly stores the address of the object it refers to. When a new reference variable is assigned the value of the old reference variable, the address stored in the old reference variable is copied into the new one. This means both the old and new reference variable point to the same object in memory. As a result if the state of the object changes through any of the reference variables it is reflected for both.
+		var employeeDetailsOriginal = {  name: 'Manjula', age: 25, Profession: 'Software Engineer' };
+		var employeeDetailsDuplicate = employeeDetailsOriginal; //Shallow copy!
+		If we change a value:   employeeDetailsDuplicate.name = 'NameChanged';
+
+ 
+	Deep Copy: Unlike the shallow copy, deep copy makes a copy of all the members of the old object, allocates separate memory location for the new object and then assigns the copied members to the new object. In this way, both the objects are independent of each other and in case of any modification to either one the other is not affected. Also, if one of the objects is deleted the other still remains in the memory. Now to create a deep copy of an object in JavaScript we use JSON.parse() and JSON.stringify() methods. Let us take an example to understand it better.
+	
+			var employee = {
+			eid: "E102",
+			ename: "Jack",
+			eaddress: "New York",
+			salary: 50000
+		}
+		console.log("=========Deep Copy========");
+		var newEmployee = JSON.parse(JSON.stringify(employee));
+
+ What are Closure?
+ A closure is the combination of a function bundled together (enclosed) with references to its surrounding state (the lexical environment). 
+	A function can return another function in JavaScript. A function which is assigned to a variable is called function expression.
+	Closure is useful in hiding implementation detail in JavaScript. In other words, it can be useful to create private variables or functions.
+	
+	Example: Closure                                       |   var innerFunc = OuterFunction();
+function OuterFunction() {
+    var outerVariable = 100;                               |   innerFunc(); // 100
+    function InnerFunction() {
+        alert(outerVariable);                              |
+    }
+    return InnerFunction;}
+
+
+
+8:08 Have you used reduce function in JS?
+
+8:19 What is the difference between map and reduce?
+
+9:24 What are the parameters map function accepts?
+
+9:49 What is difference between a Promise and a Callback?
+
+10:23 What position attributes in CSS have you used?
+
+10:35 What is the difference between them?
+
+12: 32 What is Flexbox?
+
+13:13 What is difference between display=none and visibility=hidden?
+
+13:48 What are the Hooks you have used?
+
+14:34 What is the purpose of useCallback?
+
+14:48 What are Class based Lifecycle methods?
+
+16:37 How would you be able to achieve componentDidMount, componentDidUpdate & componentDidUnMount in functional based component? 17:58
+
+What are Pure Components and its purpose?
+
+19:27 What are Higher Order components?
+
+20:07 What HOCs have you used?
+
+20:29 Have you used Context API? 20:46
+
+Already have state management in React, so why go for Redux? 21:06
+
+How Redux works?
+
+22:27 Have you used any Middlewares?
+
+22:42 What is the purpose of using middlewares?
