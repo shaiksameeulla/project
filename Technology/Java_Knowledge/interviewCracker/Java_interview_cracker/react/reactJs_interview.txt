@@ -26,57 +26,9 @@ and arrow functions(let add = (x, y) => x + y; ).
 
 3. What is Event Loop? 
 
-Function call stack: The function stack is a function which keeps track of all other functions executed in run time. Ever seen a stack trace being printed when you ran into an error in JavaScript. That is nothing but a snapshot of the function stack at that point when the error occurred.
-Event loop: An event loop is something that pulls stuff out of the queue and places it onto the function execution stack whenever the function stack becomes empty.
-The event loop is the secret by which JavaScript gives us an illusion of being multithreaded even though it is single-threaded. The below illusion demonstrates the functioning of event loop well:
+4. What is precedence in Event Loop? 
 
-Here the callback function in the event queue has not yet run and is waiting for its time into the stack when the SetTimeOut() is being executed and the Web API is making the mentioned wait. When the function stack becomes empty, the function gets loaded onto the stack as shown below:
-
-That is where the event loop comes into picture, it takes the first event from the Event Queue and places it onto the stack i.e in this case the callback function. From here, this function executes calling other functions inside it, if any.
-
-This cycle is called the event loop and this how JavaScript manages its events.
-
-
-
-
-What is precedence in Event Loop? 
-
-   Does javascript event queue have priority?
-  Sort of. 
-  The event loop is actually composed of one or more event queues. In each queue, events are handled in a FIFO order.
-
-	It's up to the browser to decide how many queues to have and what form of prioritisation to give them. There's no Javascript interface to individual event queues or to send events to a particular queue.
-
-What is difference between setTimeout and setInterval?
-
-	Scheduling: setTimeout and setInterval
-	We may decide to execute a function not right now, but at a certain time later. That’s called “scheduling a call”.
-
-	There are two methods for it:
-
-	setTimeout allows us to run a function once after the interval of time.
-	setInterval allows us to run a function repeatedly, starting after the interval of time, then repeating continuously at that interval.
-	
-	 function sayHi(phrase, who) {
-  alert( phrase + ', ' + who );
-}
-	setTimeout(sayHi, 1000, "Hello", "John"); // Hello, John
-	If the first argument is a string, then JavaScript creates a function from it.
-
-	So, this will also work:
-
-	setTimeout("alert('Hello')", 1000);
-	But using strings is not recommended, use arrow functions instead of them, like this:
-
-	setTimeout(() => alert('Hello'), 1000);
-	
-	setInterval
-		The setInterval method has the same syntax as setTimeout:
-
-		let timerId = setInterval(func|code, [delay], [arg1], [arg2], ...)
-		All arguments have the same meaning. But unlike setTimeout it runs the function not only once, but regularly after the given interval of time.
-
-		To stop further calls, we should call clearInterval(timerId).
+5.What is difference between setTimeout and setInterval?
 
  Where do you use Rest Operator?
  the rest operator is used to put the rest of some specific user-supplied values into a JavaScript array. So, for instance, here is the rest syntax: ... yourValues
@@ -124,6 +76,55 @@ function OuterFunction() {
     }
     return InnerFunction;}
 
+hof vs callback in javascript
+------------------------------
+
+A higher-order function is a function that takes another function(s) as an argument(s) and/or returns a function to its callers.
+
+
+
+
+A callback function is a function that is passed to another function with the expectation that the other function will call it.
+
+So a callback is not necessarily itself a higher-order function, but a function that receives a callback as an argument is.
+
+
+Higher-Order functions basically mean two things:
+
+		Functions can take other functions as an argument/input
+		Functions can return functions
+This is what is meant by higher-order functions.
+
+// this function takes a function as an argument
+function myFunc(anotherFunc) {
+  // executes and returns its result as the output which happens to be a function (myFunc)
+  return anotherFunc();
+}
+
+// let's call myFunc with an anonymous function
+myFunc(function() { 
+ // this returns a function as you see
+ return myFunc;
+});
+As for your example, it demonstrates higher-order functions by returning a function. It also demonstrates the notion of closure.
+
+Closure is closing over a scoped variable, in this case the input argument n.
+
+function greaterThan(n) {
+  // n is closed over (embedded into and accessible within) the function returned below
+  return function(m) { return m > n; };
+}
+
+// greatherThan10 reference points to the function returned by the greaterThan function
+// with n set to 10
+// Notice how greaterThan10 can reference the n variable and no-one else can
+// this is a closure
+var greaterThan10 = greaterThan(10);
+
+console.log(greaterThan10(11));
+// → true
+
+=====
 
 
 8:08 Have you used reduce function in JS?
@@ -134,26 +135,76 @@ function OuterFunction() {
 
 9:49 What is difference between a Promise and a Callback?
 
-10:23 What position attributes in CSS have you used?
+10:23 What position attributes in CSS have you used?  (absolute,relative FIXED, sticky)
 
 10:35 What is the difference between them?
 
-12: 32 What is Flexbox?
+ Parent(position relative)--> child--> subchild(position:absolute)---subchild align with Parent or Super Prent?
+ Parent--> child--> subchild(position:absolute)---subchild align with Parent or Super Prent?
 
-13:13 What is difference between display=none and visibility=hidden?
+12: 32 What is Flexbox? 
 
-13:48 What are the Hooks you have used?
+13:13 What is difference between display=none and visibility=hidden? 
 
-14:34 What is the purpose of useCallback?
+13:48 What are the Hooks you have used? functional Hooks
 
-14:48 What are Class based Lifecycle methods?
+14:34 What is the purpose of useMemo and useCallback?
+
+14:48 What are Class based Lifecycle methods?  (constructor-->)
+
+			Mounting
+				These methods are called in the following order when an instance of a component is being created and inserted into the DOM:
+
+				constructor()
+				static getDerivedStateFromProps()
+				render()
+				componentDidMount()
+			
+			Updating
+				An update can be caused by changes to props or state. These methods are called in the following order when a component is being re-rendered:
+
+				static getDerivedStateFromProps()
+				shouldComponentUpdate()
+				render()
+				getSnapshotBeforeUpdate()
+				componentDidUpdate()
+			Unmounting
+				This method is called when a component is being removed from the DOM:
+
+				componentWillUnmount()
+			Error Handling
+				These methods are called when there is an error during rendering, in a lifecycle method, or in the constructor of any child component.
+
+				static getDerivedStateFromError()
+				componentDidCatch()
+
+  render() will not be invoked if shouldComponentUpdate() returns false.
+
+
 
 16:37 How would you be able to achieve componentDidMount, componentDidUpdate & componentDidUnMount in functional based component? 17:58
 
 What are Pure Components and its purpose?
+			React.PureComponent
+		React.PureComponent is similar to React.Component. The difference between them is that React.Component doesn’t implement shouldComponentUpdate(), but React.PureComponent implements it with a shallow prop and state comparison.
+
+		If your React component’s render() function renders the same result given the same props and state, you can use React.PureComponent for a performance boost in some cases.
+
+		Note
+
+		React.PureComponent’s shouldComponentUpdate() only shallowly compares the objects. If these contain complex data structures, it may produce false-negatives for deeper differences. Only extend PureComponent when you expect to have simple props and state, or use forceUpdate() when you know deep data structures have changed. Or, consider using immutable objects to facilitate fast comparisons of nested data.
+
+		Furthermore, React.PureComponent’s shouldComponentUpdate() skips prop updates for the whole component subtree. Make sure all the children components are also “pure”.
 
 19:27 What are Higher Order components?
+			A higher-order component (HOC) is an advanced technique in React for reusing component logic. HOCs are not part of the React API, per se. They are a pattern that emerges from React’s compositional nature.
 
+				Concretely, a higher-order component is a function that takes a component and returns a new component.
+
+				const EnhancedComponent = higherOrderComponent(WrappedComponent);
+				Whereas a component transforms props into UI, a higher-order component transforms a component into another component.
+
+				HOCs are common in third-party React libraries, such as Redux’s connect and Relay’s createFragmentContainer.
 20:07 What HOCs have you used?
 
 20:29 Have you used Context API? 20:46
@@ -163,5 +214,18 @@ Already have state management in React, so why go for Redux? 21:06
 How Redux works?
 
 22:27 Have you used any Middlewares?
+		=> Saga and Thunk
 
 22:42 What is the purpose of using middlewares?
+
+		Both Redux Thunk and Redux Saga take care of dealing with side effects. In very simple terms, applied to the most common scenario (async functions, specifically AJAX calls) Thunk allows Promises to deal with them, Saga uses Generators. Thunk is simple to use and Promises are familiar to many developers, Saga/Generators are more powerful but you will need to learn them. When Promises are just good enough, so is Thunk, when you deal with more complex cases on a regular basis, Saga gives you better tools.
+
+			As an example, what happens when you start an AJAX call in a route/view and then the user moves to a different one? Can you safely let the reducer change the state anyway? Saga makes it trivial to cancel the effect, Thunk requires you to take care of it, with solutions that don't scale as nicely.
+
+			In practical terms choosing one or the other one really depends (tautologically) on the project.
+
+			One thing to keep in mind is that the two middlewares can coexist, so you can start with Thunks and introduce Sagas when/if you need them (and then choose how/what to refactor with hands on experience... A solution that especially fits "learning projects", MVPs, et similia) In general terms, Sagas are more powerful and easier to test, but they introduce many new concepts, that can be a bit overwhelming if you're also learning other technologies (Redux especially).
+
+			Specifically, while dealing with the simple and effective Redux philosophy (actions (literal objects) fed into reducers (pure functions)), you can deal with side effects with Thunk that is more limited but easy to grasp (Promise.then().error()), or with Saga that requires you to face the (powerful) notion that you can do more complex things with those actions.
+
+			It's also worth mentioning (redux-)observable has an even more complex (and even more powerful) paradigm to deal with side effects, just in case you are unfamiliar with it (if you already are, it might be easier to use than learning Saga).

@@ -1,0 +1,214 @@
+3. What is Event Loop? 
+
+======================
+Stack: This is where all your javascript code gets pushed and executed one by one as the interpreter reads your program, and gets popped out once the execution is done. If your statement is asynchronous: setTimeout, ajax(), promise, or click event, then that code gets forwarded to Event table, this table is responsible for moving your asynchronous code to callback/event queue after specified time.
+
+Heap: This is where all the memory allocation happens for your variables, that you have defined in your program.
+
+Callback Queue: This is where your asynchronous code gets pushed to, and waits for the execution.
+
+Event Loop: Then comes the Event Loop, which keeps running continuously and checks the Main stack, if it has any frames to execute, if not then it checks Callback queue, if Callback queue has codes to execute then it pops the message from it to the Main Stack for the execution.
+
+Job Queue: Apart from Callback Queue, browsers have introduced one more queue which is “Job Queue”, reserved only for new Promise() functionality. So when you use promises in your code, you add .then() method, which is a callback method. These `thenable` methods are added to Job Queue once the promise has returned/resolved, and then gets executed.
+
+Quick Question now: Check these statements for example, can you predict the sequence of output?:
+
+console.log('Message no. 1: Sync');
+setTimeout(function() {
+   console.log('Message no. 2: setTimeout');
+}, 0);
+var promise = new Promise(function(resolve, reject) {
+   resolve();
+});
+promise.then(function(resolve) {
+   console.log('Message no. 3: 1st Promise');
+})
+.then(function(resolve) {
+   console.log('Message no. 4: 2nd Promise');
+});
+console.log('Message no. 5: Sync');
+Some of you might answer this:
+
+// Message no. 1: Sync
+// Message no. 5: Sync
+// Message no. 2: setTimeout
+// Message no. 3: 1st Promise
+// Message no. 4: 2nd Promise
+because setTimeout was pushed to Callback Queue first, then promise was pushed. But this is not the case, the output will be:
+
+// Message no. 1: Sync
+// Message no. 5: Sync
+// Message no. 3: 1st Promise
+// Message no. 4: 2nd Promise
+// Message no. 2: setTimeout
+All `thenable` callbacks of the promise are called first, then the setTimeout callback is called.
+
+Why?: Job Queue has high priority in executing callbacks, if event loop tick comes to Job Queue, it will execute all the jobs in job queue first until it gets empty, then will move to callback queue.
+
+If you want to dive deep about why promises gets called before setTimeout, then you can checkout this article Task, Microtasks, Queues and Schedules by Jake Archibald. Which explains this really well.
+
+Code execution notes
+	Your asynchronous code will run after “Main Stack” is done with all the task execution.
+	That is the good part: Your current statements/functions in the stack will run to completion. Async code can not interrupt them. Once your async code is ready to execute, it will wait for main stack to be empty.
+	That also means that it is not guaranteed that your setTimeout() or any other async code will run exactly after the time that you have specified. That time is the minimum time after which your code will executed, it can be delayed if Main stack is busy executing existing code.
+	If you use 0ms time in your setTimeout, it won’t run immediately (If main stack is busy). e.g:
+	setTimeout(function() {
+	   console.log('Message 1')
+	}, 0);
+	console.log('Message 2');
+	In above example, the first output will be “Message 2”, then “Message 1”, even though the setTimeout is set to run after 0 millisecond. Once the browser encounters the setTimeout it pops it from Main Stack to Callback Queue, where it waits for Main stack to finish the second console.log, then setTimeout gets back to Main Stack, and runs the first console.log.
+
+	If you are doing too much heavy computation, then it will make the browser unresponsive, because your main thread is blocked and can not process any other task. So user will be unable to do any click on your webpage. That’s when Browser throws “Script is taking too much time to execute” error, and gives you option to “kill the script” or “wait” for it.
+	[Optional] Error StackTrace
+	So we have learned, if interpreter encounters a function, then that function gets pushed into Stack, now if this function calls another function, then that function call will get pushed on top of the stack as well, and the chain goes on until a function execution gets completed or returns something, then only it get’s removed from the Stack and context gets return to the function that called the last function, and then execution get continues.
+
+	This stack of function call, is what helps browser to give you Stack trace for the error occurred in a particular function. E.g:
+
+function func1 () {
+  // Accessing undefined variable will throw error
+  console.log(err);
+}
+function func2 () {
+ func1();
+}
+function func3 () {
+ func2()
+}
+// Calling func3, will result in error in func1
+func3();
+
+Stacktrace for the error
+As you can see in the error stacktrace, the error occurred in func1 function, which was called at line no. 7 in func2, and then func2 was called in func3 at line no. 11.
+
+Now when should you utilise event loop?
+When you need to do heavy computation, which is not required to run sequentially, means next statement can be executed without it. In that case you would not want to block the main thread because of that computation.
+When you want to execute your code in the end, after all the other statement/functions are done executing.
+
+====================
+       JavaScript has a runtime model based on an event loop, which is responsible for executing the code, collecting and processing events, and executing queued sub-tasks. This model is quite different from models in other languages like C and Java.
+
+Stack :   Function calls form a stack of frames.
+Heap : Objects are allocated in a heap which is just a name to denote a large (mostly unstructured) region of memory.
+Queue : A JavaScript runtime uses a message queue, which is a list of messages to be processed. Each message has an associated function that gets called to handle the message.
+
+    At some point during the event loop, the runtime starts handling the messages on the queue, starting with the oldest one. To do so, the message is removed from the queue and its corresponding function is called with the message as an input parameter. As always, calling a function creates a new stack frame for that function's use.
+
+The processing of functions continues until the stack is once again empty. Then, the event loop will process the next message in the queue (if there is one).
+
+Event loop
+  The event loop got its name because of how it's usually implemented, which usually resembles:
+		JS
+		Copy to Clipboard
+
+		while (queue.waitForMessage()) {
+		  queue.processNextMessage();
+		}
+queue.waitForMessage() waits synchronously for a message to arrive (if one is not already available and waiting to be handled).
+
+The first two arguments to the function setTimeout are a message to add to the queue and a time value (optional; defaults to 0). The time value represents the (minimum) delay after which the message will be pushed into the queue. If there is no other message in the queue, and the stack is empty, the message is processed right after the delay. However, if there are messages, the setTimeout message will have to wait for other messages to be processed. For this reason, the second argument indicates a minimum time — not a guaranteed time.
+
+Here is an example that demonstrates this concept (setTimeout does not run immediately after its timer expires):
+
+JS
+Copy to Clipboard
+
+const seconds = new Date().getTime() / 1000;
+
+setTimeout(() => {
+  // prints out "2", meaning that the callback is not called immediately after 500 milliseconds.
+  console.log(`Ran after ${new Date().getTime() / 1000 - seconds} seconds`);
+}, 500);
+
+while (true) {
+  if (new Date().getTime() / 1000 - seconds >= 2) {
+    console.log("Good, looped for 2 seconds");
+    break;
+  }
+}
+Zero delays
+Zero delay doesn't mean the call back will fire-off after zero milliseconds. Calling setTimeout with a delay of 0 (zero) milliseconds doesn't execute the callback function after the given interval.
+
+The execution depends on the number of waiting tasks in the queue. In the example below, the message "this is just a message" will be written to the console before the message in the callback gets processed, because the delay is the minimum time required for the runtime to process the request (not a guaranteed time).
+
+The setTimeout needs to wait for all the code for queued messages to complete even though you specified a particular time limit for your setTimeout.
+
+JS
+Copy to Clipboard
+
+(() => {
+  console.log("this is the start");
+
+  setTimeout(() => {
+    console.log("Callback 1: this is a msg from call back");
+  }); // has a default time value of 0
+
+  console.log("this is just a message");
+
+  setTimeout(() => {
+    console.log("Callback 2: this is a msg from call back");
+  }, 0);
+
+  console.log("this is the end");
+})();
+
+// "this is the start"
+// "this is just a message"
+// "this is the end"
+// "Callback 1: this is a msg from call back"
+// "Callback 2: this is a msg from call back"
+
+
+=============
+Function call stack: The function stack is a function which keeps track of all other functions executed in run time. Ever seen a stack trace being printed when you ran into an error in JavaScript. That is nothing but a snapshot of the function stack at that point when the error occurred.
+
+Event loop: An event loop is something that pulls stuff out of the queue and places it onto the function execution stack whenever the function stack becomes empty.
+The event loop is the secret by which JavaScript gives us an illusion of being multithreaded even though it is single-threaded. The below illusion demonstrates the functioning of event loop well:
+
+Here the callback function in the event queue has not yet run and is waiting for its time into the stack when the SetTimeOut() is being executed and the Web API is making the mentioned wait. When the function stack becomes empty, the function gets loaded onto the stack as shown below:
+
+That is where the event loop comes into picture, it takes the first event from the Event Queue and places it onto the stack i.e in this case the callback function. From here, this function executes calling other functions inside it, if any.
+
+This cycle is called the event loop and this how JavaScript manages its events.
+
+
+
+
+What is precedence in Event Loop? 
+
+   Does javascript event queue have priority?
+  Sort of. 
+  The event loop is actually composed of one or more event queues. In each queue, events are handled in a FIFO order.
+
+	It's up to the browser to decide how many queues to have and what form of prioritisation to give them. There's no Javascript interface to individual event queues or to send events to a particular queue.
+
+What is difference between setTimeout and setInterval?
+
+	Scheduling: setTimeout and setInterval
+	We may decide to execute a function not right now, but at a certain time later. That’s called “scheduling a call”.
+
+	There are two methods for it:
+
+	setTimeout allows us to run a function once after the interval of time.
+	setInterval allows us to run a function repeatedly, starting after the interval of time, then repeating continuously at that interval.
+	
+	 function sayHi(phrase, who) {
+  alert( phrase + ', ' + who );
+}
+	setTimeout(sayHi, 1000, "Hello", "John"); // Hello, John
+	If the first argument is a string, then JavaScript creates a function from it.
+
+	So, this will also work:
+
+	setTimeout("alert('Hello')", 1000);
+	But using strings is not recommended, use arrow functions instead of them, like this:
+
+	setTimeout(() => alert('Hello'), 1000);
+	
+	setInterval
+		The setInterval method has the same syntax as setTimeout:
+
+		let timerId = setInterval(func|code, [delay], [arg1], [arg2], ...)
+		All arguments have the same meaning. But unlike setTimeout it runs the function not only once, but regularly after the given interval of time.
+
+		To stop further calls, we should call clearInterval(timerId).
+	=====================================
