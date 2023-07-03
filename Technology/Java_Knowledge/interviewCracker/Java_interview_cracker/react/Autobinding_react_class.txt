@@ -1,0 +1,72 @@
+Autobinding
+==================
+In React components declared as ES6 classes, methods follow the same semantics as regular ES6 classes. This means that they don’t automatically bind this to the instance. You’ll have to explicitly use .bind(this) in the constructor:
+
+class SayHello extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {message: 'Hello!'};
+    // This line is important!
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    alert(this.state.message);
+  }
+
+  render() {
+    // Because `this.handleClick` is bound, we can use it as an event handler.
+    return (
+      <button onClick={this.handleClick}>
+        Say hello
+      </button>
+    );
+  }
+}
+With createReactClass(), this is not necessary because it binds all methods:
+
+var SayHello = createReactClass({
+  getInitialState: function() {
+    return {message: 'Hello!'};
+  },
+
+  handleClick: function() {
+    alert(this.state.message);
+  },
+
+  render: function() {
+    return (
+      <button onClick={this.handleClick}>
+        Say hello
+      </button>
+    );
+  }
+});
+This means writing ES6 classes comes with a little more boilerplate code for event handlers, but the upside is slightly better performance in large applications.
+
+If the boilerplate code is too unattractive to you, you may use ES2022 Class Properties syntax:
+
+class SayHello extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {message: 'Hello!'};
+  }
+  
+  // Using an arrow here binds the method:
+  handleClick = () => {
+    alert(this.state.message);
+  };
+
+  render() {
+    return (
+      <button onClick={this.handleClick}>
+        Say hello
+      </button>
+    );
+  }
+}
+You also have a few other options:
+
+Bind methods in the constructor.
+Use arrow functions, e.g. onClick={(e) => this.handleClick(e)}.
+Keep using createReactClass.

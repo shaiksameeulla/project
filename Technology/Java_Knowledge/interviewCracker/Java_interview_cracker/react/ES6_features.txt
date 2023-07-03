@@ -1,0 +1,46 @@
+ES6 Features:
+================================
+
+Arrow Functions (ES6)
+-------------------------
+// example 1
+this.handleChange = () => {
+  this.doSomething();
+  return;
+}
+
+
+// example 2
+this.array.map(item => item.name);
+Arrow functions are one of the most popular new features in ES6. They combine a slick new syntax with an implicit bind that makes this inside the error function equal to this in the context that defined them.
+
+The new syntax essentially consists of the list of arguments in parentheses, followed by a "fat arrow" (=>), followed by the function body.
+
+Promises (ES6)
+-------------------------
+api.get(someUrl).then((value) => {
+    console.log(value);
+}).catch((error) => {
+    console.log(error);
+});
+Promises are an alternative mechanism for dealing with asynchronisity than passing callback functions. Any time you see then in your code you can be pretty certain you're dealing with a promise.
+
+A promise is essentially a placeholder for a value. The value may be there right away, or it may need to wait until some asynchronous action like an AJAX call before it can be resolved. Regardless, if you call then on a promise and pass a function, that function will be called when the value is available.
+
+Let and Const (ES6)
+-------------------------
+const temperature = this.props.temperature;
+let iterator = 1;
+When JavaScript was first standardized, there was only one keyword for declaring a variable: var. The semantics for var were a little weird too - scoping was strange, and you could shadow variables in ways that were hard for people to understand.
+
+ES6 took this problem on, defining two new keywords for declaring variables with simpler semantics. Both let and const have block scope, something that is closer to what most developers expect naturally. The const keyword implies the reference cannot change (though if the reference is to an object or array, the internals can change - this is not immutability), while let allows the reference to change.
+
+Object Destructuring (ES6)
+-------------------------
+// example 1
+const { props, state } = this;
+
+
+// example 2
+const [ first, second ] = array;
+Object destructuring is a mechanism for directly assigning properties from an object or array into variables in a way that looks like object literal syntax.

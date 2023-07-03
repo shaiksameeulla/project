@@ -1,0 +1,175 @@
+React 18 Features
+===================
+
+New Feature: Automatic Batching 
+New Feature: Transitions 
+New Suspense Features 
+New Client and Server Rendering APIs 
+New Strict Mode Behaviors 
+New Hooks 
+
+
+
+
+
+
+New Feature: Automatic Batching 
+Batching is when React groups multiple state updates into a single re-render for better performance. Without automatic batching, we only batched updates inside React event handlers. Updates inside of promises, setTimeout, native event handlers, or any other event were not batched in React by default. With automatic batching, these updates will be batched automatically:
+
+// Before: only React events were batched.
+setTimeout(() => {
+  setCount(c => c + 1);
+  setFlag(f => !f);
+  // React will render twice, once for each state update (no batching)
+}, 1000);
+
+// After: updates inside of timeouts, promises,
+// native event handlers or any other event are batched.
+setTimeout(() => {
+  setCount(c => c + 1);
+  setFlag(f => !f);
+  // React will only re-render once at the end (that's batching!)
+}, 1000);
+
+
+New Feature: Transitions 
+A transition is a new concept in React to distinguish between urgent and non-urgent updates.
+
+Urgent updates reflect direct interaction, like typing, clicking, pressing, and so on.
+Transition updates transition the UI from one view to another.
+Urgent updates like typing, clicking, or pressing, need immediate response to match our intuitions about how physical objects behave. Otherwise they feel “wrong”. However, transitions are different because the user doesn’t expect to see every intermediate value on screen.
+
+For example, when you select a filter in a dropdown, you expect the filter button itself to respond immediately when you click. However, the actual results may transition separately. A small delay would be imperceptible and often expected. And if you change the filter again before the results are done rendering, you only care to see the latest results.
+
+Typically, for the best user experience, a single user input should result in both an urgent update and a non-urgent one. You can use startTransition API inside an input event to inform React which updates are urgent and which are “transitions”:
+
+import { startTransition } from 'react';
+
+// Urgent: Show what was typed
+setInputValue(input);
+
+// Mark any state updates inside as transitions
+startTransition(() => {
+  // Transition: Show the results
+  setSearchQuery(input);
+});
+Updates wrapped in startTransition are handled as non-urgent and will be interrupted if more urgent updates like clicks or key presses come in. If a transition gets interrupted by the user (for example, by typing multiple characters in a row), React will throw out the stale rendering work that wasn’t finished and render only the latest update.
+
+useTransition: a hook to start transitions, including a value to track the pending state.
+startTransition: a method to start transitions when the hook cannot be used.
+
+
+useTransition() 
+Call useTransition at the top level of your component to mark some state updates as transitions.
+
+import { useTransition } from 'react';
+
+function TabContainer() {
+  const [isPending, startTransition] = useTransition();
+  // ...
+}
+startTransition function 
+The startTransition function returned by useTransition lets you mark a state update as a transition.
+
+function TabContainer() {
+  const [isPending, startTransition] = useTransition();
+  const [tab, setTab] = useState('about');
+
+  function selectTab(nextTab) {
+    startTransition(() => {
+      setTab(nextTab);
+    });
+  }
+  // ...
+}
+
+New Suspense Features 
+Suspense lets you declaratively specify the loading state for a part of the component tree if it’s not yet ready to be displayed:
+<Suspense> lets you display a fallback until its children have finished loading.
+
+
+<Suspense fallback={<Spinner />}>
+  <Comments />
+</Suspense>
+Suspense makes the “UI loading state” a first-class declarative concept in the React programming model. This lets us build higher-level features on top of it.
+
+Suspense does not detect when data is fetched inside an Effect or event handler.
+
+
+
+
+New Client and Server Rendering APIs 
+
+
+
+React DOM Client 
+These new APIs are now exported from react-dom/client:
+
+createRoot: New method to create a root to render or unmount. Use it instead of ReactDOM.render. New features in React 18 don’t work without it.
+hydrateRoot: New method to hydrate a server rendered application. Use it instead of ReactDOM.hydrate in conjunction with the new React DOM Server APIs. New features in React 18 don’t work without it.
+Both createRoot and hydrateRoot accept a new option called onRecoverableError in case you want to be notified when React recovers from errors during rendering or hydration for logging. By default, React will use reportError, or console.error in the older browsers.
+
+React DOM Server 
+These new APIs are now exported from react-dom/server and have full support for streaming Suspense on the server:
+
+renderToPipeableStream: for streaming in Node environments.
+renderToReadableStream: for modern edge runtime environments, such as Deno and Cloudflare workers.
+The existing renderToString method keeps working but is discouraged.
+
+
+
+New Strict Mode Behaviors
+ 
+In the future, we’d like to add a feature that allows React to add and remove sections of the UI while preserving state. For example, when a user tabs away from a screen and back, React should be able to immediately show the previous screen. To do this, React would unmount and remount trees using the same component state as before.
+
+This feature will give React apps better performance out-of-the-box, but requires components to be resilient to effects being mounted and destroyed multiple times. Most effects will work without any changes, but some effects assume they are only mounted or destroyed once.
+
+To help surface these issues, React 18 introduces a new development-only check to Strict Mode. This new check will automatically unmount and remount every component, whenever a component mounts for the first time, restoring the previous state on the second mount.
+
+Before this change, React would mount the component and create the effects:
+
+* React mounts the component.
+  * Layout effects are created.
+  * Effects are created.
+With Strict Mode in React 18, React will simulate unmounting and remounting the component in development mode:
+
+* React mounts the component.
+  * Layout effects are created.
+  * Effects are created.
+* React simulates unmounting the component.
+  * Layout effects are destroyed.
+  * Effects are destroyed.
+* React simulates mounting the component with the previous state.
+  * Layout effects are created.
+  * Effects are created.
+
+
+New Hooks 
+
+useId 
+useId is a new hook for generating unique IDs on both the client and server, while avoiding hydration mismatches. It is primarily useful for component libraries integrating with accessibility APIs that require unique IDs. This solves an issue that already exists in React 17 and below, but it’s even more important in React 18 because of how the new streaming server renderer delivers HTML out-of-order. See docs here.
+
+Note
+
+useId is not for generating keys in a list. Keys should be generated from your data.
+
+useTransition 
+useTransition and startTransition let you mark some state updates as not urgent. Other state updates are considered urgent by default. React will allow urgent state updates (for example, updating a text input) to interrupt non-urgent state updates (for example, rendering a list of search results). See docs here
+
+useDeferredValue 
+useDeferredValue lets you defer re-rendering a non-urgent part of the tree. It is similar to debouncing, but has a few advantages compared to it. There is no fixed time delay, so React will attempt the deferred render right after the first render is reflected on the screen. The deferred render is interruptible and doesn’t block user input. See docs here.
+
+useSyncExternalStore 
+useSyncExternalStore is a new hook that allows external stores to support concurrent reads by forcing updates to the store to be synchronous. It removes the need for useEffect when implementing subscriptions to external data sources, and is recommended for any library that integrates with state external to React. See docs here.
+
+Note
+
+useSyncExternalStore is intended to be used by libraries, not application code.
+
+useInsertionEffect 
+useInsertionEffect is a new hook that allows CSS-in-JS libraries to address performance issues of injecting styles in render. Unless you’ve already built a CSS-in-JS library we don’t expect you to ever use this. This hook will run after the DOM is mutated, but before layout effects read the new layout. This solves an issue that already exists in React 17 and below, but is even more important in React 18 because React yields to the browser during concurrent rendering, giving it a chance to recalculate layout. See docs here.
+
+Note
+
+useInsertionEffect is intended to be used by libraries, not application code.
+
