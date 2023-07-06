@@ -1,0 +1,68 @@
+The Component Lifecycle
+Each component has several “lifecycle methods” that you can override to run code at particular times in the process. 
+	Mounting
+	Updating
+	Unmounting
+	Error Handling
+
+
+
+Mounting
+		These methods are called in the following order when an instance of a component is being created and inserted into the DOM:
+
+		constructor()
+		static getDerivedStateFromProps()
+		render()
+		componentDidMount()
+
+		Note:
+		This method is considered legacy and you should avoid it in new code:
+
+		UNSAFE_componentWillMount()
+
+Updating
+		An update can be caused by changes to props or state. These methods are called in the following order when a component is being re-rendered:
+
+		static getDerivedStateFromProps()
+		shouldComponentUpdate()  : is invoked before rendering when new props or state are being received.
+		render()
+		getSnapshotBeforeUpdate()
+		componentDidUpdate() : is invoked immediately after updating occurs. This method is not called for the initial render.
+		
+		Note:
+		These methods are considered legacy and you should avoid them in new code:
+
+		UNSAFE_componentWillUpdate()
+		UNSAFE_componentWillReceiveProps()
+
+Unmounting
+	This method is called when a component is being removed from the DOM:
+
+		componentWillUnmount()
+
+Error Handling
+
+	These methods are called when there is an error during rendering, in a lifecycle method, or in the constructor of any child component.
+
+		static getDerivedStateFromError()
+		componentDidCatch()
+		
+		class ErrorBoundary extends React.Component {
+			  constructor(props) {
+				super(props);
+				this.state = { hasError: false };
+			  }
+
+  static getDerivedStateFromError(error) {
+    // Update state so the next render will show the fallback UI.
+    return { hasError: true };
+  }
+
+Other APIs
+Each component also provides some other APIs:
+
+setState()
+forceUpdate()
+
+
+
