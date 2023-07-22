@@ -1,0 +1,201 @@
+Spring boot 3 Basics:
+========================
+
+
+Using the ApplicationRunner or CommandLineRunner
+==================================================
+If you need to run some specific code once the SpringApplication has started, you can implement the ApplicationRunner or CommandLineRunner interfaces. Both interfaces work in the same way and offer a single run method, which is called just before SpringApplication.run(…​) completes.
+
+This contract is well suited for tasks that should run after application startup but before it starts accepting traffic.
+The CommandLineRunner interfaces provides access to application arguments as a string array, whereas the ApplicationRunner uses the ApplicationArguments interface discussed earlier. The following example shows a CommandLineRunner with a run method:
+
+JavaKotlin
+@Component
+public class MyCommandLineRunner implements CommandLineRunner {
+
+    @Override
+    public void run(String... args) {
+        // Do something...
+    }
+
+}
+
+If several CommandLineRunner or ApplicationRunner beans are defined that must be called in a specific order, you can additionally implement the org.springframework.core.Ordered interface or use the org.springframework.core.annotation.Order annotation.
+
+Externalized Configuration:
+===========================
+Spring Boot lets you externalize your configuration so that you can work with the same application code in different environments. You can use a variety of external configuration sources including Java properties files, YAML files, environment variables, and command-line arguments
+
+Property values can be injected directly into your beans by using the @Value annotation, accessed through Spring’s Environment abstraction, or be bound to structured objects through @ConfigurationProperties.
+
+
+Spring Boot uses a very particular PropertySource order that is designed to allow sensible overriding of values. Later property sources can override the values defined in earlier ones. Sources are considered in the following order:
+
+Default properties (specified by setting SpringApplication.setDefaultProperties).
+
+@PropertySource annotations on your @Configuration classes. Please note that such property sources are not added to the Environment until the application context is being refreshed. This is too late to configure certain properties such as logging.* and spring.main.* which are read before refresh begins.
+
+		Config data (such as application.properties files).
+		A RandomValuePropertySource that has properties only in random.*.
+		OS environment variables.
+		Java System properties (System.getProperties()).
+		JNDI attributes from java:comp/env.
+		ServletContext init parameters.
+		ServletConfig init parameters.
+		Properties from SPRING_APPLICATION_JSON (inline JSON embedded in an environment variable or system property).
+		Command line arguments.
+		properties attribute on your tests. Available on @SpringBootTest and the test annotations for testing a particular slice of your application.
+		@DynamicPropertySource annotations in your tests.
+		@TestPropertySource annotations on your tests.
+		Devtools global settings properties in the $HOME/.config/spring-boot directory when devtools is active.
+		
+		Config data files are considered in the following order:
+		
+		Application properties packaged inside your jar (application.properties and YAML variants).
+		Profile-specific application properties packaged inside your jar (application-{profile}.properties and YAML variants).
+		Application properties outside of your packaged jar (application.properties and YAML variants).
+		Profile-specific application properties outside of your packaged jar (application-{profile}.properties and YAML variants).
+
+     It is recommended to stick with one format for your entire application. If you have configuration files with both .properties and YAML format in the same location, .properties takes precedence.
+	 
+1.9. Accessing Application Arguments
+==============================
+If you need to access the application arguments that were passed to SpringApplication.run(…​), you can inject a org.springframework.boot.ApplicationArguments bean. The ApplicationArguments interface provides access to both the raw String[] arguments as well as parsed option and non-option arguments, as shown in the following example:
+
+JavaKotlin
+@Component
+public class MyBean {
+
+    public MyBean(ApplicationArguments args) {
+        boolean debug = args.containsOption("debug");
+        List<String> files = args.getNonOptionArgs();
+        if (debug) {
+            System.out.println(files);
+        }
+        // if run with "--debug logfile.txt" prints ["logfile.txt"]
+    }
+
+}
+Spring Boot also registers a CommandLinePropertySource with the Spring Environment. This lets you also inject single application arguments by using the @Value annotation.
+
+
+Using the ApplicationRunner or CommandLineRunner
+====================================================
+
+both executes just after applicationcontext is created and before spring boot application startup.
+
+Both of them provides the same functionality and the only difference between CommandLineRunner and ApplicationRunner is CommandLineRunner.run() accepts String array[] whereas ApplicationRunner.run() accepts ApplicationArguments as argument. You can find more information with example at Guide To Running Logic on Startup in Spring
+
+
+If you need to run some specific code once the SpringApplication has started, you can implement the ApplicationRunner or CommandLineRunner interfaces. Both interfaces work in the same way and offer a single run method, which is called just before SpringApplication.run(…​) completes.
+
+This contract is well suited for tasks that should run after application startup but before it starts accepting traffic.
+The CommandLineRunner interfaces provides access to application arguments as a string array, whereas the ApplicationRunner uses the ApplicationArguments interface discussed earlier. The following example shows a CommandLineRunner with a run method:
+
+JavaKotlin
+@Component
+public class MyCommandLineRunner implements CommandLineRunner {
+
+    @Override
+    public void run(String... args) {
+        // Do something...
+    }
+
+}
+
+If several CommandLineRunner or ApplicationRunner beans are defined that must be called in a specific order, you can additionally implement the org.springframework.core.Ordered interface or use the org.springframework.core.annotation.Order annotation.
+
+
+Profile Specific Files
+=========================
+As well as application property files, Spring Boot will also attempt to load profile-specific files using the naming convention application-{profile}. For example, if your application activates a profile named prod and uses YAML files, then both application.yaml and application-prod.yaml will be considered.
+
+
+=====
+
+For example, when an application with the following properties is run, the common and local profiles will be activated even when it runs using the --spring.profiles.active switch:
+
+PropertiesYaml
+spring.profiles.include[0]=common
+spring.profiles.include[1]=local
+
+Similar to spring.profiles.active, spring.profiles.include can only be used in non-profile specific documents. This means it cannot be included in profile specific files or documents activated by spring.config.activate.on-profile.
+
+
+=========
+Working With Multi-Document Files
+=========================
+Spring Boot allows you to split a single physical file into multiple logical documents which are each added independently. Documents are processed in order, from top to bottom. Later documents can override the properties defined in earlier ones.
+
+For application.yaml files, the standard YAML multi-document syntax is used. Three consecutive hyphens represent the end of one document, and the start of the next.
+
+For example, the following file has two logical documents:
+
+spring:
+  application:
+    name: "MyApp"
+---
+spring:
+  application:
+    name: "MyCloudApp"
+  config:
+    activate:
+      on-cloud-platform: "kubernetes"
+
+For application.properties files a special #--- or !--- comment is used to mark the document splits:
+
+spring.application.name=MyApp
+#---
+spring.application.name=MyCloudApp
+spring.config.activate.on-cloud-platform=kubernetes
+
+other example:
+
+we can specify the dev and production properties in the same application.properties:
+
+my.prop=used-always-in-all-profiles
+#---
+spring.config.activate.on-profile=dev
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://localhost:3306/db
+spring.datasource.username=root
+spring.datasource.password=root
+#---
+spring.config.activate.on-profile=production
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.url=jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+spring.datasource.username=sa
+spring.datasource.password=sa
+
+
+ Activation Properties
+ ================
+ It is sometimes useful to only activate a given set of properties when certain conditions are met. For example, you might have properties that are only relevant when a specific profile is active.
+
+You can conditionally activate a properties document using spring.config.activate.*.
+
+The following activation properties are available:
+
+
+  on-profile :A profile expression that must match for the document to be active.
+
+on-cloud-platform :  The CloudPlatform that must be detected for the document to be active.
+
+For example, the following specifies that the second document is only active when running on Kubernetes, and only when either the “prod” or “staging” profiles are active:
+
+PropertiesYaml
+myprop=always-set
+#---
+spring.config.activate.on-cloud-platform=kubernetes
+spring.config.activate.on-profile=prod | staging
+myotherprop=sometimes-set
+ ======
+
+Importing Extensionless Files
+=========================
+Some cloud platforms cannot add a file extension to volume mounted files. To import these extensionless files, you need to give Spring Boot a hint so that it knows how to load them. You can do this by putting an extension hint in square brackets.
+
+For example, suppose you have a /etc/config/myconfig file that you wish to import as yaml. You can import it from your application.properties using the following:
+
+PropertiesYaml
+spring.config.import=file:/etc/config/myconfig[.yaml]

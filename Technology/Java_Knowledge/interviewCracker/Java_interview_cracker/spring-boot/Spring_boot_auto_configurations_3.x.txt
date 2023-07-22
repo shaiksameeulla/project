@@ -1,0 +1,93 @@
+How Spring boot autoconfiugrations works in spring boot 3.x:
+==========================================================
+
+ Auto-configuration
+Spring Boot auto-configuration attempts to automatically configure your Spring application based on the jar dependencies that you have added. For example, if HSQLDB is on your classpath, and you have not manually configured any database connection beans, then Spring Boot auto-configures an in-memory database.
+
+You need to opt-in to auto-configuration by adding the @EnableAutoConfiguration or @SpringBootApplication annotations to one of your @Configuration classes.
+
+10. Creating Your Own Auto-configuration
+------------------------------------------
+
+If you work in a company that develops shared libraries, or if you work on an open-source or commercial library, you might want to develop your own auto-configuration. Auto-configuration classes can be bundled in external jars and still be picked up by Spring Boot.
+
+Auto-configuration can be associated to a “starter” that provides the auto-configuration code as well as the typical libraries that you would use with it. We first cover what you need to know to build your own auto-configuration and then we move on to the typical steps required to create a custom starter.
+
+
+10.1. Understanding Auto-configured Beans
+------------------------------------------
+Classes that implement auto-configuration are annotated with @AutoConfiguration. This annotation itself is meta-annotated with @Configuration, making auto-configurations standard @Configuration classes. Additional @Conditional annotations are used to constrain when the auto-configuration should apply. Usually, auto-configuration classes use @ConditionalOnClass and @ConditionalOnMissingBean annotations. This ensures that auto-configuration applies only when relevant classes are found and when you have not declared your own @Configuration.
+
+You can browse the source code of spring-boot-autoconfigure to see the @AutoConfiguration classes that Spring provides (see the META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports file).
+ this file has RabbitAutoConfiguration as one of the line then RabbitAutoConfiguration is defined as below
+
+@AutoConfiguration
+@ConditionalOnClass({RabbitTemplate.class, Channel.class})
+@EnableConfigurationProperties({RabbitProperties.class})
+@Import({RabbitAnnotationDrivenConfiguration.class, RabbitStreamConfiguration.class})
+public class RabbitAutoConfiguration {
+
+10.2. Locating Auto-configuration Candidates
+------------------------------------------
+Spring Boot checks for the presence of a META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports file within your published jar. The file should list your configuration classes, with one class name per line, as shown in the following example:
+
+com.mycorp.libx.autoconfigure.LibXAutoConfiguration
+com.mycorp.libx.autoconfigure.LibXWebAutoConfiguration
+
+NOTE:
+=====
+Auto-configurations must be loaded only by being named in the imports file. Make sure that they are defined in a specific package space and that they are never the target of component scanning. Furthermore, auto-configuration classes should not enable component scanning to find additional components. Specific @Import annotations should be used instead.
+
+
+If your configuration needs to be applied in a specific order, you can use the before, beforeName, after and afterName attributes on the @AutoConfiguration annotation or the dedicated @AutoConfigureBefore and @AutoConfigureAfter annotations. For example, if you provide web-specific configuration, your class may need to be applied after WebMvcAutoConfiguration.
+
+If you want to order certain auto-configurations that should not have any direct knowledge of each other, you can also use @AutoConfigureOrder. That annotation has the same semantic as the regular @Order annotation but provides a dedicated order for auto-configuration classes.
+
+As with standard @Configuration classes, the order in which auto-configuration classes are applied only affects the order in which their beans are defined. The order in which those beans are subsequently created is unaffected and is determined by each bean’s dependencies and any @DependsOn relationships
+
+
+10.3. Condition Annotations
+------------------------------------------
+You almost always want to include one or more @Conditional annotations on your auto-configuration class. The @ConditionalOnMissingBean annotation is one common example that is used to allow developers to override auto-configuration if they are not happy with your defaults.
+
+Spring Boot includes a number of @Conditional annotations that you can reuse in your own code by annotating @Configuration classes or individual @Bean methods. These annotations include:
+
+	Class Conditions : @ConditionalOnClass and @ConditionalOnMissingClass annotations let @Configuration classes be included based on the presence or absence of specific classes. 
+	Bean Conditions  : The @ConditionalOnBean and @ConditionalOnMissingBean annotations
+	Property Conditions : @ConditionalOnProperty 
+	Resource Conditions : @ConditionalOnResource
+	Web Application Conditions : @ConditionalOnWebApplication and @ConditionalOnNotWebApplication ;@ConditionalOnWarDeployment and @ConditionalOnNotWarDeployment
+    SpEL Expression Conditions  : @ConditionalOnExpression
+	
+
+
+Spring Boot uses an annotation processor to collect the conditions on auto-configurations in a metadata file (META-INF/spring-autoconfigure-metadata.properties). If that file is present, it is used to eagerly filter auto-configurations that do not match, which will improve startup time.
+
+When building with Maven, it is recommended to add the following dependency in a module that contains auto-configurations:
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-autoconfigure-processor</artifactId>
+    <optional>true</optional>
+</dependency>
+
+If you have defined auto-configurations directly in your application, make sure to configure the spring-boot-maven-plugin to prevent the repackage goal from adding the dependency into the fat jar:
+
+<project>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-autoconfigure-processor</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
