@@ -16,22 +16,31 @@ New Hooks
 New Feature: Automatic Batching 
 Batching is when React groups multiple state updates into a single re-render for better performance. Without automatic batching, we only batched updates inside React event handlers. Updates inside of promises, setTimeout, native event handlers, or any other event were not batched in React by default. With automatic batching, these updates will be batched automatically:
 
-// Before: only React events were batched.
-setTimeout(() => {
-  setCount(c => c + 1);
-  setFlag(f => !f);
-  // React will render twice, once for each state update (no batching)
-}, 1000);
+Let’s say that you are making pasta for dinner. If you were to optimize your grocery trip, you would create a list of all the ingredients that you need to buy, make a trip to the grocery store, and get all your ingredients in one trip.
 
-// After: updates inside of timeouts, promises,
-// native event handlers or any other event are batched.
-setTimeout(() => {
-  setCount(c => c + 1);
-  setFlag(f => !f);
-  // React will only re-render once at the end (that's batching!)
-}, 1000);
+This is batching. Without batching, you would start cooking, find out you need an ingredient, go to the grocery store and buy the ingredient, come back and continue cooking, only to find out you need another ingredient, go to the grocery store...and drive yourself crazy.
 
+In React, batching helps to reduce the number of re-renders that happen when a state changes, when you call setState. Previously, React batched state updates in event handlers, for example:
 
+const handleClick = () => {
+setCounter();
+setActive();
+setValue();
+}
+
+//re-rendered once at the end.
+However, state updates that happened outside of event handlers were not batched. For example, if you had a promise or were making a network call, the state updates would not be batched. Like this:
+
+fetch('/network').then( () => {
+setCounter(); //re-rendered 1 times
+setActive();  //re-rendered 2 times
+setValue();   //re-rendered 3 times
+});
+
+//Total 3 re-renders
+As you can tell, this is not performant. React 18 introduces automatic batching which allows all state updates – even within promises, setTimeouts, and event callbacks – to be batched. This significantly reduces the work that React has to do in the background. React will wait for a micro-task to finish before re-rendering.
+
+Automatic batching is available out of the box in React, but if you want to opt-out you can use flushSync.
 New Feature: Transitions 
 A transition is a new concept in React to distinguish between urgent and non-urgent updates.
 

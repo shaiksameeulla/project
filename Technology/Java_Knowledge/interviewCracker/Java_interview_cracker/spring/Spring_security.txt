@@ -10,3 +10,144 @@ Before explaining Filter Chain, we need to understand Authentication and Authori
  
  
  https://docs.spring.io/spring-security/reference/servlet/architecture.html
+ 
+ 
+ Spring security:
+=================
+
+DelegatingFilterProxy
+-------------------------------
+The DelegatingFilterProxy  is a filter which works as a bridge between Servlet container’s life-cycle and Spring’s Application Context. Servlet container does not have any information about the Spring’s application context, but spring security needs security filters to execute the task..
+
+Since DelegatingFilterProxy is a servlet filter, the application server register it as a normal filter in the context.
+The DelegatingFilterProxy as name suggests, delegates the work to the spring bean to start the security flow.
+
+FilterChainProxy
+-------------------------------
+This filter contains all the details about the different security filters available through the security filter chain.
+ Let’s understand few important points about the FilterChainProxy:
+ 
+ The FilterChainProxy contains information about the different security filter chains and it delegates the task to the chain based on the URI’s mapping or using the RequestMatcher interface.
+It’s not executed directly but started by the DelegatingFilterProxy filter
+
+SecurityFilterChain
+==============================
+We can have multiple SecurityFilterChain configured in our application.
+
+Filter chain for our REST API starting with /api/v2/**.
+Filter chain for the internal communication /enterprise/**.
+Security chain for other applications /**.
+Spring security filter chain can contain multiple filters and registered with the FilterChainProxy.
+Each security filter can be configured uniquely.
+The FilterChainProxy determines which SecurityFilterChain will be invoked for an incoming request.There are several benefits of this architecture, I will highlight few advantages of this workflow:
+
+It provides a centralized approach to start the process. There are no multiple entry points to the security stack.
+Make it more easy to debug an application. We know where to start (FilterChainProxy is a prominent place to star).
+Security is not an optional task, it’s a central point to start the process.
+Clearing out the security context on logout is not optional and having one entry point make it easy to execute it.
+Keep in mind that we invoke servlet filter based on the given URL only, but spring security filter chain provides more flexibility
+
+Start security filters for given URL’s
+Use the RequestMatcher to create more powerful rules to start the security filter chain (e.g. Based on the certain request header etc.)
+ 
+
+2.4. Multiple Filter Chains:
+Think about FilterChainProxy as a core module. The FilterChainProxy decides which SecurityFilterChain should be used. It matches all incoming requests with the security filter chains and the first matched filter chain will execute.
+
+ 
+
+3. Security Filters
+OOTB Spring security provides several securities filters. It is typically not necessary to know every filter but keep in mind that they work in certain order or sequence. Let’s look at some important filters.
+
+UsernamePasswordAuthenticationFilter – Looks for the username and password in the request and tries to authenticate if found these parameters in the request.
+SecurityContextPersistenceFilter – Populates the SecurityContextHolder with information got from the configured.
+ConcurrentSessionFilter – Filter for handling concurrent session.
+DefaultLoginPageGeneratingFilter –Generates a login page for you, if you don’t explicitly disable that feature.
+
+
+
+example :
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(Customizer.withDefaults())
+            .authorizeHttpRequests(authorize -> authorize
+                .anyRequest().authenticated()
+            )
+            .httpBasic(Customizer.withDefaults())
+            .formLogin(Customizer.withDefaults());
+        return http.build();
+    }
+
+}
+
+above configurations
+Filter										Added by
+CsrfFilter :  						HttpSecurity#csrf
+
+UsernamePasswordAuthenticationFilter :  HttpSecurity#formLogin
+
+BasicAuthenticationFilter :   HttpSecurity#httpBasic
+
+AuthorizationFilter :  HttpSecurity#authorizeHttpRequests
+
+First, the CsrfFilter is invoked to protect against CSRF attacks.
+
+Second, the authentication filters are invoked to authenticate the request.
+
+Third, the AuthorizationFilter is invoked to authorize the request.
+There might be other Filter instances that are not listed above. If you want to see the list of filters invoked for a particular request, you can print them.
+
+The list of filters is printed at INFO level on the application startup, so you can see something like the following on the console output for example:
+
+2023-06-14T08:55:22.321-03:00  INFO 76975 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [
+				org.springframework.security.web.session.DisableEncodeUrlFilter@404db674,
+				org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@50f097b5,
+				org.springframework.security.web.context.SecurityContextHolderFilter@6fc6deb7,
+				org.springframework.security.web.header.HeaderWriterFilter@6f76c2cc,
+				org.springframework.security.web.csrf.CsrfFilter@c29fe36,
+				org.springframework.security.web.authentication.logout.LogoutFilter@ef60710,
+				org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@7c2dfa2,
+				org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@4397a639,
+				org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@7add838c,
+				org.springframework.security.web.authentication.www.BasicAuthenticationFilter@5cc9d3d0,
+				org.springframework.security.web.savedrequest.RequestCacheAwareFilter@7da39774,
+				org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@32b0876c,
+				org.springframework.security.web.authentication.AnonymousAuthenticationFilter@3662bdff,
+				org.springframework.security.web.access.ExceptionTranslationFilter@77681ce4,
+				org.springframework.security.web.access.intercept.AuthorizationFilter@169268a7]
+
+
+Authentication Mechanisms
+===========================
+Username and Password - how to authenticate with a username/password
+OAuth 2.0 Login - OAuth 2.0 Log In with OpenID Connect and non-standard OAuth 2.0 Login (i.e. GitHub)
+SAML 2.0 Login - SAML 2.0 Log In
+Central Authentication Server (CAS) - Central Authentication Server (CAS) Support
+Remember Me - how to remember a user past session expiration
+JAAS Authentication - authenticate with JAAS
+Pre-Authentication Scenarios - (RequestHeaderAuthenticationFilter) authenticate with an external mechanism such as SiteMinder or Java EE security but still use Spring Security for authorization and protection against common exploits.
+X509 Authentication - X509 Authentication
+
+
+Authentication Architecture:
+-============================
+SecurityContextHolder - The SecurityContextHolder is where Spring Security stores the details of who is authenticated.
+SecurityContext - is obtained from the SecurityContextHolder and contains the Authentication of the currently authenticated user.
+Authentication - Can be the input to AuthenticationManager to provide the credentials a user has provided to authenticate or the current user from the SecurityContext.
+GrantedAuthority - An authority that is granted to the principal on the Authentication (i.e. roles, scopes, etc.)
+AuthenticationManager - the API that defines how Spring Security’s Filters perform authentication.
+ProviderManager - the most common implementation of AuthenticationManager.
+AuthenticationProvider - used by ProviderManager to perform a specific type of authentication.
+Request Credentials with AuthenticationEntryPoint - used for requesting credentials from a client (i.e. redirecting to a log in page, sending a WWW-Authenticate response, etc.)
+AbstractAuthenticationProcessingFilter - a base Filter used for authentication. This also gives a good idea of the high level flow of authentication and how pieces work together.
+
+SecurityContext context = SecurityContextHolder.getContext();
+Authentication authentication = context.getAuthentication();
+String username = authentication.getName();
+Object principal = authentication.getPrincipal();
+Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();  (GrantedAuthority : roles, authorities)

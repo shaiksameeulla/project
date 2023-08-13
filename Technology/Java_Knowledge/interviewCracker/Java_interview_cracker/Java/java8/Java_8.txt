@@ -149,6 +149,64 @@ System.out.println(setWithoutDuplicates);
 
 3. Collectors.toMap() to count occurances
 	Sometimes, we are interested in finding out that which all elements are duplicates and how many times they appeared in the original list. We can use a Map to store this information.
+	
+	For the keyMapper, we'd supply a function corresponding to the method that returns the name, and for the valueMapper, we'd supply a function corresponding to the method that returns the average grade of the student:
+
+Map<String, Double> nameToAvgGrade = students.stream()
+                .collect(Collectors.toMap(Student::getName, Student::getAvgGrade));
+				
+   Note : Note that Student::getName is just a Method Reference - a shorthand representation of the lambda expression student -> student.getName().
+   
+   What if we wanted to map the whole a particular Student object to just their name? Java provides a built-in identity() method from the Function interface. This method simply returns a function that always returns its input argument.
+
+		That is to say - we can map the identity of each object (the object itself) to their names easily:
+
+		Map<String, Student> nameToStudentObject = students.stream()
+						.collect(Collectors.toMap(Student::getName, Function.identity()));
+
+		Even though this particular overload is the easiest to use it falls short on one very important part - duplicate key elements. If we, for example, had two students named "John", and we wanted to convert our List to a Map like we did in examples above, we'd run into a glaring:
+
+*************Exception in thread "main" java.lang.IllegalStateException: Duplicate key John ******************8
+
+===> If you want to get rid of duplicate keys, you can always just add a distinct() operation to the Stream before collecting it:
+
+		Map<String, Double> nameToStudentObject = students.stream()
+				.distinct()
+				.collect(Collectors.toMap(Student::getName, Student::getAvgGrade));
+
+==> another way is to use groupingBy by	 as mentioned below
+	// Group employees by department
+     Map<Department, List<Employee>> byDept
+         = employees.stream()
+                    .collect(Collectors.groupingBy(Employee::getDepartment));
+					
+==> if we want return Map<k,value> but not valueList then we need tofollow below approach
+
+		  if we require Map<String, City> as the return type, we can no longer group the objects with the duplicated key together in a collection.
+		  
+		  
+		  Stream API has provided the toMap() collector method to collect a stream into a Map.
+
+		Furthermore, the toMap() method allows us to specify a merge function that will be used to combine values associated with duplicate keys.
+
+		For example, we can use a simple lambda expression to ignore the latter City objects if their names have been collected already:
+
+		Map<String, City> resultMap1 = CITY_INPUT.stream()
+		  .collect(toMap(City::getName, Function.identity(), (first, second) -> first));
+
+
+-==> Finally, let's see another example of merging two “Paris” cities' locatedIn properties as a new City instance and putting this newly merged Paris instance to the map result:
+
+	Map<String, City> resultMap3 = CITY_INPUT.stream()
+	  .collect(toMap(City::getName, Function.identity(), (first, second) -> {
+		  String locations = first.getLocatedIn() + " and " + second.getLocatedIn();
+		  return new City(first.getName(), locations);
+	  }));
+     // Compute sum of salaries by department
+     Map<Department, Integer> totalByDept
+         = employees.stream()
+                    .collect(Collectors.groupingBy(Employee::getDepartment,
+                                                   Collectors.summingInt(Employee::getSalary)));
 
 
 We can use predicate.negate() function to reverse a condition so that each condition may serve true and false – both scenarios.
