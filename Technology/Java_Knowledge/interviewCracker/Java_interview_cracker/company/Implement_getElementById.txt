@@ -1,0 +1,20 @@
+
+
+Implement getElementById
+========================
+And with slight changes to the DFS function, we can easily implement a search function by DOM id.
+
+
+const getElementById = (root, id) => {
+  const stack = [root];
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (node.id === id) {
+      return node;
+    }
+    for (const child of node.children) { 
+      stack.push(child);
+    }
+  }
+  return null;
+};

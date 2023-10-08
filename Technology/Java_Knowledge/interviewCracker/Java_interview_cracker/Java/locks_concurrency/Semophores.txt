@@ -1,0 +1,112 @@
+
+
+In general, to use a semaphore, the thread that wants access to the shared resource tries to acquire a permit.
+
+If the semaphore’s count is greater than zero, then the thread acquires a permit, which causes the semaphore’s count to be decremented.
+Otherwise, the thread will be blocked until a permit can be acquired.
+When the thread no longer needs an access to the shared resource, it releases the permit, which causes the semaphore’s count to be incremented.
+If there is another thread waiting for a permit, then that thread will acquire a permit at that time.
+
+Using Semaphores as Locks(preventing race condition)
+
+We can use a semaphore to lock access to a resource, each thread that wants to use that resource must first call acquire( ) before accessing the resource to acquire the lock. When the thread is done with the resource, it must call release( ) to release lock
+
+
+Semaphore(int num)
+Semaphore(int num, boolean how)
+Here, num specifies the initial permit count. Thus, it specifies the number of threads that can access a shared resource at any one time. If it is one, then only one thread can access the resource at any one time. By default, all waiting threads are granted a permit in an undefined order. By setting how to true, you can ensure that waiting threads are granted a permit in the order in which they requested access
+
+
+----
+
+CountDownLatch is used to make sure that a task waits for other threads before it starts. To understand its application, let us consider a server where the main task can only start when all the required services have started.
+
+Working of CountDownLatch:
+When we create an object of CountDownLatch, we specify the number of threads it should wait for, all such thread are required to do count down by calling CountDownLatch.countDown() once they are completed or ready to the job. As soon as count reaches zero, the waiting task starts running.
+
+// The main task waits for  threads
+		latch.await();
+
+// Java Program to demonstrate how
+// to use CountDownLatch, Its used
+// when a thread needs to wait for other
+// threads before starting its work.
+import java.util.concurrent.CountDownLatch;
+
+public class CountDownLatchDemo
+{
+	public static void main(String args[])
+				throws InterruptedException
+	{
+		// Let us create task that is going to
+		// wait for four threads before it starts
+		CountDownLatch latch = new CountDownLatch(4);
+
+		// Let us create four worker
+		// threads and start them.
+		Worker first = new Worker(1000, latch,
+								"WORKER-1");
+		Worker second = new Worker(2000, latch,
+								"WORKER-2");
+		Worker third = new Worker(3000, latch,
+								"WORKER-3");
+		Worker fourth = new Worker(4000, latch,
+								"WORKER-4");
+		first.start();
+		second.start();
+		third.start();
+		fourth.start();
+
+		// The main task waits for four threads
+		latch.await();
+
+		// Main thread has started
+		System.out.println(Thread.currentThread().getName() +
+						" has finished");
+	}
+}
+
+// A class to represent threads for which
+// the main thread waits.
+class Worker extends Thread
+{
+	private int delay;
+	private CountDownLatch latch;
+
+	public Worker(int delay, CountDownLatch latch,
+									String name)
+	{
+		super(name);
+		this.delay = delay;
+		this.latch = latch;
+	}
+
+	@Override
+	public void run()
+	{
+		try
+		{
+			Thread.sleep(delay);
+			latch.countDown();
+			System.out.println(Thread.currentThread().getName()
+							+ " finished");
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}
+}
+
+
+CountDownLatch vs CyclicBarrie
+==============================
+CountDownLatch is a construct that a thread looks out for while different threads tally down on the latch until it arrives at zero. A CyclicBarrier is a reusable construct where a gathering of threads stands by together until the entirety of the threads shows up.
+
+the main difference is that unlike a CyclicBarrier, once a CountDownLatch is done and over with, it cannot be reused. The javadoc mentions it explicitly:
+
+This is a one-shot phenomenon -- the count cannot be reset. If you need a version that resets the count, consider using a CyclicBarrie
+
+And indeed, we find that a CyclicBarrier has a method called .reset(), which does what it means. Not only that, but there is a version of the constructor of a CyclicBarrier which associated a Runnable to be run each time the barrier is "tripped" (that is what the javadoc says; don't ask me).
+
+So, those are indeed different, for the simple fact that one is reusable (CyclicBarrier) while the other is not (CountDownLatch).

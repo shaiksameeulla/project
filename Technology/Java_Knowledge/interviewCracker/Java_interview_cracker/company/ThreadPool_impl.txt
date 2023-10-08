@@ -1,0 +1,85 @@
+How to implement Thread pool in Java
+
+public class ThreadPool {
+    private final int nThreads;
+    private final PoolWorker[] threads;
+    private final LinkedBlockingQueue queue;
+ 
+    public ThreadPool(int nThreads) {
+        this.nThreads = nThreads;
+        queue = new LinkedBlockingQueue();
+        threads = new PoolWorker[nThreads];
+ 
+        for (int i = 0; i < nThreads; i++) {
+            threads[i] = new PoolWorker();
+            threads[i].start();
+        }
+    }
+ 
+    public void execute(Runnable task) {
+        synchronized (queue) {
+            queue.add(task);
+            queue.notify();
+        }
+    }
+ 
+    private class PoolWorker extends Thread {
+        public void run() {
+            Runnable task;
+ 
+            while (true) {
+                synchronized (queue) {
+                    while (queue.isEmpty()) {
+                        try {
+                            queue.wait();
+                        } catch (InterruptedException e) {
+                            System.out.println("An error occurred while queue is waiting: " + e.getMessage());
+                        }
+                    }
+                    task = queue.poll();
+                }
+ 
+                // If we don't catch RuntimeException,
+                // the pool could leak threads
+                try {
+                    task.run();
+                } catch (RuntimeException e) {
+                    System.out.println("Thread pool is interrupted due to an issue: " + e.getMessage());
+                }
+            }
+        }
+    }
+}
+
+
+In the above example, we used notify() instead of notifyAll(). Because notify() has more desirable performance characteristics than notifyAll(); in particular, notify() causes many fewer context switches, which is important in a server application. But it is important to make sure when using notify() in other situation as there are subtle risks associated with using notify(), and it is only appropriate to use it under certain specific conditions
+===
+
+package tutorials;
+ 
+public class Task implements Runnable {
+ 
+    private int num;
+ 
+    public Task(int n) {
+        num = n;
+    }
+ 
+    public void run() {
+        System.out.println("Task " + num + " is running.");
+    }
+}
+
+import tutorials.Task;
+import tutorials.ThreadPool;
+ 
+public class Main {
+ 
+    public static void main(String[] args) {
+        ThreadPool pool = new ThreadPool(7);
+ 
+        for (int i = 0; i < 5; i++) {
+            Task task = new Task(i);
+            pool.execute(task);
+        }
+}

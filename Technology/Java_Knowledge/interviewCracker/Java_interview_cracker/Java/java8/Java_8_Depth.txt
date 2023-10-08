@@ -1,0 +1,32 @@
+Java 8 feature : more Depth;
+========================
+A functional interface:
+
+ A functional interface is basically an interface with only 1 abstract method in it. It can contain default methods, static methods, or override methods from the Object class, but restricted to only using 1 abstract method. A major reason for doing this is to support the instantiation of functional interfaces via Lambda expressions (which I might discuss at some other time). Note that an interface which is not functional i.e, has more than 1 abstract method can not be instantiated via Lambdas.
+ 
+ example : @FunctionalInterface
+			public interface FunctionalInterface_one
+			{
+				public void firstInt_method();
+			 
+				@Override
+				public String toString(); //Overridden from Object class
+			 
+				@Override
+				public boolean equals(Object obj); //Overridden from Object class
+			}
+			
+Optional Class
+In Java 8, the “java.util” package included an optional class. The public final class “Optional” is used to handle NullPointerException in a Java program. You may give other code or values to execute using Optional. Thus, optional reduces the number of null checks required to avoid a nullPointerException.
+
+You may use the Optional class to prevent the application from crashing and terminating unexpectedly. The Optional class has methods for checking the existence of a value for a given variable.
+
+Optional<String>checkNull =
+                       Optional.ofNullable(str[5]); 
+        if (checkNull.isPresent()) { 
+		}
+
+
+Java Stream API For Bulk Data Operations On Collections
+
+Another significant feature in Java 8 is the Stream API. The Stream API is used to handle a collection of items and allows many iterations. A Stream is a collection of items (elements) that enables you to combine multiple techniques to achieve your goals.

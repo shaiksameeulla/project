@@ -1,0 +1,743 @@
+Equals and hashCode:
+	So, to make hash-based collections work optimally, the objects you put in the collection should have a hashCode() method that causes the objects to be distributed among the buckets as evenly as possible. 
+
+	HashSet and HashMap in Java have a number of buckets that is normally a power of 2 (by default, a HashMap has 16 buckets, for example). 
+
+	By making the hash code of objects a prime number (or a multiple of a prime number) the objects will be distributed better over the buckets, because a prime number is not a multiple of the number of buckets (which is a power of 2), so hashCode() % numberOfBuckets won't quickly cycle back to the same number (which means the same bucket). 
+
+	What is the difference in using instanceof and getClass() method for checking type inside equals?
+	
+This question was asked multiple times, sometimes by looking at your equals() and hashCode implementation. Well, key difference comes from the point that instanceof operator returns true, even if compared with subclass e.g. Subclass instanceof Superclass is true, but with getClass() it's false. By using getClass() you ensure that your equals() implementation doesn't return true if compared with subclass object. While if you use instanceof operator, you end up breaking symmetry rule for equals which says that if a.equals(b) is true than b.equals(a) should also be true. Just replace a and b with an instance of Superclass and Subclass, and you will end up breaking symmetry rule for equals() method.
+
+Ex:
+public int hashCode() {
+        int result = 1;
+        result = 31 * result + manufacturer.hashCode();
+        result = 31 * result + engine.hashCode();
+        return 31 * result + color.hashCode();
+    }
+
+In java equals() method is used to compare equality of two Objects. The equality can be compared in two ways:
+
+Shallow comparison: The default implementation of equals method is defined in Java.lang.Object class which simply checks if two Object references (say x and y) refer to the same Object. i.e. It checks if x == y. Since Object class has no data members that define its state, it is also known as shallow comparison.
+Deep Comparison: Suppose a class provides its own implementation of equals() method in order to compare the Objects of that class w.r.t state of the Objects. That means data members (i.e. fields) of Objects are to be compared with one another. Such Comparison based on data members is known as deep comparison.
+
+
+Reflexive : for any reference value a, a.equals(a) should return true.
+Symmetric : for any reference values a and b, if a.equals(b) should return true then b.equals(a) must return true.
+Transitive : for any reference values a, b, and c, if a.equals(b) returns true and b.equals(c) returns true, then a.equals(c) should return true.
+Consistent : for any reference values a and b, multiple invocations of a.equals(b) consistently return true or consistently return false, provided no information used in equals comparisons on the object is modified.
+
+@Override
+    public boolean equals(Object obj) 
+    { 
+          
+    // checking if both the object references are  
+    // referring to the same object. 
+    if(this == obj) 
+            return true; 
+          
+        // it checks if the argument is of the  
+        // type Geek by comparing the classes  
+        // of the passed argument and this object. 
+        // if(!(obj instanceof Geek)) return false; ---> avoid. 
+        if(obj == null || obj.getClass()!= this.getClass()) 
+            return false; 
+          
+        // type casting of the argument.  
+        Geek geek = (Geek) obj; 
+          
+        // comparing the state of argument with  
+        // the state of 'this' Object. 
+        return (geek.name == this.name && geek.id == this.id); 
+    } 
+      
+    @Override
+    public int hashCode() 
+    { 
+          
+        // We are returning the Geek_id  
+        // as a hashcode value. 
+        // we can also return some  
+        // other calculated value or may 
+        // be memory address of the  
+        // Object on which it is invoked.  
+        // it depends on how you implement  
+        // hashCode() method. 
+        return this.id; 
+    } 
+      
+
+Method Overloading Rules:
+1) First and important rule to overload a method in java is to change method signature. 
+Method signature is made of number of arguments, type of arguments and order of arguments if they are of different types.
+2) Return type of method is never part of method signature, so only changing the return type of method does not amount to method overloading.
+3) Thrown exceptions from methods are also not considered when overloading a method. So your overloaded method throws the same exception, a different exception or it simply does no throw any exception; no effect at all on method loading.
+
+Method Overriding Rules:
+
+We read above the rules for method overloading, now its time to list down the rules which you should keep remember while overriding a method in java.
+
+1) The method argument list in overridden and overriding methods must be exactly same If they don’t match, you will end up with an overloaded method.
+
+2) The return type of overriding method can be child class of return type declared in overridden method.
+3) Above all rules, private, static and final methods can not be overridden in java in any way. As simple as that !!
+4) Overriding method can not throw checked Exception higher in hierarchy than thrown by overridden method. Let’s say for example overridden method in parent class throws FileNotFoundException, the overriding method in child class can throw FileNotFoundException; but it is not allowed to throw IOException or Exception, because IOException or Exception are higher in hierarchy i.e. super classes of FileNotFoundException.
+
+More to it, you can omit the exception declaration from overriding method. It’s allowed and perfectly valid. Also overriding method can throw any unchecked (runtime) exception, regardless of whether the overridden method declares the exception.
+5) Also note that overriding method can not reduce the access scope of overridden method. Put in simple words, if overridden method in parent class is protected, then overriding method in child class can not be private. It must be either protected (same access) or public (wider access).
+
+--------------------------
+
+In Java Abstraction is achieved using Abstract classes, and Interfaces.
+
+Abstract Class
+A class which contains the abstract keyword in its declaration is known as abstract class.
+
+Abstract classes may or may not contain abstract methods ie., methods without body ( public void get(); )
+
+But, if a class have at least one abstract method, then the class must be declared abstract.
+
+If a class is declared abstract it cannot be instantiated.
+
+To use an abstract class you have to inherit it from another class, provide implementations to the abstract methods in it.
+
+If you inherit an abstract class you have to provide implementations to all the abstract methods in it.
+
+----------------------------------------
+
+Comparator vs Comparable in Java
+
+Difference between Comparator vs Comparable in JavaHere are some of the common differences, which is worth remembering to answer this question if asked during a telephonic or face to face interview:
+
+1) Comparator in Java is defined in java.util package while Comparable interface in Java is defined in java.lang package, which very much says that Comparator should be used as an utility to sort objects which Comparable should be provided by default.
+
+2) Comparator interface in Java has method public int compare (Object o1, Object o2) which returns a negative integer, zero, or a positive integer as the first argument is less than, equal to, or greater than the second. While Comparable interface has method public int compareTo(Object o) which returns a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+
+3) If you see then logical difference between these two is Comparator in Java compare two objects provided to him, while Comparable interface compares "this" reference with the object specified. I have shared lot of tips on how to override compareTo() method and avoid some common mistakes programmer makes while implementing Comparable interface.
+
+4) Comparable in Java is used to implement natural ordering of object. In Java API String, Date and wrapper classes implements Comparable interface.Its always good practice to override compareTo() for value objects.
+
+5) If any class implement Comparable interface in Java then collection of that object either List or Array can be sorted automatically by using  Collections.sort() or Arrays.sort() method and object will be sorted based on there natural order defined by CompareTo method.
+
+6)Objects which implement Comparable in Java  can be used as keys in a SortedMap like TreeMap or elements in a SortedSet  for example TreeSet, without specifying any Comparator.
+
+These were combination of some theoretical and practical differences between Comparator and Comparator interface in Java. It does help you to decide when to use Comparator vs Comparable but things will be more clear when we some best practices around using both of these interfaces. Now let’s see an example of Comparator in Java:
+
+Collections vs Arrays regarding sort()
+
+Collections.sort() Operates on List Whereas Arrays.sort() Operates on an Array.
+
+Arrays.sort() uses Dual-Pivot Quicksort for Primitive Arrays and MergeSort for sorting array of Objects.
+
+Example of Collections.sort() :
+
+ ArrayList<Integer> arr = new ArrayList<Integer>();
+ arr.add(15);
+ arr.add(10);
+ arr.add(5); 
+ arr.add(2); 
+
+ Collections.sort(arr);
+Example of Arrays.sort() :
+
+int[] arr = new int[4]
+ arr[0]=15;
+ arr[1]=10;
+ arr[2]=5; 
+ arr[3]=2; 
+
+ Arrays.sort(arr);
+
+ 
+Example of using Comparator and Comparable in Java
+
+So in Summary if you want to sort objects based on natural order then use Comparable in Java and if you want to sort on some other attribute of object then use Comparator in Java. Now to understand these concepts lets see an example or real life coding:
+
+
+1) There is class called Person, sort the Person based on person_id, which is primary key in database
+2) Sort the Person based on there name.
+
+For a Person class, sorting based on person_id can be treated as natural order sorting and sorting based on name field can be implemented using Comparator interface. To sort based on person_id we need to implement compareTo() method.
+
+
+public class Person implements Comparable {
+    private int person_id;
+    private String name;
+    
+    /**
+     * Compare current person with specified person
+     * return zero if person_id for both person is same 
+     * return negative if current person_id is less than specified one
+     * return positive if specified person_id is greater than specified one
+     */
+    @Override 
+    public int compareTo(Object o) {
+        Person p = (Person) o; 
+        return this.person_id - o.person_id ;
+    }
+    ….
+}
+
+Generally you should not use difference of integers to decide output of compareTo method as result of integer subtraction can overflow but if you are sure that both operands are positive then its one of the quickest way to compare two objects. See my post things to remember while overriding compareTo in Java for more tips on compareTo.
+
+And for sorting based on person name we can implement compare(Object o1, Object o2) method of Java Comparator class.
+
+/**
+ * Comparator implementation which sorts Person objects on person_id field
+ */
+public class SortByPerson_ID implements Comparator{
+
+    public int compare(Object o1, Object o2) {
+        Person p1 = (Person) o;
+        Person p2 = (Person) o; 
+        return p1.getPersonId() - p2.getPersonId();
+    }
+}
+
+Similar guidelines applies while implementing compare() method as well and instead of using subtraction operator, its better to use logical operator to compare whether two integers are equal to, less than or greater than. You can write several types of Java Comparator based upon your need for example  reverseComparator , ANDComparator , ORComparator etc which will return negative or positive number based upon logical results. String in Java even provides an special comparator called CASE_INSENSITIVE_ORDER, to perform case insensitive comparison of String objects.
+
+
+
+How to Compare String in Java
+String is immutable in Java and one of the most used value class. For comparing String in Java we should not be worrying because String implements Comparable interface and provides a lexicographic implementation for CompareTo method which compare two strings based on contents of characters or you can say in lexical order. You just need to call String.compareTo(AnotherString) and Java will determine whether specified String is greater than , equal to or less than current object. See my post 4 example to compare String in Java for alternatives ways of comparing String.
+
+
+How to Compare Dates in Java
+Dates are represented by java.util.Date class in Java and like String,  Date also implements Comparable in Java so they will be automatically sorted based on there natural ordering if they got stored in any sorted collection like TreeSet or TreeMap. If you explicitly wants to compare two dates in Java you can call Date.compareTo(AnotherDate) method in Java and it will tell whether specified date is greater than , equal to or less than current String. See my post 3 ways to compare Dates in Java for more alternatives of comparing two dates.
+
+When to use Comparator and Comparable in Java
+At last let’s see some best practices and recommendation on when to use Comparator or Comparable in Java:
+
+1) If there is a natural or default way of sorting Object already exist during development of Class than use Comparable. This is intuitive and you given the class name people should be able to guess it correctly like Strings are sorted chronically, Employee can be sorted by there Id etc. On the other hand if an Object can be sorted on multiple ways and client is specifying on which parameter sorting should take place than use Comparator interface. for example Employee can again be sorted on name, salary or department and clients needs an API to do that. Comparator implementation can sort out this problem.
+
+2) Some time you write code to sort object of a class for which you are not the original author, or you don't have access to code. In these cases you can not implement Comparable and Comparator is only way to sort those objects.
+
+3) Beware with the fact that How those object will behave if stored in SorteSet or SortedMap like TreeSet and TreeMap. If an object doesn't implement Comparable than while putting them into SortedMap, always provided corresponding Comparator which can provide sorting logic.
+
+4) Order of comparison is very important while implementing Comparable or Comparator interface. for example if you are sorting object based upon name than you can compare first name or last name on any order, so decide it judiciously. I have shared more detailed tips on compareTo on my post how to implement CompareTo in Java.
+
+5) Comparator has a distinct advantage of being self descriptive  for example if you are writing Comparator to compare two Employees based upon there salary than name that comparator as SalaryComparator, on the other hand compareTo()
+
+*****************************************************Important*********************
+static final Comparator<Employee> SENIORITY_ORDER = 
+                                        new Comparator<Employee>() {
+            public int compare(Employee e1, Employee e2) {
+                return e2.hireDate().compareTo(e1.hireDate());
+            }
+    };
+	If you use this Comparator to insert multiple employees hired on the same date into a TreeSet, only the first one will be added to the set; the second will be seen as a duplicate element and will be ignored.
+To fix this problem, simply tweak the Comparator so that it produces an ordering that is compatible with equals. In other words, tweak it so that the only elements seen as equal when using compare are those that are also seen as equal when compared using equals. The way to do this is to perform a two-part comparison (as for Name), where the first part is the one we're interested in — in this case, the hire date — and the second part is an attribute that uniquely identifies the object. Here the employee number is the obvious attribute. This is the Comparator that results.
+
+static final Comparator<Employee> SENIORITY_ORDER = 
+                                        new Comparator<Employee>() {
+    public int compare(Employee e1, Employee e2) {
+        int dateCmp = e2.hireDate().compareTo(e1.hireDate());
+        if (dateCmp != 0)
+            return dateCmp;
+
+        return (e1.number() < e2.number() ? -1 :
+               (e1.number() == e2.number() ? 0 : 1));
+    }
+};
+******************************Important************************************8
+---------------------------------
+Difference between Checked vs Unchecked Exception in Java
+
+In Java exceptions under Error and RuntimeException classes are unchecked exceptions, everything else under throwable is checked.
+
+What is Checked Exception in Java?
+
+Checked Exception vs Unchecked Exception in Java example,Checked Exception in Java is all those Exception which requires being catches and handled during compile time. If Compiler doesn’t see try or catch block handling a Checked Exception, it throws Compilation error. Now Which Exception is checked Exception and Why Checked Exception are introduced in first place? All the Exception which are direct sub Class of Exception but not inherit RuntimeException are Checked Exception.
+
+While doing File Programming in C++ I found that most of the time programmer forgets to close file descriptors , which often result in locking of file on OS level. Since Java is introduced after C++, designers of Java thought to ensure such mistakes are not allowed and resources opened are closed properly. To ensure this they introduced Checked Exception. If you see most of File IO related operation comes under IOException which is checked one. Though is a special scenario related to Checked Exception but you can generalize this as, where Java sees an opportunity of failure more, they ensure that programmer provide recovery strategy or at least handle those scenario gracefully.
+
+Since a picture is worth 1000 words I have put together Exception hierarchy in mind map which clearly says which Exceptions are checked and which Exceptions are unchecked.
+Difference between Checked and Unchecked Exception in Java
+
+
+When to use Checked Exception in Java
+
+Knowing Checked Exception is not that useful until you know how to use Checked Exception in Java. Java has often been criticized for its Checked Exception strategy, arguments given are that checked Exception adds lot of boiler plate code and makes whole class or function unreadable. Somewhat I agree with this and java also recognize this by introducing improved Exception handling mechanism in Java7 but Checked Exception does have its real purpose. Following are some scenarios where I would prefer to use Checked Exception to ensure that Code is Robust and stable:
+
+1) All Operation where chances of failure is more e.g. IO Operation, Database Access or Networking operation can be handled with Checked Exception.
+2) When you know what to do (i.e. you have alternative) when an Exception occurs, may be as part of Business Process.
+3) Checked Exception is a reminder by compiler to programmer to handle failure scenario.
+
+Example of checked Exception in Java API
+Following are some Examples of Checked Exception in Java library:
+
+IOException
+SQLException
+DataAccessException
+ClassNotFoundException
+InvocationTargetException
+
+What is Unchecked Exception in Java?
+
+Unchecked Exception in Java is those Exceptions whose handling is not verified during Compile time. Unchecked Exceptions mostly arise due to programming errors like accessing method of a null object, accessing element outside an array bonding or invoking method with illegal arguments. In Java, Unchecked Exception is direct sub Class of RuntimeException. What is major benefit of Unchecked Exception is that it doesn't reduce code readability and keeps the client code clean.
+
+When to use UnCheckedException in Java
+
+A good strategy of Exception handling in Java is wrapping a checked Exception into UnCheckedException. Since most of Database operation throws SQLException but it’s not good to let SQLException propagate from your DAO layer to up higher on business layer and client code provide exception handling you can handle SQLException in DAO layer and you can wrap the cause in a RuntimeException to propagate through client code. Also as I said earlier unchecked exceptions are mostly programming errors and to catch them is real hard until you do a load test with all possible input and scenario.
+
+Difference between Checked and Unchecked Exception in Java
+
+Now we have enough information to differentiate Checked Exception with Unchecked Exception:
+
+1) Checked Exception is required to be handled by compile time while Unchecked Exception doesn't.
+2) Checked Exception is direct sub-Class of Exception while Unchecked Exception are of RuntimeException.
+3) CheckedException represent scenario with higher failure rate while UnCheckedException are mostly programming mistakes.
+
+Example of unchecked Exception in Java API
+
+Here are few examples of Unchecked Exception in Java library:
+NullPointerException
+ArrayIndexOutOfBound
+IllegalArgumentException
+IllegalStateException
+
+
+Summary:
+1. Both Checked and Unchecked Exception are handled using keyword try, catch and finally.
+2. In terms of Functionality Checked and Unchecked Exception are same.
+3. Checked Exception handling verified during compile time.
+4. Unchecked Exception are mostly programming errors
+5. JDK7 provides improved Exception handling code with catching multiple Exception in one catch block and reduce amount of boiler plate code required for exception handling in Java.
+--------------------------------
+
+
+Access modifiers:
+--------------
+ If a top-level class is declared as private the compiler will complain that the modifier private is not allowed here. This means that a top-level class cannot be a private, the same can be applied to protected access specifier also.
+ 
+ Protected means that the member can be accessed by any class in the same package and by subclasses even if they are in another package.
+ 
+ The top-level classes can only have public, abstract and final modifiers, and it is also possible to not define any class modifiers at all. This is called default/package accessibility.
+ 
+ We can declare the inner classes as private or protected, but it is not allowed in outer classes.
+ 
+ More than one top-level class can be defined in a Java source file, but there can be at most one public top-level class declaration. The file name must match the name of the public class.
+ 
+ 
+ -----------------
+When to use Volatile variable in Java
+
+One of the most important thing in learning of volatile keyword is understanding when to use volatile variable in Java. Many programmer knows what is volatile variable and How does it work but they never really used volatile for any practical purpose. Here are couple of example to demonstrate when to use Volatile keyword in Java:
+
+
+1) You can use Volatile variable if you want to read and write long and double variable atomically. long and double both are 64 bit data type and by default writing of long and double is not atomic and platform dependence. Many platform perform write in long and double variable 2 step, writing 32 bit in each step, due to this its possible for a Thread to see 32 bit from two different write. You can avoid this issue by making long and double variable volatile in Java.
+
+
+2) Volatile variable can be used as an alternative way of achieving synchronization in Java in some cases, like Visibility. with volatile variable its guaranteed that all reader thread will see updated value of volatile variable once write operation completed, without volatile keyword different reader thread may see different values.
+
+
+3) volatile variable can be used to inform compiler that a particular field is subject to be accessed by multiple threads, which will prevent compiler from doing any reordering or any kind of optimization which is not desirable in multi-threaded environment. Without volatile variable compiler can re-order code, free to cache value of volatile variable instead of always reading from main memory. like following example without volatile variable may result in infinite loop
+
+private boolean isActive = thread;
+public void printMessage(){
+  while(isActive){
+     System.out.println("Thread is Active");
+  }
+} 
+
+
+
+
+4) Another place where volatile variable can be used is to fixing double checked locking in Singleton pattern. As we discussed in Why should you use Enum as Singleton that double checked locking was broken in Java 1.4 environment.
+
+
+More than one top-level class can be defined in a Java source file, but there can be at most one public top-level class declaration. The file name must match the name of the public class.
+
+
+
+Important points on Volatile keyword in Java
+
+1. volatile keyword in Java is only application to variable and using volatile keyword with class and method is illegal.
+
+
+2. volatile keyword in Java guarantees that value of volatile variable will always be read from main memory and not from Thread's local cache.
+
+
+3. In Java reads and writes are atomic for all variables declared using Java volatile keyword (including long and double variables).
+
+
+4. Using Volatile keyword in Java on variables reduces the risk of memory consistency errors, because any write to a volatile variable in Java establishes a happens-before relationship with subsequent reads of that same variable.
+
+
+5. From Java 5 changes to a volatile variable are always visible to other threads. What’s more it also means that when a thread reads a volatile variable in Java, it sees not just the latest change to the volatile variable but also the side effects of the code that led up the change.
+
+
+6. Reads and writes are atomic for reference variables are for most primitive variables (all types except long and double) even without use of volatile keyword in Java.
+
+
+7. An access to a volatile variable in Java never has chance to block, since we are only doing a simple read or write, so unlike a synchronized block we will never hold on to any lock or wait for any lock.
+
+
+8. Java volatile variable that is an object reference may be null.
+
+
+9. Java volatile keyword doesn't means atomic, its common misconception that after declaring volatile ++ will be atomic, to make the operation atomic you still need to ensure exclusive access using synchronized method or block in Java.
+
+
+10. If a variable is not shared between multiple threads no need to use volatile keyword with that variable.
+
+Difference between synchronized and volatile keyword in Java
+
+What is difference between volatile and synchronized is another popular core Java question asked in multi-threading and concurrency interviews. Remember volatile is not a replacement of synchronized keyword but can be used as an alternative in certain cases. Here are few differences between volatile and synchronized keyword in Java.
+
+
+1. Volatile keyword in Java is a field modifier, while synchronized modifies code blocks and methods.
+
+
+2. Synchronized obtains and releases lock on monitor’s Java volatile keyword doesn't require that.
+
+
+3. Threads in Java can be blocked for waiting any monitor in case of synchronized, that is not the case with volatile keyword in Java.
+
+
+4. Synchronized method affects performance more than volatile keyword in Java.
+
+
+5. Since volatile keyword in Java only synchronizes the value of one variable between Thread memory and "main" memory while synchronized synchronizes the value of all variable between thread memory and "main" memory and locks and releases a monitor to boot. Due to this reason synchronized keyword in Java is likely to have more overhead than volatile.
+
+
+6. You can not synchronize on null object but your volatile variable in java could be null.
+
+
+7. From Java 5 Writing into a volatile field has the same memory effect as a monitor release, and reading from a volatile field has the same memory effect as a monitor acquire 
+
+
+In Summary volatile keyword in Java is not a replacement of synchronized block or method but in some situation is very handy and can save performance overhead which comes with use of synchronization in Java
+
+Read more: http://javarevisited.blogspot.com/2011/06/volatile-keyword-java-example-tutorial.html#ixzz3ozfU0tjr
+
+here are some more differences between Serializable and Externalizable interface in Java:
+
+1. In case of Serializable, default serialization process is used. while in case of Externalizable custom Serialization process is used which is implemented by application.
+
+2. JVM gives call back to readExternel() and writeExternal() of java.io.Externalizalbe interface for restoring and writing objects into persistence.
+
+3. Externalizable interface provides complete control of serialization process to application.
+
+4. readExternal() and writeExternal() supersede any specific implementation of writeObject and readObject methods.
+
+Though Externalizable provides complete control, it also presents challenges to serialize super type state and take care of default values in case of transient variable and static variables in Java. If used correctly Externalizable interface can improve performance of serialization process.
+
+
+Object Serialization with Inheritance in Java
+============================================
+Serialization is a mechanism of converting the state of an object into a byte stream. The byte array can be the class, version, and internal state of the object
+Deserialization is the reverse process where the byte stream is used to recreate the actual Java object in memory. This mechanism is used to persist the object.
+
+There are some cases of Serialization with respect to inheritance:
+------------------------------------------------
+
+Case 1: If the superclass is serializable, then subclass is automatically serializable
+If the superclass is Serializable, then by default, every subclass is serializable. Hence, even though subclass doesn’t implement Serializable interface( and if its superclass implements Serializable), then we can serialize subclass object.
+
+Case 2: If a superclass is not serializable, then subclass can still be serialized 
+Even though the superclass doesn’t implement a Serializable interface, we can serialize subclass objects if the subclass itself implements a Serializable interface. So we can say that to serialize subclass objects, superclass need not be serializable. But what happens with the instances of superclass during serialization in this case. The following procedure explains this.
+
+Case 2(a): What happens when a class is serializable, but its superclass is not?
+Serialization: At the time of serialization, if any instance variable inherits from the non-serializable superclass, then JVM ignores the original value of that instance variable and saves the default value to the file.
+
+Case 3: If the superclass is serializable, but we don’t want the subclass to be serialized
+There is no direct way to prevent sub-class from serialization in java. One possible way by which a programmer can achieve this is by implementing the writeObject() and readObject() methods in the subclass and needs to throw NotSerializableException from these methods. These methods are executed during serialization and de-serialization, respectively. By overriding these methods, we are just implementing our custom serialization.
+
+De- Serialization: At the time of de-serialization, if any non-serializable superclass is present, then JVM will execute instance control flow in the superclass. To execute instance control flow in a class, JVM will always invoke the default(no-arg) constructor of that class. So every non-serializable superclass must necessarily contain a default constructor. Otherwise, we will get a runtime exception.
+
+
+
+
+
+Read more: http://javarevisited.blogspot.com/2011/06/volatile-keyword-java-example-tutorial.html#ixzz3ozf8NbJu
+
+Covariant Return Type::
+-----------------------
+it's nothing but a Liskov's substitution principle
+
+The covariant return type specifies that the return type may vary in the same direction as the subclass.
+
+Before Java5, it was not possible to override any method by changing the return type. But now, since Java5, it is possible to override method by changing the return type if subclass overrides any method whose return type is Non-Primitive but it changes its return type to subclass type. Let's take a simple example:
+
+Note: If you are beginner to java, skip this topic and return to it after OOPs concepts.
+
+Simple example of Covariant Return Type
+
+class A{  
+A get(){return this;}  
+}  
+  
+class B1 extends A{  
+B1 get(){return this;}  
+void message(){System.out.println("welcome to covariant return type");}  
+  
+public static void main(String args[]){  
+new B1().get().message();  
+}  
+}  
+Test it Now
+Output:welcome to covariant return type
+As you can see in the above example, the return type of the get() method of A class is A but the return type of the get() method of B class is B. Both methods have different return type but it is method overriding. This is known as covariant return type.
+--------
+
+Type Erasure ::
+---------------
+
+Generics were introduced to the Java language to provide tighter type checks at compile time and to support generic programming. To implement generics, the Java compiler applies type erasure to:
+
+Replace all type parameters in generic types with their bounds or Object if the type parameters are unbounded. The produced bytecode, therefore, contains only ordinary classes, interfaces, and methods.
+Insert type casts if necessary to preserve type safety.
+Generate bridge methods to preserve polymorphism in extended generic types.
+Type erasure ensures that no new classes are created for parameterized types; consequently, generics incur no runtime overhead.
+
+----------------------------------------
+
+Effects of Type Erasure and Bridge Methods
+
+Sometimes type erasure causes a situation that you may not have anticipated. The following example shows how this can occur. The example (described in Bridge Methods) shows how a compiler sometimes creates a synthetic method, called a bridge method, as part of the type erasure process.
+
+Given the following two classes:
+
+public class Node<T> {
+
+    public T data;
+
+    public Node(T data) { this.data = data; }
+
+    public void setData(T data) {
+        System.out.println("Node.setData");
+        this.data = data;
+    }
+}
+
+public class MyNode extends Node<Integer> {
+    public MyNode(Integer data) { super(data); }
+
+    public void setData(Integer data) {
+        System.out.println("MyNode.setData");
+        super.setData(data);
+    }
+}
+Consider the following code:
+
+MyNode mn = new MyNode(5);
+Node n = mn;            // A raw type - compiler throws an unchecked warning
+n.setData("Hello");     
+Integer x = mn.data;    // Causes a ClassCastException to be thrown.
+After type erasure, this code becomes:
+
+MyNode mn = new MyNode(5);
+Node n = (MyNode)mn;         // A raw type - compiler throws an unchecked warning
+n.setData("Hello");
+Integer x = (String)mn.data; // Causes a ClassCastException to be thrown.
+Here is what happens as the code is executed:
+
+n.setData("Hello"); causes the method setData(Object) to be executed on the object of class MyNode. (The MyNode class inherited setData(Object) from Node.)
+In the body of setData(Object), the data field of the object referenced by n is assigned to a String.
+The data field of that same object, referenced via mn, can be accessed and is expected to be an integer (since mn is a MyNode which is a Node<Integer>.
+Trying to assign a String to an Integer causes a ClassCastException from a cast inserted at the assignment by a Java compiler.
+Bridge Methods
+
+When compiling a class or interface that extends a parameterized class or implements a parameterized interface, the compiler may need to create a synthetic method, called a bridge method, as part of the type erasure process. You normally don't need to worry about bridge methods, but you might be puzzled if one appears in a stack trace.
+
+After type erasure, the Node and MyNode classes become:
+
+public class Node {
+
+    public Object data;
+
+    public Node(Object data) { this.data = data; }
+
+    public void setData(Object data) {
+        System.out.println("Node.setData");
+        this.data = data;
+    }
+}
+
+public class MyNode extends Node {
+
+    public MyNode(Integer data) { super(data); }
+
+    public void setData(Integer data) {
+        System.out.println("MyNode.setData");
+        super.setData(data);
+    }
+}
+After type erasure, the method signatures do not match. The Node method becomes setData(Object) and the MyNode method becomes setData(Integer). Therefore, the MyNode setData method does not override the Node setData method.
+
+To solve this problem and preserve the polymorphism of generic types after type erasure, a Java compiler generates a bridge method to ensure that subtyping works as expected. For the MyNode class, the compiler generates the following bridge method for setData:
+
+class MyNode extends Node {
+
+    // Bridge method generated by the compiler
+    //
+    public void setData(Object data) {
+        setData((Integer) data);
+    }
+
+    public void setData(Integer data) {
+        System.out.println("MyNode.setData");
+        super.setData(data);
+    }
+
+    // ...
+}
+As you can see, the bridge method, which has the same method signature as the Node class's setData method after type erasure, delegates to the original setData method.
+
+ type inference:
+ ---------------
+ Type inference is a Java compiler's ability to look at each method invocation and corresponding declaration to determine the type argument (or arguments) that make the invocation applicable. The inference algorithm determines the types of the arguments and, if available, the type that the result is being assigned, or returned. Finally, the inference algorithm tries to find the most specific type that works with all of the arguments.
+
+To illustrate this last point, in the following example, inference determines that the second argument being passed to the pick method is of type Serializable:
+
+static <T> T pick(T a1, T a2) { return a2; }
+Serializable s = pick("d", new ArrayList<String>());
+
+ClassNotFoundException and NoClassDefFoundError occur when a particular class is not found at runtime. However, they occur at different scenarios.
+
+ClassNotFoundException is an exception that occurs when you try to load a class at run time using Class.forName() or loadClass() methods and mentioned classes are not found in the classpath.
+
+NoClassDefFoundError is an error that occurs when a particular class is present at compile time, but was missing at run time.
+
+ClassNotFoundException
+ClassNotFoundException is a runtime exception that is thrown when an application tries to load a class at runtime using the Class.forName() or loadClass() or findSystemClass() methods ,and the class with specified name are not found in the classpath. For example, you may have come across this exception when you try to connect to MySQL or Oracle databases and you have not updated the classpath with required JAR files. Most of the time, this exception occurs when you try to run an application without updating the classpath with required JAR files.
+
+For example, the below program will throw ClassNotFoundException if the mentioned class “oracle.jdbc.driver.OracleDriver” is not found in the classpath.
+
+1
+public class MainClass
+2
+{
+3
+    public static void main(String[] args)
+4
+    {
+5
+        try
+6
+        {
+7
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+8
+        }catch (ClassNotFoundException e)
+9
+        {
+10
+            e.printStackTrace();
+11
+        }
+12
+    }
+13
+}
+14
+​
+If you run the above program without updating the classpath with required JAR files, you will get an exception akin to:
+
+1
+java.lang.ClassNotFoundException: oracle.jdbc.driver.OracleDriver
+2
+​
+3
+at java.net.URLClassLoader.findClass(Unknown Source)
+4
+​
+5
+at java.lang.ClassLoader.loadClass(Unknown Source)
+6
+​
+7
+at sun.misc.Launcher$AppClassLoader.loadClass(Unknown Source)
+8
+​
+9
+at java.lang.ClassLoader.loadClass(Unknown Source)
+10
+​
+11
+at java.lang.Class.forName0(Native Method)
+12
+​
+13
+at java.lang.Class.forName(Unknown Source)
+14
+​
+15
+at pack1.MainClass.main(MainClass.java:17)
+
+
+NoClassDefFoundError
+NoClassDefFoundError is an error that is thrown when the Java Runtime System tries to load the definition of a class, and that class definition is no longer available. The required class definition was present at compile time, but it was missing at runtime. For example, compile the program below.
+
+1
+class A
+2
+{
+3
+  // some code
+4
+}
+5
+​
+6
+public class B
+7
+{
+8
+    public static void main(String[] args)
+9
+    {
+10
+        A a = new A();
+11
+    }
+12
+}
+13
+​
+When you compile the above program, two .class files will be generated. One is A.class and another one is B.class. If you remove the A.class file and run the B.class file, Java Runtime System will throw NoClassDefFoundError like below:
+
+1
+Exception in thread "main" java.lang.NoClassDefFoundError: A
+2
+​
+3
+at MainClass.main(MainClass.java:10)
+4
+​
+5
+Caused by: java.lang.ClassNotFoundException: A
+6
+​
+7
+at java.net.URLClassLoader.findClass(URLClassLoader.java:381)
+8
+​
+9
+at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+10
+​
+11
+at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:331)
+12
+​
+13
+at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+
+
+Before Java 7, the JVM placed the Java String Pool in the PermGen space, which has a fixed size — it can't be expanded at runtime and is not eligible for garbage collection.
+
+The risk of interning Strings in the PermGen (instead of the Heap) is that we can get an OutOfMemory error from the JVM if we intern too many Strings.
+
+From Java 7 onwards, the Java String Pool is stored in the Heap space, which is garbage collected by the JVM. The advantage of this approach is the reduced risk of OutOfMemory error because unreferenced Strings will be removed from the pool, thereby releasing memory.
+
+
+A Note About Java 9
+Until Java 8, Strings were internally represented as an array of characters – char[], encoded in UTF-16, so that every character uses two bytes of memory.
+
+With Java 9 a new representation is provided, called Compact Strings. This new format will choose the appropriate encoding between char[] and byte[] depending on the stored content.
+
+Since the new String representation will use the UTF-16 encoding only when necessary, the amount of heap memory will be significantly lower, which in turn causes less Garbage Collector overhead on the JVM.
+

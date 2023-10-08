@@ -1,0 +1,193 @@
+String Interview Core java Questions :
+====================================
+1) What is String in Java? Is String is data type?
+   String in Java is not a primitive data type like int, long or double. The string is a class or in more simple term a user defined type. This is confusing for someone who comes from C background. String is defined in java.lang package and wrappers its content in a character array. String provides equals() method to compare two String and provides various other methods to operate on String like toUpperCase() to convert String into upper case, replace() to replace String contents, substring() to get substring, split() to split long String into multiple String.
+2) Why is String final in Java?
+The string is final by design in Java, some of the points which make sense why String is final is Security, optimization and to maintain a pool of String in Java.
+
+3)Why string is Immutable in java?:
+	Since Strings are very popular as HashMap key, it's important for them to be immutable so that they can retrieve the value object which was stored in HashMap. Since HashMap works in the principle of hashing, which requires same has value to function properly. Mutable String would produce two different hashcodes at the time of insertion and retrieval if contents of String was modified after insertion, potentially losing the value object in the map.
+	 Security and String pool being primary reason of making String immutable, 
+
+
+
+4)Why character array is better than String for Storing password in Java
+
+	Since Strings are immutable in Java if you store password as plain text it will be available in memory until Garbage collector clears it and since String are used in String pool for reusability there is pretty high chance that it will be remain in memory for long duration, which pose a security threat. Since any one who has access to memory dump can find the password in clear text and that's another reason you should always used an encrypted password than plain text. Since Strings are immutable there is no way contents of Strings can be changed because any change will produce new String, while if you char[] you can still set all his element as blank or zero. So Storing password in character array 
+		clearly mitigates security risk of stealing password
+	
+	With String there is always a risk of printing plain text in a log file or console but if use Array you won't print contents of the array instead its memory location gets printed. though not a real reason still makes sense.
+
+
+
+Is it necessary that each try block must be followed by a catch block?
+
+No it is not mandatory that there should be a catch block after a try block. try block can have only a matching finally block. So there are these valid combinations try-catch-finally, try-catch, try-finally.
+
+Read more about try-catch block here.
+
+What is the difference between error and exception?
+
+Exception- An Exception indicates that a problem has occurred, but it is not a serious system problem. The user programs you write will throw and catch Exceptions.
+
+Error- It defines exceptions that are not expected to be caught by your program. Exceptions of type Error are used by the Java run-time system to indicate errors having to do with the run-time environment, itself.
+Examples of error are StackOverflowError, OutOfMemoryError etc.
+
+Explain the exception hierarchy in Java?
+
+Throwable class is the super class of all the exception types. Below Throwable class there are two subclasses which denotes two distinct branches of exceptions-
+
+Exception- An Exception indicates that a problem has occurred, but it is not a serious system problem. The user programs you write will throw and catch Exceptions.
+Error- It defines exceptions that are not expected to be caught by your program. Exceptions of type Error are used by the Java run-time system to indicate errors having to do with the run-time environment, itself.
+Examples of error are StackOverflowError, OutOfMemoryError etc.
+Below Exception there is a distinct subclass RunTimeExcpetion- RunTimeExcpetion and its descendants denote the exceptional conditions that are external to the application, and the application usually cannot anticipate or recover from them.
+
+Read more about exception hierarchy in Java here.
+
+What is try-with-resources or ARM in Java 7?
+
+Java 7 introduced a new form of try known as try-with-resources for Automatic Resource Management (ARM). Here resource is an object that must be closed after the program is finished with it. Example of resources would be an opened file handle or database connection etc.
+
+Before the introduction of try-with-resources we had to explicitly close the resources once the try block completes normally or abruptly.
+
+try {
+    br = new BufferedReader(new FileReader("C:\\test.txt"));
+    System.out.println(br.readLine());
+} catch (IOException e) {
+    e.printStackTrace();
+} finally {
+  try {
+    if (br != null){
+      System.out.println("Closing the file");
+      br.close();
+    }                
+  } catch (IOException ex) {
+    ex.printStackTrace();
+  }
+}
+try-with-resources helps in reducing such boiler plate code. Let's see the same example using try-with-resources.
+
+try(BufferedReader br = new BufferedReader(new FileReader("C:\\test.txt"))) {            
+  System.out.println(br.readLine());
+} catch (IOException e) {
+  e.printStackTrace();
+} 
+
+
+are you aware of any scenario when finally will not be executed?
+
+According to Java docs. If the JVM exits (By explicitly using System.exit() or a JVM crash) while the try or catch code is being executed, then the finally block may not execute. Likewise, if the thread executing the try or catch code is interrupted or killed, the finally block may not execute even though the application as a whole continues.
+
+System. exit function has status code, which tells about the termination, such as: 
+exit(0) : Indicates successful termination.
+exit(1) or exit(-1) or any non-zero value – indicates unsuccessful termination.
+
+Cases when finally block may not execute
+=====================================
+When we call System.exit(zero or nonzero) either inside try or catch block.
+
+When the JVM encounters non-terminating code.
+
+
+Read more about finally here.
+
+what will happend if catchblock catching Exception class then catching RuntimeException/IOException...etc exception ?
+error : Unreachable catch block for RuntimeException. It is already handled by the catch block for Exception
+
+
+Immutable :
+If you want to encapsulate a mutable object into an immutable one, then you need to:
+
+1) defensive copy:: Create a copy of the mutable object (i.e. via copy constructor, cloning, serialization/deserialization, etc.);
+2)  never store the reference to the original mutable object.
+3) Never return the mutable object. If you must to, then return a copy of the object.
+4) Avoid methods which can change the mutable object
+
+1) 
+Make address both final and private.
+Prevent any mutable reference to that object from being seen externally to your immutable object.
+In this case, #2 probably means you can't return a reference to Address like you have with getAddress(). And you have to make a defensive copy. Make a copy of the object, and store that copy in Employee. If you can't make a defensive copy, there's really no way to make Employee immutable.
+
+public final class Employee{
+    private final int id;
+    private final Address address;
+    public Employee(int id, Address address)
+    {
+        this.id = id;
+        this.address=new Address();  // defensive copy
+        this.address.setStreet( address.getStreet() );
+    }
+    pulbic int getId(){
+        return id;
+    }
+    public Address getAddress() {
+        Address nuAdd = new Address(); // must copy here too
+        nuAdd.setStreet( address.getStreet() );
+        return nuAdd;
+}
+Implementing clone() or something similar (a copy ctor) would make creating defensive objects easier for complicated classes. However, the best recommendation I think would be to make Address immutable. Once you do that you can freely pass around its reference without any thread-safety issues.
+
+In this example, notice I do NOT have to copy the value of street.  Street is a String, and strings are immutable. If street consisted of mutable fields (integer street number for example) then I would have to make a copy of street also, and so on ad infinitum. This is why immutable objects are so valuable, they break the "infinite copy" chain.
+
+
+clone() Return Values
+returns the copy of the object
+throws CloneNotSupportedException if the object's class does not implement the Cloneable interface
+
+in java, if a class needs to support cloning, we must do the following things:
+
+We must implement Cloneable interface.
+We must override clone() method from Object class.(It is weird. clone() method should have been in Cloneable interface.) as below
+protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
+
+Shallow cloning is the “default implementation” in Java. 
+In overridden clone() method, if we are not cloning all the object types (not primitives), then we are making a shallow copy.
+
+===>Deep cloning or deep copying is the desired behavior in most cases. In the deep copy, we create a clone that is independent of the original object and making changes in the cloned object should not affect the original object.
+
+Let’s see how deep copy is created in Java.
+@Override
+protected Object clone() throws CloneNotSupportedException {
+	Employee cloned = (Employee)super.clone();
+	cloned.setDepartment((Department)cloned.getDepartment().clone());
+	return cloned;
+}
+
+----
+
+==>Deep Cloning with Serialization
+--------------------------------
+Serialization is another easy way of deep cloning. In this method, we serialize the object to be cloned and de-serialize it back. Obviously, the object, that needs to be cloned, should implement Serializable interface.
+
+Before going any further, I should caution that this technique is not to be used lightly.
+
+First of all, serialization is hugely expensive. It could easily be a hundred times more expensive than the clone() method.
+Second, not all objects are Serializable.
+Third, making a class Serializable is tricky and not all classes can be relied on to get it right.
+
+===>Copy constructors are special constructors in a class that takes an argument for its own class type.
+
+===>Cloning with Apache Commons
+In Apache commons, SerializationUtils class also has a utility function for deep cloning. If you feel interested follow their official docs.
+
+Class Loaders :
+====================
+
+1) Singleton class with several different classloaders ::
+
+If you want a true Singleton across classloaders, then you need a common parent to load the class in question, or you need to specify the classloader yourself.
+
+Update: From the comment from @Pshemo below a fair bit of the content in the blog below might come directly from a JavaWorld Article. I've left the blog entry in as it may still help someone, but its worth knowing where the content originally came from.
+
+Original: There is a blog entry that gives you a way to do this" (although I havent tried it!), and it looks fairly reasonable
+
+As requested below here a code snippet from my link above - I do suggest you visit the blog though for the full context:
+
+private static Class getClass(String classname) throws ClassNotFoundException {
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    if(classLoader == null) 
+        classLoader = Singleton.class.getClassLoader();
+      return (classLoader.loadClass(classname));
+}

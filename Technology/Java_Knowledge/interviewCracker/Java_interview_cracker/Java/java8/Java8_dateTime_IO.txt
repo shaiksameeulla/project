@@ -1,0 +1,140 @@
+Java 8 Date/time;
+=============
+New date-time API is introduced in Java 8 to overcome the following drawbacks of old date-time API : 
+
+	Not thread safe : Unlike old java.util.Date which is not thread safe the new date-time API is immutable and doesn’t have setter methods.
+	Less operations : In old API there are only few date operations but the new API provides us with many date operations.
+
+
+Java 8 under the package java.time introduced a new date-time API, most important classes among them are :  
+
+Local : Simplified date-time API with no complexity of timezone handling.
+Zoned : Specialized date-time API to deal with various timezones.
+LocalDate/LocalTime and LocalDateTime API : Use it when time zones are NOT required.
+
+
+LocalDateTime current = LocalDateTime.now();
+    System.out.println("current date and time : "+
+                        current);
+   
+    // to print in a particular format
+    DateTimeFormatter format =
+      DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"); 
+   
+    String formatedDateTime = current.format(format); 
+	
+	====================
+Class	Description
+LocalDate	Represents a date (year, month, day (yyyy-MM-dd))
+LocalTime	Represents a time (hour, minute, second and nanoseconds (HH-mm-ss-ns))
+LocalDateTime	Represents both a date and a time (yyyy-MM-dd-HH-mm-ss-ns)
+DateTimeFormatter	Formatter for displaying and parsing date-time objects
+
+
+Dates
+
+In Java 8, the Date class has been deprecated. The following are the new courses that have been introduced:
+
+A date is defined by the LocalDate class. It is devoid of any indication of time or time zone.
+A time is defined by the LocalTime class. It doesn’t have a date or time-zone representation.
+A date-time is defined by the LocalDateTime class. It doesn’t have a time-zone representation
+To combine time-zone information with date functions, you may utilize Lambda’s OffsetDate, OffsetTime, and OffsetDateTime classes. Another class – “ZoneId” – is used to express the timezone offset here.
+
+
+ZoneId zoneId = ZoneId.of("Europe/Paris");
+
+And we can get a set of all zone ids:
+
+Set<String> allZoneIds = ZoneId.getAvailableZoneIds();
+
+The LocalDateTime can be converted to a specific zone:
+
+ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, zoneId);
+
+The ZonedDateTime provides the parse method to get time-zone-specific date-time:
+
+ZonedDateTime.parse("2015-05-03T10:15:30+01:00[Europe/Paris]");
+
+ Working With Period
+The Period class is widely used to modify values of given a date or to obtain the difference between two dates:
+
+LocalDate initialDate = LocalDate.parse("2007-05-10");
+
+We can manipulate the Date by using Period:
+
+LocalDate finalDate = initialDate.plus(Period.ofDays(5));
+
+The Period class has various getter methods such as getYears, getMonths and getDays to get values from a Period object.
+
+For example, this returns an int value of 5 as we try to get difference in terms of days:
+
+int five = Period.between(initialDate, finalDate).getDays();
+
+We can get the Period between two dates in a specific unit such as days or months or years, using ChronoUnit.between:
+
+long five = ChronoUnit.DAYS.between(initialDate, finalDate);
+
+This code example returns five days.
+
+Let's continue by taking a look at the Duration class.
+
+5.2. Working With Duration
+Similar to Period, the Duration class is used to deal with Time.
+
+Let's create a LocalTime of 6:30 a.m. and then add a duration of 30 seconds to make a LocalTime of 6:30:30 a.m.:
+
+LocalTime initialTime = LocalTime.of(6, 30, 0);
+
+LocalTime finalTime = initialTime.plus(Duration.ofSeconds(30));
+
+We can get the Duration between two instants as either a Duration or a specific unit.
+
+First, we use the between() method of the Duration class to find the time difference between finalTime and initialTime and return the difference in seconds:
+
+long thirty = Duration.between(initialTime, finalTime).getSeconds();
+
+In the second example, we use the between() method of the ChronoUnit class to perform the same operation:
+
+long thirty = ChronoUnit.SECONDS.between(initialTime, finalTime);
+
+Now we'll look at how to convert existing Date and Calendar to new Date/Time.
+
+6. Compatibility With Date and Calendar
+Java 8 has added the toInstant() method, which helps to convert existing Date and Calendar instance to new Date and Time API:
+
+LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+LocalDateTime.ofInstant(calendar.toInstant(), ZoneId.systemDefault());
+
+The LocalDateTime can be constructed from epoch seconds. The result of the below code would be a LocalDateTime representing 2016-06-13T11:34:50:
+
+LocalDateTime.ofEpochSecond(1465817690, 0, ZoneOffset.UTC);
+
+Now let's move on to Date and Time formatting.
+
+7. Date and Time Formatting
+Java 8 provides APIs for the easy formatting of Date and Time:
+
+LocalDateTime localDateTime = LocalDateTime.of(2015, Month.JANUARY, 25, 6, 30);
+
+This code passes an ISO date format to format the local date, with a result of 2015-01-25:
+
+String localDateString = localDateTime.format(DateTimeFormatter.ISO_DATE);
+
+The DateTimeFormatter provides various standard formatting options.
+
+Custom patterns can be provided to the format method as well, which here returns a LocalDate as 2015/01/25:
+
+localDateTime.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+
+We can pass in formatting style either as SHORT, LONG or MEDIUM as part of the formatting option.
+
+For example, this would give an output representing LocalDateTime in 25-Jan-2015, 06:30:00:
+
+localDateTime
+  .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+  .withLocale(Locale.UK));
+
+Let's take a look at alternatives available to Java 8 Core Date/Time APIs.
+
+
+

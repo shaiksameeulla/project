@@ -1,0 +1,72 @@
+Arrays in Java :
+-----------------
+1) array size must be +ve integer, otherwise NegativeArraySizeException
+
+from the below diagram long,double are not allowed
+ byte-->short---->Integer
+							----->long--->double
+		Char -----Integer
+		
+		
+		ex: int a[] = new int[10]  int b[] = new int['a']
+		here char promotes to int ie 
+		
+2) Array representations.
+
+valid ex1:  int[] b; int []b; int b[];
+
+valid ex2:  int[][] x; int [][]x; int x[][]; int[] []x; int[] x[]; int []x[];
+valid ex3 :  
+int[] a,b; size a=1,b=1;
+int[] a[],b; size a=2,b=1;
+int[] a[],b[]; size a=2,b=2;
+int[]  []a,b; size a=2,b=2;
+int[] []a,b[]; size a=2,b=3;
+int[] []a,[]b; Compiletime error
+
+3) Array classes:
+
+int []a= new int[10];
+sysout (a.getClass().getName()): [I
+ for shot :[S
+ boolean  :[Z
+ 
+ similartly : int [][]a= new int[10][10];
+sysout (a.getClass().getName()): [II
+
+4) Two dimension arrays :
+--------------------
+-->also known as Matrix
+--> array of Arrays to avoid memory wastage
+ ex: int [][]x= new int[2][];
+ int [0]= new  int[2];
+ int [1]= new  int[3];
+ 
+ -->EX1: int x[][]= new int[2][3];
+ sop(x); //[I @a2dasdeee
+ sop(x[0])//[I @a3kase
+ sop(x[0][0]);//0
+ 
+ -->EX2: int x[][]= new int[2][];
+ sop(x); //[I @a2dasdeee
+ sop(x[0])//[I @a3kase
+ sop(x[0][0]);//Nullpointer exception
+ 
+ -->int[][][] x={{{10,20,30 },{ 10,20}},{{70,80,90},{1,2}}}
+ 
+ 
+ 
+ --> int[] x= {10,20,30,40};
+ --> char []y= {'c','b','a','k'};
+ 
+ int[]k=x;// valid
+ int []z= y;//invalid  compile time array
+ 
+Reason : element level promotions are not applicable for array level.
+ 
+
+
+
+
+
+
