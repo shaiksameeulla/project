@@ -44,3 +44,54 @@ const { props, state } = this;
 // example 2
 const [ first, second ] = array;
 Object destructuring is a mechanism for directly assigning properties from an object or array into variables in a way that looks like object literal syntax.
+
+
+Classes (ES6)
+class MyClass extends BaseClass {
+  constructor() {
+    super();
+    this.doSomething();
+  }
+}
+The class and extends keywords and the special function constructor are parts of ES6 classes. These classes are a new syntax for developing JavaScript in an object oriented manner that feels more similar to other object oriented languages.
+
+This new syntax is not a new approach to object orientation - underneath it, JavaScript still uses a prototypal inheritance model - but they do make it easier to reason about what is going on.
+
+
+Props and State (React)
+constructor(props) {
+  super(props);
+  this.state = {date: new Date()};
+}
+The concepts of props and state were formalized by React and are becoming accepted throughout component oriented frameworks.
+
+First, props refers to data that is passed into a component and influences how that component behaves. The component cannot change props directly - it does not own this data - but it reacts to changes in props, so if the props change, the component rerenders.
+
+Next, state refers to data that the component itself controls. This state may directly influence how the component lays out, or may just be used for internal bookkeeping - it's up to the component. The component owns this data and can change it, but also reacts automatically to changes in state, rerendering when it changes. Changes need to happen through a specified method, setState, which is covered below.
+
+
+
+setState (React)
+  this.setState({isLoggedIn: true});
+Except in the constructor of a component, changes to the state of a React component need to happen via the setState method. This allows React to batch these changes, and automatically trigger re-rendering of the component on changes.
+
+
+
+Spread/Rest (ES6)
+// example 1
+const image = { ...image, ...attributes };
+
+
+// example 2
+this.setState({ ...this.state.image, ...attributes });
+The Spread operator, aka the ... operator, essentially takes an array or an object and expands it into its set of items. This lets you do fun things like merging of objects or creating shallow copies of objects with a very tight syntax.
+
+
+Template Literals (ES6)
+const str = `What's going on, ${name}?`;
+Template literals are a new way of creating strings in JavaScript. Essentially, they allow you to plug javascript straight into strings without needing to do lots of concatenation and adding of strings the way you used to.
+
+A template literal is a string within backticks `, and then anything inside of a ${} gets evaluated as JavaScript.
+
+The most common use is simply to put variables in, but any single JavaScript expression can be inside of the ${}, including functions - the return value will be injected into the string.
+
