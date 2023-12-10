@@ -168,6 +168,11 @@ Java Collection classes are fail-fast which means that if the Collection will be
 Concurrent Collection classes support full concurrency of retrievals and adjustable expected concurrency for updates.
 Major classes are ConcurrentHashMap, CopyOnWriteArrayList and CopyOnWriteArraySet, check this post to learn how to avoid ConcurrentModificationException when using iterator.
 
+To avoid the ConcurrentModificationException in multithreaded environments, certain precautions can be used:
+
+	Iterating over an array instead of a collection - this can work well with small-sized lists but can degrade performance for larger ones.
+	Locking the collection by placing it in a synchronized block - this may not be the most effective approach as it does not utilize the very purpose of multi-threading.
+	Using Java concurrent collections such as ConcurrentHashMap and CopyOnWriteArrayList classes can help avoid the ConcurrentModificationException.
 
 What is Executors Class?
 Executors class provide utility methods for Executor, ExecutorService, ScheduledExecutorService, ThreadFactory, and Callable classes.

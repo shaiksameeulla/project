@@ -1,0 +1,139 @@
+STOMP Protocol
+
+========
+
+STOMP is the Simple (or Streaming) Text Orientated Messaging Protocol, formerly known as TTMP.  It provides an interoperable wire format that allows STOMP clients to talk with any message broker asynchronously supporting the protocol. It is similar to HTTP, and works over TCP using the commands – CONNECT, SEND, SUBSCRIBE, UNSUBSCRIBE, BEGIN, COMMIT, ABORT, ACK, NACK, DISCONNECT.
+
+STOMP is a simple and easy-to-translate protocol. Many developers managed to write an STOMP client in just a couple of hours in their particular language, runtime, or platform into the STOMP network. So if the language/runtime we prefer does not offer a good enough STOMP client we can write one without any hassle.
+
+
+STOMP Client Commands
+In STOMP communication between client and server is through a “frame” consisting of a number of lines. The first line contains the command, followed by headers in the form <key>: <value> (one per line), followed by a blank line and then the body content, ending in a null character. Communication between server and client is through a MESSAGE, RECEIPT, or ERROR frame with a similar format of headers and body content.
+
+
+		CONNECT
+		UserName: <userName>
+		password: <password>
+
+			SEND
+
+			destination: /url/address
+			receipt:message-1
+
+			Hello World
+
+		SUBSCRIBE
+
+		destination: url/address
+		acknowledge: client
+
+		UNSUBSCRIBE
+
+		UNSUBSCRIBE
+		destination: url/address
+
+		BEGIN
+
+		BEGIN
+		transaction: <transaction-ID>
+
+COMMIT
+
+	COMMIT
+	transaction: <transaction-ID>
+
+ABORT
+
+		ABORT
+		transaction: <transaction-ID>
+
+ACK
+
+	transaction: <transaction-ID>
+	message-id: <message-ID>
+
+NACK
+
+		NACK
+		transaction: <transaction-ID>
+		message-id: <message-ID>
+
+DISCONNECT
+
+		DISCONNECT
+
+		STOMP Server Commands
+		The server will, on occasion, send frames to the client (in addition to the initial CONNECTED frame). These frames MAY be one of:
+
+MESSAGE
+
+	MESSAGE
+	transaction: <transaction-ID>
+	destination:/url/address
+	message-id: <message-ID>
+	content-type:text/plain
+
+	hello world
+
+RECIEPT
+
+	RECEIPT
+	receipt-id:<message-ID>ERROR
+	receipt-id:<message-ID>
+	content-type:text/plain
+	content-length:565
+	message: malformed frame received
+
+	The message:
+	-----
+	MESSAGE
+	destined:/url/address
+	receipt:<message-ID>
+
+	Hello world a!
+	-----
+	Did not contain a destination header, which is REQUIRED
+	for message propagation.
+
+Implementations
+=============
+Below mentioned are the implementations of the STOMP Protocol
+
+STOMP Servers
+These are some message servers that support STOMP:
+
+	Apache ActiveMQ,
+	Fuse Message Broker
+	Open Message Queue (OpenMQ)
+	RabbitMQ 
+	syslog-ng through its STOMP destination plugin
+	STOMP Client
+	activemessaging, stomp in Ruby
+	Apache CMS in C++
+	Gozirra and Stampy in Java
+	Stompy, pyactivemq, stomper, stompest and stomp.py in Python
+	stomp-php, Zend_Queue, stomp in PHP
+	stompngo in Go
+	AnyEvent::STOMP, Net::Stomp, Net::STOMP::Client, POE::Component::Client::Stomp in Perl
+	STOMP is also supported by the Spring Framework in module org.springframework:spring-websocket. 
+
+STOMP Releases
+	The latest version of the specification can be found at:
+
+	STOMP1.2 Released on 10/22/2012
+	The older version of the specification are at:
+
+	STOMP1.1
+	STOMP1.0
+	Conclusion
+	STOMP is simple and lightweight, with a wide range of language bindings. It allows you to expose messaging in a browser through WebSockets. This opens up some interesting possibilities—like updating a browser, mobile app, or machine in real-time with all types of information. 
+
+FAQs on STOMP Protocol
+1. How does STOMP differ from other messaging protocols like MQTT or AMQP?
+STOMP is text-based, making it human-readable, whereas MQTT and AMQP are binary protocols. STOMP is designed to be simpler and easier to implement than some of the other messaging protocols, making it a good choice for lightweight applications or scenarios where simplicity is preferred.
+
+2. What are some common use cases for STOMP?
+STOMP is commonly used for real-time messaging, including chat applications, stock trading systems, and any application that requires the exchange of messages between different software components in a distributed system.
+
+3. Which programming languages and platforms support STOMP?
+STOMP libraries and clients are available for various programming languages, including Java, Python, JavaScript, Ruby, and more. This wide support makes it versatile for cross-platform development.

@@ -76,3 +76,140 @@ public class Item {
 Copy
 When we serialize using the Public view, it works correctly because we excluded userItems from being serialized:
 
+
+Json View
+Puts @JsonView on field level to limit fields display for different views.
+
+Normal – display name and age.
+Manager – display name, age, position and skills
+HR – display name, age, salary and position
+P.S Manager has no right to view the salary field, and HR doesn’t care what skills you have 🙂
+
+Staff.java
+
+package com.mkyong;
+
+import com.fasterxml.jackson.annotation.JsonView;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+public class Staff {
+
+    @JsonView(CompanyViews.Normal.class)
+    private String name;
+
+    @JsonView(CompanyViews.Normal.class)
+    private int age;
+
+    // two views
+    @JsonView({CompanyViews.HR.class, CompanyViews.Manager.class})
+    private String[] position;
+
+    @JsonView(CompanyViews.Manager.class)
+    private List<String> skills;
+
+    @JsonView(CompanyViews.HR.class)
+    private Map<String, BigDecimal> salary;
+
+3. Jackson – Enable the @JsonView
+3.1 Below example, show you how to enable the JsonView with mapper.writerWithView()
+
+JacksonExample.java
+
+package com.mkyong;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+public class JacksonExample {
+
+    public static void main(String[] args) {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        Staff staff = createStaff();
+
+        try {
+
+            // to enable pretty print
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+            // normal
+            String normalView = mapper.writerWithView(CompanyViews.Normal.class).writeValueAsString(staff);
+
+            System.out.format("Normal views\n%s\n", normalView);
+
+            // manager
+            String managerView = mapper.writerWithView(CompanyViews.Manager.class).writeValueAsString(staff);
+
+            System.out.format("Manager views\n%s\n", managerView);
+
+            // hr
+            String hrView = mapper.writerWithView(CompanyViews.HR.class).writeValueAsString(staff);
+
+            System.out.format("HR views\n%s\n", hrView);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static Staff createStaff() {
+
+        Staff staff = new Staff();
+
+        staff.setName("mkyong");
+        staff.setAge(38);
+        staff.setPosition(new String[]{"Founder", "CTO", "Writer"});
+        Map<String, BigDecimal> salary = new HashMap() {{
+            put("2010", new BigDecimal(10000));
+            put("2012", new BigDecimal(12000));
+            put("2018", new BigDecimal(14000));
+        }};
+        staff.setSalary(salary);
+        staff.setSkills(Arrays.asList("java", "python", "node", "kotlin"));
+
+        return staff;
+
+    }
+
+}
+
+Output
+
+
+Normal views
+{
+  "name" : "mkyong",
+  "age" : 38
+}
+
+Manager views
+{
+  "name" : "mkyong",
+  "age" : 38,
+  "position" : [ "Founder", "CTO", "Writer" ],
+  "skills" : [ "java", "python", "node", "kotlin" ]
+}
+
+HR views
+{
+  "name" : "mkyong",
+  "age" : 38,
+  "position" : [ "Founder", "CTO", "Writer" ],
+  "salary" : {
+    "2018" : 14000,
+    "2012" : 12000,
+    "2010" : 10000
+  }
+}

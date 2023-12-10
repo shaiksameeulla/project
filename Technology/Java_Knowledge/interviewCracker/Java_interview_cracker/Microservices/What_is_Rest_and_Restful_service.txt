@@ -1,0 +1,88 @@
+
+REST based Services/Architecture vs. RESTFUL Services/Architecture
+===========================================================
+"REST" is an architectural paradigm. "RESTful" describes using that paradigm.
+
+
+
+Representational state transfer (REST) is a style of software architecture. 
+As described in a dissertation by Roy Fielding, REST is an "architectural style" that basically exploits the existing technology and protocols of the Web.
+
+RESTful is typically used to refer to web services implementing such an architecture.
+
+To differentiate or compare these 2, you should know what REST is.
+
+REST (REpresentational State Transfer) is basically an architectural style of development having some principles:
+
+	It should be stateless
+
+	It should access all the resources from the server using only URI
+
+	It does not have inbuilt encryption
+
+	It does not have session
+
+	It uses one and only one protocol - HTTP
+
+	For performing CRUD operations, it should use HTTP verbs such as get, post, put and delete
+
+	It should return the result only in the form of JSON or XML, atom, OData etc. (lightweight data )
+
+REST based services follow some of the above principles and not all
+
+RESTFUL services means it follows all the above principles.
+
+	It is similar to the concept of:
+
+	Object oriented languages support all the OOP concepts, examples: C++, C#
+
+	Object-based languages support some of the OOP features, examples: JavaScript, VB
+
+
+
+
+Is every API a microservice?
+Microservices is an approach to building an application that breaks its functionality into modular components. APIs are part of an application that communicates with other applications. So, APIs can be used to enable microservices.
+
+
+
+What is the difference between microservices and API?
+
+Microservices vs APIs: Understanding the Difference
+Microservices are a complete architecture with multiple, smaller services, whereas an API is a component of microservices that helps improve the effectiveness of microservices architecture. The components of a microservices architecture are business logic, APIs, a data access layer, and a database.
+
+
+
+Know how RESTful your API is: An Overview of the Richardson Maturity Model
+============================================================================
+
+A model (developed by Leonard Richardson) that breaks down the principal elements of a REST approach into three steps. These introduce resources, http verbs, and hypermedia controls.
+
+Roy Thomas Fielding
+Roy Fielding has made it clear that level 3 RMM is a pre-condition of REST.
+
+
+There are 4 levels of API defined in the Richardson Maturity Model. These are defined as:
+
+level 0: any system that has a single endpoint for all its apis(SOAP or RPC fall in this category). Level 0 apis can also resemble "commands".
+
+level 1: a ResourceUri described system. This is a system that defines multiple entity-based URIs (instead of having a single endpoint like a level 0 systems would). These URIs can use different http actions (POST, GET, PUT, etc) to implement different actions against that resource.
+
+level 2: aka level 1 w/ a compliant use of Standard HTTP methods/verbs and multi status code responses
+	REST developed under this level leverages the full potential of HTTP as an application Layer Protocol.
+	REST API developed at this LEVEL uses Standard HTTP methods/verbs and different HTTP status codes to do different operations on Resource URI. So, the Request Body will no longer carry Operation information at this level. Hence, this API is much more mature than the API developed at LEVEL 0 and LEVEL 1.
+
+level 3: aka level 2 plus HATEOAS (hypermedia included in the response which describes additional calls you can make)
+      
+	  In LEVEL 1, the Resource-Based URI concept is introduced and in LEVEL 2, we leveraged the full potential of HTTP protocol using HTTP methods. LEVEL 3 makes use of Hypermedia (also Called HATEOAS--Hypermedia as Engine of Application state in REST world), which drives the interaction for the API Client. Generally, the API Client is not aware of all resource endpoints and REST does not deal much with API documents (which can tell API client information about all endpoints), unlike SOAP where we have WSDL, which provides information about service to the API Client.
+
+       Different Resource Based Endpoints are made aware to API Client using concept HATEOAS i.e. sending some hypermedia as the response of endpoint response which in turns acts as Engine of Application state and hence the name HATEOAS. The HATEOAS concept in REST API makes API self-documented and hence no need for API documentation.
+	
+	API developed at this LEVEL 3 is generally considered as fully RESTful API and this is where we see the charm of REST API.
+
+While levels 1, level 2, and level 3 can be considered as REST systems, only the stricter levels (aka level 2 and level 3) are considered to be RESTful.
+
+A lot of people settle for level two because hypermedia is difficult to understand and its value in the web service domain isn't as clear. 
+
+So essentially all RESTful apis are REST apis, but not all REST apis are RESTful
+

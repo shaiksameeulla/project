@@ -1,0 +1,104 @@
+Spring Autoconfiguration Internals:
+==================================
+Springboot 2.0.x
+================
+
+Under the hood, auto-configuration is implemented with standard @Configuration classes. Additional @Conditional annotations are used to constrain when the auto-configuration should apply. Usually, auto-configuration classes use @ConditionalOnClass and @ConditionalOnMissingBean annotations. This ensures that auto-configuration applies only when relevant classes are found and when you have not declared your own @Configuration.
+
+You can browse the source code of spring-boot-autoconfigure to see the @Configuration classes that Spring provides (see the META-INF/spring.factories file).
+
+
+Spring Boot checks for the presence of a META-INF/spring.factories file within your published jar. The file should list your configuration classes under the EnableAutoConfiguration key, as shown in the following example:
+
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.mycorp.libx.autoconfigure.LibXAutoConfiguration,\
+com.mycorp.libx.autoconfigure.LibXWebAutoConfiguration
+You can use the @AutoConfigureAfter or @AutoConfigureBefore annotations if your configuration needs to be applied in a specific order. For example, if you provide web-specific configuration, your class may need to be applied after WebMvcAutoConfiguration.
+
+
+Spring boot 2.7.x
+=====================
+You can browse the source code of spring-boot-autoconfigure to see the @AutoConfiguration classes that Spring provides (see the META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports file).
+
+Locating Auto-configuration Candidates
+Spring Boot checks for the presence of a META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports file within your published jar. The file should list your configuration classes, with one class name per line, as shown in the following example:
+
+com.mycorp.libx.autoconfigure.LibXAutoConfiguration
+com.mycorp.libx.autoconfigure.LibXWebAutoConfiguration
+
+==========================================================================
+
+
+Condition Annotations
+You almost always want to include one or more @Conditional annotations on your auto-configuration class. The @ConditionalOnMissingBean annotation is one common example that is used to allow developers to override auto-configuration if they are not happy with your defaults.
+
+Spring Boot includes a number of @Conditional annotations that you can reuse in your own code by annotating @Configuration classes or individual @Bean methods. These annotations include:
+
+Section 47.3.1, “Class Conditions”
+Section 47.3.2, “Bean Conditions”
+Section 47.3.3, “Property Conditions”
+Section 47.3.4, “Resource Conditions”
+Section 47.3.5, “Web Application Conditions”
+Section 47.3.6, “SpEL Expression Conditions”
+
+To handle this scenario, a separate @Configuration class can be used to isolate the condition, as shown in the following example:
+
+@Configuration
+// Some conditions
+public class MyAutoConfiguration {
+
+	// Auto-configured beans
+
+	@Configuration
+	@ConditionalOnClass(EmbeddedAcmeService.class)
+	static class EmbeddedConfiguration {
+
+		@Bean
+		@ConditionalOnMissingBean
+		public EmbeddedAcmeService embeddedAcmeService() { ... }
+
+	}
+
+}
+
+
+Creating Your Own Starter
+==================================
+A typical Spring Boot starter contains code to auto-configure and customize the infrastructure of a given technology, let’s call that "acme". To make it easily extensible, a number of configuration keys in a dedicated namespace can be exposed to the environment. Finally, a single "starter" dependency is provided to help users get started as easily as possible.
+
+Concretely, a custom starter can contain the following:
+
+The autoconfigure module that contains the auto-configuration code for "acme".
+
+The starter module that provides a dependency to the autoconfigure module as well as "acme" and any additional dependencies that are typically useful. In a nutshell, adding the starter should provide everything needed to start using that library.
+
+This separation in two modules is in no way necessary. If "acme" has several flavors, options or optional features, then it is better to separate the auto-configuration as you can clearly express the fact some features are optional. Besides, you have the ability to craft a starter that provides an opinion about those optional dependencies. At the same time, others can rely only on the autoconfigure module and craft their own starter with different opinions.
+
+If the auto-configuration is relatively straightforward and does not have optional feature, merging the two modules in the starter is definitely an option.
+
+
+
+The “autoconfigure” Module
+================================
+The autoconfigure module contains everything that is necessary to get started with the library. It may also contain configuration key definitions (such as @ConfigurationProperties) and any callback interface that can be used to further customize how the components are initialized.
+
+Spring Boot uses an annotation processor to collect the conditions on auto-configurations in a metadata file (META-INF/spring-autoconfigure-metadata.properties). If that file is present, it is used to eagerly filter auto-configurations that do not match, which will improve startup time.
+
+When building with Maven, it is recommended to add the following dependency in a module that contains auto-configurations:
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-autoconfigure-processor</artifactId>
+    <optional>true</optional>
+</dependency>
+
+If you have defined auto-configurations directly in your application, make sure to configure the spring-boot-maven-plugin to prevent the repackage goal from adding the dependency into the fat jar:
+
+
+Starter Module
+===============
+The starter is really an empty jar. Its only purpose is to provide the necessary dependencies to work with the library. You can think of it as an opinionated view of what is required to get started.
+
+Do not make assumptions about the project in which your starter is added. If the library you are auto-configuring typically requires other starters, mention them as well. Providing a proper set of default dependencies may be hard if the number of optional dependencies is high, as you should avoid including dependencies that are unnecessary for a typical usage of the library. In other words, you should not include optional dependencies.
+
+Either way, your starter must reference the core Spring Boot starter (spring-boot-starter) directly or indirectly (there is no need to add it if your starter relies on another starter). If a project is created with only your custom starter, Spring Boot’s core features will be honoured by the presence of the core starter.

@@ -110,3 +110,23 @@ This is a one-shot phenomenon -- the count cannot be reset. If you need a versio
 And indeed, we find that a CyclicBarrier has a method called .reset(), which does what it means. Not only that, but there is a version of the constructor of a CyclicBarrier which associated a Runnable to be run each time the barrier is "tripped" (that is what the javadoc says; don't ask me).
 
 So, those are indeed different, for the simple fact that one is reusable (CyclicBarrier) while the other is not (CountDownLatch).
+
+
+
+//creating a constructor of the CyclicBarrier class       
+CyclicBarrier cb = new CyclicBarrier(3, new AfterAction());  
+//initializing three threads to read 3 different files  
+Thread t1 = new Thread(new TxtReader("thread-1", "file-1", cb));  
+Thread t2 = new Thread(new TxtReader("thread-2", "file-2", cb));  
+Thread t3 = new Thread(new TxtReader("thread-3", "file-3", cb));  
+//start begin execution of threads   
+t1.start();  
+t2.start();  
+t3.start();  
+System.out.println("Done ");  
+
+
+thread
+//calling await() so the current thread may suspends  
+cb.await();             
+

@@ -329,7 +329,86 @@ public static void main(String[] args) throws Exception {
     System.out.println(f.isDone()); // False
     CompletableFuture<Integer> f2 = f.thenApply(new PlusOne());
     System.out.println(f2.get()); // Waits until the "calculation" is done, then prints 2
+	
 }
+
+7. Difference Between thenApply() and thenCompose()
+
+
+So thenApply method is useful when we want to transform the result of a CompletableFuture call:
+
+if the idea is to chain CompletableFuture methods, then it’s better to use thenCompose().
+
+
+When we need to execute multiple Futures in parallel, we usually want to wait for all of them to execute and then process their combined results.
+
+		The CompletableFuture.allOf static method allows to wait for the completion of all of the Futures provided as a var-arg:
+
+		CompletableFuture<String> future1  
+		  = CompletableFuture.supplyAsync(() -> "Hello");
+		CompletableFuture<String> future2  
+		  = CompletableFuture.supplyAsync(() -> "Beautiful");
+		CompletableFuture<String> future3  
+		  = CompletableFuture.supplyAsync(() -> "World");
+
+		CompletableFuture<Void> combinedFuture 
+		  = CompletableFuture.allOf(future1, future2, future3);
+
+Handling Errors
+----------------
+
+Instead of catching an exception in a syntactic block, the CompletableFuture class allows us to handle it in a special handle method. This method receives two parameters: a result of a computation (if it finished successfully) and the exception thrown (if some computation step did not complete normally).
+
+In the following example, we use the handle method to provide a default value when the asynchronous computation of a greeting was finished with an error because no name was provided:
+
+
+CompletableFuture<String> completableFuture  
+  =  CompletableFuture.supplyAsync(() -> {
+      if (name == null) {
+          throw new RuntimeException("Computation error!");
+      }
+      return "Hello, " + name;
+  }).handle((s, t) -> s != null ? s : "Hello, Stranger!");
+  
+  
+  As an alternative scenario, suppose we want to manually complete the Future with a value, as in the first example, but also have the ability to complete it with an exception. The completeExceptionally method is intended for just that. The completableFuture.get() method in the following example throws an ExecutionException with a RuntimeException as its cause:
+
+	CompletableFuture<String> completableFuture = new CompletableFuture<>();
+
+	// ...
+
+	completableFuture.completeExceptionally(
+	  new RuntimeException("Calculation failed!"));
+
+	// ...
+
+completableFuture.get(); // ExecutionException
+
+
+		JDK 9 CompletableFuture API
+		=============================
+		Java 9 enhances the CompletableFuture API with the following changes:
+
+			New factory methods added
+			Support for delays and timeouts
+			Improved support for subclassing
+			and new instance APIs:
+
+			Executor defaultExecutor()
+			CompletableFuture<U> newIncompleteFuture()
+			CompletableFuture<T> copy()
+			CompletionStage<T> minimalCompletionStage()
+			CompletableFuture<T> completeAsync(Supplier<? extends T> supplier, Executor executor)
+			CompletableFuture<T> completeAsync(Supplier<? extends T> supplier)
+			CompletableFuture<T> orTimeout(long timeout, TimeUnit unit)
+			CompletableFuture<T> completeOnTimeout(T value, long timeout, TimeUnit unit)
+			We also now have a few static utility methods:
+
+			Executor delayedExecutor(long delay, TimeUnit unit, Executor executor)
+			Executor delayedExecutor(long delay, TimeUnit unit)
+			<U> CompletionStage<U> completedStage(U value)
+			<U> CompletionStage<U> failedStage(Throwable ex)
+			<U> CompletableFuture<U> failedFuture(Throwable ex)
 ==========================--------------------9################################
 1. Implementations of ReadWriteLock
 	ReadWriteLock is implemented by ReentrantReadWriteLock Class in java.util.concurrent.locks package.Multiple Threads can acquire multiple read Locks, but only a single Thread can acquire mutually-exclusive write Lock .Other threads requesting readLocks have to wait till the write Lock is released. A thread is allowed to degrade from write lock to read lock but not vice-versa. Allowing a read thread to upgrade would lead to a deadlock as more than one thread can try to upgrade its lock. The ReentrantReadWriteLock also supports all the features of the Reentrant lock like providing fair mechanism ,reentrantLocks, Condition Support (on a write Lock only), allowing interruption on read as well as write Locks.

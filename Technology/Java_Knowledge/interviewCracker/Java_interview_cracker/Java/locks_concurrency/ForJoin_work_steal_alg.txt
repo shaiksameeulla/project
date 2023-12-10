@@ -1,0 +1,45 @@
+ ExecutorService newWorkStealingPool
+ public static ExecutorService newWorkStealingPool(int parallelism)  
+
+ 
+ The newWorkStealingPool() method of Executors class creates a work-stealing thread pool using the number of available processors as its target parallelism level.
+ 
+ 
+ public static ExecutorService newWorkStealingPool() {
+    return new ForkJoinPool(Runtime.getRuntime().availableProcessors(),
+                                                 ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+                                                 null, true);
+												 
+								
+n Java 8, the most convenient way to get access to the instance of the ForkJoinPool is to use its static method commonPool(). This will provide a reference to the common pool, which is a default thread pool for every ForkJoinTask.
+
+According to Oracle’s documentation, using the predefined common pool reduces resource consumption since this discourages the creation of a separate thread pool per task.
+
+ForkJoinPool commonPool = ForkJoinPool.commonPool();
+Copy
+We can achieve the same behavior in Java 7 by creating a ForkJoinPool and assigning it to a public static field of a utility class:
+
+public static ForkJoinPool forkJoinPool = new ForkJoinPool(2);
+Copy
+Now we can easily access it:
+
+ForkJoinPool forkJoinPool = PoolUtil.forkJoinPool;
+Copy
+With ForkJoinPool’s constructors, we can create a custom thread pool with a specific level of parallelism, thread factory and exception handler. Here the pool has a parallelism level of 2. This means that pool will use two processor cores.
+								
+
+
+ForkJoinTask<V>
+ForkJoinTask is the base type for tasks executed inside ForkJoinPool. In practice, one of its two subclasses should be extended: the RecursiveAction for void tasks and the RecursiveTask<V> for tasks that return a value. They both have an abstract method compute() in which the task’s logic is defined.											
+
+
+
+// get no. of threads active
+        ForkJoinPool Pool = ForkJoinPool.commonPool();
+         
+        System.out.println("Number of active thread before invoking: "
+            + Pool.getActiveThreadCount());
+             
+        NewTask t = new NewTask(400);
+         
+        Pool.invoke(t);
