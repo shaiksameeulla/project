@@ -1,0 +1,32 @@
+call, apply and bind method in JavaScript:
+------------------------------------------
+
+bind()
+The official docs say: The bind() method creates a new function that, when called, has its this keyword set to the provided value. (It actually talks about even more stuff, but we’ll leave that for another time :) )
+
+This is extremely powerful. It let’s us explicitly define the value of this when calling a function. Let’s look at cooooode:
+
+
+Using the bind() method on line 14.
+Let’s break it down. When we use the bind() method:
+
+the JS engine is creating a new pokemonName instance and binding pokemon as its this variable. It is important to understand that it copies the pokemonName function.
+After creating a copy of the pokemonName function it is able to call logPokemon(), although it wasn’t on the pokemon object initially. It will now recognizes its properties (Pika and Chu) and its methods.
+And the cool thing is, after we bind() a value we can use the function just like it was any other normal function. We could even update the function to accept parameters, and pass them like so:
+
+
+call(), apply()
+The official docs for call() say: The call() method calls a function with a given this value and arguments provided individually.
+
+What that means, is that we can call any function, and explicitly specify what this should reference within the calling function. Really similar to the bind() method! This can definitely save us from writing hacky code (even though we are all still hackerzzz).
+
+The main differences between bind() and call() is that the call() method:
+
+Accepts additional parameters as well
+Executes the function it was called upon right away.
+The call() method does not make a copy of the function it is being called on.
+call() and apply() serve the exact same purpose. The only difference between how they work is that call() expects all parameters to be passed in individually, whereas apply() expects an array of all of our parameters. Example:
+
+
+Notice that apply accepts and array, and call expects each param individually.
+These built in methods, that exist on every JS function can be very useful. Even if you do not end up using them in your day to day programming, you will still run into it often when reading other peoples code.

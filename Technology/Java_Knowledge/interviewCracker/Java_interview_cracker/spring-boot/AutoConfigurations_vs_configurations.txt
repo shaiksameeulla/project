@@ -1,0 +1,138 @@
+@SpringBootApplication is a combination of three annotations,
+
+@Configuration - for java based configuration classes.
+
+@ComponentScan - to enable component scanning, all the packages and subpackages will be auto-scanned which are under the root package on which @SpringBootApplication is applied.
+
+@EnableAutoConfiguration - to enable auto-configuration of the classes bases on the jars added in classpath.
+
+
+====
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+public @interface SpringBootApplication {
+
+@SpringBootConfiguration vs @Configuration
+@SpringBootConfiguration is an alternative to the @Configuration annotation. The main difference is that @SpringBootConfiguration allows configuration to be automatically located. This can be especially useful for unit or integration tests.
+
+The recommendation is to only have one @SpringBootConfiguration or @SpringBootApplication for your application. Most applications will simply use @SpringBootApplication.
+
+====
+
+What is the difference between the @ComponentScan and @EnableAutoConfiguration annotations in Spring Boot?
+
+@EnableAutoConfiguration annotation tells Spring Boot to "guess" how you will want to configure Spring, based on the jar dependencies that you have added. For example, If HSQLDB is on your classpath, and you have not manually configured any database connection beans, then Spring will auto-configure an in-memory database.
+
+@ComponentScan tells Spring to look for other components, configurations, and services in the specified package. Spring is able to auto scan, detect and register your beans or components from pre-defined project package. If no package is specified current class package is taken as the root package.
+
+Is it necessary to add these?
+
+If you need Spring boot to Auto configure every thing for you @EnableAutoConfiguration is required. You don't need to add it manually, spring will add it internally for you based on the annotation you provide.
+
+Actually the @SpringBootApplication annotation is equivalent to using @Configuration, @EnableAutoConfiguration and @ComponentScan with their default attributes.
+
+See also:
+
+Using the @SpringBootApplication annotation
+Auto-configuration
+
+
+
+
+===
+The @EnableAutoConfiguration annotation enables Spring Boot to auto-configure the application context. Therefore, it automatically creates and registers beans based on both the included jar files in the classpath and the beans defined by us.
+
+====
+A lot of this magic because of AutoConfigurations. AutoConfiguration classes are very very similar to regular Configuration classes except for the following two differences:
+
+AutoConfiguration classes are run last (meaning after all regular non-autoconfiguration classes) while the order in which Configuration classes are run is indeterminate (except if we use ordering annotations like @Ordered)
+To declare a class as an AutoConfiguration they need to be specified as such in the spring.factories file. An example can be found here.
+
+
+By now I am sure you are wondering when should one choose an AutoConfiguration class vs a Configuration class. Great question! Personally, I like to use an AutoConfiguration when:
+
+The creation of beans depends on the presence of other beans. In other words, if you are considering using the @ConditionalOnBean or the @ConditionalOnMissingBean annotations.
+Your configuration depends on other AutoConfigurations. You can use the @AutoConfigureAfter or @AutoConfigureBefore annotations to control the order of beans creation when it comes to AutoConfiguration classes.
+Let's look at some examples (and do some logging to understand the sequence of beans creation):
+
+Beans using only @Configuration
+Let's make some very very basic and simple examples. Consider two utility classes: StringUtils and ObjectUtils :
+
+Next, we are going to be creating a StringUtilsConfiguration class:
+
+@Configuration
+class StringUtilsConfiguration {
+    @Bean
+    fun stringUtils(): StringUtils {
+        logger.info("Running StringUtilsConfiguration")
+        return StringUtils()
+    }
+    companion object {
+       private val logger = Logger.getLogger(this.javaClass.name)
+    }
+}
+
+Next, we are going to be creating a StringUtilsConfiguration class:
+
+@Configuration
+class StringUtilsConfiguration {
+    @Bean
+    fun stringUtils(): StringUtils {
+        logger.info("Running StringUtilsConfiguration")
+        return StringUtils()
+    }
+    companion object {
+       private val logger = Logger.getLogger(this.javaClass.name)
+    }
+}
+and an ObjectUtilsConfiguration class:
+
+@Configuration
+class ObjectUtilsConfiguration {
+    @Bean
+    fun objectUtils(): ObjectUtils {
+        logger.info("Running ObjectUtilsConfiguration")
+        ObjectUtils()
+    }
+    companion object {
+        private val logger = Logger.getLogger(this.javaClass.name)
+    }
+}
+If we were to run this spring boot application you should see the following log statements:
+
+Running ObjectUtilsConfiguration
+Running StringUtilsConfiguration
+In order to control the order of execution we could use the @Order annotation. But this is easy when there are only configuration classes. Ordering becomes hard if we had many configuration classes or if we need to conditionally create or not create beans depending on if other beans are present. Finally, if we want to provide defaults (E.g.: to provide defaults)- Enter AutoConfigurations.
+
+Introducing AutoConfigurations
+AutoConfiguration classes, as mentioned earlier, are a big component of what makes Spring Boot so effective. We can find several AutoConfiguration classes in Spring boot’s source code. Some example include: FlywayAutoConfiguration, GsonAutoConfiguration, MailSenderAutoConfiguration etc.
+
+On a lot of these classes you may see some form of an @Conditionalxxx annotation. So these classes are executed when those conditions are fullfilled.
+
+Let us start off with creating an AutoConfiguration and for simplicity’s sake let us change the StringUtilsConfiguration class to be an AutoConfiguration. The only thing we will need to do is register the StringUtilsConfiguration as an AutoConfiguration by creating a spring.factories file under the src/main/resource/META-INF directory:
+
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.example.autoconfiguration.sample.ObjectUtilsConfiguration
+
+=============
+
+@Configuration is a spring framework annotation and not strictly bound to spring-boot. It was introduced when spring started to allow programmatic creation of spring-beans as to move forward from xml definitions of beans.
+
+@AutoConfiguration is a spring-boot specific annotation not commonly available in spring framework. The reason it exists, is for external providers that cooperate with spring-boot to be able to mark some classes in some libraries they provide with this annotation as to inform spring-boot that those classes could be parsed and make some initializations during start up of spring application automatically.
+
+So if some regular programmer that develops some application happens to have kafka in dependencies then some beans will automatically be created and added in application context and will be ready for the programmer to use, although he has not defined any configuration for them. Spring-boot already knows this as the kafka provider has already informed by marking some class in the jar they provide with the annotation @AutoConfiguration.
+
+For this reason @AutoConfiguration has some more powerful configurations available as before, after, beforeName, afterName as to allow the provider to specify when the configuration is applied during application startup if some order is necessary.
+
+So this annotation is not to be used from some regular programmer that develops an application using spring-boot. It is for someone that develops a library that other users might use with spring-boot. One such example is kafka library.
+
+For this to work in a spring-boot project @EnableAutoConfiguration is needed as well, to enable auto configuration.
+
+From spring documentation
+
+Spring Boot auto-configuration attempts to automatically configure your Spring application based on the jar dependencies that you have added. For example, if HSQLDB is on your classpath, and you have not manually configured any database connection beans, then Spring Boot auto-configures an in-memory database.
+
+@Configuration instead is to be used from some regular programmer that develops an application using spring-boot or spring-framework as to inform the framework for which beans should be created and how.
+

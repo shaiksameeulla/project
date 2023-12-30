@@ -1,0 +1,56 @@
+WHAT IS CURRYING IN JAVASCRIPT?
+==========================
+Currying in JavaScript transforms a function with multiple arguments into a nested series of functions, each taking a single argument. Currying helps you avoid passing the same variable multiple times, and it helps you create a higher order function.
+
+That is, when we turn a function call sum(1,2,3) into sum(1)(2)(3). 
+
+Why Is Currying in JavaScript Useful?
+1. Currying helps you avoid passing the same variable again and again.
+2. It helps to create a higher order function.
+
+Currying transforms a function with multiple arguments into a sequence/series of functions, each taking a single argument.
+
+For example:
+
+function sum(a, b, c) {
+    return a + b + c;
+}
+sum(1,2,3); // 6
+As you can see, this is a function with full arguments. Let’s create a curried version of the function and see how we would call the same function (and get the same result) in a series of calls:
+
+function sum(a) {
+    return (b) => {
+        return (c) => {
+            return a + b + c
+        }
+    }
+}
+console.log(sum(1)(2)(3)) // 6
+We could even separate this sum(1)(2)(3) to understand it better:
+
+const sum1 = sum(1);
+const sum2 = sum1(2);
+const result = sum2(3);
+console.log(result); // 6
+
+
+example:
+let multiply = function (a, b) {
+  console.log(a * b);
+};
+
+
+let multipleCurrey = multiply.bind(this, 3);
+let multiply2 = multipleCurrey(6);
+
+another example using closures
+------------
+
+let multiply = function (a) {
+  return function (b) {
+    console.log(a * b);
+  };
+};
+
+let multipleCurrey = multiply(3);
+let multiply2 = multipleCurrey(6);
