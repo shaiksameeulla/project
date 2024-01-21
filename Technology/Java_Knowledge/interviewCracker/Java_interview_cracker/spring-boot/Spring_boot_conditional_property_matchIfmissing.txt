@@ -1,0 +1,11 @@
+What is purpose of @ConditionalOnProperty annotation?
+
+The annotation is used to conditionally create a Spring bean depending on the configuration of a property. In the usage you've shown in the question the bean will only be created if the spring.social.auto-connection-views property exists and it has a value other than false. This means that, for this View bean to be created, you need to set the spring.social.auto-connection-views property and it has to have a value other than false.
+
+You can find numerous other uses of this annotation throughout the Spring Boot code base. Another example is:
+
+@ConditionalOnProperty(prefix = "spring.rabbitmq", name = "dynamic", matchIfMissing = true)
+public AmqpAdmin amqpAdmin(CachingConnectionFactory connectionFactory) {
+    return new RabbitAdmin(connectionFactory);
+}
+Note the use of matchIfMissing. In this case the AmqpAdmin bean will be created if the spring.rabbitmq.dynamic property exists and has a value other than false or the property doesn't exist at all. This makes the creation of the bean opt-out rather than the example in the question which is opt-in.

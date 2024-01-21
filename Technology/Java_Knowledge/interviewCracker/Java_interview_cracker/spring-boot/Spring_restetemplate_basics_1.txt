@@ -1,0 +1,52 @@
+RestTemplate :
+===============
+Why do you think it’s better to use RestTemplate than plain HttpClient or other similar Java libraries
+
+RestTemplate is a higher level library than HttpClient, which makes it easier to use. It also has built in support for a number of features, such as error handling and automatic retries, which can make it more reliable.
+
+
+How does RestTemplate handle error handling? Does it provide any built-in support for this purpose?
+
+RestTemplate does not provide any built-in support for error handling. However, it is possible to configure it to use a custom error handler. This can be done by setting the ‘restTemplateErrorHandler’ property on the RestTemplate bean.
+
+How many ways are there to add parameters to a request URL? Which one would you recommend?
+There are two ways to add parameters to a request URL: query parameters and path parameters. Query parameters are added to the end of the URL, after a question mark, and are used to provide information to the server that is needed to process the request. Path parameters are added to the URL itself, and are used to identify specific resources that the server should provide.
+
+Is it possible to send binary data over an HTTP request? If yes, how?
+Yes, it is possible to send binary data over an HTTP request. This can be done by using the Base64 encoding scheme to encode the binary data into a string, which can then be included in the HTTP request.
+
+As of Spring Framework 5, alongside the WebFlux stack, Spring introduced a new HTTP client called WebClient.
+
+WebClient is a modern, alternative HTTP client to RestTemplate. 
+
+Get Plain JSON:
++++++++++++++
+RestTemplate restTemplate = new RestTemplate();
+String fooResourceUrl
+  = "http://localhost:8080/spring-rest/foos";
+ResponseEntity<String> response
+  = restTemplate.getForEntity(fooResourceUrl + "/1", String.class);
+Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+
+Retrieving POJO Instead of JSON
++++++++++++++++++++++++++++++
+Foo foo = restTemplate
+  .getForObject(fooResourceUrl + "/1", Foo.class);
+  
+Use HEAD to Retrieve Headers
+===========================
+HttpHeaders httpHeaders = restTemplate.headForHeaders(fooResourceUrl);
+Assertions.assertTrue(httpHeaders.getContentType().includes(MediaType.APPLICATION_JSON));
+
+Use POST to Create a Resource
+===========================
+In order to create a new Resource in the API, we can make good use of the postForLocation(), postForObject() or postForEntity() APIs.
+
+The first returns the URI of the newly created Resource, while the second returns the Resource itself.
+
+HttpEntity<Foo> request = new HttpEntity<>(new Foo("bar"));
+Foo foo = restTemplate.postForObject(fooResourceUrl, request, Foo.class);
+
+HttpEntity<Foo> request = new HttpEntity<>(new Foo("bar"));
+URI location = restTemplate
+  .postForLocation(fooResourceUrl, request);

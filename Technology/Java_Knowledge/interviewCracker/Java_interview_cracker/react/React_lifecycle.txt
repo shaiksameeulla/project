@@ -1,0 +1,34 @@
+React lifecycle 
+================
+
+Render phase : Pure and has no side effects. May be paused, aborted or restarted by React.
+“Pre-commit phase” : Can read the DOM.
+“Commit phase” : Can work with DOM, run side effects, schedule updates.
+
+
+ React Component can go through four stages of its life as follows. 
+
+Initialization: This is the stage where the component is constructed with the given Props and default state. This is done in the constructor of a Component Class.
+Mounting: Mounting is the stage of rendering the JSX returned by the render method itself.
+Updating: Updating is the stage when the state of a component is updated and the application is repainted.
+Unmounting: As the name suggests Unmounting is the final step of the component lifecycle where the component is removed from the page.
+
+
+Mounting(Render phase)	
+		-->constructor(Render phase)-->static getDerivedStateFromProps()(Render phase)---->render(Render phase)
+		-->React updates DOM and refs(Commit phase)--->componentDidMount(Commit phase)
+
+
+Updating(Render phase)
+	-->New props(Render phase)-->set­State(Render phase)--->force­Update()-->render(Render phase) 
+	-->React updates ­D­O­M and refs(Commit phase)--->componentDidUpdate(Commit phase)
+   
+   componentDidUpdate(prevProps, prevState, snapshot)
+
+
+Unmounting(Render phase)
+	----->componentWillUnmount(Commit phase)
+
+         componentWillUnmount()
+
+

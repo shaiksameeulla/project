@@ -1,0 +1,33 @@
+In useEffect, what's the difference between providing no dependency array and an empty one?
+
+
+useEffect(() => {
+  performSideEffect();
+}, []);
+But what's the difference between that, and the following?
+
+useEffect(() => {
+  performSideEffect();
+});
+
+Notice the lack of [] at the end. The linter plugin doesn't throw a warning.
+
+
+
+It's not quite the same.
+
+Giving it an empty array acts like componentDidMount as in, it only runs once.
+
+Giving it no second argument acts as both componentDidMount and componentDidUpdate, as in it runs first on mount and then on every re-render.
+
+Giving it an array as second argument with any value inside, eg , [variable1] will only execute the code inside your useEffect hook ONCE on mount, as well as whenever that particular variable (variable1) changes.
+
+
+
+If you return a clean up function from your useEffect
+
+useEffect(() => {
+  performSideEffect();
+  return cleanUpFunction;
+}, []);
+It will run before every useEffect code run, to clean up for the previous useEffect run. (Except the very first useEffect run)
