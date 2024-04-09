@@ -1,6 +1,36 @@
 Stream Partition
 ===========
 
+
+======================
+Collectors.partitioningBy() using a Predicate
+======================
+In its essential form - the partitioningBy() method accepts a predicate:
+
+public static <T> Collector<T,?,Map<Boolean,List<T>>> partitioningBy(Predicate<? super T> predicate)
+Each of the elements from the Stream are tested against the predicate, and based on the resulting boolean value, this Collector groups the elements into two sets and returns the result as Map<Boolean, List<T>>.
+
+
+Note: There are no guarantees on the type, mutability, serializability, or thread-safety of the Map returned.
+
+
+internal code:
+													
+public static <T>
+    Collector<T, ?, Map<Boolean, List<T>>> partitioningBy(Predicate<? super T> predicate) {
+        return partitioningBy(predicate, toList());
+    }
+
+Syntax 2:
+---------
+
+
+ public static <T, D, A>
+    Collector<T, ?, Map<Boolean, D>> partitioningBy(Predicate<? super T> predicate,
+                                                    Collector<? super T, A, D> downstream) {}
+
+
+
 // Partition students into passing and failing
      Map<Boolean, List<Student>> passingFailing =
          students.stream()
@@ -52,16 +82,6 @@ List<Student> students = Arrays.asList(
         new Student("Gabriella", "Robertson", "Miami", 9.1, 20),
         new Student("Kyle", "Miller", "Miami", 9.83, 20)
 );
-======================
-Collectors.partitioningBy() using a Predicate
-======================
-In its essential form - the partitioningBy() method accepts a predicate:
-
-public static <T> Collector<T,?,Map<Boolean,List<T>>> partitioningBy(Predicate<? super T> predicate)
-Each of the elements from the Stream are tested against the predicate, and based on the resulting boolean value, this Collector groups the elements into two sets and returns the result as Map<Boolean, List<T>>.
-
-
-Note: There are no guarantees on the type, mutability, serializability, or thread-safety of the Map returned.
 
 Before applying the method on our student list - let's try partitioning a list of names based on whether their length surpasses 4 or not:
 
@@ -113,9 +133,11 @@ Using Collectors.mapping() as a Downstream Collector
 Collectors.mapping() is a very common collector - and we can perform mapping on the elements after partitioning them. For instance, let's partition a stream of names based on their length, and then map the names to their uppercase counterparts and finally collect them back to a list:
 
 List<String> names = Arrays.asList("John", "Mike", "Michael", "Joe", "James");
+
 Map<Boolean, List<String>> partitionByNameLength = names.stream()
     .collect(Collectors.partitioningBy(name -> name.length() > 4,
             Collectors.mapping(String::toUpperCase, Collectors.toList())));
+
 
 System.out.println(partitionByNameLength);
 The Collectors.mapping() method is used as a downstream collector, which accepts two parameters itself - a mapper (function to be applied on the input elements), and its own downstream collector which accepts the mapped values.
