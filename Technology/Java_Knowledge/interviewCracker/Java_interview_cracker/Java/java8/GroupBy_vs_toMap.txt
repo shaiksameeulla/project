@@ -1,0 +1,198 @@
+
+Differences between Collectors.toMap() and Collectors.groupingBy() to collect into a Map
+==============================================================================
+
+
+To collect into a Map that contains a single value by key (Map<MyKey,MyObject>), use Collectors.toMap().
+To collect into a Map that contains multiple values by key (Map<MyKey, List<MyObject>>), use Collectors.groupingBy().
+
+Collectors.toMap()
+====================
+Collectors.toMap() with Mapper and Merge Functions
+Besides the two Mapper Functions, we can supply a Merge Function:
+
+public static <T,K,U> Collector<T,?,Map<K,U>> 
+    toMap(Function<? super T,? extends K> keyMapper,
+          Function<? super T,? extends U> valueMapper,
+          BinaryOperator<U> mergeFunction)
+The mergeFuction is a function that is called only if there are duplicate key elements present in our final Map that need their values merged and assigned to the one unique key. Its input are two values that is the two values for which keyMapper returned the same key, and merges those two values into a single one.
+
+================
+
+By writing :
+
+chargePoints.stream().collect(Collectors.toMap(Point::getParentId, c -> c));
+The returned object will have the Map<Long,Point> type.
+Look at the Collectors.toMap() function that you are using :
+
+Collector<T, ?, Map<K,U>> toMap(Function<? super T, ? extends K> keyMapper,
+                                    Function<? super T, ? extends U> valueMapper)
+It returns a Collector with as result Map<K,U> where K and U are the type of return of the two functions passed to the method. In your case, Point::getParentId is a Long and c refers to a Point. Whereas the Map<Long,Point> returned when collect() is applied on.
+
+And this behavior is rather expected as Collectors.toMap() javadoc states :
+
+returns a Collector that accumulates elements into a Map whose keys and values are the result of applying the provided mapping functions to the input elements.
+
+But if the mapped keys contains duplicates (according to Object.equals(Object)), an IllegalStateException is thrown
+It will be probably your case as you will group the Points according to a specific property : parentId.
+
+If the mapped keys may have duplicates, you could use the toMap(Function, Function, BinaryOperator) overload but it will not really solve your problem as it will not group elements with the same parentId. It will just provide a way to not have two elements with the same parentId.
+
+Collectors.groupingBy()
+
+To achieve your requirement, you should use Collectors.groupingBy() which the behavior and the method declaration suits much better to your need :
+
+public static <T, K> Collector<T, ?, Map<K, List<T>>>
+groupingBy(Function<? super T, ? extends K> classifier) 
+It is specified as :
+
+Returns a Collector implementing a "group by" operation on input elements of type T, grouping elements according to a classification function, and returning the results in a Map.
+
+The method takes a Function.
+In your case, the Function parameter is Point (the type of Stream) and you return Point.getParentId() as you want to group elements by parentId values.
+
+So you could write :
+
+Map<Long, List<Point>> pointByParentId = 
+                       chargePoints.stream()
+                                   .collect(Collectors.groupingBy( p -> p.getParentId())); 
+Or with a method reference :
+
+Map<Long, List<Point>> pointByParentId = 
+                       chargePoints.stream()
+                                   .collect(Collectors.groupingBy(Point::getParentId));
+Collectors.groupingBy() : go further
+
+Indeed the groupingBy() collector goes further than the actual example. The Collectors.groupingBy(Function<? super T, ? extends K> classifier) method is finally just a convenient method to store the values of the collected Map in a List.
+To store values of the Map in another thing than a List or to store the result of a specific computation , groupingBy(Function<? super T, ? extends K> classifier,                                          Collector<? super T, A, D> downstream) should interest you.
+
+For example :
+
+Map<Long, Set<Point>> pointByParentId = 
+                       chargePoints.stream()
+                                   .collect(Collectors.groupingBy(Point::getParentId, toSet()));
+So beyond the asked question, you should consider groupingBy() as a flexible way to choose values that you want to store into the collected Map, what definitively toMap() is not.
+====================================
+
+InJava, the Stream API helps work with collections of objects in a smart way. Two common tools in the Stream API are groupingBy and toMap(). Both of these tools collect elements into a map, but they do it differently. Let's take a closer look at the differences between groupingBy and toMap() and when to use each one.
+
+GroupingBy Collector
+
+The groupingBy collector puts things into groups based on a function. It makes groups of elements that share something in common. Here's how groupingBy works:
+
+groupingBy(Function<? super T, ? extends K> classifier)
+classifier: This function decides which group an element belongs to.
+For example, if we have a list of people and want to group them by age:
+
+Map<Integer, List<Person>> peopleByAge = people.stream()
+    .collect(Collectors.groupingBy(Person::getAge));
+In this example, we use Person::getAge to group people by their ages. It creates a map where the keys are ages and the values are lists of people with those ages.
+
+ToMap Collector
+
+The toMap() collector turns elements into keys and values directly. It needs two functions: one for keys and one for values. Here's how toMap works:
+
+toMap(Function<? super T, ? extends K> keyMapper, 
+      Function<? super T, ? extends U> valueMapper)
+keyMapper: This function decides what the key should be.
+valueMapper: This function decides what the value should be.
+For instance, if we have a list of people and want to create a map where names are keys and ages are values:
+
+Map<String, Integer> nameToAgeMap = people.stream()
+    .collect(Collectors.toMap(Person::getName, Person::getAge));
+In this example, Person::getName gives us the names as keys, and Person::getAge gives us the ages as values.
+
+Key Differences
+
+GroupingBy versus ToMap: groupingBy groups elements based on a shared characteristic, while toMap maps elements directly to keys and values.
+Values in Map: In groupingBy, values in the map are lists of elements with the same key, whereas in toMap, values come directly from the elements.
+Use Cases: Use groupingBy when you want to put things into groups based on something they have in common. Use toMap when you want to map each element to a key-value pair directly.
+In summary, groupingBy and toMap collectors do similar things, but they work differently and are used for different purposes. Understanding these differences helps use the Java Stream API effectively in various situations.
+
+
+Examples :
+==========
+
+List<String> list= List.of("Apple","Ball","Apple","cat");
+		
+		//below code throws  Exception in thread "main" java.lang.IllegalStateException: Duplicate key 5 (attempted merging values Apple and Apple)
+		Map<Integer,String> respnse = list.stream().collect(Collectors.toMap(key->key.length(),Function.identity()) );
+		
+	
+		
+		// below method fix duplicate problem
+		Map<Integer,String> respnse1 = list.stream().collect(Collectors.toMap(key->key.length(), Function.identity(),(a,b)->a));
+
+
+final List<City> CITY_INPUT = Arrays.asList(
+  new City("New York City", "USA"),
+  new City("Shanghai", "China"),
+  new City("Hamburg", "Germany"),
+  new City("Paris", "France"),
+  new City("Paris", "Texas, USA"));
+  
+  
+  In this tutorial, we’ll stick to the standard Java API. Therefore, we’ll use the groupingBy() collector to produce a Map<String, List<City>> result, as the groupingBy() method can group objects by some property as keys and store the objects in a Map instance:
+
+Map<String, List<City>> resultMap = CITY_INPUT.stream()
+  .collect(groupingBy(City::getName));
+
+assertEquals(4, resultMap.size());
+assertEquals(Arrays.asList(new City("Paris", "France"), new City("Paris", "Texas, USA")),
+  resultMap.get("Paris"));
+  
+  
+  Alternatively, if we want always to overwrite the existing entry in the map when a duplicated key occurs, we can adjust the lambda expression to return the second City object:
+  Map<String, City> resultMap2 = CITY_INPUT.stream()
+  .collect(toMap(City::getName, Function.identity(), (first, second) -> second));
+
+assertEquals(4, resultMap2.size());
+assertEquals(new City("Paris", "Texas, USA"), resultMap2.get("Paris"));
+
+
+Finally, let’s see another example of merging two “Paris” cities’ locatedIn properties as a new City instance and putting this newly merged Paris instance to the map result:
+
+
+Map<String, City> resultMap3 = CITY_INPUT.stream()
+  .collect(toMap(City::getName, Function.identity(), (first, second) -> {
+      String locations = first.getLocatedIn() + " and " + second.getLocatedIn();
+      return new City(first.getName(), locations);
+  }));
+
+assertEquals(4, resultMap2.size());
+assertEquals(new City("Paris", "France and Texas, USA"), resultMap3.get("Paris"));
+
+
+=================
+
+Generating a Map<Key, List<Value>> Using the groupingBy() Method
+
+
+One idea to handle duplicated keys in a map is to make the key associate multiple values in a collection, such as Map<String, List<City>>. Some popular libraries have provided MultiMap types, such as Guava’s Multimap and Apache Commons MultiValuedMap, to handle multiple-value maps more easily.
+
+In this tutorial, we’ll stick to the standard Java API. Therefore, we’ll use the groupingBy() collector to produce a Map<String, List<City>> result, as the groupingBy() method can group objects by some property as keys and store the objects in a Map instance:
+
+Map<String, List<City>> resultMap = CITY_INPUT.stream()
+  .collect(groupingBy(City::getName));
+
+assertEquals(4, resultMap.size());
+assertEquals(Arrays.asList(new City("Paris", "France"), new City("Paris", "Texas, USA")),
+  resultMap.get("Paris"));
+  
+  As we can see in the test above, the map result produced by the groupingBy() collector contains four entries. Also, the two “Paris” city instances are grouped under the key “Paris“.
+
+Therefore, using the multi-value map approach can solve the key duplication problem. However, this approach returns Map<String, List<City>>. If we require Map<String, City> as the return type, we can no longer group the objects with the duplicated key together in a collection.
+
+
+=======
+ List to Map – Sort & Collect
+===============================
+
+Map result1 = list.stream()
+                .sorted(Comparator.comparingLong(Hosting::getWebsites).reversed())
+                .collect(
+                        Collectors.toMap(
+                                Hosting::getName, Hosting::getWebsites, // key = name, value = websites
+                                (oldValue, newValue) -> oldValue,       // if same key, take the old key
+                                LinkedHashMap::new                      // returns a LinkedHashMap, keep order
+                        ));
