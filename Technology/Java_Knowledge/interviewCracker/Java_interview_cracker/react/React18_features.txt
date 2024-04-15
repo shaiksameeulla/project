@@ -41,11 +41,38 @@ setValue();   //re-rendered 3 times
 As you can tell, this is not performant. React 18 introduces automatic batching which allows all state updates – even within promises, setTimeouts, and event callbacks – to be batched. This significantly reduces the work that React has to do in the background. React will wait for a micro-task to finish before re-rendering.
 
 Automatic batching is available out of the box in React, but if you want to opt-out you can use flushSync.
+
+example:
+
+import { flushSync } from 'react-dom';
+
+
+useEffect(() => {
+    function handleBeforePrint() {
+      flushSync(() => {
+        setIsPrinting(true);
+      })
+    }
+flushSync(() => {
+  setSomething(123);
+});
+// By this line, the DOM is updated.
+
+flushSync lets you force React to flush any updates inside the provided callback synchronously. This ensures that the DOM is updated immediately.
+flushSync flushes the entire tree and actually forces complete re-rendering for updates that happen inside of a call, so you should use it very sparingly. This way it doesn’t break the guarantee of internal consistency between props, state, and refs.
+
+
+
+
+=========
+
 New Feature: Transitions 
+
 A transition is a new concept in React to distinguish between urgent and non-urgent updates.
 
 Urgent updates reflect direct interaction, like typing, clicking, pressing, and so on.
 Transition updates transition the UI from one view to another.
+
 Urgent updates like typing, clicking, or pressing, need immediate response to match our intuitions about how physical objects behave. Otherwise they feel “wrong”. However, transitions are different because the user doesn’t expect to see every intermediate value on screen.
 
 For example, when you select a filter in a dropdown, you expect the filter button itself to respond immediately when you click. However, the actual results may transition separately. A small delay would be imperceptible and often expected. And if you change the filter again before the results are done rendering, you only care to see the latest results.
@@ -93,6 +120,7 @@ function TabContainer() {
 }
 
 New Suspense Features 
+
 Suspense lets you declaratively specify the loading state for a part of the component tree if it’s not yet ready to be displayed:
 <Suspense> lets you display a fallback until its children have finished loading.
 
