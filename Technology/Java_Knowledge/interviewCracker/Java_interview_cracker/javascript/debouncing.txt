@@ -61,3 +61,105 @@ let button = document.getElementById("debounce");
                 "click the debounce button, I get " +
                 "executed once every 3 seconds!!")
         }, 3000));
+		
+		
+		==============
+		
+		But when the outer function returns this inner function, the inner function still holds a reference to the local variables of the outer function long after the outer function has finished execution. This is the concept of a closure.
+
+Let's understand closures with an example.
+
+function outerFunction() {
+  const x = 5;
+
+  return () => {
+    console.log(x);
+  }
+}
+
+const inner = outerFunction();
+
+inner(); // prints 5
+
+// console.log(x)   Throws reference error
+Here, if we call inner(), the code runs without any errors and prints 5. But, if we try to access x directly, JavaScript throws a reference error.
+
+Screenshot-2024-02-09-141749
+JavaScript Reference Error
+Here, inner() closes over x and only this function can use the variable and no one other one can. We cannot access the variable explicitly.
+
+You can check out this beginner-friendly tutorial to learn more about closures.
+
+Back to Debouncing
+Let's get back to where we left off:
+
+function debounce(func, delay) {
+    let timeout=null
+    return () => {
+        timeout=setTimeout(() => {
+            func()
+        }, delay)
+    }
+}
+Here, JavaScript uses a closure to hold access to timeout every time we use the debounced function.
+
+Let's use this to our advantage. Since debouncedFun() has access to the same timeout variable in every function call, we can add a condition to check whether a previous timeout exists. We can simply do this with a null check, if(timeout !== null) or if(timeout).
+
+Then, we use the clearTimeout() method to cancel the previous timeout, thus resetting the timer.
+
+Add the following statement before starting a new timeout:
+
+if(timeout) 
+	clearTimeout(timeout)
+Once the timeout is reset, a new timeout is started for the current function call, whose ID is then assigned to timeout. The process is repeated for the subsequent function calls who have access to the same timeout due to closures.
+
+function debounce(func, delay) {
+    let timeout=null
+    return () => {
+        if(timeout) clearTimeout(timeout)
+
+        timeout=setTimeout(() => {
+            func()
+        }, delay)
+    }
+}
+With this, we have satisfied our second requirement – that is, resetting the timer and starting a new one. It's time to use this debounced function.
+
+Let's pass fun() to the debounce() method with a delay of 500ms.
+
+const debouncedFun = debounce(fun, 500)
+debouncedFun() is basically fun() with debouncing behaviour. Let's call this function at different time intervals to test our functionality.
+
+debouncedFun()
+
+setTimeout(debouncedFun, 300)
+
+setTimeout(debouncedFun, 900)
+The first function call is made instantly. The other two are made after 300ms and 900ms respectively. Can you guess the output?
+
+The code prints This is a function two times. Let's understand why. Here, after the first call is made, fun() is scheduled to execute after 500ms. But the second one is made in 300ms which resets the timer and starts a new one.
+
+500ms have passed and the fun() method executes. Then, at 900ms, another function call is made. This again executes fun() after 500ms.
+
+There is still a small improvement we should make. Our logic does not consider function arguments. Let's replace fun() with fun(a, b).
+
+function fun(a, b) {
+    console.log(`This is a function with arguments ${a} and ${b}`)
+}
+To incorporate arguments while debouncing, return a debounced function that accepts arguments.
+
+function debounce(func, delay) {
+    let timeout=null
+    return (...args) => {
+        if(timeout) clearTimeout(timeout)
+
+        timeout=setTimeout(() => {
+            func(...args)
+            timeout=null
+        }, delay)
+    }
+}
+By using the spread operator, any arguments passed to the debounced function will be stored as an array in the args variable. Then, spread out the same args array to call the actual function with the arguments passed.
+
+const debouncedFun=debounce(fun, 500)
+debouncedFun(2,3)
