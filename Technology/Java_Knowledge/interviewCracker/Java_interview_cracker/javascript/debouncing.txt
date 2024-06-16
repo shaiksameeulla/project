@@ -17,20 +17,33 @@ const getData = () => {
   console.log("Fetching Data ..", counter++);
 }
 
-const debounce = function (fn, d) {
   let timer;
+const debounce = function (fn, d) {
+
   return function () {
     let context = this,
       args = arguments;
+      if(timer){
     clearTimeout(timer);
+    }
     timer = setTimeout(() => {
-      getData.apply(context, args);
+      fn.apply(context, args);
     }, d);
   }
 }
 
 const betterFunction = debounce(getData, 300);
 
+example 2:
+<input type="text" onkeypress="debounce(myFunction,3000)(event)">
+<script src="debounce.js"></script>
+<script>
+ 
+function myFunction(event) {
+console.log(event)
+  console.log(event.key)
+}
+</script>
 
 Approach
 ===========
