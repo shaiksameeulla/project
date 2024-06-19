@@ -49,7 +49,9 @@ Consistent : for any reference values a and b, multiple invocations of a.equals(
           
         // comparing the state of argument with  
         // the state of 'this' Object. 
-        return (geek.name == this.name && geek.id == this.id); 
+        // field comparison
+		return java.util.Objects.equals(firstName, person.firstName)
+            && java.util.Objects.equals(lastName, person.lastName);
     } 
       
     @Override
@@ -108,7 +110,7 @@ If you inherit an abstract class you have to provide implementations to all the 
 
 Comparator vs Comparable in Java
 
-Difference between Comparator vs Comparable in JavaHere are some of the common differences, which is worth remembering to answer this question if asked during a telephonic or face to face interview:
+Difference between Comparator vs Comparable in Java Here are some of the common differences, which is worth remembering to answer this question if asked during a telephonic or face to face interview:
 
 1) Comparator in Java is defined in java.util package while Comparable interface in Java is defined in java.lang package, which very much says that Comparator should be used as an utility to sort objects which Comparable should be provided by default.
 
@@ -244,6 +246,12 @@ static final Comparator<Employee> SENIORITY_ORDER =
 ---------------------------------
 Difference between Checked vs Unchecked Exception in Java
 
+  For the purposes of compile-time checking of exceptions, {@code
+ Throwable} and any subclass of {@code Throwable} that is not also a
+  subclass of either {@link RuntimeException} or {@link Error} are
+  regarded as checked exceptions.
+ 
+ 
 In Java exceptions under Error and RuntimeException classes are unchecked exceptions, everything else under throwable is checked.
 
 What is Checked Exception in Java?
@@ -311,6 +319,8 @@ Access modifiers:
 --------------
  If a top-level class is declared as private the compiler will complain that the modifier private is not allowed here. This means that a top-level class cannot be a private, the same can be applied to protected access specifier also.
  
+ top-level classescan have  only public, abstract & final are permitted
+ 
  Protected means that the member can be accessed by any class in the same package and by subclasses even if they are in another package.
  
  The top-level classes can only have public, abstract and final modifiers, and it is also possible to not define any class modifiers at all. This is called default/package accessibility.
@@ -322,6 +332,7 @@ Access modifiers:
  
  -----------------
 When to use Volatile variable in Java
+=========================================================================================
 
 One of the most important thing in learning of volatile keyword is understanding when to use volatile variable in Java. Many programmer knows what is volatile variable and How does it work but they never really used volatile for any practical purpose. Here are couple of example to demonstrate when to use Volatile keyword in Java:
 
@@ -344,7 +355,8 @@ public void printMessage(){
 
 
 
-4) Another place where volatile variable can be used is to fixing double checked locking in Singleton pattern. As we discussed in Why should you use Enum as Singleton that double checked locking was broken in Java 1.4 environment.
+4) Another place where volatile variable can be used is to fixing double checked locking in Singleton pattern.
+ As we discussed in Why should you use Enum as Singleton that double checked locking was broken in Java 1.4 environment.
 
 
 More than one top-level class can be defined in a Java source file, but there can be at most one public top-level class declaration. The file name must match the name of the public class.
@@ -383,6 +395,7 @@ Important points on Volatile keyword in Java
 10. If a variable is not shared between multiple threads no need to use volatile keyword with that variable.
 
 Difference between synchronized and volatile keyword in Java
+=========================================================================================
 
 What is difference between volatile and synchronized is another popular core Java question asked in multi-threading and concurrency interviews. Remember volatile is not a replacement of synchronized keyword but can be used as an alternative in certain cases. Here are few differences between volatile and synchronized keyword in Java.
 
@@ -413,6 +426,7 @@ In Summary volatile keyword in Java is not a replacement of synchronized block o
 Read more: http://javarevisited.blogspot.com/2011/06/volatile-keyword-java-example-tutorial.html#ixzz3ozfU0tjr
 
 here are some more differences between Serializable and Externalizable interface in Java:
+=========================================================================================
 
 1. In case of Serializable, default serialization process is used. while in case of Externalizable custom Serialization process is used which is implemented by application.
 
@@ -423,6 +437,73 @@ here are some more differences between Serializable and Externalizable interface
 4. readExternal() and writeExternal() supersede any specific implementation of writeObject and readObject methods.
 
 Though Externalizable provides complete control, it also presents challenges to serialize super type state and take care of default values in case of transient variable and static variables in Java. If used correctly Externalizable interface can improve performance of serialization process.
+
+
+Serialization:
+===============
+
+To make a Java object serializable we implement the java.io.Serializable interface. The ObjectOutputStream class contains writeObject() method for serializing an Object. 
+
+public final void writeObject(Object obj)
+                       throws IOException
+The ObjectInputStream class contains readObject() method for deserializing an object. 
+public final Object readObject()
+                  throws IOException,
+               ClassNotFoundException
+			   
+SerialVersionUID The Serialization runtime associates a version number with each Serializable class called a SerialVersionUID, which is used during Deserialization to verify that sender and receiver of a serialized object have loaded classes for that object which are compatible with respect to serialization. If the receiver has loaded a class for the object that has different UID than that of corresponding sender’s class, the Deserialization will result in an InvalidClassException. 
+
+A Serializable class can declare its own UID explicitly by declaring a field name. It must be static, final and of type long. i.e- ANY-ACCESS-MODIFIER static final long serialVersionUID=42L; If a serializable class doesn’t explicitly declare a serialVersionUID, then the serialization runtime will calculate a default one for that class based on various aspects of class, as described in Java Object Serialization Specification. However it is strongly recommended that all serializable classes explicitly declare serialVersionUID value, since its computation is highly sensitive to class details that may vary depending on compiler implementations, any change in class or using different id may affect the serialized data. It is also recommended to use private modifier for UID since it is not useful as inherited member.
+
+In case of transient variables:- A variable defined with transient keyword is not serialized during serialization process.This variable will be initialized with default value during deserialization. (e.g: for objects it is null, for int it is 0). 
+
+In case of static Variables:- A variable defined with static keyword is not serialized during serialization process.This variable will be loaded with current value defined in the class during deserialization. 
+
+Transient Vs Final:
+final variables will be participated into serialization directly by their values.
+Hence declaring a final variable as transient there is no use.
+//the compiler assign the value to final variable
+
+during default serialization, there may be a chance of loss of information because of the transient keyword. To recover this loss, we will have to use Customized Serialization.
+
+There is, however, a strange yet crafty solution. By using a built-in feature of the serialization mechanism, developers can enhance the normal process by providing two methods inside their class files. Those methods are:
+
+Customized serialization can be implemented using the following two methods:
+
+		private void writeObject(ObjectOutputStream oos) throws Exception: This method will be executed automatically by the jvm(also known as Callback Methods) at the time of serialization. Hence to perform any activity during serialization, it must be defined only in this method.
+
+		private void readObject(ObjectInputStream ois) throws Exception: This method will be executed automatically by the jvm(also known as Callback Methods) at the time of deserialization. Hence to perform any activity during deserialization, it must be defined only in this method.
+Note: While performing object serialization, we have to define the above two methods in that class.
+
+In this method, what you could do is serialize it into other forms if you need to such as the ArrayList for Location that you illustrated or JSON or other data format/method and reconstruct it back on readObject()
+
+With your example, you add the following code
+
+example :
+========
+		  private void writeObject(ObjectOutputStream oos)
+throws IOException {
+    // default serialization 
+    oos.defaultWriteObject();
+    // write the object
+    List loc = new ArrayList();
+    loc.add(location.x);
+    loc.add(location.y);
+    loc.add(location.z);
+    loc.add(location.uid);
+    oos.writeObject(loc);
+}
+
+private void readObject(ObjectInputStream ois)
+throws ClassNotFoundException, IOException {
+    // default deserialization
+    ois.defaultReadObject();
+    List loc = (List)ois.readObject(); // Replace with real deserialization
+    location = new Location(loc.get(0), loc.get(1), loc.get(2), loc.get(3));
+    // ... more code
+
+}
+
 
 
 Object Serialization with Inheritance in Java
@@ -638,62 +719,31 @@ If you run the above program without updating the classpath with required JAR fi
 
 1
 java.lang.ClassNotFoundException: oracle.jdbc.driver.OracleDriver
-2
-​
-3
 at java.net.URLClassLoader.findClass(Unknown Source)
-4
-​
-5
 at java.lang.ClassLoader.loadClass(Unknown Source)
-6
-​
-7
 at sun.misc.Launcher$AppClassLoader.loadClass(Unknown Source)
-8
-​
-9
 at java.lang.ClassLoader.loadClass(Unknown Source)
-10
-​
-11
 at java.lang.Class.forName0(Native Method)
-12
-​
-13
 at java.lang.Class.forName(Unknown Source)
-14
-​
-15
 at pack1.MainClass.main(MainClass.java:17)
 
 
 NoClassDefFoundError
 NoClassDefFoundError is an error that is thrown when the Java Runtime System tries to load the definition of a class, and that class definition is no longer available. The required class definition was present at compile time, but it was missing at runtime. For example, compile the program below.
 
-1
+
 class A
-2
 {
-3
   // some code
-4
 }
-5
-​
-6
+
 public class B
 7
 {
-8
     public static void main(String[] args)
-9
     {
-10
         A a = new A();
-11
     }
-12
 }
 13
 ​
@@ -701,29 +751,17 @@ When you compile the above program, two .class files will be generated. One is A
 
 1
 Exception in thread "main" java.lang.NoClassDefFoundError: A
-2
-​
-3
+
 at MainClass.main(MainClass.java:10)
-4
-​
-5
+
 Caused by: java.lang.ClassNotFoundException: A
-6
-​
-7
+
 at java.net.URLClassLoader.findClass(URLClassLoader.java:381)
-8
-​
-9
+
 at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
-10
-​
-11
+
 at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:331)
-12
-​
-13
+
 at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
 
 
