@@ -1,0 +1,69 @@
+Record Classes:
+
+Record classes, which are a special kind of class, help to model plain data aggregates with less ceremony than normal classes.
+
+A record declaration specifies in a header a description of its contents; the appropriate accessors, constructor, equals, hashCode, and toString methods are created automatically. A record's fields are final because the class is intended to serve as a simple "data carrier".
+
+For example, here is a record class with two fields:
+
+
+
+record Rectangle(double length, double width) { }
+
+record Rectangle(double length, double width) {
+    public Rectangle(double length, double width) {
+        if (length <= 0 || width <= 0) {
+            throw new java.lang.IllegalArgumentException(
+                String.format("Invalid dimensions: %f, %f", length, width));
+        }
+        this.length = length;
+        this.width = width;
+    }
+}
+
+
+A record class declares the following members automatically:
+
+For each component in the header, the following two members:
+A private final field with the same name and declared type as the record component. This field is sometimes referred to as a component field.
+A public accessor method with the same name and type of the component; in the Rectangle record class example, these methods are Rectangle::length() and Rectangle::width().
+A canonical constructor whose signature is the same as the header. This constructor assigns each argument from the new expression that instantiates the record class to the corresponding component field.
+Implementations of the equals and hashCode methods, which specify that two record classes are equal if they are of the same type and contain equal component values.
+An implementation of the toString method that includes the string representation of all the record class's components, with their names.
+As record classes are just special kinds of classes, you create a record object (an instance of a record class) with the new keyword, for example:
+
+
+
+Rectangle r = new Rectangle(4,5);
+
+
+Record Serialization
+
+You can serialize and deserialize instances of record classes, but you can't customize the process by providing writeObject, readObject, readObjectNoData, writeExternal, or readExternal methods. The components of a record class govern serialization, while the canonical constructor of a record class governs deserialization. See Serializable Records for more information and an extended example. See also the section Serialization of Records in the Java Object Serialization Specification.
+
+Explicit Declaration of Record Class Members
+
+
+
+You can declare static fields, static initializers, and static methods in a record class, and they behave as they would in a normal class, for example:
+
+record Rectangle(double length, double width) {
+    
+    // Static field
+    static double goldenRatio;
+
+    // Static initializer
+    static {
+        goldenRatio = (1 + Math.sqrt(5)) / 2;
+    }
+
+    // Static method
+    public static Rectangle createGoldenRectangle(double width) {
+        return new Rectangle(width, width * goldenRatio);
+    }
+	
+	// Instance initializers are not allowed in records:****************************
+    {
+        diagonal = (x, y) -> Math.sqrt(x*x + y*y);
+    }
+}

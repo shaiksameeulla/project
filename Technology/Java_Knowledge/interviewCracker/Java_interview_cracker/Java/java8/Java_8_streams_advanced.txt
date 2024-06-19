@@ -1,0 +1,173 @@
+
+ 1. Stream.ofNullable
+ 2. Stream.iterate()
+ 3. Collectors.collectingAndThen
+ 4. Stream.takeWhile and Stream.dropWhile
+ 5. Collectors.teeing()
+ 6. Stream.concat()
+ 7. Collectors.partitioningBy
+ 8. IntStream for Ranges
+
+
+
+Stream.ofNullable (since 9)
+===============================
+
+List<String> names= Arrays.asList("Raj",null);
+
+names.stream().filter(name->name!=null).collect(Collectors.asList);
+we can achieve same using ofNullable.
+Returns a sequential Stream containing a single element, if non-null, otherwise returns an empty Stream.
+
+collection.stream().flatMap(s -> Stream.ofNullable(s))
+
+ Stream.iterate():
+ ===============================
+ 
+ 1. Stream.iterate(2,a->a+2).limit(5).forEach(system::out::println);
+ 
+ 
+ Java 9
+The stream.iterate was enhanced in Java 9. It supports a predicate (condition) as second argument, and the stream.iterate will stop if the predicate is false.
+
+2.1 Stop the stream iteration if n >= 20
+
+
+	Stream.iterate(1, n -> n < 20 , n -> n * 2)
+           .forEach(x -> System.out.println(x));
+		   
+ static <T> Stream<T> iterate(T seed,
+                             Predicate<T> hasNext,
+                             UnaryOperator<T> next)
+		seed: which is the initial element,
+hasNext: which is a predicate to apply to elements to determine when the stream must terminate and
+next: which is a function to be applied to the previous element to produce a new element.
+Return value: This method returns a new sequential Stream.
+					 
+ Stream<Integer> stream 
+            = Stream.iterate(1, 
+                             i -> i <= 20, i -> i * 2); 
+							 
+Collectors.collectingAndThen						 
+===============================
+The collectingAndThen(Collector downstream, Function finisher) method of class collectors in Java, which adopts Collector so that we can perform an additional finishing transformation. Syntax :
+
+public static <T, A, R, RR> 
+       Collector <T, A, RR> 
+       collectingAndThen(Collector <T, A, R> downstream, 
+                         Function <R, RR> finisher)
+                                                             
+
+Where,
+    T : The type of the input elements
+    A :Intermediate accumulation type of the downstream collector
+    R :Result type of the downstream collector
+    RR :Result type of the resulting collector
+	
+	
+	 // Create an Immutable List
+        List<String> lt
+            = Stream
+                  .of("GEEKS", "For", "GEEKS")
+                  .collect(Collectors
+                               .collectingAndThen(
+                                   Collectors.toList(),
+                                   Collections::<String> unmodifiableList));
+        System.out.println(lt);
+		
+		
+		 // Create an Immutable Map
+        Map<String, String> mp
+            = Stream
+                  .of(new String[][] {
+                      { "1", "Geeks" },
+                      { "2", "For" },
+                      { "3", "Geeks" } })
+                  .collect(
+                      Collectors
+                          .collectingAndThen(
+                              Collectors.toMap(p -> p[0], p -> p[1]),
+                              Collections::<String, String>
+                                  unmodifiableMap));
+        System.out.println(mp);
+		
+
+List<Person> personList = Arrays.asList(new Person("bob", 34), new Person("bob", 43),
+                new Person("mary", 84), new Person("john", 12), new Person("bob", 22));
+
+        System.out.println("list of person objects - " + personList);
+
+        Stream<Person> personStream = personList.stream();
+
+        Map<String, Set<Integer>> result = personStream.collect(Collectors.groupingBy(p -> p.name, 
+                Collectors.mapping(e -> e.age, 
+                        Collectors.collectingAndThen(Collectors.toSet(), 
+                                Collections::unmodifiableSet))));							
+								
+								
+👉 4. Stream.takeWhile and Stream.dropWhile
+===============================			
+
+In this quick write-up, we are going to focus on the new interesting Stream API improvements coming in Java 9.
+
+2. Stream Takewhile/Dropwhile
+Discussions about these methods have appeared repeatedly on StackOverflow (the most popular is this one).
+
+Imagine that we want to generate a Stream of Strings by adding one character to the previous Stream‘s value until the length of the current value in this Stream is lower than 10.
+
+How would we solve it in Java 8? We could use one of the short-circuiting intermediate operations like limit, allMatch that actually serve for other purposes or write our own takeWhile implementation based on a Spliterator that, in turn, complicates such a simple issue.
+
+With Java 9, the solution is easy:
+
+Stream<String> stream = Stream.iterate("", s -> s + "s")
+  .takeWhile(s -> s.length() < 10);
+Copy
+The takeWhile operation takes a Predicate which is applied to elements to determine the longest prefix of these elements (if a stream is ordered) or a subset of the stream’s elements (when a stream is unordered).
+
+To move forward, we had better understand what terms “the longest prefix” and “a Stream’s subset” mean:
+
+the longest prefix is a contiguous sequence of elements of the stream that match the given predicate. The first element of the sequence is the first element of this stream, and the element immediately following the last element of the sequence does not match the given predicate
+a Stream’s subset is a set of some (but not all) elements of the Stream match the given predicate.
+After introducing these key terms, we can easily comprehend another new dropWhile operation.
+
+It does exactly the opposite of takeWhile. If a stream is ordered, the dropWile returns a stream consisting of the remaining elements of this Stream after dropping the longest prefix of elements that match the given predicate.
+
+Otherwise, if a Stream is unordered, the dropWile returns a stream consisting of the remaining elements of this Stream after dropping a subset of elements that match the given predicate.
+
+Let’s throw away the first five elements by using the preceding obtained Stream:
+
+stream.dropWhile(s -> !s.contains("sssss"));
+Copy
+Simply put, the dropWhile operation will remove elements while the given predicate for an element returns true and stops removing on the first predicate’s false.
+
+3. Stream Iterate
+The next new feature is the overloaded iterate method for finite Streams generation. Not to be confused with the finite variant which returns an infinite sequential ordered Stream produced by some function.
+
+A new iterate slightly modifies this method by adding a predicate which applies to elements to determine when the Stream must terminate. Its usage is very convenient and concise:
+
+Stream.iterate(0, i -> i < 10, i -> i + 1)
+  .forEach(System.out::println);
+Copy
+It can be associated with the corresponding for statement:
+
+for (int i = 0; i < 10; ++i) {
+    System.out.println(i);
+}
+Copy
+4. Stream Ofnullable
+There are some situations when we need to put an element into a Stream. Sometimes, this element may be a null, but we don’t want that our Stream contains such values. It causes of writing either an if statement or a ternary operator which checks whether an element is a null.
+
+Assuming that collection and map variables, have been created and filled successfully, have a look at the following example:
+
+collection.stream()
+  .flatMap(s -> {
+      Integer temp = map.get(s);
+      return temp != null ? Stream.of(temp) : Stream.empty();
+  })
+  .collect(Collectors.toList());
+Copy
+To avoid such boilerplate code, the ofNullable method has been added to the Stream class. With this method the preceding sample can be simply transformed into:
+
+collection.stream()
+  .flatMap(s -> Stream.ofNullable(map.get(s)))
+  .collect(Collectors.toList());					

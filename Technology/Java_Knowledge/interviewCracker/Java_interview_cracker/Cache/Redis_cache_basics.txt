@@ -1,0 +1,99 @@
+Redis :
+==========
+Top usecases.
+1. session
+2. Cache
+3. Distributed lock
+4. Counter
+5. Rate limitting
+6. Global Id
+7. Shopping cart
+8.  User Rententions
+9. Message queue
+10. Lank/leadeboard
+
+At scale Radis is distribution among  cluster of Redis servers
+sharding is common technique to distribution the caching  load evenly  across the clusters
+ at the time of configurations :
+ 1. TimeToLive TTL need to set
+ 2. Thundering herd on cold start
+ 
+ 
+ Redis is used as Distributed lock  with its atomic commands  like SETNX or set if not eXist
+ 
+ Why Redis So fast?
+ -----------------
+ 1. Redis uses RAM
+ 2.its single threaded
+ 3.
+ 
+ 
+ Thundering herd:
+ -----------------
+ 1. The 'thundering herd problem redis' error can occur due to the way Redis handles cache expiration. When a large number of requests arrive at the same time, and a cached value has expired, all those requests will attempt to retrieve a new value, causing an excessive amount of traffic on the database. This sudden surge in traffic is known as the 'thundering herd' effect and can cause Redis to become unresponsive or even crash under heavy load.
+ 
+2.	 When many readers simultaneously request the same data element, there can be a database read overload, sometimes called the “Thundering Herd” problem
+	 
+	 Problem
+	Many readers read an empty value from the cache and subseqeuntly try to load it from the database. The result is unnecessary database load as all readers simultaneously execute the same query against the database.
+
+	Solution
+	Implement the cache-as-sor pattern by using a BlockingCache or SelfPopulatingCache included with Ehcache.
+
+3. Solution - Here's How To Resolve It
+	To resolve the 'thundering herd problem redis' error, there are several possible solutions. One approach is to implement a technique called cache stampede protection, which involves having multiple backend servers generate the cache values independently, rather than relying on a single server. This distributes the load across multiple instances, reducing the chance of a thundering herd scenario.
+
+	Another solution is to use a request queue that buffers incoming requests before sending them to Redis. This allows the system to handle the requests in a controlled manner and avoid sudden spikes in traffic. Additionally, you can optimize Redis performance by using pipelining and other techniques to minimize the number of round-trips between the client and server.
+
+	Finally, it may be necessary to scale up your Redis infrastructure by adding more nodes or increasing the size of the existing nodes. This can help distribute the load across multiple instances and prevent any one instance from becoming overwhelmed. By implementing these solutions, you can avoid the 'thundering herd problem redis' error and ensure that your Redis deployment remains stable and performant under heavy load.
+	
+	
+	=============
+	-> its a key value pair in memory
+	-> help to store most frequently used data for faster retrieval
+	-> redis install on linux/mac but window is little complex
+	-> in linus : sudo apt-get  install redis
+	-> to run : run command >  redis-server
+	-> runs in standalone mode with port 6379 (default port)
+	->to access redis : command redis-cli
+	-> to set key value ==> SET name sami
+	=> GET name returns as "sami" (string always)
+	=>DEL name = delets
+	=>EXISTS name => check it exists
+	=> KEYS *
+	=>flushall (clears all)
+	==> ttl name returns -1 means no expiration
+	=>expire name  10  it set 10 seconds for name.
+	
+	Dealing with arrays :
+	===================
+	1. lpush friends john jocky
+	2. to print lrange friends 0 -1  to show all array values
+	it always push at the begining of the array default
+	3. rpush friends sally  
+	it pushes to end of the array
+	4. LPOP friends : removes element from left
+	 similarly we have RPOP
+	 
+	 dealing with SET:
+	 ================
+	 1. SADD hobbies "cricket"  to add
+	 2. SMEMEBERS hobbies       to list
+	 3. SREM hobbies "cricket"   to remove
+	 
+	 dealing with Hashes:
+	 ================ 
+	 
+	 1. HSET  person name sami
+	   HSET person age 10
+	 2. HSET person name
+	 3. HGETALL  person returns
+	   name
+	   sami
+	   age
+	   10
+	  4. HDEL person age
+	  5. HEXISTS person name
+	  
+	 
+	

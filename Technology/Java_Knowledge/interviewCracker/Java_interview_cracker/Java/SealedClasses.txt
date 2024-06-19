@@ -1,0 +1,59 @@
+Sealed Classes
+----------------
+Sealed classes and interfaces restrict which other classes or interfaces may extend or implement them.
+
+To seal a class, add the sealed modifier to its declaration. Then, after any extends and implements clauses, add the permits clause. This clause specifies the classes that may extend the sealed class.
+
+For example, the following declaration of Shape specifies three permitted subclasses, Circle, Square, and Rectangle:
+
+public sealed class Shape
+    permits Circle, Square, Rectangle {
+}
+
+Permitted subclasses have the following constraints:
+
+They must have exactly one of the following modifiers to describe how it continues the sealing initiated by its superclass:
+
+	final: Cannot be extended further
+
+	sealed: Can only be extended by its permitted subclasses
+
+	non-sealed: Can be extended by unknown subclasses; a sealed class cannot prevent its permitted subclasses from doing this
+
+For example, the permitted subclasses of Shape demonstrate each of these three modifiers: Circle is final while Rectangle is sealed and Square is non-sealed.
+
+They must be in the same module as the sealed class (if the sealed class is in a named module) or in the same package (if the sealed class is in the unnamed module, as in the Shape.java example).
+
+package com.example.records.expressions;
+
+public class TestExpressions {
+  public static void main(String[] args) {
+    // (6 + 7) * -8
+    System.out.println(
+      new TimesExpr(
+        new PlusExpr(new ConstantExpr(6), new ConstantExpr(7)),
+        new NegExpr(new ConstantExpr(8))
+      ).eval());
+   }
+}
+
+sealed interface Expr
+    permits ConstantExpr, PlusExpr, TimesExpr, NegExpr {
+    public int eval();
+}
+
+record ConstantExpr(int i) implements Expr {
+    public int eval() { return i(); }
+}
+
+record PlusExpr(Expr a, Expr b) implements Expr {
+    public int eval() { return a.eval() + b.eval(); }
+}
+
+record TimesExpr(Expr a, Expr b) implements Expr {
+    public int eval() { return a.eval() * b.eval(); }
+}
+
+record NegExpr(Expr e) implements Expr {
+    public int eval() { return -e.eval(); }
+}
