@@ -7,6 +7,7 @@ The string is final by design in Java, some of the points which make sense why S
 
 3)Why string is Immutable in java?:
 	Since Strings are very popular as HashMap key, it's important for them to be immutable so that they can retrieve the value object which was stored in HashMap. Since HashMap works in the principle of hashing, which requires same has value to function properly. Mutable String would produce two different hashcodes at the time of insertion and retrieval if contents of String was modified after insertion, potentially losing the value object in the map.
+	 
 	 Security and String pool being primary reason of making String immutable, 
 
 
@@ -17,6 +18,8 @@ The string is final by design in Java, some of the points which make sense why S
 		clearly mitigates security risk of stealing password
 	
 	With String there is always a risk of printing plain text in a log file or console but if use Array you won't print contents of the array instead its memory location gets printed. though not a real reason still makes sense.
+	
+	So storing a password in a character array clearly mitigates the security risk of stealing a password. With an array, the data can be wiped explicitly data after its work is complete. The array can be overwritten and the password won't be present anywhere in the system, even before garbage collection
 
 
 

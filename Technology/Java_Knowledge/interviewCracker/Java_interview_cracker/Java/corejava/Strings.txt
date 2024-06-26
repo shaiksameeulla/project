@@ -1,0 +1,37 @@
+String vs StringBuffer vs StringBuilder
+String is immutable whereas StringBuffer and StringBuilder are mutable classes.
+StringBuffer is thread-safe and synchronized whereas StringBuilder is not. That’s why StringBuilder is faster than StringBuffer.
+String concatenation operator (+) internally uses StringBuffer or StringBuilder class.
+For String manipulations in a non-multi threaded environment, we should use StringBuilder else use StringBuffer class
+
+
+Creating String object Directly:
+String s1 = "Hip Hop" 
+will create a string object but first JVM checks the String constant or literal pool and if the string does not exist, it creates a new String object “Hip jop” and a reference is maintained in the pool. The variable s1 also refers the same object. Now, if we put a statement after this:
+
+ String s2 = "Hip Hop"
+JVM checks the String constant pool first and since the string already exists, a reference to the pooled instance is returned to s2.
+
+System.out.println(s1==s2) // comparing reference and it will print true
+java can make this optimization since strings are immutable and can be shared without fear of data corruption.
+
+Creating String Object using new
+String s3 = new String("Hip Hop")
+For new keyword, a String object is created in the heap memory wither or not an equal string object already exists in the pool and s3 will refer to the newly created one.
+
+System.out.println(s3==s2) // two reference is different, will print false 
+String objects created with the new operator do not refer to objects in the string pool but can be made to using String’s intern() method. The java.lang.String.intern() returns an interned String, that is, one that has an entry in the global String literal pool. If the String is not already in the global String literal pool, then it will be added to the pool.
+
+String s4 = s3.intern();
+Systen.out.println(s4 == s2); // will print `true` because s4 is interned, 
+               //it now have the same reference to "Hip Hop" as s2 or s1
+But try:
+
+Systen.out.println(s4 == s3) // it will be false,
+As the reference of s4, s2 and s1 is the reference to the pooled instance while s3 is referring to the created object in heap memory.
+
+use of new for creting string:
+prior to OpenJDK 7, Update 6, Java String.susbtring method had potential memory leak. substring method would build a new String object keeping a reference to the whole char array, to avoid copying it. You could thus inadvertently keep a reference to a very big character array with just a one character string. If we want to have minimal strings after substring, we use the constructor taking another string :
+
+String s2 = new String(s1.substring(0,1));
+The issue is resolved in JDK 7 update 6. So No need to create string with new any more for taking advantage provided by String literal pool mechanism.

@@ -39,6 +39,22 @@ private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundE
 If the superclass is serializable but we don’t want the subclass to be serialized.
 
 To prevent subclass from being serialized we must implement writeObject() and readObject() method and need to throw NotSerializableException from these methods. 
+// By implementing writeObject method,  
+    // we can prevent  
+    // subclass from serialization  
+    private void writeObject(ObjectOutputStream out) throws IOException  
+    {  
+        throw new NotSerializableException();  
+    }  
+      
+    // By implementing readObject method,  
+    // we can prevent  
+    // subclass from de-serialization  
+    private void readObject(ObjectInputStream in) throws IOException  
+    {  
+        throw new NotSerializableException();  
+    }  
+      
 /****999*****/
 
 I have modified the Lion class to include these two methods and on the fly I change a property of Lion to demonstrate this. This is not overriding or overloading methods and this is a mechanism provided by serialization. These two included methods are declared private but JVM can access the private methods of an object. There is no change to the class that does the serialization and de-serialization.
@@ -173,4 +189,11 @@ Backward Compatibility and Control: If you have to support multiple versions, yo
 
 public No-arg constructor:  Serializable uses reflection to construct object and does not require no arg constructor. But Externalizable demands public no-arg constructor.
 
+-=================
+
+What is Object Graph?
+An Object Graph is the set of objects which will be serialized automatically, if the object which contains reference to them is serialized.
+In other words, we can say that when we serialize any object and if it contains any other object reference then JVM serializes the object and as well as its object references.
+
+Note: In object graph every object should be serializable. If at-least one object is not serializable then we will get runtime execution saying NonSerializableExecution.
 

@@ -26,50 +26,30 @@ public class MySingleton {
 
 =====================================
 There are mainly three concepts in which we can break the singleton property of a Singleton class in Java. In this post, we will discuss how it can break and how to prevent it.
+1. through reflection : throw exception in private constructor
+2. through deserialization : use readResolve in singleton class
+3. through cloning : implement/override clone and throw exception
 
 Here is sample Singleton class and SingletonTest class.
 
 Singleton.Java
 
-1
+
 package demo1;
-2
-​
-3
 public final class Singleton {
-4
-​
-5
     private static volatile Singleton instance = null;
-6
-​
-7
     private Singleton() {
-8
     }
-9
-​
-10
     public static Singleton getInstance() {
-11
         if (instance == null) {
-12
             synchronized (Singleton.class) {
-13
                 if (instance == null) {
-14
                     instance = new Singleton();
-15
                 }
-16
             }
-17
         }
-18
         return instance;
-19
     }
-20
 }
 
 

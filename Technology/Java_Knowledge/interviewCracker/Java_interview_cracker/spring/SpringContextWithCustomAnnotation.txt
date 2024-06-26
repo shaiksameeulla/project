@@ -1,0 +1,42 @@
+STEP 1: Create an annotation interface called as @EnableRestCallLogs
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface EnableRestCallLogs {
+
+}
+STEP 2: Create an Aspect
+
+@Aspect
+@Component
+public class EnableRestCallLogAspect {
+ @Around("@annotation(EnableRestCallLogs)")
+ public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+     
+  long initTime = System.currentTimeMillis();
+     Object proceed = joinPoint.proceed();
+     long executionTime = System.currentTimeMillis() - initTime;
+     System.out.println("============================================================================================================");
+     System.out.println("Method Signature is : "+joinPoint.getSignature() );
+     System.out.println("Method executed in : " + executionTime + "ms");
+     System.out.println("Input Request: " + joinPoint.getArgs()[0]);
+     System.out.println("Output Response : " + proceed);
+     return proceed;
+ }
+}
+Use the annotation @Aspect to let know Spring that this is an Aspect class. Then use with @Component ,spring identifies that the class as a Spring bean. @Around annotation has a point cut argument. Our pointcut just says, that apply this advice any method which is annotated with @EnableRestCallLogs. This method accept the ProceedingJoinPoint type and should return Object data type.The ProceedingJoinPoint gives access to the method and we can retrieve the parameters using getArgs() method.
+You can get the response by calling joinPoint.proceed() .
+
+@GetMapping("/testGet/{name}")
+ @ResponseStatus(HttpStatus.OK)
+ @EnableRestCallLogs
+ public OutputResponseInfo testGetEndPoint(@PathVariable String name) {
+  
+  OutputResponseInfo result=new OutputResponseInfo();
+  result.setResponse_state(HttpStatus.OK);
+   Map<String, Object> hm= new HashMap<>();
+   hm.put("Id", Integer.valueOf(1));
+   hm.put("Input_Name", String.valueOf(name));
+  result.setPayload(hm);
+  return result;
+ }
