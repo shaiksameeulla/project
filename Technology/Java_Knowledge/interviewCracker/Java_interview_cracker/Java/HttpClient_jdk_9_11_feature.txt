@@ -1,0 +1,399 @@
+
+HttpClient 
+===============
+The new HTTP client from the java.net.http package was introduced in Java 9. It has now become a standard feature in Java 11.
+
+In this tutorial, we’ll explore Java 11’s standardization of HTTP client API that implements HTTP/2 and Web Socket.
+
+
+Specifying the HTTP Method
+We can define the HTTP method that our request will use by calling one of the methods from Builder:
+
+GET()
+POST(BodyPublisher body)
+PUT(BodyPublisher body)
+DELETE()
+
+Now let’s just create a very simple GET request example:
+
+HttpRequest request = HttpRequest.newBuilder()
+  .uri(new URI("https://postman-echo.com/get"))
+  .GET()
+  .build();
+
+This request has all parameters required by HttpClient.
+
+However, we sometimes need to add additional parameters to our request. Here are some important ones:
+
+The version of the HTTP protocol
+Headers
+A timeout
+
+Setting HTTP Protocol Version
+The API fully leverages the HTTP/2 protocol and uses it by default, but we can define which version of the protocol we want to use:
+
+HttpRequest request = HttpRequest.newBuilder()
+  .uri(new URI("https://postman-echo.com/get"))
+  .version(HttpClient.Version.HTTP_2)
+  .GET()
+  .build();
+
+Important to mention here is that the client will fall back to, e.g., HTTP/1.1 if HTTP/2 isn’t supported.
+
+4.4. Setting Headers
+In case we want to add additional headers to our request, we can use the provided builder methods.
+
+We can do that by either passing all headers as key-value pairs to the headers() method or by using header() method for the single key-value header:
+
+HttpRequest request = HttpRequest.newBuilder()
+  .uri(new URI("https://postman-echo.com/get"))
+  .headers("key1", "value1", "key2", "value2")
+  .GET()
+  .build();
+
+HttpRequest request2 = HttpRequest.newBuilder()
+  .uri(new URI("https://postman-echo.com/get"))
+  .header("key1", "value1")
+  .header("key2", "value2")
+  .GET()
+  .build();
+
+The last useful method we can use to customize our request is a timeout().
+
+4.5. Setting a Timeout
+Let’s now define the amount of time we want to wait for a response.
+
+If the set time expires, a HttpTimeoutException will be thrown. The default timeout is set to infinity.
+
+The timeout can be set with the Duration object by calling method timeout() on the builder instance:
+
+HttpRequest request = HttpRequest.newBuilder()
+  .uri(new URI("https://postman-echo.com/get"))
+  .timeout(Duration.of(10, SECONDS))
+  .GET()
+  .build();
+
+5. Setting a Request Body
+We can add a body to a request by using the request builder methods: POST(BodyPublisher body), PUT(BodyPublisher body) and DELETE().
+
+
+freestar
+The new API provides a number of BodyPublisher implementations out-of-the-box that simplify passing the request body:
+
+StringProcessor – reads body from a String, created with HttpRequest.BodyPublishers.ofString
+InputStreamProcessor – reads body from an InputStream, created with HttpRequest.BodyPublishers.ofInputStream
+ByteArrayProcessor – reads body from a byte array, created with HttpRequest.BodyPublishers.ofByteArray
+FileProcessor – reads body from a file at the given path, created with HttpRequest.BodyPublishers.ofFile
+In case we don’t need a body, we can simply pass in an HttpRequest.BodyPublishers.noBody():
+
+HttpRequest request = HttpRequest.newBuilder()
+  .uri(new URI("https://postman-echo.com/post"))
+  .POST(HttpRequest.BodyPublishers.noBody())
+  .build();
+
+Note: In JDK 16, there’s a new HttpRequest.BodyPublishers.concat(BodyPublisher…) method that helps us building a request body from the concatenation of the request bodies published by a sequence of publishers. The request body published by a concatenation publisher is logically equivalent to the request body that would have been published by concatenating all the bytes of each publisher in sequence.
+
+5.1. StringBodyPublisher
+Setting a request body with any BodyPublishers implementation is very simple and intuitive.
+
+For example, if we want to pass a simple String as a body, we can use StringBodyPublishers.
+
+As we already mentioned, this object can be created with a factory method ofString() — it takes just a String object as an argument and creates a body from it:
+
+HttpRequest request = HttpRequest.newBuilder()
+  .uri(new URI("https://postman-echo.com/post"))
+  .headers("Content-Type", "text/plain;charset=UTF-8")
+  .POST(HttpRequest.BodyPublishers.ofString("Sample request body"))
+  .build();
+
+5.2. InputStreamBodyPublisher
+To do that, the InputStream has to be passed as a Supplier (to make its creation lazy), so it’s a little bit different than StringBodyPublishers.
+
+However, this is also quite straightforward:
+
+byte[] sampleData = "Sample request body".getBytes();
+HttpRequest request = HttpRequest.newBuilder()
+  .uri(new URI("https://postman-echo.com/post"))
+  .headers("Content-Type", "text/plain;charset=UTF-8")
+  .POST(HttpRequest.BodyPublishers
+   .ofInputStream(() -> new ByteArrayInputStream(sampleData)))
+  .build();
+
+Notice how we used a simple ByteArrayInputStream here. Of course, that can be any InputStream implementation.
+
+5.3. ByteArrayProcessor
+We can also use ByteArrayProcessor and pass an array of bytes as the parameter:
+
+byte[] sampleData = "Sample request body".getBytes();
+HttpRequest request = HttpRequest.newBuilder()
+  .uri(new URI("https://postman-echo.com/post"))
+  .headers("Content-Type", "text/plain;charset=UTF-8")
+  .POST(HttpRequest.BodyPublishers.ofByteArray(sampleData))
+  .build();
+
+5.4. FileProcessor
+To work with a File, we can make use of the provided FileProcessor.
+
+Its factory method takes a path to the file as a parameter and creates a body from the content:
+
+HttpRequest request = HttpRequest.newBuilder()
+  .uri(new URI("https://postman-echo.com/post"))
+  .headers("Content-Type", "text/plain;charset=UTF-8")
+  .POST(HttpRequest.BodyPublishers.fromFile(
+    Paths.get("src/test/resources/sample.txt")))
+  .build();
+
+We’ve covered how to create HttpRequest and how to set additional parameters in it.
+
+Now it’s time to take a deeper look at HttpClient class, which is responsible for sending requests and receiving responses.
+
+6. HttpClient
+All requests are sent using HttpClient, which can be instantiated using the HttpClient.newBuilder() method or by calling HttpClient.newHttpClient().
+
+It provides a lot of useful and self-describing methods we can use to handle our request/response.
+
+
+freestar
+Let’s cover some of these here.
+
+6.1. Handling Response Body
+Similar to the fluent methods for creating publishers, there are methods dedicated to creating handlers for common body types:
+
+BodyHandlers.ofByteArray
+BodyHandlers.ofString
+BodyHandlers.ofFile
+BodyHandlers.discarding
+BodyHandlers.replacing
+BodyHandlers.ofLines
+BodyHandlers.fromLineSubscriber
+
+Pay attention to the usage of the new BodyHandlers factory class.
+
+Before Java 11, we had to do something like this:
+
+HttpResponse<String> response = client.send(request, HttpResponse.BodyHandler.asString());
+
+And we can now simplify it:
+
+HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+
+6.2. Setting a Proxy
+We can define a proxy for the connection by just calling proxy() method on a Builder instance:
+
+HttpResponse<String> response = HttpClient
+  .newBuilder()
+  .proxy(ProxySelector.getDefault())
+  .build()
+  .send(request, BodyHandlers.ofString());
+
+In our example, we used the default system proxy.
+
+6.3. Setting the Redirect Policy
+Sometimes the page we want to access has moved to a different address.
+
+
+freestar
+In that case, we’ll receive HTTP status code 3xx, usually with the information about new URI. HttpClient can redirect the request to the new URI automatically if we set the appropriate redirect policy.
+
+We can do it with the followRedirects() method on Builder:
+
+HttpResponse<String> response = HttpClient.newBuilder()
+  .followRedirects(HttpClient.Redirect.ALWAYS)
+  .build()
+  .send(request, BodyHandlers.ofString());
+
+All policies are defined and described in enum HttpClient.Redirect.
+
+6.4. Setting Authenticator for a Connection
+An Authenticator is an object that negotiates credentials (HTTP authentication) for a connection.
+
+It provides different authentication schemes (such as basic or digest authentication).
+
+In most cases, authentication requires username and password to connect to a server.
+
+27
+
+I was trying to do something similar using HttpClient and I got it working by making a small change as below.
+
+post.setHeader(HttpHeaders.CONTENT_TYPE,"application/json");
+post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + finalToken);
+
+We can use PasswordAuthentication class, which is just a holder of these values:
+
+HttpResponse<String> response = HttpClient.newBuilder()
+  .authenticator(new Authenticator() {
+    @Override
+    protected PasswordAuthentication getPasswordAuthentication() {
+      return new PasswordAuthentication(
+        "username", 
+        "password".toCharArray());
+    }
+}).build()
+  .send(request, BodyHandlers.ofString());
+
+Here we passed the username and password values as a plaintext. Of course, this would have to be different in a production scenario.
+
+
+freestar
+Note that not every request should use the same username and password. The Authenticator class provides a number of getXXX (e.g., getRequestingSite()) methods that can be used to find out what values should be provided.
+
+Now we’re going to explore one of the most useful features of new HttpClient — asynchronous calls to the server.
+
+6.5. Send Requests – Sync vs Async
+New HttpClient provides two possibilities for sending a request to a server:
+
+send(…) – synchronously (blocks until the response comes)
+sendAsync(…) – asynchronously (doesn’t wait for the response, non-blocking)
+Up until now, the send(...) method naturally waits for a response:
+
+HttpResponse<String> response = HttpClient.newBuilder()
+  .build()
+  .send(request, BodyHandlers.ofString());
+
+This call returns an HttpResponse object, and we’re sure that the next instruction from our application flow will be run only when the response is already here.
+
+However, it has a lot of drawbacks especially when we are processing large amounts of data.
+
+So, now we can use sendAsync(...) method — which returns CompletableFeature<HttpResponse> — to process a request asynchronously:
+
+CompletableFuture<HttpResponse<String>> response = HttpClient.newBuilder()
+  .build()
+  .sendAsync(request, HttpResponse.BodyHandlers.ofString());
+
+The new API can also deal with multiple responses, and stream the request and response bodies:
+
+
+freestar
+List<URI> targets = Arrays.asList(
+  new URI("https://postman-echo.com/get?foo1=bar1"),
+  new URI("https://postman-echo.com/get?foo2=bar2"));
+HttpClient client = HttpClient.newHttpClient();
+List<CompletableFuture<String>> futures = targets.stream()
+  .map(target -> client
+    .sendAsync(
+      HttpRequest.newBuilder(target).GET().build(),
+      HttpResponse.BodyHandlers.ofString())
+    .thenApply(response -> response.body()))
+  .collect(Collectors.toList());
+
+6.6. Setting Executor for Asynchronous Calls
+We can also define an Executor that provides threads to be used by asynchronous calls.
+
+This way we can, for example, limit the number of threads used for processing requests:
+
+ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+CompletableFuture<HttpResponse<String>> response1 = HttpClient.newBuilder()
+  .executor(executorService)
+  .build()
+  .sendAsync(request, HttpResponse.BodyHandlers.ofString());
+
+CompletableFuture<HttpResponse<String>> response2 = HttpClient.newBuilder()
+  .executor(executorService)
+  .build()
+  .sendAsync(request, HttpResponse.BodyHandlers.ofString());
+
+By default, the HttpClient uses executor java.util.concurrent.Executors.newCachedThreadPool().
+
+6.7. Defining a CookieHandler
+With new API and builder, it’s straightforward to set a CookieHandler for our connection. We can use builder method cookieHandler(CookieHandler cookieHandler) to define client-specific CookieHandler.
+
+Let’s define CookieManager (a concrete implementation of CookieHandler that separates the storage of cookies from the policy surrounding accepting and rejecting cookies) that doesn’t allow to accept cookies at all:
+
+HttpClient.newBuilder()
+  .cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_NONE))
+  .build();
+
+In case our CookieManager allows cookies to be stored, we can access them by checking CookieHandler from our HttpClient:
+
+((CookieManager) httpClient.cookieHandler().get()).getCookieStore()
+
+Now let’s focus on the last class from Http API — the HttpResponse.
+
+7. HttpResponse Object
+The HttpResponse class represents the response from the server. It provides a number of useful methods, but these are the two most important:
+
+
+freestar
+statusCode() returns status code (type int) for a response (HttpURLConnection class contains possible values).
+body() returns a body for a response (return type depends on the response BodyHandler parameter passed to the send() method).
+The response object has other useful methods that we’ll cover such as uri(), headers(), trailers() and version().
+
+7.1. URI of Response Object
+The method uri() on the response object returns the URI from which we received the response.
+
+Sometimes it can be different than URI in the request object because a redirection may occur:
+
+assertThat(request.uri()
+  .toString(), equalTo("http://stackoverflow.com"));
+assertThat(response.uri()
+  .toString(), equalTo("https://stackoverflow.com/"));
+
+7.2. Headers from Response
+We can obtain headers from the response by calling method headers() on a response object:
+
+HttpResponse<String> response = HttpClient.newHttpClient()
+  .send(request, HttpResponse.BodyHandlers.ofString());
+HttpHeaders responseHeaders = response.headers();
+
+It returns HttpHeaders object, which represents a read-only view of HTTP Headers.
+
+It has some useful methods that simplify searching for headers value.
+
+7.3. Version of the Response
+The method version() defines which version of HTTP protocol was used to talk with a server.
+
+Remember that even if we define that we want to use HTTP/2, the server can answer via HTTP/1.1.
+
+
+freestar
+The version in which the server answered is specified in the response:
+
+HttpRequest request = HttpRequest.newBuilder()
+  .uri(new URI("https://postman-echo.com/get"))
+  .version(HttpClient.Version.HTTP_2)
+  .GET()
+  .build();
+HttpResponse<String> response = HttpClient.newHttpClient()
+  .send(request, HttpResponse.BodyHandlers.ofString());
+assertThat(response.version(), equalTo(HttpClient.Version.HTTP_1_1));
+
+8. Handling Push Promises in HTTP/2
+New HttpClient supports push promises through PushPromiseHandler interface.
+
+It allows the server to “push” content to the client additional resources while requesting the primary resource, saving more roundtrip and as a result improves performance in page rendering.
+
+It is really the multiplexing feature of HTTP/2 that allows us to forget about resource bundling. For each resource, the server sends a special request, known as a push promise to the client.
+
+Push promises received, if any, are handled by the given PushPromiseHandler. A null valued PushPromiseHandler rejects any push promises.
+
+The HttpClient has an overloaded sendAsync method that allows us to handle such promises, as shown below.
+
+Let’s first create a PushPromiseHandler:
+
+private static PushPromiseHandler<String> pushPromiseHandler() {
+    return (HttpRequest initiatingRequest, 
+        HttpRequest pushPromiseRequest, 
+        Function<HttpResponse.BodyHandler<String>, 
+        CompletableFuture<HttpResponse<String>>> acceptor) -> {
+        acceptor.apply(BodyHandlers.ofString())
+            .thenAccept(resp -> {
+                System.out.println(" Pushed response: " + resp.uri() + ", headers: " + resp.headers());
+            });
+        System.out.println("Promise request: " + pushPromiseRequest.uri());
+        System.out.println("Promise request: " + pushPromiseRequest.headers());
+    };
+}
+
+Next, let’s use sendAsync method to handle this push promise:
+
+
+freestar
+httpClient.sendAsync(pageRequest, BodyHandlers.ofString(), pushPromiseHandler())
+    .thenAccept(pageResponse -> {
+        System.out.println("Page response status code: " + pageResponse.statusCode());
+        System.out.println("Page response headers: " + pageResponse.headers());
+        String responseBody = pageResponse.body();
+        System.out.println(responseBody);
+    })
+    .join();

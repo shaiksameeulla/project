@@ -1,0 +1,50 @@
+Java 21 is finally released on 19-Sep-2023 as the next long-term support (LTS) release of Oracle’s standard Java implementation
+
+Main Highlights of Java 21
+Among other changes, the following are the main changes that we should be aware of as a Java developer.
+
+    >Virtual Threads have been finalized.
+    >The Record Patterns (Project Amber) have been finalized.
+	>Pattern Matching for switch statements has been finalized.
+	>A new collection, SequencedCollection, has been added that provides direct access to an ordered collection’s first and last elements.
+	>String templates and unnamed classes & instance main() methods are available as preview features.
+	>Scoped values feature is now a preview API.
+	>Unnamed Patterns and Variables are introduced as a preview feature.
+	>Unnamed Classes and Instance Main Methods are introduced as a preview feature.
+	>Structured Concurrency continues to be a preview feature.
+The other included changes are:
+
+	Generational ZGC [JEP-439]
+	Pattern Matching for switch [JEP-441]
+	Foreign Function & Memory API (Third Preview) [JEP-442]
+	Vector API (Sixth Incubator) [JEP-448]
+	Deprecate the Windows 32-bit x86 Port for Removal [JEP-449]
+	Prepare to Disallow the Dynamic Loading of Agents [JEP-451]
+	Key Encapsulation Mechanism API [JEP-452]
+
+ Virtual Threads
+ ============
+ 
+ Classic / Platform Threads
+In Java, a classic thread is an instance of java.lang.Thread class. Moving forward, we will call them platform threads, as well.
+
+Traditionally, Java has treated the platform threads as thin wrappers around operating system (OS) threads. Creating such platform threads has always been costly (due to a large stack and other resources that are maintained by the operating system), so Java has been using the thread pools to avoid the overhead in thread creation.
+
+The number of platform threads also has to be limited because these resource-hungry threads can affect the performance of the whole machine. This is mainly because platform threads are mapped 1:1 to OS threads.
+
+It is worth mentioning that we can create a very high number of virtual threads (millions) in an application without depending on the number of platform threads. These virtual threads are managed by JVM, so they do not add extra context-switching overhead as well because they are stored in RAM as normal Java objects.
+
+Difference between Platform Threads and Virtual Threads
+
+Virtual threads are always daemon threads. The Thread.setDaemon(false) method cannot change a virtual thread to be a non-daemon thread. Note that JVM terminates when all started non-daemon threads have terminated. This means JVM will not wait for virtual threads to complete before exiting.
+Thread virtualThread = ...; //Create virtual thread
+
+//virtualThread.setDaemon(true);  //It has no effect
+
+Virtual threads always have the normal priority and the priority cannot be changed, even with setPriority(n) method. Calling this method on a virtual thread has no effect.
+Thread virtualThread = ...; //Create virtual thread
+
+//virtualThread.setPriority(Thread.MAX_PRIORITY);  //It has no effect
+
+Virtual threads are not active members of thread groups. When invoked on a virtual thread, Thread.getThreadGroup() returns a placeholder thread group with the name “VirtualThreads“.
+Virtual threads do not support the stop(), suspend(), or resume() methods. These methods throw an UnsupportedOperationException when invoked on a virtual thread.
