@@ -5,7 +5,23 @@ After reading the source and resource files, as well as the values of its parame
 
 Maven Archetype is a Maven plugin that makes it possible to create a project structure based on a template. These archetypes are essentially project templates that Maven generates when you create a new project. Archetype is a Maven project templating toolkit, in a nutshell.
 
+Life cycle is a sequence of named phases.
+Phases executes sequentially. Executing a phase means executes all previous phases.
 
+Plugin is a collection of goals(i.e. tasks) which also called MOJO (Maven Old Java Object).
+
+Maven is based around the central concept of a Build Life Cycles. Inside each Build Life Cycles there are Build Phases, and inside each Build Phases there are Build Goals.
+
+For example, a Java project can be compiled with the compiler-plugin's compile-goal by running mvn compiler:compile.
+
+Build lifecycle is a list of named phases that can be used to give order to goal execution.
+
+Goals provided by plugins can be associated with different phases of the lifecycle. For example, by default, the goal compiler:compile is associated with the compile phase, while the goal surefire:test is associated with the test phase. Consider the following command:
+
+mvn test
+When the preceding command is executed, Maven runs all goals associated with each of the phases up to and including the test phase. In such a case, Maven runs the resources:resources goal associated with the process-resources phase, then compiler:compile, and so on until it finally runs the surefire:test goal.
+
+===================
 
 In Maven, what do you mean by Clean, Default, and Site?
 The three built-in build life cycles are:
