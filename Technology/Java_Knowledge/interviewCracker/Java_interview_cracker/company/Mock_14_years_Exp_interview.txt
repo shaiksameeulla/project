@@ -1,0 +1,58 @@
+Here are my top 5 favourite java questions:
+
+1. What is java memory model? Explain differences between pre java 8 and post java 8 memory model.
+2. What is a garbage collector? Explain all GCs upto java latest stable release. What is mark and sweep algorithm in GC?
+3. Write a Fibonnaci calculator using a ForkJoinPool. 
+4. Write a ConcurrentQueue using wait and notify. 
+5. Give a stream of employees having id and name, using Java streams, give me a map where keys will be first letter of the name and value will be a set of employee names starting with that letter.
+
+
+My top 5 favourite Spring boot questions:
+
+1. What is application context? What is web application context and dispatcher servlet? How are they related?
+2. How do I create my own spring boot "starter".
+3. Explain step by step how will you write a unit test for a TODO app created with spring boot. 
+4. I want to log the name of the method which gets executed when a route path of a particular controller gets called. How do I design such a solution without code repetition (Use AOP)
+5. What is Isolation and propagation in a database transaction? What is locking? Why is it needed? Explain a few locking mechanisms!
+==============================
+SOLID -> 
+Spring Transaction, he didn't know MAVEN cycle,VAR keyword 
+Docker explanation,helm charts
+application design for Zomato
+
+==============================
+Map<String, Long> charMap = Arrays.stream(str.split("")).collect(Collectors.groupingBy(Function.identity(), Collectors.counting())); 
+
+is great
+
+
+I just wanna add some info. Here we get error when we use Method References for identity and counting here like 
+
+Map<String, Long> charMap = Arrays.stream(str.split("")).collect(Collectors.groupingBy(Function::identity, Collectors::counting));
+
+
+REASON
+————-
+Because this identity and counting methods don’t have expected number of arguments (here expected number of args is 1 to use a method as method reference)
+
+
+Another example:
+
+Map<Department, Integer> countInDeptMap = employees.stream().collect(Collectors.groupingBy(Employee::getDepartment,Collectors.summingInt(Employee::getSalary)));
+
+Here we can use getDepartment, getSalary methods as Method reference as they have expected number of argument count.
+
+====================
+immutable
+SQL injections
+sonar qube
+sonar Cube report 
+Spring Security
+spring data jpa microservices hibernate
+how hashmap Works in Java and what happens when two keys have the same hash
+concurrent hashmap
+immutable classes in Java
+insertion of null objects using con concurrent hash
+kubernetes will
+read Helm charts okay frequently so that Helm charts will give
+stream API
