@@ -1,0 +1,158 @@
+
+How do you create a responsive modal dialog using CSS and HTML?
+
+Hide Answer
+To create a responsive modal dialog using CSS and HTML, you can use a combination of HTML structure and CSS styles along with JavaScript to toggle its visibility. Here's a basic example:
+
+<div class="modal">
+  <div class="modal-content">
+    <h2>Modal Title</h2>
+    <p>Modal content goes here.</p>
+    <button class="modal-close">Close</button>
+  </div>
+</div>
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+}
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+In this example, the modal is positioned fixed to cover the entire viewport. The modal content is centered using flexbox. The display: none property is used to hide the modal by default, and JavaScript can be used to toggle its visibility on button click.
+
+
+Explain the concept of CSS grid-template-areas and provide an example of usage.
+
+Hide Answer
+CSS grid-template-areas is a property that allows you to define named grid areas in a grid layout. It provides a convenient way to visually define and rearrange the placement of grid items. Here's an example:
+
+.container {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar content"
+    "footer footer";
+}
+.header {
+  grid-area: header;
+}
+.sidebar {
+  grid-area: sidebar;
+}
+.content {
+  grid-area: content;
+}
+.footer {
+  grid-area: footer;
+}
+In this example, the grid-template-areas property defines a grid layout with named areas for the header, sidebar, content, and footer. The individual grid items are then assigned to their respective areas using the grid-area property.
+
+7.
+What are CSS media queries and how are they used?
+
+Hide Answer
+CSS media queries are used to apply different CSS styles based on the characteristics of the device or viewport. They allow you to create responsive designs that adapt to different screen sizes and orientations.
+
+Media queries can also be used to target specific device features like orientation, resolution, and aspect ratio, allowing you to create more tailored styles for different devices.
+
+Here's an example of using a media query to apply different styles for screens smaller than 600 pixels:
+
+@media (max-width: 600px) {
+  .element {
+    font-size: 14px;
+  }
+}
+In the above example, the .element class will have a font size of 14 pixels only when the screen width is 600 pixels or less.
+
+
+42. How can we make our website responsive using CSS?
+Media query is used to create a responsive web design. It means that the view of a web page differs from system to system based on screen or media types.
+
+Media queries can be used to check many things:
+
+width and height of the viewport
+width and height of the device
+Orientation
+Resolution
+A media query consist of a media type that can contain one or more expression which can be either true or false. The result of the query is true if the specified media matches the type of device the document is displayed on. If the media query is true then a style sheet is applied.
+
+Syntax:
+
+@media not | only mediatype and (expression) {
+    // Code content
+}
+43. What is CSS flexbox?
+It is also called a flexible box model. It is basically a layout model that provides an easy and clean way to arrange items within a container. Flexbox is different from the block model which is vertically biased and the inline which is horizontally biased. Flexbox was created for small-scale layouts and there’s another standard called grids which are geared more towards larger-scale layouts, It works similar to the way to Twitter bootstrap grid system works. Flexbox is responsive and mobile-friendly. To start with flexbox firstly create a flex container. To create a flex container set the display property to flex.
+
+Syntax:
+
+.main-container {
+    display: flex;
+}
+Flex Properties:
+
+flex-direction
+flex-wrap
+flex-flow
+justify-content
+align-items
+align-content
+44. What is CSS Grid?
+It is a CSS property that offers a grid-based layout system, with rows and columns, making it easier to design web pages without floats and positioning.
+
+
+
+Syntax:
+
+grid: none|grid-template-rows / grid-template-columns|grid-template-areas|
+grid-template-rows / [grid-auto-flow] grid-auto-columns|[grid-auto-flow] 
+grid-auto-rows / grid-template-columns|initial|inherit;
+45. What is the difference between flexbox and grid?
+1. Dimensionality and Flexibility:
+
+Flexbox offers greater control over alignment and space distribution between items. Being one-dimensional, Flexbox only deals with either columns or rows.
+The grid has two-dimension layout capabilities which allow flexible widths as a unit of length. This compensates for the limitations in Flex.
+2. Alignment:
+
+Flex Direction allows developers to align elements vertically or horizontally, which is used when developers create and reverse rows or columns.
+CSS Grid deploys fractional measure units for grid fluidity and auto-keyword functionality to automatically adjust columns or rows.
+3. Item Management
+
+Flex Container is the parent element while Flex Item represents the children. The Flex Container can ensure balanced representation by adjusting item dimensions. This allows developers to design for fluctuating screen sizes.
+Grid supports both implicit and explicit content placement. Its inbuilt automation allows it to automatically extend line items and copy values into the new creation from the preceding item.
+Property    		  Grid   																				Flexbox
+Dimension  		 Two – Dimensional 																	One – Dimensional
+Features   		Can flex combination of items through space-occupying Features                   Can push content element to extreme alignment
+
+Support Type         Layout First                                                      Content First
+
+
+
+58. What is !important?
+The !important property in CSS is used to provide more weight (importance) than normal property. In CSS, the !important means that “this is important”, ignore all the subsequent rules, and apply !important rule and the !important keyword must be placed at the end of the line, immediately before the semicolon.
+
+In other words, it adds importance to all the sub-properties that the shorthand property represents.
+In normal use, a rule defined in an external style sheet which is overruled by a style defined in the head of the document, which in turn, is overruled by an inline style within the element itself (assuming equal specificity of the selectors).
+Defining a rule with the !important attribute that discards the normal concerns as regards the later rule overriding the earlier ones.
+So, it is used for overriding the styles that are previously declared in other style sources, in order to achieve a certain design.
+Syntax:
+
+element {
+    color: blue  !important;
+    font-size: 14px !important; 
+    ...
+}
