@@ -61,13 +61,19 @@ The java.util.concurrent package defines three executor interfaces:
 	Typically, variables that refer to executor objects are declared as one of these three interface types, not with an executor class type.
 
 ----The Executor Interface----
-
-The Executor interface provides a single method, execute, designed to be a drop-in replacement for a common thread-creation idiom. If r is a Runnable object, and e is an Executor object you can replace
+Executor=>All Known Subinterfaces:==>ExecutorService, ScheduledExecutorService
+			All Known Implementing Classes ForkJoinPool, ScheduledThreadPoolExecutor, ThreadPoolExecutor
+			
+			void execute(Runnable command):Executes the given command at some time in the future.
+			
+The Executor interface provides a single method, ie execute(void execute(Runnable command)), designed to be a drop-in replacement for a common thread-creation idiom.
+ If r is a Runnable object, and e is an Executor object you can replace
 
 (new Thread(r)).start();
 with
 
 e.execute(r);
+
 
 Example :
 ExecutorService executor = Executors.newFixedThreadPool(2);

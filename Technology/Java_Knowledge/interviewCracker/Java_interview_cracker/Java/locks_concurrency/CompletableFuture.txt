@@ -1,0 +1,23 @@
+What is the difference between thenApply and thenApplyAsync of Java CompletableFuture?
+
+The difference has to do with the Executor that is responsible for running the code. Each operator on CompletableFuture generally has 3 versions.
+
+thenApply(fn) - runs fn on a thread defined by the CompleteableFuture on which it is called, so you generally cannot know where this will be executed. It might immediately execute if the result is already available.
+thenApplyAsync(fn) - runs fn on a environment-defined executor regardless of circumstances. For CompletableFuture this will generally be ForkJoinPool.commonPool().
+thenApplyAsync(fn,exec) - runs fn on exec.
+In the end the result is the same, but the scheduling behavior depends on the choice of method.
+
+===========================
+
+public class CompletableFuture<T>
+extends Object
+implements Future<T>, CompletionStage<T>
+A Future that may be explicitly completed (setting its value and status), and may be used as a CompletionStage, supporting dependent functions and actions that trigger upon its completion.
+When two or more threads attempt to complete, completeExceptionally, or cancel a CompletableFuture, only one of them succeeds.
+
+In addition to these and related methods for directly manipulating status and results, CompletableFuture implements interface CompletionStage with the following policies:
+
+Actions supplied for dependent completions of non-async methods may be performed by the thread that completes the current CompletableFuture, or by any other caller of a completion method.
+All async methods without an explicit Executor argument are performed using the ForkJoinPool.commonPool() (unless it does not support a parallelism level of at least two, in which case, a new Thread is created to run each task). This may be overridden for non-static methods in subclasses by defining method defaultExecutor(). To simplify monitoring, debugging, and tracking, all generated asynchronous tasks are instances of the marker interface CompletableFuture.AsynchronousCompletionTask. Operations with time-delays can use adapter methods defined in this class, for example: supplyAsync(supplier, delayedExecutor(timeout, timeUnit)). To support methods with delays and timeouts, this class maintains at most one daemon thread for triggering and cancelling actions, not for running them.
+All CompletionStage methods are implemented independently of other public methods, so the behavior of one method is not impacted by overrides of others in subclasses.
+All CompletionStage methods return CompletableFutures. To restrict usages to only those methods defined in interface CompletionStage, use method minimalCompletionStage(). Or to ensure only that clients do not themselves modify a future, use method copy().
