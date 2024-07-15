@@ -120,3 +120,54 @@ Computation represent by FutureTask is implemented with Callable interface.
 It implements Future or Callable interface.
 Behaviour of get() method depends on the state of the task. If tasks are not completed get() method waits or blocks till the task is completed. Once task completed, it returns the result or throws an ExecutionException.
 An example of using Future is working with Thread pools. When one submit a task to ExecutorService which is take a long running time, then it returns a Future object immediately. This Future object can be used for task completion and getting result of computation.
+==============
+
+Interface RejectedExecutionHandler
+All Known Implementing Classes:
+ThreadPoolExecutor.AbortPolicy,  (Default)
+ThreadPoolExecutor.CallerRunsPolicy,
+ ThreadPoolExecutor.DiscardOldestPolicy, 
+ ThreadPoolExecutor.DiscardPolicy
+ 
+ Create a class and implement interface RejectedExecutionHandler. It’s method rejectedExecution() is responsible for handling the tasks which get rejected from ThreadPoolExecutor.
+
+class RejectedTaskHandler implements RejectedExecutionHandler 
+{ 
+	@Override 
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) 
+	{ 
+		System.out.printf("RejectedTaskHandler: The task %s has been rejected", r.toString()); 
+    }
+}
+
+
+======
+
+
+ private static class DefaultThreadFactory implements ThreadFactory {
+        private static final AtomicInteger poolNumber = new AtomicInteger(1);
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        DefaultThreadFactory() {
+            @SuppressWarnings("removal")
+            SecurityManager s = System.getSecurityManager();
+            group = (s != null) ? s.getThreadGroup() :
+                                  Thread.currentThread().getThreadGroup();
+            namePrefix = "pool-" +
+                          poolNumber.getAndIncrement() +
+                         "-thread-";
+        }
+
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(group, r,
+                                  namePrefix + threadNumber.getAndIncrement(),
+                                  0);
+            if (t.isDaemon())
+                t.setDaemon(false);
+            if (t.getPriority() != Thread.NORM_PRIORITY)
+                t.setPriority(Thread.NORM_PRIORITY);
+            return t;
+        }
+    }

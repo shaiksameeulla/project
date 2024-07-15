@@ -1,0 +1,75 @@
+
+Like Iterator and ListIterator, Spliterator is a Java Iterator, which is used to iterate elements one-by-one from a List implemented object.
+
+The main functionalities of Spliterator are: 
+
+	Splitting the source data
+	Processing the source data
+The Interface Spliterator is included in JDK 8 for taking the advantages of parallelism in addition to sequential traversal. It is designed as a parallel analogue of an iterator.
+
+-->A Spliterator may traverse elements individually (tryAdvance()) or sequentially in bulk (forEachRemaining()).
+-->A Spliterator may also partition off some of its elements (using trySplit()) as another Spliterator, to be used in possibly-parallel operations. 
+
+
+=====
+
+An Iterator is a simple representation of a series of elements that can be iterated over.
+
+eg:
+
+ List<String> list = Arrays.asList("Apple", "Banana", "Orange");
+ Iterator<String> i = list.iterator();
+ i.next();
+ i.forEachRemaining(System.out::println);
+
+		#output
+		Banana
+		Orange
+A Spliterator can be used to split given element set into multiple sets so that we can perform some kind of operations/calculations on each set in different threads independently, possibly taking advantage of parallelism. It is designed as a parallel analogue of Iterator. Other than collections, the source of elements covered by a Spliterator could be, for example, an array, an IO channel, or a generator function.
+
+There are 2 main methods in the Spliterator interface.
+
+- tryAdvance() and forEachRemaining()
+
+With tryAdvance(), we can traverse underlying elements one by one (just like Iterator.next()). If a remaining element exists, this method performs the consumer action on it, returning true; else returns false.
+
+For sequential bulk traversal we can use forEachRemaining():
+
+ List<String> list = Arrays.asList("Apple", "Banana", "Orange");
+ Spliterator<String> s = list.spliterator();
+ s.tryAdvance(System.out::println);
+ System.out.println(" --- bulk traversal");
+ s.forEachRemaining(System.out::println);
+
+ System.out.println(" --- attempting tryAdvance again");
+ boolean b = s.tryAdvance(System.out::println);
+ System.out.println("Element exists: "+b);
+Output:
+
+Apple
+ --- bulk traversal
+Banana
+Orange
+ --- attempting tryAdvance again
+Element exists: false
+- Spliterator trySplit()
+
+Splits this spliterator into two and returns the new one:
+
+  List<String> list = Arrays.asList("Apple", "Banana", "Orange");
+
+  Spliterator<String> s = list.spliterator();
+  Spliterator<String> s1 = s.trySplit();
+
+  s.forEachRemaining(System.out::println);
+  System.out.println("-- traversing the other half of the spliterator --- ");
+  s1.forEachRemaining(System.out::println);
+Output:
+
+Banana
+Orange
+-- traversing the other half of the spliterator ---
+Apple
+An ideal trySplit method should divide its elements exactly in half, allowing balanced parallel computation.
+
+The splitting process is termed as 'partitioning' or 'decomposition' as well.

@@ -520,3 +520,59 @@ Other threads may produce new commands (i.e., Runnable objects), and call the ex
 
 Approximately, because worker A could pick a new command from the queue, and then lose its time slice before calling the command's .run() method. Other workers could then pick other commands from the queue and perform them before the scheduler allows worker A to run again.
 
+
+=========
+
+
+==============
+
+Interface RejectedExecutionHandler
+All Known Implementing Classes:
+ThreadPoolExecutor.AbortPolicy,  (Default)
+ThreadPoolExecutor.CallerRunsPolicy,
+ ThreadPoolExecutor.DiscardOldestPolicy, 
+ ThreadPoolExecutor.DiscardPolicy
+ 
+ Create a class and implement interface RejectedExecutionHandler. It’s method rejectedExecution() is responsible for handling the tasks which get rejected from ThreadPoolExecutor.
+
+class RejectedTaskHandler implements RejectedExecutionHandler 
+{ 
+	@Override 
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) 
+	{ 
+		System.out.printf("RejectedTaskHandler: The task %s has been rejected", r.toString()); 
+    }
+}
+
+
+======
+
+
+ private static class DefaultThreadFactory implements ThreadFactory {
+        private static final AtomicInteger poolNumber = new AtomicInteger(1);
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        DefaultThreadFactory() {
+            @SuppressWarnings("removal")
+            SecurityManager s = System.getSecurityManager();
+            group = (s != null) ? s.getThreadGroup() :
+                                  Thread.currentThread().getThreadGroup();
+            namePrefix = "pool-" +
+                          poolNumber.getAndIncrement() +
+                         "-thread-";
+        }
+
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(group, r,
+                                  namePrefix + threadNumber.getAndIncrement(),
+                                  0);
+            if (t.isDaemon())
+                t.setDaemon(false);
+            if (t.getPriority() != Thread.NORM_PRIORITY)
+                t.setPriority(Thread.NORM_PRIORITY);
+            return t;
+        }
+    }
+
