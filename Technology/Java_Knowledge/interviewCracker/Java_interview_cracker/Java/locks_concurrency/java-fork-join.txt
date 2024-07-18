@@ -1,0 +1,374 @@
+java-fork-join
+==============
+
+public class ForkJoinPool
+extends AbstractExecutorService
+
+An ExecutorService for running ForkJoinTasks. A ForkJoinPool provides the entry point for submissions from non-ForkJoinTask clients, as well as management and monitoring operations.
+A ForkJoinPool differs from other kinds of ExecutorService mainly by virtue of employing work-stealing: all threads in the pool attempt to find and execute tasks submitted to the pool and/or created by other active tasks (eventually blocking waiting for work if none exist). This enables efficient processing when most tasks spawn other subtasks (as do most ForkJoinTasks), as well as when many small tasks are submitted to the pool from external clients. Especially when setting asyncMode to true in constructors, ForkJoinPools may also be appropriate for use with event-style tasks that are never joined. All worker threads are initialized with Thread.isDaemon() set true.
+
+A static commonPool() is available and appropriate for most applications. The common pool is used by any ForkJoinTask that is not explicitly submitted to a specified pool. Using the common pool normally reduces resource usage (its threads are slowly reclaimed during periods of non-use, and reinstated upon subsequent use).
+
+For applications that require separate or custom pools, a ForkJoinPool may be constructed with a given target parallelism level; by default, equal to the number of available processors. The pool attempts to maintain enough active (or available) threads by dynamically adding, suspending, or resuming internal worker threads, even if some tasks are stalled waiting to join others. However, no such adjustments are guaranteed in the face of blocked I/O or other unmanaged synchronization. The nested ForkJoinPool.ManagedBlocker interface enables extension of the kinds of synchronization accommodated. The default policies may be overridden using a constructor with parameters corresponding to those documented in class ThreadPoolExecutor.
+
+In addition to execution and lifecycle control methods, this class provides status check methods (for example getStealCount()) that are intended to aid in developing, tuning, and monitoring fork/join applications. Also, method toString() returns indications of pool state in a convenient form for informal monitoring.
+
+As is the case with other ExecutorServices, there are three main task execution methods summarized in the following table. These are designed to be used primarily by clients not already engaged in fork/join computations in the current pool. The main forms of these methods accept instances of ForkJoinTask, but overloaded forms also allow mixed execution of plain Runnable- or Callable- based activities as well. However, tasks that are already executing in a pool should normally instead use the within-computation forms listed in the table unless using async event-style tasks that are not usually joined, in which case there is little difference among choice of methods.
+
+Summary of task execution methods
+
+Call from non-fork/join clients								Call from within fork/join computations
+Arrange async execution	execute(ForkJoinTask)					ForkJoinTask.fork()
+Await and obtain result	invoke(ForkJoinTask)					ForkJoinTask.invoke()
+Arrange exec and obtain Future	submit(ForkJoinTask)			ForkJoinTask.fork() (ForkJoinTasks are Futures)
+
+=========
+ How fork-join works?
+ForkJoinPool has array of DEqueues (WorkerQueue) which will be shared by all the worker threads. You can assume it is a single shared task queue that is usually used in normal ExecutorServices. Each DEQueue is belongs to one worker thread who will be the owner for that queue. Every time fork is called on a task will be pushed into its own queue. Each thread repeatedly removes a task from its own DEQueue and runs it. DEQueue support three functions: push, pop and poll where push and pop methods will be called by owner thread only and poll will be called by other threads. If a thread discovers its queue is empty then it becomes a theaf: it chooses a victive thread at random and calls that queue’s poll method to steal a task for itself. This process is called work stealing.
+
+==========
+
+ ExecutorService newWorkStealingPool
+ public static ExecutorService newWorkStealingPool(int parallelism)  
+
+ 
+ The newWorkStealingPool() method of Executors class creates a work-stealing thread pool using the number of available processors as its target parallelism level.
+ 
+ 
+ public static ExecutorService newWorkStealingPool() {
+    return new ForkJoinPool(Runtime.getRuntime().availableProcessors(),
+                                                 ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+                                                 null, true);
+												 
+								
+in Java 8, the most convenient way to get access to the instance of the ForkJoinPool is to use its static method commonPool(). This will provide a reference to the common pool, which is a default thread pool for every ForkJoinTask.
+
+According to Oracle’s documentation, using the predefined common pool reduces resource consumption since this discourages the creation of a separate thread pool per task.
+
+ForkJoinPool commonPool = ForkJoinPool.commonPool();
+Copy
+We can achieve the same behavior in Java 7 by creating a ForkJoinPool and assigning it to a public static field of a utility class:
+
+public static ForkJoinPool forkJoinPool = new ForkJoinPool(2);
+Copy
+Now we can easily access it:
+
+ForkJoinPool forkJoinPool = PoolUtil.forkJoinPool;
+Copy
+With ForkJoinPool’s constructors, we can create a custom thread pool with a specific level of parallelism, thread factory and exception handler. Here the pool has a parallelism level of 2. This means that pool will use two processor cores.
+								
+
+
+ForkJoinTask<V>
+ForkJoinTask is the base type for tasks executed inside ForkJoinPool. In practice, one of its two subclasses should be extended: the RecursiveAction for void tasks and the RecursiveTask<V> for tasks that return a value. They both have an abstract method compute() in which the task’s logic is defined.											
+
+
+
+// get no. of threads active
+        ForkJoinPool Pool = ForkJoinPool.commonPool();
+         
+        System.out.println("Number of active thread before invoking: "
+            + Pool.getActiveThreadCount());
+             
+        NewTask t = new NewTask(400);
+         
+        Pool.invoke(t);
+		
+==================
+Java 7 introduced the fork/join framework. It provides tools to help speed up parallel processing by attempting to use all available processor cores. It accomplishes this through a divide and conquer approach.
+
+In practice, this means that the framework first “forks,” recursively breaking the task into smaller independent subtasks until they are simple enough to run asynchronously.
+
+After that, the “join” part begins. The results of all subtasks are recursively joined into a single result. In the case of a task that returns void, the program simply waits until every subtask runs.
+
+The ForkJoinPool class is the center of the fork/join framework, which is an implementation of the ExecutorService interface. ForkJoinPool class is an extension of the AbstractExecutorService class, and it implements the work-stealing algorithm (i.e., worker threads that run out of things to do can steal tasks from other threads that are still busy) of fork/join framework and can execute ForkJoinTask processes.
+
+Syntax:
+
+public class ForkJoinPool extends AbstractExecutorService  
+
+Fork: Fork step splits the task into smaller subtasks and these tasks are executed concurrently. 
+
+Join: After the execution of the subtasks, the task may join all the results into one result.
+
+
+
+
+// Java program to demonstrate the
+// Implementation of getActiveThreadCount()
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+class NewTask extends RecursiveAction 
+{
+	private long Load = 0;
+	
+	public NewTask(long Load) { this.Load = Load; }
+
+	protected void compute()
+	{
+		// fork tasks into smaller subtasks
+		List<NewTask> subtasks = new ArrayList<NewTask>();
+		subtasks.addAll(createSubtasks());
+		
+		for (RecursiveAction subtask : subtasks) {
+			subtask.fork();
+		}
+	}
+	
+	// function to create and add subtasks
+	private List<NewTask> createSubtasks()
+	{
+		// create subtasks
+		List<NewTask> subtasks = new ArrayList<NewTask>();
+		NewTask subtask1 = new NewTask(this.Load / 2);
+		NewTask subtask2 = new NewTask(this.Load / 2);
+		NewTask subtask3 = new NewTask(this.Load / 2);
+		
+		// to add the subtasks
+		subtasks.add(subtask1);
+		subtasks.add(subtask2);
+		subtasks.add(subtask3);
+		
+		return subtasks;
+	}
+}
+public class JavaForkJoingetActivethreadcountExample1 {
+	public static void main(final String[] arguments)
+		throws InterruptedException
+	{
+		// get no. of available core available
+		int proc = Runtime.getRuntime().availableProcessors();
+		
+		System.out.println("Number of available core in the processor is: "
+			+ proc);
+			
+		// get no. of threads active
+		ForkJoinPool Pool = ForkJoinPool.commonPool();
+		
+		System.out.println("Number of active thread before invoking: "
+			+ Pool.getActiveThreadCount());
+			
+		NewTask t = new NewTask(400);
+		
+		Pool.invoke(t);
+		
+		System.out.println("Number of active thread after invoking: "
+			+ Pool.getActiveThreadCount());
+		System.out.println("Common Pool Size is: "
+						+ Pool.getPoolSize());
+	}
+}
+Output
+Number of available core in the processor is: 4
+Number of active thread before invoking: 0
+Number of active thread after invoking: 3
+Common Pool Size is: 3
+
+
+To provide effective parallel execution, the fork/join framework uses a pool of threads called the ForkJoinPool. This pool manages worker threads of type ForkJoinWorkerThread.
+
+ForkJoinPool
+	The ForkJoinPool is the heart of the framework. It is an implementation of the ExecutorService that manages worker threads and provides us with tools to get information about the thread pool state and performance.
+
+	Worker threads can execute only one task at a time, but the ForkJoinPool doesn’t create a separate thread for every single subtask. Instead, each thread in the pool has its own double-ended queue (or deque, pronounced “deck”) that stores tasks.
+
+	This architecture is vital for balancing the thread’s workload with the help of the work-stealing algorithm.
+	2.1. Work-Stealing Algorithm
+	Simply put, free threads try to “steal” work from deques of busy threads.
+
+	By default, a worker thread gets tasks from the head of its own deque. When it is empty, the thread takes a task from the tail of the deque of another busy thread or from the global entry queue since this is where the biggest pieces of work are likely to be located.
+
+	This approach minimizes the possibility that threads will compete for tasks. It also reduces the number of times the thread will have to go looking for work, as it works on the biggest available chunks of work first.
+
+
+
+2.2. ForkJoinPool Instantiation
+		In Java 8, the most convenient way to get access to the instance of the ForkJoinPool is to use its static method commonPool(). This will provide a reference to the common pool, which is a default thread pool for every ForkJoinTask.
+
+		According to Oracle’s documentation, using the predefined common pool reduces resource consumption since this discourages the creation of a separate thread pool per task.
+
+		ForkJoinPool commonPool = ForkJoinPool.commonPool();
+		Copy
+		We can achieve the same behavior in Java 7 by creating a ForkJoinPool and assigning it to a public static field of a utility class:
+
+		public static ForkJoinPool forkJoinPool = new ForkJoinPool(2);
+		Copy
+		Now we can easily access it:
+
+		ForkJoinPool forkJoinPool = PoolUtil.forkJoinPool;
+		Copy
+		With ForkJoinPool’s constructors, we can create a custom thread pool with a specific level of parallelism, thread factory and exception handler. Here the pool has a parallelism level of 2. This means that pool will use two processor cores.
+
+3. ForkJoinTask<V>
+	ForkJoinTask is the base type for tasks executed inside ForkJoinPool. In practice, one of its two subclasses should be extended: the RecursiveAction for void tasks and the RecursiveTask<V> for tasks that return a value. They both have an abstract method compute() in which the task’s logic is defined.
+
+3.1. RecursiveAction 
+		In the example below, we use a String called workload to represent the unit of work to be processed. For demonstration purposes, the task is a nonsensical one: It simply uppercases its input and logs it.
+
+		To demonstrate the forking behavior of the framework, the example splits the task if workload.length() is larger than a specified threshold using the createSubtask() method.
+
+		The String is recursively divided into substrings, creating CustomRecursiveTask instances that are based on these substrings.
+
+		As a result, the method returns a List<CustomRecursiveAction>.
+
+		The list is submitted to the ForkJoinPool using the invokeAll() method:
+
+		public class CustomRecursiveAction extends RecursiveAction {
+
+			private String workload = "";
+			private static final int THRESHOLD = 4;
+
+			private static Logger logger = 
+			  Logger.getAnonymousLogger();
+
+			public CustomRecursiveAction(String workload) {
+				this.workload = workload;
+			}
+
+			@Override
+			protected void compute() {
+				if (workload.length() > THRESHOLD) {
+					ForkJoinTask.invokeAll(createSubtasks());
+				} else {
+				   processing(workload);
+				}
+			}
+
+			private List<CustomRecursiveAction> createSubtasks() {
+				List<CustomRecursiveAction> subtasks = new ArrayList<>();
+
+				String partOne = workload.substring(0, workload.length() / 2);
+				String partTwo = workload.substring(workload.length() / 2, workload.length());
+
+				subtasks.add(new CustomRecursiveAction(partOne));
+				subtasks.add(new CustomRecursiveAction(partTwo));
+
+				return subtasks;
+			}
+
+			private void processing(String work) {
+				String result = work.toUpperCase();
+				logger.info("This result - (" + result + ") - was processed by " 
+				  + Thread.currentThread().getName());
+			}
+		}
+		Copy
+		We can use this pattern to develop our own RecursiveAction classes. To do this, we create an object that represents the total amount of work, chose a suitable threshold, define a method to divide the work and define a method to do the work.
+
+3.2. RecursiveTask<V>
+	For tasks that return a value, the logic here is similar.
+
+	The difference is that the result for each subtask is united in a single result:
+
+	public class CustomRecursiveTask extends RecursiveTask<Integer> {
+		private int[] arr;
+
+		private static final int THRESHOLD = 20;
+
+		public CustomRecursiveTask(int[] arr) {
+			this.arr = arr;
+		}
+
+		@Override
+		protected Integer compute() {
+			if (arr.length > THRESHOLD) {
+				return ForkJoinTask.invokeAll(createSubtasks())
+				  .stream()
+				  .mapToInt(ForkJoinTask::join)
+				  .sum();
+			} else {
+				return processing(arr);
+			}
+		}
+
+		private Collection<CustomRecursiveTask> createSubtasks() {
+			List<CustomRecursiveTask> dividedTasks = new ArrayList<>();
+			dividedTasks.add(new CustomRecursiveTask(
+			  Arrays.copyOfRange(arr, 0, arr.length / 2)));
+			dividedTasks.add(new CustomRecursiveTask(
+			  Arrays.copyOfRange(arr, arr.length / 2, arr.length)));
+			return dividedTasks;
+		}
+
+		private Integer processing(int[] arr) {
+			return Arrays.stream(arr)
+			  .filter(a -> a > 10 && a < 27)
+			  .map(a -> a * 10)
+			  .sum();
+		}
+	}
+	Copy
+	In this example, we use an array stored in the arr field of the CustomRecursiveTask class to represent the work. The createSubtasks() method recursively divides the task into smaller pieces of work until each piece is smaller than the threshold. Then the invokeAll() method submits the subtasks to the common pool and returns a list of Future.
+
+	To trigger execution, the join() method is called for each subtask.
+
+	We’ve accomplished this here using Java 8’s Stream API. We use the sum() method as a representation of combining sub results into the final result.
+
+4. Submitting Tasks to the ForkJoinPool
+
+	We can use a few approaches to submit tasks to the thread pool.
+
+	Let’s start with the submit() or execute() method (their use cases are the same):
+
+	forkJoinPool.execute(customRecursiveTask);
+	int result = customRecursiveTask.join();
+	Copy
+	The invoke() method forks the task and waits for the result, and doesn’t need any manual joining:
+
+	int result = forkJoinPool.invoke(customRecursiveTask);
+	Copy
+	The invokeAll() method is the most convenient way to submit a sequence of ForkJoinTasks to the ForkJoinPool. It takes tasks as parameters (two tasks, var args or a collection), forks and then returns a collection of Future objects in the order in which they were produced.
+
+
+
+	Alternatively, we can use separate fork() and join() methods. The fork() method submits a task to a pool, but it doesn’t trigger its execution. We must use the join() method for this purpose.
+
+	In the case of RecursiveAction, the join() returns nothing but null; for RecursiveTask<V>, it returns the result of the task’s execution:
+
+	customRecursiveTaskFirst.fork();
+	result = customRecursiveTaskLast.join();
+	Copy
+	Here we used the invokeAll() method to submit a sequence of subtasks to the pool. We can do the same job with fork() and join(), though this has consequences for the ordering of the results.
+
+	To avoid confusion, it is generally a good idea to use invokeAll() method to submit more than one task to the ForkJoinPool.
+
+5. Conclusion
+
+	Using the fork/join framework can speed up processing of large tasks, but to achieve this outcome, we should follow some guidelines:
+
+	Use as few thread pools as possible. In most cases, the best decision is to use one thread pool per application or system.
+	Use the default common thread pool if no specific tuning is needed.
+	Use a reasonable threshold for splitting ForkJoinTask into subtasks.
+	Avoid any blocking in ForkJoinTasks.
+	
+	
+	===============
+	
+	/**
+     * Creates a thread pool that maintains enough threads to support
+     * the given parallelism level, and may use multiple queues to
+     * reduce contention. The parallelism level corresponds to the
+     * maximum number of threads actively engaged in, or available to
+     * engage in, task processing. The actual number of threads may
+     * grow and shrink dynamically. A work-stealing pool makes no
+     * guarantees about the order in which submitted tasks are
+     * executed.
+     *
+     * @param parallelism the targeted parallelism level
+     * @return the newly created thread pool
+     * @throws IllegalArgumentException if {@code parallelism <= 0}
+     * @since 1.8
+     */
+    public static ExecutorService newWorkStealingPool(int parallelism) {
+        return new ForkJoinPool
+            (parallelism,
+             ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+             null, true);
+    }
+	
+	========
+	
+	
