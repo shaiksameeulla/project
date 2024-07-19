@@ -1,0 +1,125 @@
+
+class Executers{
+ public static ExecutorService newWorkStealingPool() {
+        return new ForkJoinPool
+            (Runtime.getRuntime().availableProcessors(),
+             ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+             null, true);
+			} 
+			
+	class ForkJoinPool{		
+			public ForkJoinPool(int parallelism,
+                        ForkJoinWorkerThreadFactory factory,
+                        UncaughtExceptionHandler handler,
+                        boolean asyncMode) {}
+}
+
+copied from Code : this.config = asyncMode ? FIFO : 0;
+
+ForkJoinPool.commonPool uses a last-in, first-out (LIFO) queue configuration, 
+whereas Executors.newWorkStealingPool uses first-in, first-out approach (FIFO) one.
+
+
+
+Each worker thread in a ForkJoinPool has its own work queue. Async mode concerns the order in which each worker takes forked tasks that are never joined from its work queue.
+
+Workers in a ForkJoinPool in async mode process such tasks in FIFO (first in, first out) order. By default, ForkJoinPools process such tasks in LIFO (last in, first out) order.
+
+It's important to emphasise that the async mode setting only concerns forked tasks that are never joined. When using a ForkJoinPool for what it was originally designed for, namely recursive fork/join task decomposition, asyncMode doesn't come into play at all. Only when a worker is not engaged in actual fork/join processing does it execute async tasks, and only then is the asyncMode flag actually queried.
+
+Here's a small program that demonstrates the difference between the two different async mode settings:
+
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Demo of {@code ForkJoinPool} behaviour in async and non-async mode.
+ */
+public class ForkJoinAsyncMode {
+    public static void main(String[] args) {
+        // Set the asyncMode argument below to true or false as desired:
+        ForkJoinPool pool = new ForkJoinPool(
+                4, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true);
+
+        pool.invoke(new RecursiveRangeAction(0, 200));
+        pool.awaitQuiescence(2L, TimeUnit.SECONDS);
+    }
+
+    /**
+     * A {@code ForkJoinTask} that prints a range if the range is smaller than a
+     * certain threshold; otherwise halves the range and proceeds recursively.
+     * Every recursive invocation also forks off a task that is never joined.
+     */
+    private static class RecursiveRangeAction extends RecursiveAction {
+        private static final AtomicInteger ASYNC_TASK_ID = new AtomicInteger();
+
+        private final int start;
+        private final int end;
+
+        RecursiveRangeAction(int start, int end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        @Override
+        protected void compute() {
+            if (end - start < 10) {
+                System.out.format("%s range [%d-%d] done%n",
+                        Thread.currentThread().getName(), start, end);
+            } else {
+                int mid = (start + end) >>> 1;
+                int id = ASYNC_TASK_ID.incrementAndGet();
+
+                System.out.format(
+                        "%1$s [%2$d-%3$d] -< [%3$d-%4$d], fork async task %5$d%n",
+                        Thread.currentThread().getName(), start, mid, end, id);
+
+                // Fork off additional asynchronous task that is never joined.
+				/** * Returns ForkJoinTask.adapt a new {@code ForkJoinTask} that performs the {@code run}
+				 * method of the given {@code Runnable} as its action, and returns
+				 * a null result upon {@link #join}.
+                ForkJoinTask.adapt(() -> {
+                    System.out.format("%s async task %d done%n",
+                            Thread.currentThread().getName(), id);
+                }).fork();
+
+                invokeAll(new RecursiveRangeAction(start, mid),
+                        new RecursiveRangeAction(mid, end));
+            }
+        }
+    }
+}
+In non-async mode (the default for ForkJoinPool), forked tasks that are never joined are executed in LIFO order.
+
+When you run the example program in non-async mode, looking at the output of one worker you might see a pattern like the following:
+
+ForkJoinPool-1-worker-0 [175-187] -< [187-200], fork async task 10
+ForkJoinPool-1-worker-0 [175-181] -< [181-187], fork async task 11
+ForkJoinPool-1-worker-0 range [175-181] done
+ForkJoinPool-1-worker-0 range [181-187] done
+ForkJoinPool-1-worker-0 [187-193] -< [193-200], fork async task 12
+ForkJoinPool-1-worker-0 range [187-193] done
+ForkJoinPool-1-worker-0 range [193-200] done
+ForkJoinPool-1-worker-0 async task 12 done
+ForkJoinPool-1-worker-0 async task 11 done
+ForkJoinPool-1-worker-0 async task 10 done
+Here, tasks 10, 11, 12 are forked and later executed in reverse order once the worker gets around to executing them.
+
+In async mode on the other hand, again looking at the output of one worker the pattern would rather look like the following:
+
+ForkJoinPool-1-worker-3 [150-175] -< [175-200], fork async task 8
+ForkJoinPool-1-worker-3 [150-162] -< [162-175], fork async task 9
+ForkJoinPool-1-worker-3 [150-156] -< [156-162], fork async task 10
+ForkJoinPool-1-worker-3 range [150-156] done
+ForkJoinPool-1-worker-3 range [156-162] done
+ForkJoinPool-1-worker-3 [162-168] -< [168-175], fork async task 11
+...
+ForkJoinPool-1-worker-3 async task 8 done
+ForkJoinPool-1-worker-3 async task 9 done
+ForkJoinPool-1-worker-3 async task 10 done
+ForkJoinPool-1-worker-3 async task 11 done
+Tasks 8, 9, 10, 11 are forked and later executed in the order they were submitted.
+
+When to use which mode? Whenever a ForkJoinPool thread pool is chosen to take advantage of its work-stealing properties rather than for recursive fork/join task processing, async mode is probably the more natural choice, as tasks get executed in the order they are submitted.
+
+Async event-driven frameworks like CompletableFuture are sometimes said to profit from async mode. For example, when constructing a complex chain of CompletableFuture callbacks, then a custom ForkJoinPool executor in async mode might perform slightly better than the default executor. (I can't speak from experience though.)

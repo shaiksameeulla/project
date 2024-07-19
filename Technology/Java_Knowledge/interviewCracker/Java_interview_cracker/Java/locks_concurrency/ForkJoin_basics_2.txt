@@ -1,11 +1,27 @@
 java-fork-join
 ==============
 
+Understand Fork/Join Framework’s API
+
+The Fork/Join framework API is implemented in the java.util.concurrent package. At its core are the following 4 classes:
+
+	ForkJoinTask<V>: an abstract class that defines a task that runs within a ForkJoinPool.
+	ForkJoinPool: a thread pool that manages the execution of ForkJoinTasks.
+	RecursiveAction: a ForkJoinTask’s subclass for tasks that don’t return values.
+	RecursiveTask<V>: a ForkJoinTask’s subclass for tasks that return values.
+
+Basically, you implement code for solving problems in a subclass of either RecursiveAction or RecursiveTask. And then submit the task to be executed by a ForkJoinPool, which handles everything from threads management to utilization of multicore processor.
+
+
+
+====================
+
 public class ForkJoinPool
 extends AbstractExecutorService
 
 An ExecutorService for running ForkJoinTasks. A ForkJoinPool provides the entry point for submissions from non-ForkJoinTask clients, as well as management and monitoring operations.
-A ForkJoinPool differs from other kinds of ExecutorService mainly by virtue of employing work-stealing: all threads in the pool attempt to find and execute tasks submitted to the pool and/or created by other active tasks (eventually blocking waiting for work if none exist). This enables efficient processing when most tasks spawn other subtasks (as do most ForkJoinTasks), as well as when many small tasks are submitted to the pool from external clients. Especially when setting asyncMode to true in constructors, ForkJoinPools may also be appropriate for use with event-style tasks that are never joined. All worker threads are initialized with Thread.isDaemon() set true.
+A ForkJoinPool differs from other kinds of ExecutorService mainly by virtue of employing work-stealing: all threads in the pool attempt to find and execute tasks submitted to the pool and/or created by other active tasks (eventually blocking waiting for work if none exist). This enables efficient processing when most tasks spawn other subtasks (as do most ForkJoinTasks), as well as when many small tasks are submitted to the pool from external clients. Especially when setting asyncMode to true in constructors, ForkJoinPools may also be appropriate for use with event-style tasks that are never joined. 
+	All worker threads are initialized with Thread.isDaemon() set true.
 
 A static commonPool() is available and appropriate for most applications. The common pool is used by any ForkJoinTask that is not explicitly submitted to a specified pool. Using the common pool normally reduces resource usage (its threads are slowly reclaimed during periods of non-use, and reinstated upon subsequent use).
 
@@ -24,13 +40,39 @@ Arrange exec and obtain Future	submit(ForkJoinTask)			ForkJoinTask.fork() (ForkJ
 
 =========
  How fork-join works?
+ 
 ForkJoinPool has array of DEqueues (WorkerQueue) which will be shared by all the worker threads. You can assume it is a single shared task queue that is usually used in normal ExecutorServices. Each DEQueue is belongs to one worker thread who will be the owner for that queue. Every time fork is called on a task will be pushed into its own queue. Each thread repeatedly removes a task from its own DEQueue and runs it. DEQueue support three functions: push, pop and poll where push and pop methods will be called by owner thread only and poll will be called by other threads. If a thread discovers its queue is empty then it becomes a theaf: it chooses a victive thread at random and calls that queue’s poll method to steal a task for itself. This process is called work stealing.
+
+copied from Code : this.config = asyncMode ? FIFO : 0;
+
+ForkJoinPool.commonPool uses a last-in, first-out (LIFO) queue configuration,
+ whereas Executors.newWorkStealingPool uses first-in, first-out approach (FIFO) one.
 
 ==========
 
  ExecutorService newWorkStealingPool
  public static ExecutorService newWorkStealingPool(int parallelism)  
-
+ /**
+     * Creates a thread pool that maintains enough threads to support
+     * the given parallelism level, and may use multiple queues to
+     * reduce contention. The parallelism level corresponds to the
+     * maximum number of threads actively engaged in, or available to
+     * engage in, task processing. The actual number of threads may
+     * grow and shrink dynamically. A work-stealing pool makes no
+     * guarantees about the order in which submitted tasks are
+     * executed.
+     *
+     * @param parallelism the targeted parallelism level
+     * @return the newly created thread pool
+     * @throws IllegalArgumentException if {@code parallelism <= 0}
+     * @since 1.8
+     */
+    public static ExecutorService newWorkStealingPool(int parallelism) {
+        return new ForkJoinPool
+            (parallelism,
+             ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+             null, true);
+    }
  
  The newWorkStealingPool() method of Executors class creates a work-stealing thread pool using the number of available processors as its target parallelism level.
  
@@ -39,8 +81,16 @@ ForkJoinPool has array of DEqueues (WorkerQueue) which will be shared by all the
     return new ForkJoinPool(Runtime.getRuntime().availableProcessors(),
                                                  ForkJoinPool.defaultForkJoinWorkerThreadFactory,
                                                  null, true);
-												 
-								
+  public ForkJoinPool(int parallelism,
+                        ForkJoinWorkerThreadFactory factory,
+                        UncaughtExceptionHandler handler,
+                        boolean asyncMode) {												 
+	asyncMode if true,
+     * establishes local first-in-first-out scheduling mode for forked
+     * tasks that are never joined. This mode may be more appropriate
+     * than default locally stack-based mode in applications in which
+     * worker threads only process event-style asynchronous tasks.											 
+		default is false						
 in Java 8, the most convenient way to get access to the instance of the ForkJoinPool is to use its static method commonPool(). This will provide a reference to the common pool, which is a default thread pool for every ForkJoinTask.
 
 According to Oracle’s documentation, using the predefined common pool reduces resource consumption since this discourages the creation of a separate thread pool per task.
@@ -347,27 +397,7 @@ ForkJoinPool
 	
 	===============
 	
-	/**
-     * Creates a thread pool that maintains enough threads to support
-     * the given parallelism level, and may use multiple queues to
-     * reduce contention. The parallelism level corresponds to the
-     * maximum number of threads actively engaged in, or available to
-     * engage in, task processing. The actual number of threads may
-     * grow and shrink dynamically. A work-stealing pool makes no
-     * guarantees about the order in which submitted tasks are
-     * executed.
-     *
-     * @param parallelism the targeted parallelism level
-     * @return the newly created thread pool
-     * @throws IllegalArgumentException if {@code parallelism <= 0}
-     * @since 1.8
-     */
-    public static ExecutorService newWorkStealingPool(int parallelism) {
-        return new ForkJoinPool
-            (parallelism,
-             ForkJoinPool.defaultForkJoinWorkerThreadFactory,
-             null, true);
-    }
+	
 	
 	========
 	
