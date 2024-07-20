@@ -16,6 +16,19 @@ Semaphore(int num)
 Semaphore(int num, boolean how)
 Here, num specifies the initial permit count. Thus, it specifies the number of threads that can access a shared resource at any one time. If it is one, then only one thread can access the resource at any one time. By default, all waiting threads are granted a permit in an undefined order. By setting how to true, you can ensure that waiting threads are granted a permit in the order in which they requested access
 
+Types of Semaphores
+There are four types of semaphores, which are as follows:
+
+Counting Semaphores
+Bounded Semaphores
+Timed Semaphores
+Binary Semaphores
+
+Semaphore semaphore = new Semaphore(6);  //creates a semaphore with 6 permits  
+semaphore.acquire();   //acquire 1 ticket  
+semaphore.availablePermits();  //current available permits is 5  
+semaphore.release();  //releases the acquire ticket and increments the permit by 1  
+semaphore.availablePermits();  //current available permits is 5  
 
 ----
 
@@ -105,7 +118,7 @@ CountDownLatch is a construct that a thread looks out for while different thread
 
 the main difference is that unlike a CyclicBarrier, once a CountDownLatch is done and over with, it cannot be reused. The javadoc mentions it explicitly:
 
-This is a one-shot phenomenon -- the count cannot be reset. If you need a version that resets the count, consider using a CyclicBarrie
+This is a one-shot phenomenon -- the count cannot be reset. If you need a version that resets the count, consider using a CyclicBarrier
 
 And indeed, we find that a CyclicBarrier has a method called .reset(), which does what it means. Not only that, but there is a version of the constructor of a CyclicBarrier which associated a Runnable to be run each time the barrier is "tripped" (that is what the javadoc says; don't ask me).
 
@@ -130,3 +143,42 @@ thread
 //calling await() so the current thread may suspends  
 cb.await();             
 
+class TxtReader implements Runnable   
+{  
+private String threadName;  
+private String fileName;  
+private CyclicBarrier cb;  
+//construuctor of the TextReader class  
+TxtReader(String threadName, String fileName, CyclicBarrier cb)  
+{  
+this.threadName = threadName;  
+this.fileName = fileName;  
+this.cb = cb;          
+}  
+@Override  
+public void run()   
+{  
+System.out.println("Reading file " + fileName + " thread " + threadName);      
+try  
+{  
+//calling await so the current thread suspends  
+cb.await();          
+}   
+catch (InterruptedException e)   
+{  
+System.out.println(e);  
+}   
+catch (BrokenBarrierException e)   
+{  
+System.out.println(e);  
+}  
+}  
+}  
+class AfterAction implements Runnable   
+{  
+@Override  
+public void run()   
+{  
+System.out.println("In after action class, start further processing as all files are read");  
+}  
+}  

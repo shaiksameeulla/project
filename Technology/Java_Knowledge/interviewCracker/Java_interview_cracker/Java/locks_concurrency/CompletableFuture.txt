@@ -1,13 +1,3 @@
-What is the difference between thenApply and thenApplyAsync of Java CompletableFuture?
-
-The difference has to do with the Executor that is responsible for running the code. Each operator on CompletableFuture generally has 3 versions.
-
-thenApply(fn) - runs fn on a thread defined by the CompleteableFuture on which it is called, so you generally cannot know where this will be executed. It might immediately execute if the result is already available.
-thenApplyAsync(fn) - runs fn on a environment-defined executor regardless of circumstances. For CompletableFuture this will generally be ForkJoinPool.commonPool().
-thenApplyAsync(fn,exec) - runs fn on exec.
-In the end the result is the same, but the scheduling behavior depends on the choice of method.
-
-===========================
 
 public class CompletableFuture<T>
 extends Object
@@ -15,9 +5,134 @@ implements Future<T>, CompletionStage<T>
 A Future that may be explicitly completed (setting its value and status), and may be used as a CompletionStage, supporting dependent functions and actions that trigger upon its completion.
 When two or more threads attempt to complete, completeExceptionally, or cancel a CompletableFuture, only one of them succeeds.
 
+
+
+Future vs. CompletableFuture
+========================================
+A CompletableFuture is an extension to Java's Future API which was introduced in Java 8.
+
+A Future is used for asynchronous Programming. It provides two methods, isDone() and get(). The methods retrieve the result of the computation when it completes.
+
+
+
+
+CompletableFuture is a class in Java 8's java.util.concurrent package that allows developers to write asynchronous code. It lets developers perform operations on a future result without blocking the main thread, which can help improve program performance. 
+
+Here are some ways CompletableFuture can be used:
+
+	Compose asynchronous operations: Developers can use CompletableFuture to combine multiple asynchronous operations into one.
+	Handle errors and exceptions: CompletableFuture has a descriptive way of handling errors.
+
+	Run tasks in parallel: CompletableFuture uses the global ForkJoinPool to execute tasks in parallel, but developers can also pass their own thread pool. 
+
+
+In summary, CompletableFuture provides a powerful and flexible way to write asynchronous, non-blocking code in Java. We can use it to compose multiple asynchronous operations, handle errors and exceptions, and combine multiple CompletableFutures into one.
+
+CompletionStage
+	It performs an action and returns a value when another completion stage completes.
+	A model for a task that may trigger other tasks.
+	Hence, it is an element of a chain.
+When more than one thread attempt to complete - complete exceptionally or cancel a CompletableFuture, only one of them succeeds.
+
+======================
+
+Creating a CompletableFuture
+
+	We can create a CompletableFuture only by using the following no-argument constructor.
+
+CompletableFuture<String> CompletableFuture = new CompletableFuture<String>();  
+
+The most frequently used CompletableFuture methods are:
+
+
+
+	supplyAsync(): It complete its job asynchronously. The result of supplier is run by a task from ForkJoinPool.commonPool() as default. The supplyAsync() method returns CompletableFuture on which we can apply other methods.
+	
+	thenApply(): The method accepts function as an arguments. It returns a new CompletableStage when this stage completes normally. The new stage use as the argument to the supplied function.
+	
+	join(): the method returns the result value when complete. It also throws a CompletionException (unchecked exception) if completed exceptionally.
+	
+	example :
+	
+	private static int getNumber(int a)  
+{  
+return a*a;  
+}  
+	List<Integer> list = Arrays.asList(5,9,14);  
+			list.stream().map(num->CompletableFuture.supplyAsync(()->getNumber(num)))
+						.map(CompletableFuture->CompletableFuture.thenApply(n->n*n))
+						.map(t->t.join())
+						.forEach(s->System.out.println(s));  
+	
+	output :
+	625
+	6561
+	38416
+	
+	
+	There are three method to handle an exception:
+=============================================
+		public CompletableFuture <T> exceptionally(Function <Throwable, ? extends T> function);  
+		public <U> CompletableFuture<U> handle(BiFunction<? super T, Throwable, ? extends U> bifunction);  
+		public CompletableFuture<T> whenComplete(BiConsumer<? super T, ? super Throwable> action);  
+		
+		
+		CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+    throw new RuntimeException("Exception occurred in asynchronous task");
+			}).exceptionally(ex -> {
+				// Exception handling logic
+				return "Default value";
+			});
+
+String result = future.join(); // Get the result or default value
+System.out.println("Result: " + result);
+
+==================================================================================
+CompletableFuture runAsync vs supplyAsync, when to choose one over the other?
+
+
+	runAsync takes Runnable as input parameter and returns CompletableFuture<Void>, which means it does not return any result.
+
+	CompletableFuture<Void> run = CompletableFuture.runAsync(()-> System.out.println("hello"));
+	But suppyAsync takes Supplier as argument and returns the CompletableFuture<U> with result value, which means it does not take any input parameters but it returns result as output.
+
+	CompletableFuture<String> supply = CompletableFuture.supplyAsync(() -> {
+			System.out.println("Hello");
+			return "result";
+		});
+
+	 System.out.println(supply.get());  //result
+	Conclusion : So if you want the result to be returned, then choose supplyAsync or if you just want to run an async action, then choose runAsync.
+
+
+==================================================================================
+What is the difference between thenApply and thenApplyAsync of Java CompletableFuture?
+
+The difference has to do with the Executor that is responsible for running the code. Each operator on CompletableFuture generally has 3 versions.
+
+thenApply(fn) - runs fn on a thread defined by the CompleteableFuture on which it is called, so you generally cannot know where this will be executed. It might immediately execute if the result is already available.
+
+thenApplyAsync(fn) - runs fn on a environment-defined executor regardless of circumstances. For CompletableFuture this will generally be ForkJoinPool.commonPool().
+
+thenApplyAsync(fn,exec) - runs fn on exec.
+In the end the result is the same, but the scheduling behavior depends on the choice of method.
+
+===========================
+
+
+
 In addition to these and related methods for directly manipulating status and results, CompletableFuture implements interface CompletionStage with the following policies:
 
 Actions supplied for dependent completions of non-async methods may be performed by the thread that completes the current CompletableFuture, or by any other caller of a completion method.
 All async methods without an explicit Executor argument are performed using the ForkJoinPool.commonPool() (unless it does not support a parallelism level of at least two, in which case, a new Thread is created to run each task). This may be overridden for non-static methods in subclasses by defining method defaultExecutor(). To simplify monitoring, debugging, and tracking, all generated asynchronous tasks are instances of the marker interface CompletableFuture.AsynchronousCompletionTask. Operations with time-delays can use adapter methods defined in this class, for example: supplyAsync(supplier, delayedExecutor(timeout, timeUnit)). To support methods with delays and timeouts, this class maintains at most one daemon thread for triggering and cancelling actions, not for running them.
 All CompletionStage methods are implemented independently of other public methods, so the behavior of one method is not impacted by overrides of others in subclasses.
 All CompletionStage methods return CompletableFutures. To restrict usages to only those methods defined in interface CompletionStage, use method minimalCompletionStage(). Or to ensure only that clients do not themselves modify a future, use method copy().
+
+Running a Runnable Upon Completion of Both Stages
+
+Runnable triggers upon completion of both of two stages. Note that all the stages below run synchronously, 
+ StringBuilder result = new StringBuilder();
+    CompletableFuture.completedFuture(original).thenApply(String::toUpperCase).runAfterBoth(
+            CompletableFuture.completedFuture(original).thenApply(String::toLowerCase),
+            () -> result.append("done"));
+			

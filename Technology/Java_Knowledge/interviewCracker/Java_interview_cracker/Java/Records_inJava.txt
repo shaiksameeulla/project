@@ -4,6 +4,12 @@ Record classes, which are a special kind of class, help to model plain data aggr
 
 A record declaration specifies in a header a description of its contents; the appropriate accessors, constructor, equals, hashCode, and toString methods are created automatically. A record's fields are final because the class is intended to serve as a simple "data carrier".
 
+A RecordComponent provides information about, and dynamic access to, a component of a record class.
+
+A record class is implicitly final, so you cannot explicitly extend a record class. However, beyond these restrictions, record classes behave like normal classes:
+
+The abstract class java.lang.Record is the common superclass of all record classes.
+
 For example, here is a record class with two fields:
 
 
@@ -25,14 +31,19 @@ record Rectangle(double length, double width) {
 A record class declares the following members automatically:
 
 For each component in the header, the following two members:
-A private final field with the same name and declared type as the record component. This field is sometimes referred to as a component field.
-A public accessor method with the same name and type of the component; in the Rectangle record class example, these methods are Rectangle::length() and Rectangle::width().
-A canonical constructor whose signature is the same as the header. This constructor assigns each argument from the new expression that instantiates the record class to the corresponding component field.
-Implementations of the equals and hashCode methods, which specify that two record classes are equal if they are of the same type and contain equal component values.
-An implementation of the toString method that includes the string representation of all the record class's components, with their names.
+	
+	==>A private final field with the same name and declared type as the record component. This field is sometimes referred to as a component field.
+	
+	==> A public accessor method with the same name and type of the component; in the Rectangle record class example, these methods are Rectangle::length() and Rectangle::width().
+	
+	==> A canonical constructor whose signature is the same as the header. This constructor assigns each argument from the new expression that instantiates the record class to the corresponding component field.
+	
+	==>Implementations of the equals and hashCode methods, which specify that two record classes are equal if they are of the same type and contain equal component values.
+	
+	An implementation of the toString method that includes the string representation of all the record class's components, with their names.
+
+
 As record classes are just special kinds of classes, you create a record object (an instance of a record class) with the new keyword, for example:
-
-
 
 Rectangle r = new Rectangle(4,5);
 

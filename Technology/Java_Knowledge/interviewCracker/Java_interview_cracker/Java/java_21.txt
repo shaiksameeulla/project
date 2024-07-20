@@ -1,6 +1,7 @@
 Java 21 is finally released on 19-Sep-2023 as the next long-term support (LTS) release of Oracle’s standard Java implementation
 
 Main Highlights of Java 21
+
 Among other changes, the following are the main changes that we should be aware of as a Java developer.
 
     >Virtual Threads have been finalized.
@@ -21,6 +22,21 @@ The other included changes are:
 	Deprecate the Windows 32-bit x86 Port for Removal [JEP-449]
 	Prepare to Disallow the Dynamic Loading of Agents [JEP-451]
 	Key Encapsulation Mechanism API [JEP-452]
+	
+=================================	
+	
+	Unmodifiable List Static Factory Methods
+		The List.of static factory methods provide a convenient way to create unmodifiable lists.
+
+		A list is an ordered collection in which duplicate elements are allowed. Null values are not allowed.
+
+		The syntax of these methods is:
+
+
+		List.of()
+		List.of(e1)
+		List.of(e1, e2)         // fixed-argument form overloads up to 10 elements
+		List.of(elements...)   // varargs form supports an arbitrary number of elements or an array
 
  Virtual Threads
  ============
@@ -34,6 +50,56 @@ The number of platform threads also has to be limited because these resource-hun
 
 It is worth mentioning that we can create a very high number of virtual threads (millions) in an application without depending on the number of platform threads. These virtual threads are managed by JVM, so they do not add extra context-switching overhead as well because they are stored in RAM as normal Java objects.
 
+Call the Thread.ofVirtual() method to create an instance of Thread.Builder for creating virtual threads.
+
+	Thread thread = Thread.ofVirtual().start(() -> System.out.println("Hello"));
+	thread.join();
+
+The following example creates a virtual thread named MyThread with the Thread.Builder interface:
+	Thread.Builder builder = Thread.ofVirtual().name("MyThread");
+	Runnable task = () -> {
+		System.out.println("Running thread");
+	};
+	Thread t = builder.start(task);
+	System.out.println("Thread t name: " + t.getName());
+	t.join();
+
+
+The following example creates and starts two virtual threads with Thread.Builder:
+
+
+			Thread.Builder builder = Thread.ofVirtual().name("worker-", 0);
+		Runnable task = () -> {
+			System.out.println("Thread ID: " + Thread.currentThread().threadId());
+		};
+
+		// name "worker-0"
+		Thread t1 = builder.start(task);   
+		t1.join();
+		System.out.println(t1.getName() + " terminated");
+
+		// name "worker-1"
+		Thread t2 = builder.start(task);   
+		t2.join();  
+		System.out.println(t2.getName() + " terminated");
+		
+		
+		output
+		Thread ID: 21
+		worker-0 terminated
+		Thread ID: 24
+		worker-1 terminated
+		
+		
+		The following example creates an ExecutorService with the Executors.newVirtualThreadPerTaskExecutor() method. Whenever ExecutorService.submit(Runnable) is called, a new virtual thread is created and started to run the task. This method returns an instance of Future. Note that the method Future.get() waits for the thread's task to complete. Consequently, this example prints a message once the virtual thread's task is complete.
+		
+			try (ExecutorService myExecutor = Executors.newVirtualThreadPerTaskExecutor()) {
+			Future<?> future = myExecutor.submit(() -> System.out.println("Running thread"));
+			future.get();
+			System.out.println("Task completed");
+		// ...
+================
+
 Difference between Platform Threads and Virtual Threads
 
 Virtual threads are always daemon threads. The Thread.setDaemon(false) method cannot change a virtual thread to be a non-daemon thread. Note that JVM terminates when all started non-daemon threads have terminated. This means JVM will not wait for virtual threads to complete before exiting.
@@ -45,6 +111,74 @@ Virtual threads always have the normal priority and the priority cannot be chang
 Thread virtualThread = ...; //Create virtual thread
 
 //virtualThread.setPriority(Thread.MAX_PRIORITY);  //It has no effect
+																				public static final int MIN_PRIORITY = 1;
+																				public static final int NORM_PRIORITY = 5;
+																				public static final int MAX_PRIORITY = 10;
 
 Virtual threads are not active members of thread groups. When invoked on a virtual thread, Thread.getThreadGroup() returns a placeholder thread group with the name “VirtualThreads“.
 Virtual threads do not support the stop(), suspend(), or resume() methods. These methods throw an UnsupportedOperationException when invoked on a virtual thread.
+
+
+A sequenced collection is a Collection whose elements have a defined encounter order. The new SequencedCollection interface provides methods to add, retrieve, or remove elements at both ends of the collection, along with a method to get a reverse-ordered view of the collection.
+
+interface SequencedCollection<E> extends Collection<E> {
+
+    // new method
+    SequencedCollection<E> reversed();
+
+    // methods promoted from Deque
+    void addFirst(E);
+    void addLast(E);
+
+    E getFirst();
+    E getLast();
+
+    E removeFirst();
+    E removeLast();
+}
+Copy
+All methods, except reversed(), are default methods, provide a default implementation, and are promoted from Deque. The reversed() method provides a reversed-order view of the original collection. Also, any modifications to the original collection are visible in the reversed view
+
+================
+Beginning with JDK 21, JEP 431 introduces three Java Collections Framework interfaces for creating sequenced collections, sequenced sets, and sequenced maps:
+
+SequencedCollection
+SequencedSet
+SequencedMap
+
+interface SequencedSet<E> extends Set<E>, SequencedCollection<E> {
+
+    // covariant override
+    SequencedSet<E> reversed();
+}
+interface SequencedMap<K, V> extends Map<K, V> {
+    
+    // new methods
+    SequencedMap<K, V> reversed();
+    SequencedSet<K> sequencedKeySet();
+    SequencedCollection<V> sequencedValues();
+    SequencedSet<Entry<K, V>> sequencedEntrySet();
+
+    V putFirst(K, V);
+    V putLast(K, V);
+	
+	pollFirstEntry()// Removes and returns the first key-value mapping in this map,
+	pollLastEntry ()//Removes and returns the last key-value mapping in this map,
+	}
+	
+	New Methods Added in Collections Class
+	
+The Collections class is a utility class that contains methods for common operations on collection types. One such operation is converting a mutable collection to an immutable one.
+
+For example, Collections.unmodifiableList() method returns an unmodifiable view of the specified list. Matching the same theme, the Collections class has now three new methods that return immutable views for newly added types.
+
+Collections.unmodifiableSequencedCollection(sequencedCollection);
+Collections.unmodifiableSequencedSet(sequencedSet);
+Collections.unmodifiableSequencedMap(sequencedMap);
+
+    // methods promoted from NavigableMap
+    Entry<K, V> firstEntry();
+    Entry<K, V> lastEntry();
+    Entry<K, V> pollFirstEntry();
+    Entry<K, V> pollLastEntry();
+}
