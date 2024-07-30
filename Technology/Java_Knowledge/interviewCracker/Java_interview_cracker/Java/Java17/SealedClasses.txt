@@ -1,3 +1,9 @@
+
+Sealed Classes were proposed by JEP 360 and delivered in JDK 15 as a preview feature.
+ They were proposed again, with refinements, by JEP 397 and delivered in JDK 16 as a preview feature. 
+ This JEP proposes to finalize Sealed Classes in JDK 17, with no changes from JDK 16.
+
+
 Sealed Classes
 ----------------
 Sealed classes and interfaces restrict which other classes or interfaces may extend or implement them.
@@ -57,3 +63,15 @@ record TimesExpr(Expr a, Expr b) implements Expr {
 record NegExpr(Expr e) implements Expr {
     public int eval() { return -e.eval(); }
 }
+
+Sealed interfaces
+=====================
+
+As for classes, an interface can be sealed by applying the sealed modifier to the interface. After any extends clause to specify superinterfaces, the implementing classes and subinterfaces are specified with a permits clause. For example, the planetary example from above can be rewritten as follows:
+
+sealed interface Celestial 
+    permits Planet, Star, Comet { ... }
+
+final class Planet implements Celestial { ... }
+final class Star   implements Celestial { ... }
+final class Comet  implements Celestial { ... }

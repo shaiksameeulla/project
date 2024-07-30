@@ -1,0 +1,210 @@
+===========================
+	The yield Statement
+		In switch expressions, the yield statement plays a similar role to break in switch statements. The yield statement can only be used in switch expressions.
+
+	yield expression;
+	Execution of the statement above will return the value of expression as the result of the switch expression.
+	
+
+The Switch Statement
+=================
+3.1. The Switch Statement With The Colon Notation (:)
+This statement allows the programmer to choose between several alternative actions, depending on a parameter. Its syntax is as follows:
+	
+	switch(selector_expression){
+    case value1: statements_value1
+    case value2: statements_value2
+        ....
+    case valueN: statements_valueN
+    default: statements_default
+}
+
+1) selector_expression must be an expression returning a value of the following data type:
+
+A primitive data type: char, byte, short, or int
+A wrapper class: Character, Byte, Short, or Integer
+An Enum type
+A String(Since Java 7)
+2) value1, value2, … valueN must be type-compatible with selector_expression.
+3) statements_value1, statements_value2, … statements_valueN can be a single statement, a group of statements, or a block statement.
+4) The default block will be executed if none of the constants matches the input value.
+5) The case constants can appear in any order in the switch block. For instance, the default can be the firs
+
+switch(selector_expression){
+    default: statements_default
+    case value1: statements_value1
+    case value2: statements_value2
+        ....
+    case valueN: statements_valueN
+}
+
+When different case labels have a common action, they can be grouped like this:
+Multiple Case Labels with a Common Action
+
+switch(selector_expression){
+    case value1: statements_value1
+    case value2: case value3: case value4: statements_value1_2_3
+        ....
+    case valueN: statements_valueN
+    default: statements_default
+}
+
+Single Case Label, multiple constants with a Common Action
+
+
+switch(selector_expression){
+    case value1: statements_value1
+    case value2, value3, value4: statements_value1_2_3
+        ....
+    case valueN: statements_valueN
+    default: statements_default
+}
+
+3.2. The Switch Statement With The Arrow(->) Notation
+=============================================
+
+The syntax of this form of the switch statement is shown below:
+
+
+
+switch(selector_expression){
+    case value1 -> statements_value2
+    case value2: statements_value2
+        ....
+    case valueN: statements_valueN
+    default: statements_default
+}
+Compared to the colon notation construct, you have the following points of difference to note:
+
+
+Multiple case labels are not allowed
+The arrow notation does not allow multiple case labels to be associated with the same action, unlike the colon notation.
+The code below will not compile:
+
+int value = 5;
+switch (value){
+    case 1 -> System.out.println("Value is 1");
+    case 2 -> case 3 -> System.out.println("Value is 2");//**************Not allowed*************
+    case 5 -> System.out.println("Value is 5");
+    default -> System.out.println("Value doesn't match any of the constants");
+}
+
+To get around this, you can specify a single case label with a list of constants:
+
+
+int value = 5;
+switch (value){
+    case 1 -> System.out.println("Value is 1");
+    case 2, 3 -> System.out.println("Value is 2");       //This is OK
+    case 5 -> System.out.println("Value is 5");
+    default -> System.out.println("Value doesn't match any of the constants");
+}
+
+	
+	U
+Correct Example of Switching on Strings
+Find below an example of a switch statement using String constants.
+
+String color = "blue";
+final String YELLOW = "yellow";
+switch (color){
+    case "red" -> System.out.println("Color is red");
+    case "blue" -> System.out.println("Color is blue");
+    case YELLOW -> System.out.println("Color is yellow");
+    default ->  throw new IllegalArgumentException("Not a valid color");
+}
+
+
+Incorrect Way of Switching on Strings
+The following example will not compile because the compiler cannot guarantee that the value of the case constants will not change at runtime.
+String color = "blue";
+String YELLOW = "yellow";
+String RED = new String("red");
+switch (color){
+    case RED -> System.out.println("Color is red");//Compile-time error, RED is not a constant
+    case "blue" -> System.out.println("Color is blue");
+    case YELLOW -> System.out.println("Color is yellow");//Compile-time error, YELLOW is not a constant
+    default ->  throw new IllegalArgumentException("Not a valid color");
+}
+
+Using Enum as Case Constants
+
+An enum type is a special data type that enables for a variable to be a set of predefined constants. We’ll talk about this in a future article. For now, you should know that this data type has been introduced since Java 5 and since then can be used as a constant in switch constructs.
+Here are the key points you need to remember when it comes to using the Enum data type in a switch:
+
+The Java compiler assigns a unique integer value to each enum constant. Switching on enum values is based on equality comparison on that integer value.
+The enum constants must be of the same type as the selector expression.
+You must not use the fully qualified name when specifying the enum constants. Correct Example of Switching on Enum Values
+		enum Color {BLUE,RED,YELLOW}
+		public static void main(String[] args) {
+			Color color = Color.BLUE;
+			switch (color){
+				case RED -> System.out.println("Color is red");
+				case BLUE -> System.out.println("Color is blue");
+				case YELLOW -> System.out.println("Color is yellow");
+				default ->  throw new IllegalArgumentException("Not a valid color");
+			}
+		}
+Incorrect Way of Switching on Enum Values
+The code below will not compile because the case constant RED is using a fully qualified name.
+
+		  enum Color {BLUE,RED,YELLOW};
+		public static void main(String[] args) {
+			Color color = Color.BLUE;
+			switch (color){
+				case Color.RED -> System.out.println("Color is red");//Compile-time error
+				case BLUE -> System.out.println("Color is blue");
+				case YELLOW -> System.out.println("Color is yellow");
+				default ->  throw new IllegalArgumentException("Not a valid color");
+			}
+		}
+
+
+The Switch Expression
+===============================
+A Switch expression has the same semantics as a switch statement, with the difference that it returns a value. Just like switch statements, there are two forms of switch expressions: Colon notation and Arrow notation switch expressions.
+
+
+
+Below is an example of the switch expression with colon(:) notation:
+
+
+int value = 5;
+int switchValue = switch(value){
+    case 1:
+        System.out.println("Value is 1");
+        yield 1;
+    case 2:
+        System.out.println("Value is 2");
+        yield 2;
+    case 3,4:
+        System.out.println("Value is 3 or 4");
+        yield 3;
+    default:
+        System.out.println("Value not in range");
+        yield 0;
+};//Don't forget the semicolon (;)
+System.out.println(switchValue);
+
+Example of Switch Expression with the Arrow(->) Notation
+
+int value = 3;
+int switchValue = switch(value){
+    case 1 ->{
+        System.out.println("Value is 1");
+        yield 1;
+    }
+    case 2-> 2;
+    case 3,4->{
+        System.out.println("Value is 3 or 4");
+        yield 3;
+    }
+    default->
+        throw  new IllegalArgumentException("Not a valid value");
+};
+System.out.println(switchValue);
+
+output:
+
+Value is 3 or 4
+3

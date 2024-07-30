@@ -1,4 +1,11 @@
+
+Records were proposed by JEP 359 and delivered in JDK 14 as a preview feature.
+
+In response to feedback, the design was refined by JEP 384 and delivered in JDK 15 as a preview feature for a second time.
+This JEP proposes to finalize the feature in JDK 16, with the following refinement:
+
 Record Classes:
+=========================
 
 Record classes, which are a special kind of class, help to model plain data aggregates with less ceremony than normal classes.
 
@@ -13,6 +20,7 @@ The abstract class java.lang.Record is the common superclass of all record class
 For example, here is a record class with two fields:
 
 
+Example 1;
 
 record Rectangle(double length, double width) { }
 
@@ -26,6 +34,28 @@ record Rectangle(double length, double width) {
         this.width = width;
     }
 }
+
+Example 2;
+public record Person(String name, String address) {
+    public Person(String name, String address) {
+        this.name = name;
+        this.address = address;
+    }
+}
+
+Example 3
+		record Student(String sname,int age) {
+				public Student(String name) {
+					this(name, 0);
+				}
+			}
+
+			public static void main(String[] args) {
+				Student student = new Student("Ram");
+				System.out.println(student);
+			}
+
+
 
 
 A record class declares the following members automatically:
@@ -78,3 +108,27 @@ record Rectangle(double length, double width) {
         diagonal = (x, y) -> Math.sqrt(x*x + y*y);
     }
 }
+
+Java Records provides a method for managing data with the promise of immutability. Although it may seem possible to alter certain aspects of a Record, its core cannot be altered. By using Records intelligently, we can improve code readability and reliability, thereby simplifying Java data management
+
+record Student(  StringBuilder sname,int age) {
+		public Student(StringBuilder name) {
+	        this(name, 0);
+	    }
+	}
+
+	public static void main(String[] args) {
+		StringBuilder sb= new StringBuilder("Ram");
+		Student student = new Student(sb);
+		System.out.println(student);
+		student.sname().append("safasdf");
+		System.out.println(student);
+	}
+	
+	
+	output :
+Student[sname=Ram, age=0]
+Student[sname=Ramsafasdf, age=0]
+
+
+similary for List, Set, Map we can mutate the data

@@ -1,0 +1,353 @@
+
+ JEP 406: Pattern Matching for switch (Preview)
+ ===============================================
+Enhance the Java programming language with pattern matching for switch expressions and statements, along with extensions to the language of patterns. Extending pattern matching to switch allows an expression to be tested against a number of patterns, each with a specific action, so that complex data-oriented queries can be expressed concisely and safely.
+
+For further details, see JEP 406.
+
+1. switch statements 
+2. switch expressions
+
+The switch statement:
+========================
+Unlike the if/else if/else statement, a switch statement can have a number of possible execution paths. 
+A switch works with the primitive types, byte, short, char, and int, 
+their respective wrapper types (Byte, Short, Character, and Integer), enumerated types, 
+	and the String type1.
+
+	While an if-else statement is used to test expressions based on ranges of values or conditions, a switch statement is used to test expressions based only on a single value.
+
+
+
+		enum PaymentStatus {
+			UNPAID, PARTPAID, PAID, DISPUTED, UNKNOWN;
+		}
+
+		public class Main {
+			public static void main(String[] args) {
+				String message = "";
+				PaymentStatus paymentStatus = PaymentStatus.PARTPAID;
+
+				switch (paymentStatus) {
+				case UNPAID:
+					message = "The order has not been paid yet. Please make the minimum/full amount to procced.";
+					break;
+				case PARTPAID:
+					message = "The order is partially paid. Some features will not be available. Please check the brochure for details.";
+					break;
+				case PAID:
+					message = "The order is fully paid. Please choose the desired items from the menu.";
+					break;
+				default:
+					throw new IllegalStateException("Invalid payment status: " + paymentStatus);
+				}
+				System.out.println(message);
+			}
+		}
+		Output:
+
+		The order is partially paid. Some features will not be available. Please check the brochure for details.
+
+The switch expression:
+========================
+
+The switch expression was introduced with Java SE 12. However, it remained as a Preview feature in Java SE 12 and 13 and finally got standardized with Java SE 14. Like any expression, switch expressions evaluate to a single value, and can be used in statements.
+ It also introduced "arrow case" labels eliminating the need for break statements to prevent fall through. As of Java SE 15, there is no change in the supported data types (mentioned in the switch statement section above).
+
+
+
+			enum PaymentStatus {
+				UNPAID, PARTPAID, PAID, DISPUTED, UNKNOWN;
+			}
+
+			public class Main {
+				public static void main(String[] args) {
+					PaymentStatus paymentStatus = PaymentStatus.PARTPAID;
+
+					String message = switch (paymentStatus) {
+					case UNPAID -> "The order has not been paid yet. Please make the minimum/full amount to procced.";
+					case PARTPAID -> "The order is partially paid. Some features will not be available. Please check the brochure for details.";
+					case PAID -> "The order is fully paid. Please choose the desired items from the menu.";
+					default -> throw new IllegalStateException("Invalid payment status: " + paymentStatus);
+					};
+
+					System.out.println(message);
+				}
+			}
+			Output:
+
+			The order is partially paid. Some features will not be available. Please check the brochure for details.
+
+The switch expression with yield:
+========================
+A switch statement, but not a switch expression, can be the target of a break statement. 
+Conversely, a switch expression, but not a switch statement, can be the target of a yield statement.
+
+Since Java SE 13, you can use yield statement, instead of the arrow operator (->), to return a value from a switch expression.
+
+
+
+		enum PaymentStatus {
+			UNPAID, PARTPAID, PAID, DISPUTED, UNKNOWN;
+		}
+
+		public class Main {
+			public static void main(String[] args) {
+				PaymentStatus paymentStatus = PaymentStatus.PARTPAID;
+
+				String message = switch (paymentStatus) {
+				case UNPAID:
+					yield "The order has not been paid yet. Please make the minimum/full amount to procced.";
+				case PARTPAID:
+					yield "The order is partially paid. Some features will not be available. Please check the brochure for details.";
+				case PAID:
+					yield "The order is fully paid. Please choose the desired items from the menu.";
+				default:
+					throw new IllegalStateException("Invalid payment status: " + paymentStatus);
+				};
+
+				System.out.println(message);
+			}
+		}
+		Output:
+
+		The order is partially paid. Some features will not be available. Please check the brochure for details.
+1 The support for String was added with JDK 7
+
+
+
+
+
+
+
+
+===================
+
+We might like to use patterns to test the same variable against a number of possibilities, taking a specific action on each, but since the existing switch does not support that, we end up with a chain of if...else tests such as:
+
+static String formatter(Object o) {
+    String formatted = "unknown";
+    if (o instanceof Integer i) {
+        formatted = String.format("int %d", i);
+    } else if (o instanceof Long l) {
+        formatted = String.format("long %d", l);
+    } else if (o instanceof Double d) {
+        formatted = String.format("double %f", d);
+    } else if (o instanceof String s) {
+        formatted = String.format("String %s", s);
+    }
+    return formatted;
+}
+
+we could rewrite the above code more clearly and reliably:
+
+static String formatterPatternSwitch(Object o) {
+    return switch (o) {
+        case Integer i -> String.format("int %d", i);
+        case Long l    -> String.format("long %d", l);
+        case Double d  -> String.format("double %f", d);
+        case String s  -> String.format("String %s", s);
+        default        -> o.toString();
+    };
+}
+===============================
+
+Switch Expressions
+=======================
+Like all expressions, switch expressions evaluate to a single value and can be used in statements. They may contain "case L ->" labels that eliminate the need for break statements to prevent fall through. You can use a yield statement to specify the value of a switch expression.
+
+For background information about the design of switch expressions, see JEP 361.
+
+"case L ->" Labels
+
+Consider the following switch statement that prints the number of letters of a day of the week:
+
+
+Copy
+public enum Day { SUNDAY, MONDAY, TUESDAY,
+    WEDNESDAY, THURSDAY, FRIDAY, SATURDAY; }
+
+// ...
+
+    int numLetters = 0;
+    Day day = Day.WEDNESDAY;
+    switch (day) {
+        case MONDAY:
+        case FRIDAY:
+        case SUNDAY:
+            numLetters = 6;
+            break;
+        case TUESDAY:
+            numLetters = 7;
+            break;
+        case THURSDAY:
+        case SATURDAY:
+            numLetters = 8;
+            break;
+        case WEDNESDAY:
+            numLetters = 9;
+            break;
+        default:
+            throw new IllegalStateException("Invalid day: " + day);
+    }
+    System.out.println(numLetters);
+It would be better if you could "return" the length of the day's name instead of storing it in the variable numLetters; you can do this with a switch expression. Furthermore, it would be better if you didn't need break statements to prevent fall through; they are laborious to write and easy to forget. You can do this with a new kind of case label. The 
+
+following is a switch expression that uses the new kind of case label to print the number of letters of a day of the week:
+
+    Day day = Day.WEDNESDAY;    
+    System.out.println(
+        switch (day) {
+            case MONDAY, FRIDAY, SUNDAY -> 6;
+            case TUESDAY                -> 7;
+            case THURSDAY, SATURDAY     -> 8;
+            case WEDNESDAY              -> 9;
+            default -> throw new IllegalStateException("Invalid day: " + day);
+        }
+    );    
+The new kind of case label has the following form:
+
+
+
+case label_1, label_2, ..., label_n -> expression;|throw-statement;|block 
+When the Java runtime matches any of the labels to the left of the arrow, it runs the code to the right of the arrow and does not fall through; it does not run any other code in the switch expression (or statement). If the code to the right of the arrow is an expression, then the value of that expression is the value of the switch expression.
+
+You can use the new kind of case label in switch statements. The following is like the first example, except it uses "case L ->" labels instead of "case L:" labels:
+
+
+
+    int numLetters = 0;
+    Day day = Day.WEDNESDAY;
+    switch (day) {
+        case MONDAY, FRIDAY, SUNDAY -> numLetters = 6;
+        case TUESDAY                -> numLetters = 7;
+        case THURSDAY, SATURDAY     -> numLetters = 8;
+        case WEDNESDAY              -> numLetters = 9;
+        default -> throw new IllegalStateException("Invalid day: " + day);
+    };
+    System.out.println(numLetters);
+A "case L ->" label along with its code to its right is called a switch labeled rule.
+
+"case L:" Statements and the yield Statement
+
+You can use "case L:" labels in switch expressions; a "case L:" label along with its code to the right is called a switch labeled statement group:
+
+
+Copy
+    Day day = Day.WEDNESDAY;
+    int numLetters = switch (day) {
+        case MONDAY:
+        case FRIDAY:
+        case SUNDAY:
+            System.out.println(6);
+            yield 6;
+        case TUESDAY:
+            System.out.println(7);
+            yield 7;
+        case THURSDAY:
+        case SATURDAY:
+            System.out.println(8);
+            yield 8;
+        case WEDNESDAY:
+            System.out.println(9);
+            yield 9;
+        default:
+            throw new IllegalStateException("Invalid day: " + day);
+    };
+    System.out.println(numLetters);
+The previous example uses yield statements. They take one argument, which is the value that the case label produces in a switch expression.
+
+The yield statement makes it easier for you to differentiate between switch statements and switch expressions. A switch statement, but not a switch expression, can be the target of a break statement. Conversely, a switch expression, but not a switch statement, can be the target of a yield statement.
+
+Note:It's recommended that you use "case L ->" labels. It's easy to forget to insert break or yield statements when using "case L:" labels; if you do, you might introduce unintentional fall through in your code.
+For "case L ->" labels, to specify multiple statements or code that are not expressions or throw statements, enclose them in a block. Specify the value that the case label produces with the yield statement:
+
+
+    int numLetters = switch (day) {
+        case MONDAY, FRIDAY, SUNDAY -> {
+            System.out.println(6);
+            yield 6;
+        }
+        case TUESDAY -> {
+            System.out.println(7);
+            yield 7;
+        }
+        case THURSDAY, SATURDAY -> {
+            System.out.println(8);
+            yield 8;
+        }
+        case WEDNESDAY -> {
+            System.out.println(9);
+            yield 9;
+        }
+        default -> {
+            throw new IllegalStateException("Invalid day: " + day);
+        }
+    };  
+
+Exhaustiveness
+---------------
+
+Unlike switch statements, the cases of switch expressions must be exhaustive, which means that for all possible values, there must be a matching switch label. Thus, switch expressions normally require a default clause. However, for enum switch expressions that cover all known constants, the compiler inserts an implicit default clause.
+
+In addition, a switch expression must either complete normally with a value or complete abruptly by throwing an exception.
+ For example, the following code doesn't compile because the switch labeled rule doesn't contain a yield statement:
+
+
+Copy
+int i = switch (day) {
+    case MONDAY -> {
+        System.out.println("Monday"); 
+        // ERROR! Block doesn't contain a yield statement
+    }
+    default -> 1;
+};
+FIX : add yield 3 in MONDAY block
+
+The following example doesn't compile because the switch labeled statement group doesn't contain a yield statement:
+
+
+Copy
+i = switch (day) {
+    case MONDAY, TUESDAY, WEDNESDAY: 
+        yield 0;
+    default: 
+        System.out.println("Second half of the week");
+        // ERROR! Group doesn't contain a yield statement
+};
+FIX : add yield 3 in default block
+Because a switch expression must evaluate to a single value (or throw an exception), you can't jump through a switch expression with a break, yield, return, or continue statement, like in the following example:
+
+Copy
+z: 
+    for (int i = 0; i < MAX_VALUE; ++i) {
+        int k = switch (e) { 
+            case 0:  
+                yield 1;
+            case 1:
+                yield 2;
+            default: 
+                continue z; 
+                // ERROR! Illegal jump through a switch expression 
+        };
+    // ...
+    }
+	
+	
+	below examples show error : Mixing of different kinds of case statements '->' and  ':' is not allowed within a switch
+	
+	enum Direction {
+	    UP, DOWN, HOLD;
+	}
+
+	
+	public static void main(String[] args) {
+	    var dir = Direction.UP;
+	    var where = switch(dir) {
+	        case UP -> "up";               // line n1
+	        case HOLD -> { yield "hold"; } // line n2  This must be under brackets otherwise gets error
+	        case DOWN: yield "down";       // line n3  compilation error
+	    };
+	    System.out.print(where);
+	}
+
