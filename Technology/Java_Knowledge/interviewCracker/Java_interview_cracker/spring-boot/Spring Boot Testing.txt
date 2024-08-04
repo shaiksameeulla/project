@@ -1,0 +1,321 @@
+
+
+
+@SpringBootTest annotation tells Spring Boot to go and look for a main configuration class (one with @SpringBootApplication for instance), and use that to start a Spring application context. SpringBootTest loads complete application and injects all the beans which can be slow.
+
+@WebMvcTest - for testing the controller layer and you need to provide remaining dependencies required using Mock Objects.
+
+Few more annotations below for your reference.
+
+Testing slices of the application Sometimes you would like to test a simple “slice” of the application instead of auto-configuring the whole application. Spring Boot 1.4 introduces 4 new test annotations:
+
+@WebMvcTest - for testing the controller layer
+@JsonTest - for testing the JSON marshalling and unmarshalling
+@DataJpaTest - for testing the repository layer
+@RestClientTests - for testing REST clients
+
+-------------
+
++==>When you use this combo
+
+@SpringBootTest
+@AutoConfigureMockMvc
+	spring will create :
+
+		all Controller layer beans
+		all Service layer beans
+		all Repository beans
+
+When you use this single annotation
+
+==>@WebMvcTest(HelloController.class)
+
+spring will create :
+
+	only your HelloController bean
+	no Service layer bean
+	no Repository bean
+	except if you explicitly declare some beans :
+
+-->by using an inner static class with a @TestConfiguration annotation
+-->by using an external @TestConfiguration with an @Import annotation
+
+===============
+
+@SpringBootTest
+Spring-Boot provides an@SpringBootTest annotation which provides spring-boot features over and above of the spring-test module. This annotation works by creating the ApplicationContext used in our tests through SpringApplication. It starts the embedded server, creates a web environment and then enables @Test methods to do integration testing.
+
+
+
+By default, @SpringBootTest will not start a server. You can use the webEnvironment attribute of @SpringBootTest to further refine how your tests run:
+MOCK(Default) : Loads a web ApplicationContext and provides a mock web environment. Embedded servers are not started when using this annotation. If a web environment is not available on your classpath, this mode transparently falls back to creating a regular non-web ApplicationContext. It can be used in conjunction with @AutoConfigureMockMvc or @AutoConfigureWebTestClient for mock-based testing of your web application.
+
+The first thing you can do is write a simple sanity check test that will fail if the application context cannot start. The following listing (from src/test/java/com/example/testingweb/TestingWebApplicationTest.java) shows how to do so:
+
+package com.example.testingweb;
+
+import org.junit.jupiter.api.Test;
+
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class TestingWebApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
+
+The @SpringBootTest annotation tells Spring Boot to look for a main configuration class (one with @SpringBootApplication, for instance) and use that to start a Spring application context. You can run this test in your IDE or on the command line (by running ./mvnw test or ./gradlew test), and it should pass. To convince yourself that the context is creating your controller, you could add an assertion, as the following example (from src/test/java/com/example/testingweb/SmokeTest.java) shows:
+
+package com.example.testingweb;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class SmokeTest {
+
+	@Autowired
+	private HomeController controller;
+
+	@Test
+	void contextLoads() throws Exception {
+		assertThat(controller).isNotNull();
+	}
+}
+
+A nice feature of the Spring Test support is that the application context is cached between tests. That way, if you have multiple methods in a test case or multiple test cases with the same configuration, they incur the cost of starting the application only once. You can control the cache by using the @DirtiesContext annotation.
+
+Testing with starting the Server:
+ ==============================
+
+To do that, you could start the application and listen for a connection (as it would do in production) and then send an HTTP request and assert the response. The following listing (from src/test/java/com/example/testingweb/HttpRequestTest.java) shows how to do so:
+
+package com.example.testingweb;
+
+import org.junit.jupiter.api.Test;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.web.server.LocalServerPort;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+class HttpRequestTest {
+
+	@LocalServerPort
+	private int port;
+
+	@Autowired
+	private TestRestTemplate restTemplate;
+
+	@Test
+	void greetingShouldReturnDefaultMessage() throws Exception {
+		assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/",
+				String.class)).contains("Hello, World");
+	}
+}
+
+ without starting the Server:
+ ==============================
+Another useful approach is to not start the server at all but to test only the layer below that, where Spring handles the incoming HTTP request and hands it off to your controller. That way, almost all of the full stack is used, and your code will be called in exactly the same way as if it were processing a real HTTP request but without the cost of starting the server. To do that, use Spring’s MockMvc and ask for that to be injected for you by using the @AutoConfigureMockMvc annotation on the test case. The following listing (from src/test/java/com/example/testingweb/TestingWebApplicationTest.java) shows how to do so:
+
+package com.example.testingweb;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.junit.jupiter.api.Test;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+class TestingWebApplicationTest {
+
+	@Autowired
+	private MockMvc mockMvc;
+
+	@Test
+	void shouldReturnDefaultMessage() throws Exception {
+		this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string(containsString("Hello, World")));
+	}
+}
+
+Test Configuration With @TestConfiguration
+=====================================
+
+
+However, we might want to avoid bootstrapping the real application context but use a special test configuration. We can achieve this with the @TestConfiguration annotation. There are two ways of using the annotation. Either on a static inner class in the same test class where we want to @Autowire the bean:
+
+@RunWith(SpringRunner.class)
+public class EmployeeServiceImplIntegrationTest {
+
+    @TestConfiguration
+    static class EmployeeServiceImplTestContextConfiguration {
+        @Bean
+        public EmployeeService employeeService() {
+            return new EmployeeService() {
+                // implement methods
+            };
+        }
+    }
+
+    @Autowired
+    private EmployeeService employeeService;
+}
+
+Alternatively, we can create a separate test configuration class:
+
+@TestConfiguration
+public class EmployeeServiceImplTestContextConfiguration {
+    
+    @Bean
+    public EmployeeService employeeService() {
+        return new EmployeeService() { 
+            // implement methods 
+        };
+    }
+}
+
+Configuration classes annotated with @TestConfiguration are excluded from component scanning, therefore we need to import it explicitly in every test where we want to @Autowire it. We can do that with the @Import annotation:
+
+@RunWith(SpringRunner.class)
+@Import(EmployeeServiceImplTestContextConfiguration.class)
+public class EmployeeServiceImplIntegrationTest {
+
+    @Autowired
+    private EmployeeService employeeService;
+
+    // remaining class code
+}
+
+
+
+Unit Testing With @WebMvcTest
+==============================
+
+
+We use @MockBean to create and inject a mock for the GreetingService (if you do not do so, the application context cannot start), and we set its expectations using Mockito.
+
+@RunWith(SpringRunner.class)
+@WebMvcTest(EmployeeRestController.class)
+public class EmployeeRestControllerIntegrationTest {
+
+    @Autowired
+    private MockMvc mvc;
+
+    @MockBean
+    private EmployeeService service;
+
+    // write test cases here
+	
+	@Test
+	void greetingShouldReturnMessageFromService() throws Exception {
+		when(service.greet()).thenReturn("Hello, Mock");
+		this.mockMvc.perform(get("/greeting")).andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string(containsString("Hello, Mock")));
+	}
+}
+
+
+
+@WebMvcTest accepts Class<?>[] as value() :
+
+		public @interface WebMvcTest {
+		  ...
+			@AliasFor("controllers")
+			Class<?>[] value() default {};
+		  ...
+		}
+
+Passing a single value (possible only because it is annotation) or an array is so legal.
+
+Your problem is you don't use the correct syntax to declare a literal array.
+Try :
+
+@WebMvcTest({HomeController.class, BookController.class})
+
+public class ControllerTest{
+Note that by annotating your test class with @WebMvcTest without valuing any param in the annotation declaration :
+
+@WebMvcTest
+public class ControllerTest{
+	all Spring controllers are added in the Spring context.
+	
+	==========
+	
+	============
+	
+	Use @DirtiesContext to reset the Spring context after a test.
+
+If you have tests that modify the Spring context, such as adding or modifying beans, you may need to reset the context after each test to ensure that subsequent tests start with a clean context. You can use the @DirtiesContext annotation to do this. Here's an example:
+
+@SpringBootTest
+@DirtiesContext
+public class MyServiceTest {
+    
+    @Autowired
+    private MyService myService;
+    
+    @Test
+    public void testMyMethod() {
+        myService.myMethod();
+        
+        // Assertions here
+    }
+}
+
+ Use @Disabled to temporarily disable a test.
+
+If you need to temporarily disable a test, you can use the @Disabled annotation. Here's an example:
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+public class MyServiceTest {
+    
+    @Disabled("Temporarily disabled until bug XYZ is fixed")
+    @Test
+    public void testMyMethod() {
+        // Test code here
+    }
+}
+
+
+Use @RepeatedTest to repeat a test a specified number of times.
+
+If you need to repeat a test a specified number of times, you can use the @RepeatedTest annotation. Here's an example:
+
+import org.junit.jupiter.api.RepeatedTest;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+public class MyServiceTest {
+    
+    @RepeatedTest(10)
+    public void testMyMethod() {
+        // Test code here
+    }
+}
+This will run the test 10 times. You can also use the @ParameterizedTest annotation to run a test with multiple sets of parameters.

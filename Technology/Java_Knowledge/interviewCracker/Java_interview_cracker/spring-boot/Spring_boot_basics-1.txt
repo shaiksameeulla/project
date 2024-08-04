@@ -1,0 +1,100 @@
+
+
+SpringBootApplication is equal to 
+
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+
+As per Springboot docs (hierarchy below), @Configuration is a part of @SpringBootConfiguration which ultimately has @SpringBootApplication annotation.
+
+@SpringBootConfiguration  = 
+	Can be used as an alternative to the Spring's  standard  @Configuration} annotation so that configuration can be found  automatically (for example in tests).
+	
+@Configuration:	
+	Indicates that a class declares one or more {@link Bean @Bean} methods and
+ * may be processed by the Spring container to generate bean definitions and
+ * service requests for those beans at runtime,
+ 
+ Bootstrapping @Configuration classes
+ ====================================
+ 
+ Via AnnotationConfigApplicationContext
+ =====================
+ 
+		@Configuration classes are typically bootstrapped using either AnnotationConfigApplicationContext or its web-capable variant, AnnotationConfigWebApplicationContext. A simple example with the former follows:
+
+		 AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+		 ctx.register(AppConfig.class);
+		 ctx.refresh();
+		 MyBean myBean = ctx.getBean(MyBean.class);
+		 // use myBean ...
+		 
+		See the AnnotationConfigApplicationContext javadocs for further details, and see AnnotationConfigWebApplicationContext for web configuration instructions in a Servlet container.
+
+Via Spring <beans> XML
+=====================
+	As an alternative to registering @Configuration classes directly against an AnnotationConfigApplicationContext, @Configuration classes may be declared as normal <bean> definitions within Spring XML files:
+
+	 <beans>
+		<context:annotation-config/>
+		<bean class="com.acme.AppConfig"/>
+	 </beans>
+	 
+	In the example above, <context:annotation-config/> is required in order to enable ConfigurationClassPostProcessor and other annotation-related post processors that facilitate handling @Configuration classes.
+
+ 
+ 
+ Via component scanning
+ =====================
+Since @Configuration is meta-annotated with @Component, @Configuration classes are candidates for component scanning — for example, using @ComponentScan or Spring XML's <context:component-scan/> element — and therefore may also take advantage of @Autowired/@Inject like any regular @Component. In particular, if a single constructor is present, autowiring semantics will be applied transparently for that constructor:
+
+ @Configuration
+ public class AppConfig {
+
+     private final SomeBean someBean;
+
+     public AppConfig(SomeBean someBean) {
+         this.someBean = someBean;
+     }
+
+     // @Bean definition using "SomeBean"
+
+ }
+@Configuration classes may not only be bootstrapped using component scanning, but may also themselves configure component scanning using the @ComponentScan annotation:
+
+ @Configuration
+ @ComponentScan("com.acme.app.services")
+ public class AppConfig {
+     // various @Bean definitions ...
+ }
+ ===================
+ 
+The @springbootapplication annotation is used to create simple spring boot applications.
+ We need to add several annotations to our Application class or Main class to create a spring boot application. 
+ 
+ The @SpringBootApplication annotation is a combination of @EnablAutoConfiguration,@Configuration, and @ComponentScan.
+ 
+ SpringBootApplication : Indicates a configuration class that declares one or more @Bean methods and also triggers auto-configuration and component scanning.
+ This is a convenienceannotation that is equivalent to declaring @SpringBootConfiguration, @EnableAutoConfiguration and @ComponentScan.
+ 
+ 
+ @SpringBootConfiguration:
+ 
+ Most Spring Boot use @SpringBootConfiguration via @SpringBootApplication, an annotation that inherits from it. If an application uses @SpringBootApplication, it is already using @SpringBootConfiguration.
+ 
+ The @SpringBootConfiguration annotation annotates the Application class. This indicates to the Spring container that the class has @Bean definition methods. In other words, it contains methods that instantiate and configure our dependencies.
+ 
+ 
+ @SpringBootConfiguration vs @Configuration
+ 
+ 
+@SpringBootConfiguration is an alternative to the @Configuration annotation. The main difference is that @SpringBootConfiguration allows configuration to be automatically located. This can be especially useful for unit or integration tests.
+
+The recommendation is to only have one @SpringBootConfiguration or @SpringBootApplication for your application. Most applications will simply use @SpringBootApplication.
+
+
+"@SpringBootConfiguration allows the configuration to be found automatically" means you don't have to do anything to have this (and therefore @SpringBootApplication) found. Other @Configuration classes are generally discovered by @ComponentScan
+
+An extra advantage over @Configuration, is that it will be discovered by @StringBootTest.

@@ -1,0 +1,32 @@
+@Configuration is a spring framework annotation and not strictly bound to spring-boot. It was introduced when spring started to allow programmatic creation of spring-beans as to move forward from xml definitions of beans.
+
+@AutoConfiguration is a spring-boot specific annotation not commonly available in spring framework. The reason it exists, is for external providers that cooperate with spring-boot to be able to mark some classes in some libraries they provide with this annotation as to inform spring-boot that those classes could be parsed and make some initializations during start up of spring application automatically.
+
+So if some regular programmer that develops some application happens to have kafka in dependencies then some beans will automatically be created and added in application context and will be ready for the programmer to use, although he has not defined any configuration for them. Spring-boot already knows this as the kafka provider has already informed by marking some class in the jar they provide with the annotation @AutoConfiguration.
+
+For this reason @AutoConfiguration has some more powerful configurations available as before, after, beforeName, afterName as to allow the provider to specify when the configuration is applied during application startup if some order is necessary.
+
+So this annotation is not to be used from some regular programmer that develops an application using spring-boot. It is for someone that develops a library that other users might use with spring-boot. One such example is kafka library.
+
+For this to work in a spring-boot project @EnableAutoConfiguration is needed as well, to enable auto configuration.
+
+From spring documentation
+
+Spring Boot auto-configuration attempts to automatically configure your Spring application based on the jar dependencies that you have added. For example, if HSQLDB is on your classpath, and you have not manually configured any database connection beans, then Spring Boot auto-configures an in-memory database.
+
+@Configuration instead is to be used from some regular programmer that develops an application using spring-boot or spring-framework as to inform the framework for which beans should be created and how.
+
+What is the difference between the @ComponentScan and @EnableAutoConfiguration annotations in Spring Boot?
+=====================
+
+@EnableAutoConfiguration annotation tells Spring Boot to "guess" how you will want to configure Spring, based on the jar dependencies that you have added. For example, If HSQLDB is on your classpath, and you have not manually configured any database connection beans, then Spring will auto-configure an in-memory database.
+
+@ComponentScan tells Spring to look for other components, configurations, and services in the specified package. Spring is able to auto scan, detect and register your beans or components from pre-defined project package. If no package is specified current class package is taken as the root package.
+Furthermore, the @ComponentScan annotation can also scan, detect, and register beans for classes annotated with @Component, @Controller, @Service, and @Repository.
+
+Is it necessary to add these?
+
+If you need Spring boot to Auto configure every thing for you @EnableAutoConfiguration is required. You don't need to add it manually, spring will add it internally for you based on the annotation you provide.
+
+Actually the @SpringBootApplication annotation is equivalent to using @Configuration, @EnableAutoConfiguration and @ComponentScan with their default attributes.
+
