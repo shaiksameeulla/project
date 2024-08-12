@@ -1,0 +1,37 @@
+Let’s say you are building a URL shortener with the following requirements:
+
+10 requests/second to generate short URLs.
+
+All of the requests to generate short URLs have unique long URLs.
+
+You need to support the short URLs for one year, and after that, you can re-use the short URL for some other long URL.
+
+Let’s assume there is no growth in the number of requests over time.
+
+We can use all characters from A-Z, a-z, and 0-9 in short URLs.
+
+50 requests/second to get long URLs from short URLs
+
+What is the minimum number of characters required to create enough short URLs to support these requirements?
+
+We can ignore the characters in the protocol/domain name/any fixed paths.
+
+
+Overall explanation
+Given that we need to generate 10 new short URLs every second, we’ll need to support 366(days)*24(hours)*60(minutes)*60(seconds)*10(requests per second) short URLs every year(assuming leap year as a worst case) before we can start re-using them after a year.
+
+
+
+Also, we know that each character can have 62 possible values amongst 26 uppercase A-Z, 26 lowercase a-z, and 10 numbers from 0 to 9.
+
+
+
+To support 366 * 24 * 60 * 60 * 10 = 316224000 short URLs with N characters in the short URL, where each of these N characters can have 62 possibilities, we’ll need N to be such that 62^N > 316224000 for the minimum possible integer value of N.
+
+
+
+N > Log62(316224000) ie, N > 4.7
+
+
+
+So for N = 5, we’ll be able to generate enough short URLs to serve all the requests in a year.

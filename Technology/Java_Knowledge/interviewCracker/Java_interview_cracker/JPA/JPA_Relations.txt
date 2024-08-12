@@ -1,0 +1,155 @@
+JPA Mappings/Relations:
+=========================
+To make this association bidirectional, we need to add a collection-valued attribute to the Publisher class, and annotate it @OneToMany.
+
+To indicate clearly that this is a bidirectional association, and to reuse any mapping information already specified in the Book entity, we must use the mappedBy annotation member to refer back to Book.publisher.
+
+@Entity
+class Publisher {
+    @Id @GeneratedValue
+    Long id;
+
+    @OneToMany(mappedBy="publisher")
+    Set<Book> books;
+
+    ...
+}
+The Publisher.books field is called the unowned side of the association.
+
+Now, we passionately hate the stringly-typed mappedBy reference to the owning side of the association. Thankfully, the Metamodel Generator gives us a way to make it a bit more typesafe:
+
+@OneToMany(mappedBy=Book_.PUBLISHER)  // get used to doing it this way!
+Set<Book> books;
+We’re going to use this approach for the rest of the Introduction.
+
+To modify a bidirectional association, we must change the owning side.
+
+ One-to-one:
+ ------------------
+ 
+ A one-to-one association must be annotated @OneToOne:
+
+@Entity
+class Author {
+    @Id @GeneratedValue
+    Long id;
+
+    @OneToOne(optional=false, fetch=LAZY)
+    Person author;
+
+    ...
+}
+Here, the Author table has a foreign key column holding the identifier of the associated Person.
+
+
+We can make this association bidirectional by adding a reference back to the Author in the Person entity:
+
+@Entity
+class Person {
+    @Id @GeneratedValue
+    Long id;
+
+    @OneToOne(mappedBy = Author_.PERSON)
+    Author author;
+
+    ...
+}
+Person.author is the unowned side, because it’s the side marked mappedBy.
+
+
+One-to-one (second way)
+=======================
+An arguably more elegant way to represent such a relationship is to share a primary key between the two tables.
+
+To use this approach, the Author class must be annotated like this:
+
+@Entity
+class Author {
+    @Id
+    Long id;
+
+    @OneToOne(optional=false, fetch=LAZY)
+    @MapsId
+    Person author;
+
+    ...
+}
+Notice that, compared with the previous mapping:
+
+the @Id attribute is no longer a @GeneratedValue and,
+
+instead, the author association is annotated @MapsId.
+
+This lets Hibernate know that the association to Person is the source of primary key values for Author.
+
+Here, there’s no extra foreign key column in the Author table, since the id column holds the identifier of Person. That is, the primary key of the Author table does double duty as the foreign key referring to the Person table.
+
+The Person class doesn’t change. If the association is bidirectional, we annotate the unowned side @OneToOne(mappedBy = Author_.PERSON) just as before.
+
+
+Many-to-many
+============
+it always maps to a separate association table in the database.
+
+If the association is bidirectional, we add a very similar-looking attribute to Book, but this time we must specify mappedBy to indicate that this is the unowned side of the association:
+We are establishing a relationship between Employee and Project by using the @ManyToMany annotation.
+
+@Entity
+@Table(name = "EMPLOYEE")
+public class Employee {
+
+ @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
+    private int id;
+
+ @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+    @JoinTable(name = "EMPLOYEE_PROJECT_MAPPING", joinColumns = @JoinColumn(name = "employee_id"), 
+        	inverseJoinColumns = @JoinColumn(name = "project_id"))
+    private Set<Project> projects;
+	
+	}
+	
+	
+	Using @JoinTable annotation, we create the join table or the link table and its details:
+
+   
+   The join table is called EMPLOYEE_PROJECT_MAPPING, and its columns are employee_id and project_id.
+
+	While viewing this many-to-many relationship from the Employee side, joinColumns (employee_id) is used to set a reference to the Employee entity, and inverseJoinColumns (project_id) refers to the Project entity.
+ 
+     As a result, from the perspective of an Employee, the ID column of the EMPLOYEE table will have a foreign key relationship with the employee_id column of the EMPLOYEE_PROJECT_MAPPING table.
+	
+	The inverseJoinColumns (project_id) refers to the Employee’s other side, which is the Project entity.
+	
+	
+	@Entity
+@Table(name = "PROJECT")
+public class Project {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
+    private int id;
+	
+	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
+    @JoinTable(name = "EMPLOYEE_PROJECT_MAPPING", joinColumns = @JoinColumn(name = "project_id"), 
+        inverseJoinColumns = @JoinColumn(name = "employee_id"))
+    private Set<Employee> employees;
+	
+	}
+	
+	
+	While viewing this many-to-many relationship from the Project side, joinColumns (project_id) is used to set a reference to the Project entity, and inverseJoinColumns (employee_id) refers to the Employee entity.
+ 
+   As a result, the PROJECT table’s ID column will have a foreign key relationship with the EMPLOYEE_PROJECT_MAPPING table’s project_id.
+  
+  The inverseJoinColumns (employee_id) refers to the Employee entity on the other side of the Project.
+  
+  joinColumns: 
+	
+	Specifies the foreign key column(s) from the owning entity to the join table. These columns represent the relationship from the owning entity to the join table. Use the @JoinColumn annotation within joinColumns to define the foreign key column(s).
+  
+  inverseJoinColumns: 
+
+	Specifies the foreign key column(s) from the inverse entity to the join table. These columns represent the relationship from the inverse entity to the join table. Use the @JoinColumn annotation within inverseJoinColumns to define the foreign key column(s). 

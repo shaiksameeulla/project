@@ -1,0 +1,88 @@
+Query by Example
+====================
+Query by Example (QBE) is a user-friendly querying technique with a simple interface. It allows dynamic query creation and does not require you to write queries that contain field names. In fact, Query by Example does not require you to write queries by using store-specific query languages at all.
+
+The information is pulled from the Spring Data Commons module.
+
+
+The Query by Example API consists of four parts:
+
+	Probe: The actual example of a domain object with populated fields.
+
+	ExampleMatcher: The ExampleMatcher carries details on how to match particular fields. It can be reused across multiple Examples.
+
+	Example: An Example consists of the probe and the ExampleMatcher. It is used to create the query.
+
+	FetchableFluentQuery: A FetchableFluentQuery offers a fluent API, that allows further customization of a query derived from an Example. Using the fluent API lets you specify ordering projection and result processing for your query.
+
+Query by Example is well suited for several use cases:
+
+	Querying your data store with a set of static or dynamic constraints.
+
+	Frequent refactoring of the domain objects without worrying about breaking existing queries.
+
+	Working independently of the underlying data store API.
+
+Query by Example also has several limitations:
+
+	No support for nested or grouped property constraints, such as firstname = ?0 or (firstname = ?1 and lastname = ?2).
+
+	Store-specific support on string matching. Depending on your databases, String matching can support starts/contains/ends/regex for strings.
+
+Exact matching for other property types.
+
+Before getting started with Query by Example, you need to have a domain object. To get started, create an interface for your repository, as shown in the following example:
+
+Sample Person object
+public class Person {
+
+  @Id
+  private String id;
+  private String firstname;
+  private String lastname;
+  private Address address;
+
+  // … getters and setters omitted
+}
+
+
+
+You can run the example queries by using repositories. To do so, let your repository interface extend QueryByExampleExecutor<T>. The following listing shows an excerpt from the QueryByExampleExecutor interface:
+
+public interface QueryByExampleExecutor<T> {
+
+  <S extends T> S findOne(Example<S> example);
+
+  <S extends T> Iterable<S> findAll(Example<S> example);
+
+  // … more functionality omitted.
+}
+
+
+Person person = new Person();           1              
+person.setFirstname("Dave");            2              
+
+Example<Person> example = Example.of(person);    3     
+1 Create a new instance of the domain object.
+2 Set the properties to query.
+3 Create the Example.
+
+
+
+Person person = new Person();                          
+person.setFirstname("Dave");                           
+
+ExampleMatcher matcher = ExampleMatcher.matching()     
+  .withIgnorePaths("lastname")                         
+  .withIncludeNullValues()                             
+  .withStringMatcher(StringMatcher.ENDING);            
+
+Example<Person> example = Example.of(person, matcher); 
+
+	Create a new instance of the domain object.
+	Set properties.
+	Create an ExampleMatcher to expect all values to match. It is usable at this stage even without further configuration.
+	Construct a new ExampleMatcher to ignore the lastname property path.
+	Construct a new ExampleMatcher to ignore the lastname property path and to include null values.
+	Construct a new ExampleMatcher to ignore the lastname property path, to include null values, and to perform suffix string matching.
+	Create a new Example based on the domain object and the configured ExampleMatcher.

@@ -1,0 +1,142 @@
+Projections:
+
+Spring Data query methods usually return one or multiple instances of the aggregate root managed by the repository
+
+
+ Spring Data allows modeling dedicated return types, to more selectively retrieve partial views of the managed aggregates.
+ 
+ A sample aggregate and repository
+class Person {
+
+  @Id UUID id;
+  String firstname, lastname;
+  Address address;
+
+  static class Address {
+    String zipCode, city, street;
+  }
+}
+
+interface PersonRepository extends Repository<Person, UUID> {
+
+  Collection<Person> findByLastname(String lastname);
+}
+
+1. Interface-based Projections
+	Closed Projections
+	Open Projections
+2.Class-based Projections (DTOs)
+3. Dynamic Projections
+
+It is important to note that Class-based projections with JPQL is limited to constructor expressions in your JPQL expression, 
+	e.g. SELECT new com.example.NamesOnly(u.firstname, u.lastname) from User u. 
+	(Note the usage of a FQDN for the DTO type!)
+	This JPQL expression can be used in @Query annotations as well where you define any named queries. 
+	
+	And it’s important to point out that class-based projections do not work with native queries AT ALL.
+	As a workaround you may use named queries with ResultSetMapping or the Hibernate specific ResultTransformer
+	
+	
+Interface-based:
+
+interface NamesOnly {
+
+  String getFirstname();
+  String getLastname();
+}
+
+A repository using an interface based projection with a query method
+interface PersonRepository extends Repository<Person, UUID> {
+
+  Collection<NamesOnly> findByLastname(String lastname);
+}
+
+interface PersonSummary {
+
+  String getFirstname();
+  String getLastname();
+  AddressSummary getAddress();
+
+  interface AddressSummary {
+    String getCity();
+  }
+}
+
+Open Projections
+Accessor methods in projection interfaces can also be used to compute new values by using the @Value annotation, as shown in the following example:
+
+An Open Projection
+interface NamesOnly {
+
+  @Value("#{target.firstname + ' ' + target.lastname}")
+  String getFullName();
+  …
+}
+
+you want to avoid programming in String variables. For very simple expressions, one option might be to resort to default methods (introduced in Java 8), as shown in the following example:
+
+A projection interface using a default method for custom logic
+interface NamesOnly {
+
+  String getFirstname();
+  String getLastname();
+
+  default String getFullName() {
+    return getFirstname().concat(" ").concat(getLastname());
+  }
+}
+
+A second, more flexible, option is to implement the custom logic in a Spring bean and then invoke that from the SpEL expression, as shown in the following example:
+
+Sample Person object
+@Component
+class MyBean {
+
+  String getFullName(Person person) {
+    …
+  }
+}
+
+interface NamesOnly {
+
+  @Value("#{@myBean.getFullName(target)}")
+  String getFullName();
+  …
+}
+
+interface NamesOnly {
+
+  @Value("#{args[0] + ' ' + target.firstname + '!'}")
+  String getSalutation(String prefix);
+}
+
+Class-based Projections (DTOs)
+
+A projecting DTO
+record NamesOnly(String firstname, String lastname) {
+}
+
+Dynamic Projections
+======================
+
+Dynamic Projections is one of the lesser known and used feature of Spring Data JPA.
+
+Dynamic projections let you define a generic method on the repository level that takes any kind of projection, and remain unaware of the shape of projections.
+
+java
+package com.app.account.domain;
+
+public interface AccountRepository extends Repository<Account, String> {
+    <T> T findById(String id, Class<T> projection);
+}
+Now, in any package we can define a projection interface or a record, which as long as it matches the structure of an Account entity, can be used with this dynamic repository method:
+
+java
+package com.app.account;
+
+record AccountBasic(String id, 
+                    String iban, 
+                    String bic) {}
+
+// ...
+AccountBasic account = accountRepository.findById(id, AccountBasic.class);
