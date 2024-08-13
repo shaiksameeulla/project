@@ -1,0 +1,152 @@
+
+N+1 Select problem :
+
+
+
+So, you can make the relationship for User.articles a Lazy Relationship which instructs JPA to not load the articles information by default.
+
+public class User {
+
+  @OneToMany(fetch = FetchType.LAZY)
+  List<Article> articles = new ArrayList<>();
+
+...
+}
+
+
+List<User> allUsers = userRepository.getAll(); // Grabs 10 users in the system
+
+for(User user in Users) {
+
+  List<Article> myArticles = user.getArticles(); // Triggers Lazy Loading
+  ...
+}
+
+What is N+1 Loading
+The N+1 loading problem occurs when an application makes one query to retrieve the initial data (e.g., a list of users) and then an additional query for each row of data to retrieve related data (e.g., the user’s articles) where those related data were not part of the initial data. Hence, if there are N users, the application will make 1 query to get all users and then N additional queries to get the articles for each user, totaling N+1 queries.
+
+=========================
+
+With all this covered. We can finally talk about manually controlling the “fetch boundary” of the initial query. There are two main strategies
+
+Using JOIN FETCHING in the Query
+
+Defining ENTITY GRAPH
+
+Extending Fetch Boundary with JPQL/HQL Fetch Joins
+=========================
+I refer to Member/User interchangeably in the following sections. I apologize for any confusion.
+
+“Fetch Join” is a strategy to extend the “Fetch Boundary” when defining JPQL/HQL. Hibernate documentation defines Fetch Join as
+
+A “fetch” join allows associations or collections of values to be initialized along with their parent objects using a single select.
+
+public interface MemberRepository extends ListCrudRepository<Member, Long> {
+
+    @Query("""
+            select m from Member m
+            join fetch m.articles a
+            left join fetch a.category
+            """)
+    List<Member> getAll();
+}
+
+Similarly to JPQL Join Fetching, defining Fetch can also be performed on Criteria Query.
+
+CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+CriteriaQuery<Article> criteria = builder.createQuery(Article.class);
+Root<Article> root = criteria.from(Article.class);
+
+// Left Join Fetching Category
+Fetch<Article, Category> personFetch = root.fetch("category", JoinType.LEFT);
+
+List<Article> articles = entityManager.createQuery(criteria).getResultList();
+Utilizing Join Fetch is an easy solution to overriding the default “Fetch Boundary”. The drawback of this approach is that the developer needs to manually define them for each query. And that’s when you can use Entity Graph
+
+
+Defining Entity Graph
+=========================
+EntityGraph is a feature that was introduced as part of JPA 2.1. It is a template that defines a subset of an entity’s attributes and relationships to be fetched from the database in a single query. It allows developers to specify which properties or associations of an entity should be eagerly loaded, and which should be left lazy.
+
+If you are using Spring Data’s Query Methods or Spring Data’s Specification, you can control the “Fetch Boundary” using the EntityGraph
+
+
+
+Let’s take our example of User(Member) -> Article -> Category We want to fetch both member.articles as well as article.category This can be achieved by constructing @NamedEntityGraph
+
+@Entity
+@Data
+@NamedEntityGraph(
+  name = "graph.Member.articles.category",
+  attributeNodes = 
+      @NamedAttributeNode(value = "articles", subgraph = "article.category"),
+  subgraphs = {
+      @NamedSubgraph(
+              name = "article.category",
+              attributeNodes = @NamedAttributeNode("category")
+      )
+  }
+)
+public class Member {
+
+    @Id @GeneratedValue
+    private Long id;
+
+    private String name;
+
+    private String email;
+
+    @OneToMany(mappedBy = "author", fetch = FetchType.EAGER)
+    private List<Article> articles;
+}
+
+
+This can be used in Spring Data Query Methods by simply using @EntityGraph annotation.
+
+@EntityGraph("graph.Member.articles.category")
+List<Member> getUsingEntityGraphByNameStartingWith(String name);
+
+
+
+If you want to define the Article -> Category fetch configuration in Article, we can also do that and reuse it.
+
+@Entity
+@Data
+@NamedEntityGraph(
+        name = "graph.Article.category",
+        attributeNodes = @NamedAttributeNode(value = "category")
+)
+public class Article {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+	
+	
+	
+	If you choose to, you can also define a one-off EntityGraph directly in the query itself.
+
+@EntityGraph(attributePaths = {"category"})
+List<Article> findByTitleStartingWith(String title);
+When using EntityGraph, you may need to watch out for infinite looping. For example, if Member has friends relationships that’s also Member , EntityGraph must be defined in a way so that it does not try to loop forever. Ex] Only fetch for top level friends and not friends of friends.
+
+
+
+Using BatchSize to Enhance N+1 Performance
+Another strategy, although not directly related to our discussions on “Fetch Boundary” is BatchSize.
+
+BatchSize basically groups your N part of the N+1 so that SQL becomes a IN query, reducing the number of total queries.
+
+select * from category where (?, ?, ? ....)
+In our example of Article -> Category let’s say you retrieve 100 articles each having its own unique category, this by default would result in 101 queries. But if you useBatchSize(size=20) defined on the Entity class, this would get reduced to 6, (100/20) + 1.
+
+@Entity
+@Data
+@BatchSize(size=20)
+public class Category {
+    @Id @GeneratedValue
+    private Long id;
+
+    private String name;
+}

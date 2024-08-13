@@ -1,0 +1,201 @@
+
+ Batching
+ ==========
+Given a Book and its Author, we can create one DataFetcher for books and another for the author of a book. This means books and authors aren’t automatically loaded together, which enables queries to select the subset of data they need. However, loading multiple books, results in loading each author individually, and this is a performance issue known as the N+1 select problem.
+
+GraphQL Java provides a batching feature that allows related entities, such as the authors for all books, to be loaded together. This is how the underlying mechanism works in GraphQL Java:
+
+For each request, an application can register a batch loading function as a DataLoader in the DataLoaderRegistry to assist with loading instances of a given entity, such as Author from a set of unique keys.
+
+A DataFetcher can access the DataLoader for the entity and use it to load entity instances; for example the author DataFetcher obtains the authorId from the Book parent object, and uses it to load the Author.
+
+DataLoader does not load the entity immediately but rather returns a future, and defers until it is ready to batch load all related entities as one.
+
+DataLoader additionally maintains a cache of previously loaded entities that can further improve efficiency when the same entity is in multiple places of the response.
+
+Spring GraphQL provides:
+==============
+
+BatchLoaderRegistry that accepts and stores registrations of batch loading functions; This is used in ExecutionGraphQlService to make DataLoader registrations per request.
+
+DataLoader argument for @SchemaMapping methods to access the DataLoader for the field type.
+
+@BatchMapping data controller methods that provide a shortcut and avoid the need to use DataLoader directly.
+
+The Spring Boot starter declares a BatchLoaderRegistry bean, so that applications can simply autowire the registry into their controllers in order to register batch loading functions for entities.
+
+ DataLoader
+ ==============
+When you register a batch loading function for an entity, as explained in Batching, you can access the DataLoader for the entity by declaring a method argument of type DataLoader and use it to load the entity:
+
+@Controller
+public class BookController {
+
+    public BookController(BatchLoaderRegistry registry) {
+        registry.forTypePair(Long.class, Author.class).registerMappedBatchLoader((authorIds, env) -> {
+            // return Map<Long, Author>
+        });
+    }
+
+    @SchemaMapping
+    public CompletableFuture<Author> author(Book book, DataLoader<Long, Author> loader) {
+        return loader.load(book.getAuthorId());
+    }
+
+}
+
+By default, BatchLoaderRegistry uses the full class name of the value type (e.g. the class name for Author) for the key of the registration, and therefore simply declaring the DataLoader method argument with generic types provides enough information to locate it in the DataLoaderRegistry. As a fallback, the DataLoader method argument resolver will also try the method argument name as the key but typically that should not be necessary.
+
+For straight-forward cases where the @SchemaMapping simply delegates to a DataLoader, you can reduce boilerplate by using a @BatchMapping method instead.
+
+
+
+
+
+
+@BatchMapping
+Batching addresses the N+1 select problem through the use of an org.dataloader.DataLoader to defer the loading of individual entity instances, so they can be loaded together. For example:
+
+@Controller
+public class BookController {
+
+    public BookController(BatchLoaderRegistry registry) {
+        registry.forTypePair(Long.class, Author.class).registerMappedBatchLoader((authorIds, env) -> {
+            // load authors
+			// return Map<Long, Author>
+	
+        });
+    }
+
+    @SchemaMapping
+    public CompletableFuture<Author> author(Book book, DataLoader<Long, Author> loader) {
+        return loader.load(book.getAuthorId());
+    }
+
+}
+
+
+For the straight-forward case of loading an associated entity, shown above, the @SchemaMapping method does nothing more than delegate to the DataLoader. This is boilerplate that can be avoided with a @BatchMapping method. For example:
+
+@Controller
+public class BookController {
+
+    @BatchMapping
+    public Mono<Map<Book, Author>> author(List<Book> books) {
+        // ...
+    }
+}
+
+The above becomes a batch loading function in the BatchLoaderRegistry where keys are Book instances and the loaded values their authors. In addition, a DataFetcher is also transparently bound to the author field of the type Book, which simply delegates to the DataLoader for authors, given its source/parent Book instance.
+
+To be used as a unique key, Book must implement hashcode and equals.
+
+By default, the field name defaults to the method name, while the type name defaults to the simple class name of the input List element type. Both can be customized through annotation attributes. The type name can also be inherited from a class level @SchemaMapping.
+
+
+example :
+
+@SchemaMapping(field "DealIns", typeName "Holding")
+public CompletableFuture<DIEntity> DealInss (HEntity holding, DataFetchingEnvironment environment) {
+ DataLoader<HEntity, DIEntity> dataLoader =  environment.getDataLoader("dlsDataloader"); 
+return dataLoader.load(holding);
+
+}
+
+
+import org.dataloader.DataLoaderOptions;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+
+public class DataLoaderConfig {
+
+
+@Bean
+public DataLoaderOptions dataLoaderOptions(@Value("300") final int size) {
+
+DataLoaderOptions options = DataLoaderOptions.newOptions();
+
+options.setMaxBatchSize(size);
+
+options.setBatchingEnabled(true);
+
+return options;
+
+}
+
+}
+
+
+@Configuration(proxyBeanMethods = false)
+ public class GraphQLConfig {
+
+@Bean
+
+public GraphQlSourceBuilderCustomizer sourceBuilderCustomizer(){
+
+return (builder) ->
+
+builder.configureGraphQL(graphQLBuilder ->>
+
+GraphQLBuilder.preparsedDocumentProvider(new Caching PreparsedDocumentProvider()));
+
+}
+
+}
+
+@Configuration
+public class StreamingConfig {
+
+
+@Bean
+
+public ExecutorService streamingExecutorService (@Value("${streamingExecutorService.size:200}")
+
+final int size, final BeanFactory beanFactory) { return new DelegatingSecurityContextExecutorService(new ThreadPoolExecutor(corePoolSize: 15, size,
+
+keepAliveTime: 120L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(size),
+
+new ThreadFactoryBuilder().setNameFormat("streaming-%d").build()));
+
+
+
+* There is limit of 1024 elements for incoming List elements, which is bumped
+* upto to 5000 for transactions export summary
+*/
+
+
+public AnnotatedControllerConfigurer annotated ControllerConfigurer (){
+
+AnnotatedControllerConfigurer annotatedControllerConfigurer = new AnnotatedControllerConfigurer();
+
+annotatedControllerConfigurer.setDataBinderInitializer(dataBinder ->
+
+dataBinder.setAutoGrowCollectionLimit(5000));
+
+}
+
+HoldingDataLoader.java
+private ExecutorService executorService;
+private DataLoaderOptions dataLoaderOptions;
+private BatchLoaderRegistry batchLoaderRegistry;
+private DealInsRepository DealInsRepository;
+
+batchLoaderRegistry.forTypePair(HEntity.class, DIEntity.class)
+	.withName("dlsDataloader").withOptions(dataLoaderOptions)
+}, executorService)))
+.registerMappedBatchLoader((hldngs, env) -> Mono.fromFuture (CompletableFuture.supplyAsync(() -> {
+
+	List<Integer> DealInsIds = PECollectionUtils.fetchDistinct(hldngs,HEntity::getDealInsSeqId);
+
+	Map<Integer, DIEntity> hldngsMap = DealInsRepository.findAllById(
+
+	DealInsIds).stream() .collect(Collectors.toflap (DIEntity::getDealInsSeqId, o -> 0));
+
+	return hldngs.stream()
+
+	.collect(HashMap::new, (m, v) -> m.put(v, hldngsMap.get(v.getDealInsSeqId())), HashMap::putAll);
+
+}, executorService)));
