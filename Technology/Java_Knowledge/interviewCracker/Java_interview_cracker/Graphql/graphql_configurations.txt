@@ -92,110 +92,133 @@ To be used as a unique key, Book must implement hashcode and equals.
 
 By default, the field name defaults to the method name, while the type name defaults to the simple class name of the input List element type. Both can be customized through annotation attributes. The type name can also be inherited from a class level @SchemaMapping.
 
+=============
+Exception Handling:
+===================
 
-example :
+Error Handling
+Error handling is a core component of any API. Users of the API must be notified properly of the errors, if any, in the API response. GraphQL specification states every request must have a well-formed response containing data, errors and extensions. If no error occurred, the error component in the response will be absent.
 
-@SchemaMapping(field "DealIns", typeName "Holding")
-public CompletableFuture<DIEntity> DealInss (HEntity holding, DataFetchingEnvironment environment) {
- DataLoader<HEntity, DIEntity> dataLoader =  environment.getDataLoader("dlsDataloader"); 
-return dataLoader.load(holding);
+We can have two types of errors:
+
+Request Errors:
+	This means an issue with the request itself, either a parsing failure or an invalid request.
+Field Errors:
+	This means either there was an exception in the value resolution of the field or an unexpected type for the specified field. In such cases, we may have partial responses along with errors.
+	
+By default, Spring for GraphQL has a built-in exception handler DataFetcherExceptionHandler. It allows our applications to register one or more DataFetcherExceptionResolver components. These resolvers are invoked sequentially until one resolves the exception to the GraphQLError object. If none of them can handle the exception, then the exception is categorized as INTERNAL_ERROR.
+
+A GraphQLError object can be assigned to a category via graphql.ErrorClassification. In Spring GraphQL, you can also assign via ErrorType which has the following common classifications that applications can use to categorize errors:
+
+BAD_REQUEST
+UNAUTHORIZED
+FORBIDDEN
+NOT_FOUND
+INTERNAL_ERROR
+To create a custom exception resolver, we can implement the DataFetcherExceptionHandler interface.
+
+An example implementation
+@Component
+public class CustomDataFetchingExceptionHandler implements DataFetcherExceptionHandler {
+
+   @Override
+   public CompletableFuture<DataFetcherExceptionHandlerResult> handleException(DataFetcherExceptionHandlerParameters handlerParameters) {
+      if (handlerParameters.getException() instanceof MyException) {
+         Map<String, Object> debugInfo = new HashMap<>();
+         debugInfo.put("somefield", "somevalue");
+
+         GraphQLError graphqlError = TypedGraphQLError.newInternalErrorBuilder()
+                 .message("This custom thing went wrong!")
+                 .debugInfo(debugInfo)
+                 .path(handlerParameters.getPath()).build();
+
+         DataFetcherExceptionHandlerResult result = DataFetcherExceptionHandlerResult.newResult()
+                 .error(graphqlError)
+                 .build();
+
+         return CompletableFuture.completedFuture(result);
+      } else {
+         return DataFetcherExceptionHandler.super.handleException(handlerParameters);
+      }
+   }
+}
+
+another example
+below method gets executed when we throw MyRuntimeException from controller
+	@Component
+	public class CustomExceptionResolver extends DataFetcherExceptionResolverAdapter {
+
+	@Override
+	public GraphQLError resolveToSingleError(Throwable exception, DataFetchingEnvironment environment) {
+
+
+	if (exception instanceof MyRuntimeException)
+
+	return GraphqlErrorBuilder.newError() GraphqlErrorBuilder<capture of ?> .errorType (ErrorType. ValidationError) capture of ? .message(exception.getMessage()) .path(environment.getExecutionStepInfo().getPath()) .Location(environment.getField().getSourceLocation()) .build();
+
+	}
+	return null;
+	}
+
+
+Additionally, since Spring boot 3.1, We can define @GraphQlExceptionHandler methods to handle exceptions either in a @Controller or @ControllerAdvice annotated class. When declared in a controller, exception handler methods apply to exceptions from the same controller:
+
+@Controller
+public class BookController {
+
+    @QueryMapping
+    public Book bookById(@Argument Long id) {
+        // ...
+    }
+
+    @GraphQlExceptionHandler
+    public GraphQLError handle(BindException ex) {
+        return GraphQLError.newError().errorType(ErrorType.BAD_REQUEST).message("...").build();
+    }
 
 }
 
+When declared in an @ControllerAdvice, it applies for all the controllers in the application:
 
-import org.dataloader.DataLoaderOptions;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+@ControllerAdvice
+public class GlobalExceptionHandler {
 
-@Configuration
-
-public class DataLoaderConfig {
-
-
-@Bean
-public DataLoaderOptions dataLoaderOptions(@Value("300") final int size) {
-
-DataLoaderOptions options = DataLoaderOptions.newOptions();
-
-options.setMaxBatchSize(size);
-
-options.setBatchingEnabled(true);
-
-return options;
+    @GraphQlExceptionHandler
+    public GraphQLError handle(BindException ex) {
+        return GraphQLError.newError().errorType(ErrorType.BAD_REQUEST).message("...").build();
+    }
 
 }
 
+7.3. Query Caching
+============
+Every GraphQL query must be parsed and validated before being executed. This may have some performance impact. To speed up this and avoid the need to re-parse and validate, we can configure the PreparsedDocumentProvider that caches and reuses Document instances.
+
+@Component 
+public class CachingPreparsedDocumentProvider implements PreparsedDocumentProvider {
+
+  private final Cache<String, PreparsedDocumentEntry> cache = Caffeine
+      .newBuilder()
+      .maximumSize(2500)
+      .expireAfterAccess(Duration.ofHours(1))
+      .build();
+
+  @Override
+  public PreparsedDocumentEntry getDocument(ExecutionInput executionInput,
+          Function<ExecutionInput, PreparsedDocumentEntry> parseAndValidateFunction) {
+
+      return cache.get(executionInput.getQuery(), 
+          operationString -> parseAndValidateFunction.apply(executionInput));
+  }
 }
 
+In order to achieve a high cache hit ratio it is recommended that field arguments are passed in as variables instead of directly in the query.
 
-@Configuration(proxyBeanMethods = false)
- public class GraphQLConfig {
+8. Using GraphiQL
+GraphiQL is a graphical interactive in-browser GraphQL Integrated Development Environment (IDE). It is a powerful tool for learning and test out GraphQL queries. GraphiQL offers syntax highlighting, autocompletion, automatic documentation, and much more.
 
-@Bean
+By default, GraphiQL is disabled. To enable add the following property.
 
-public GraphQlSourceBuilderCustomizer sourceBuilderCustomizer(){
+spring.graphql.graphiql.enabled=true
 
-return (builder) ->
-
-builder.configureGraphQL(graphQLBuilder ->>
-
-GraphQLBuilder.preparsedDocumentProvider(new Caching PreparsedDocumentProvider()));
-
-}
-
-}
-
-@Configuration
-public class StreamingConfig {
-
-
-@Bean
-
-public ExecutorService streamingExecutorService (@Value("${streamingExecutorService.size:200}")
-
-final int size, final BeanFactory beanFactory) { return new DelegatingSecurityContextExecutorService(new ThreadPoolExecutor(corePoolSize: 15, size,
-
-keepAliveTime: 120L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(size),
-
-new ThreadFactoryBuilder().setNameFormat("streaming-%d").build()));
-
-
-
-* There is limit of 1024 elements for incoming List elements, which is bumped
-* upto to 5000 for transactions export summary
-*/
-
-
-public AnnotatedControllerConfigurer annotated ControllerConfigurer (){
-
-AnnotatedControllerConfigurer annotatedControllerConfigurer = new AnnotatedControllerConfigurer();
-
-annotatedControllerConfigurer.setDataBinderInitializer(dataBinder ->
-
-dataBinder.setAutoGrowCollectionLimit(5000));
-
-}
-
-HoldingDataLoader.java
-private ExecutorService executorService;
-private DataLoaderOptions dataLoaderOptions;
-private BatchLoaderRegistry batchLoaderRegistry;
-private DealInsRepository DealInsRepository;
-
-batchLoaderRegistry.forTypePair(HEntity.class, DIEntity.class)
-	.withName("dlsDataloader").withOptions(dataLoaderOptions)
-}, executorService)))
-.registerMappedBatchLoader((hldngs, env) -> Mono.fromFuture (CompletableFuture.supplyAsync(() -> {
-
-	List<Integer> DealInsIds = PECollectionUtils.fetchDistinct(hldngs,HEntity::getDealInsSeqId);
-
-	Map<Integer, DIEntity> hldngsMap = DealInsRepository.findAllById(
-
-	DealInsIds).stream() .collect(Collectors.toflap (DIEntity::getDealInsSeqId, o -> 0));
-
-	return hldngs.stream()
-
-	.collect(HashMap::new, (m, v) -> m.put(v, hldngsMap.get(v.getDealInsSeqId())), HashMap::putAll);
-
-}, executorService)));
+Restart the Spring Boot application and navigate to http://localhost:8080/graphiql on your browser. It should open up the GraphiQL window.

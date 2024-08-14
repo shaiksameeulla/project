@@ -10,10 +10,14 @@ Server runtime: On the service side, a GraphQL service provides a runtime layer 
 In short, GraphQL is a query language for API and a server-side runtime for executing queries. Also, it’s not tied to any specific programming language, database, or storage engine.
 
 GraphQL Schema
+===============
 
 The GraphQL Schema defines how data is requested and returned from the server and is governed by GraphQL Schema Definition Language (SDL). A GraphQL schema may contain operations, variables, and directives.
 
+GraphQL is an API query language and a server-side runtime for querying and updating the existing data stored in any kind of data storage. It was initially developed by Facebook and later moved to open source GraphQL Foundation.
+
 GraphQL Operation
+===============
 
 A GraphQL service can support the following operations
 
@@ -155,3 +159,75 @@ By default, the Boot starter checks in src/main/resources/graphql for GraphQL sc
 
 spring.graphql.schema.locations=classpath:graphql/ 
 spring.graphql.schema.fileExtensions=.graphqls, .gqls
+
+
+
+Mutation
+=====================
+A mutation is used for creating, updating or deleting data. Like queries, if a mutation returns back an object, we can ask for nested fields. For example, to update a book object, we can specify a mutation as follows:
+
+Mutation query example with default values
+mutation {
+  updateBook(id: 1, title: "GraphQL Overview Revised Edition") {
+    id
+    title
+    pages
+    author {
+      name
+    }
+  }
+}
+
+Here we update a book using the id specified and return back the book object which is updated.
+
+
+=============================================================
+
+@SchemaMapping
+
+The @SchemaMapping is used to map a handler method to a type and field pair. It takes in two arguments: typeName and value.
+
+typeName: It is the operation Query or Mutation. It can be defined at the class or method level.
+value: It is the name of the field as its defined in the GraphQL schema. If not specified, defaults to the method name.
+To map the “allBooks” query to a handler method, we could define it as follows:
+
+@SchemaMapping(typeName = "Query", value="allBooks")
+public List<Book> getAllBooks() {
+	return bookRepository.allBooks();
+}
+
+5.2. @QueryMapping
+
+@QueryMapping is a composite annotation to indicate the typeName as Query.
+
+Let’s define the ‘bookById’ query handler method. This query takes an ID argument. This can be defined using the @Argument annotation which binds a named GraphQL argument onto a method parameter.
+
+@QueryMapping
+public Book bookById(@Argument Integer id) {
+	return bookRepository.bookById(id);
+}
+
+5.3. @MutationMapping
+As the name indicates, @MutationMapping is a composite annotation for Mutation types.
+
+@MutationMapping
+public Book updateBook(@Argument Integer id, @Argument String title) {
+	return bookRepository.updateBook(id, title);
+}
+
+6. How to Test the APIs?
+Run the Spring Boot Application. GraphQL APIs would be exposed by default at localhost:8080/graphql. We would need an API testing tool like Postman to test the APIs.
+
+To test the allBooks query, we can use the following payload in a POST query:
+
+Test Payload
+{
+  allBooks {
+    id
+    title
+    pages
+    author {
+      name
+    }
+  }
+}
