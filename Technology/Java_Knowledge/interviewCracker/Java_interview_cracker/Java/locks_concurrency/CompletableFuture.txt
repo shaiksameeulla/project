@@ -1,11 +1,17 @@
 
-public class CompletableFuture<T>
-extends Object
-implements Future<T>, CompletionStage<T>
-A Future that may be explicitly completed (setting its value and status), and may be used as a CompletionStage, supporting dependent functions and actions that trigger upon its completion.
-When two or more threads attempt to complete, completeExceptionally, or cancel a CompletableFuture, only one of them succeeds.
+public class CompletableFuture<T> extends Object implements Future<T>, CompletionStage<T>
 
+The CompletableFuture API is a high-level API for asynchronous programming in Java. This API supports pipelining (also known as chaining or combining) of multiple asynchronous computations into a single result without the mess of nested callbacks (“callback hell“). This API also is an implementation of the future/promise concurrency constructs in Java.
 
+Blocking  methods
+get()   : returns the result value when complete (waits if necessary) or throws an exception if completed exceptionally
+join()	 : returns the result value when complete (waits if necessary)  or throws only unchecked exceptions
+
+tocheck future,non blocking
+
+isDone                      :returns true if the CompletableFuture is completed in any manner: normally, exceptionally, or by cancellation
+isCompletedExceptionally    : returns true if this CompletableFuture is completed exceptionally, including cancellation
+isCancelled                 : returns true if this CompletableFuture is canceled before it completed normally
 
 Future vs. CompletableFuture
 ========================================
@@ -40,7 +46,18 @@ Creating a CompletableFuture
 
 	We can create a CompletableFuture only by using the following no-argument constructor.
 
-CompletableFuture<String> CompletableFuture = new CompletableFuture<String>();  
+CompletableFuture<String> CompletableFuture = new CompletableFuture<String>();  // this will be incomplete stage
+String result = completableFuture.get()   // blocks until the Future is complete. So, the above call will block forever because the Future is never completed.
+
+
+completableFuture.complete("Future's Result")    // manually complete a Future
+
+
+	You might be wondering that - Well, I know that the runAsync() and supplyAsync() methods execute their tasks in a separate thread. But, we never created a thread right?
+
+Yes! CompletableFuture executes these tasks in a thread obtained from the global ForkJoinPool.commonPool().
+
+	But hey, you can also create a Thread Pool and pass it to runAsync() and supplyAsync() methods to let them execute their tasks in a thread obtained from your thread pool.
 
 The most frequently used CompletableFuture methods are:
 
@@ -86,6 +103,100 @@ return a*a;
 
 String result = future.join(); // Get the result or default value
 System.out.println("Result: " + result);
+
+
+However, you should choose between .exceptionally() and .handle():
+=============================================================
+
+	==> .exceptionally() is usually used to return a default value instead of letting an exception through
+
+	==>  .handle() is usually used to log, transform and/or wrap the exception like a catch block; don't forget to rethrow if you want the exception to go through
+
+	==>   For cleanup actions like a finally block, .whenComplete() is more appropriate.
+
+    ==>  The stage created by handle() method is always executed regardless of exception occurs or not,
+		 whereas exceptionally() stage is only executed when there's an exception.
+
+whenComplete:
+==========
+.whenComplete is similar to a finally block. It's useful when you want to do something even if the previous stage has failed. For example, log an exception or clean up some resources without stopping the propagation of the failure.
+
+In your case, it seems that you want to send an email only when there are no failures. You could rewrite it as:
+
+.thenAccept(emailService::sendEmail);
+
+
+exceptionally::
+----------------
+The exceptionally() method is your go-to choice for handling exceptions in CompletableFuture. It allows you to define an alternative value or perform custom logic when an exception occurs during the execution of a CompletableFuture.
+CompletableFuture<Integer> handledFuture = future.exceptionally(ex -> {
+    System.err.println("Exception: " + ex.getMessage());
+    return -1; // Provide a default value
+});
+
+handle:
+-------
+The handle() method is a more comprehensive approach to exception handling. It allows you to handle both successful results and exceptions in a single callback. This method takes a BiFunction that processes the result and the exception (if one occurred).
+
+CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+    // Simulate an exception
+    throw new RuntimeException("Something went wrong");
+});
+
+
+CompletableFuture<String> handledFuture = future.handle((result, ex) -> {
+    if (ex != null) {
+        System.err.println("Exception: " + ex.getMessage());
+        return "Default";
+    } else {
+        return "Result: " + result;
+    }
+});
+
+
+Returns a new CompletionStage with the same result or exception as this stage, that executes the given action when this stage completes.
+
+
+
+==========
+handle() vs whenComplete()
+The above methods, accept BiConsumer, whereas CompletionStage.handle(....) methods accept BiFunction. That means handle() methods are allowed to return a result (in case of exception a recovering result) thus they can handle the exception. On the other hand, whenComplete() methods cannot return a results. So they are used as merely callbacks that do not interfere in the processing pipeline of CompletionStages.
+
+If there's an unhandled exception coming from the stages before 'whenComplete' stage then that exception is passed through as it is. In other words if the upstream CompletionStage completes exceptionally, the CompletionStage returned by whenComplete() also completes exceptionally.
+
+handles exception in an exceptionally() stage placed after whenComplete() stage
+
+
+
+==========
+
+
+
+This implies that an exception is not swallowed by this stage as it is supposed to have the same result or exception. However, you might be surprised by the fact that subsequent stages will receive the exception of a previous stage wrapped within a CompletionException, so it’s not exactly the same exception:
+
+	CompletableFuture<String> test=new CompletableFuture<>();
+			test
+				.whenComplete((result, ex) -> System.out.println("stage 2: "+result+"\t"+ex))
+				.exceptionally(ex -> { System.out.println("stage 3: "+ex); return ""; });
+		  test.completeExceptionally(new IOException()); // this makes the complete the future exceptionally if you comments this, this never complete and cf.get() forever blocks
+		  
+will print:
+
+	stage 2: null   java.io.IOException
+	stage 3: java.util.concurrent.CompletionException: java.io.IOException
+
+Note that you can always append multiple actions on one stage instead of chaining then:
+
+	CompletableFuture<String> test=new CompletableFuture<>();
+		test.whenComplete((result, ex) -> System.out.println("stage 2a: "+result+"\t"+ex));
+		test.exceptionally(ex -> { System.out.println("stage 2b: "+ex); return ""; });
+		test.completeExceptionally(new IOException());
+
+will print:		
+		stage 2b: java.io.IOException
+		stage 2a: null  java.io.IOException
+
+Of course, since now there is no dependency between the stage 2a and 2b, there is no ordering between them and in the case of async action, they may run concurrently.
 
 ==================================================================================
 CompletableFuture runAsync vs supplyAsync, when to choose one over the other?
@@ -135,4 +246,72 @@ Runnable triggers upon completion of both of two stages. Note that all the stage
     CompletableFuture.completedFuture(original).thenApply(String::toUpperCase).runAfterBoth(
             CompletableFuture.completedFuture(original).thenApply(String::toLowerCase),
             () -> result.append("done"));
-			
+=========================================================================================================
+
+
+The thenApply method creates a new stage, that upon completion transforms the result of the single previous stage by the given Function.
+
+		CompletionStage<String> stage1 = supplyAsync(() -> sleepAndGet("single"));
+	CompletionStage<String> stage = stage1.thenApply(
+		   s -> s.toUpperCase());	
+	assertEquals("SINGLE", stage.toCompletableFuture().get());
+The thenCompose method creates a new stage, that upon completion also transforms the result of the single previous stage by the given Function. This method is similar to the thenApply method described above. The difference is that the result of this Function is a subclass of CompletionStage, which is useful when a transformation is a slow operation that is reasonable to execute in a separate stage (possible asynchronously).
+
+	CompletionStage<String> stage1 = supplyAsync(() -> sleepAndGet("sequential1"));
+	CompletionStage<String> stage = stage1.thenCompose(
+		   s -> supplyAsync(() -> sleepAndGet((s + " " + "sequential2").toUpperCase())));
+	assertEquals("SEQUENTIAL1 SEQUENTIAL2", stage.toCompletableFuture().get());
+The applyToEither method creates a new stage, that upon completion transforms the first result of the previous two stages by the given Function.
+
+	CompletionStage<String> stage1 = supplyAsync(() -> sleepAndGet(1, "parallel1"));
+	CompletionStage<String> stage2 = supplyAsync(() -> sleepAndGet(2, "parallel2"));
+	CompletionStage<String> stage = stage1.applyToEither(stage2,
+		   s -> s.toUpperCase());
+	assertEquals("PARALLEL1", stage.toCompletableFuture().get());
+The thenCombine method creates a new stage, that upon completion transforms the two results of the previous two stages by the given BiFunction.
+
+	CompletionStage<String> stage1 = supplyAsync(() -> sleepAndGet("parallel1"));
+	CompletionStage<String> stage2 = supplyAsync(() -> sleepAndGet("parallel2"));
+	CompletionStage<String> stage = stage1.thenCombine(stage2,
+		   (s1, s2) -> (s1 + " " + s2).toUpperCase());
+	assertEquals("PARALLEL1 PARALLEL2", stage.toCompletableFuture().get());
+The thenAccept method creates a new stage, that upon completion consumes the single previous stage by the given _ Consumer_.
+
+	CompletableFuture<String> stage1 = supplyAsync(() -> sleepAndGet("single"));
+	CompletionStage<Void> stage = stage1.thenAccept(
+		   s -> logger.info("consumes the single: {}", s));
+	assertNull(stage.toCompletableFuture().get());
+The acceptEither method creates a new stage, that upon completion consumes the first result of the previous two stages by the given Consumer.
+
+		CompletionStage<String> stage1 = supplyAsync(() -> sleepAndGet(1, "parallel1"));
+		CompletionStage<String> stage2 = supplyAsync(() -> sleepAndGet(2, "parallel2"));
+		CompletionStage<Void> stage = stage1.acceptEither(stage2,
+			   s -> logger.info("consumes the first: {}", s));
+		assertNull(stage.toCompletableFuture().get());
+The thenAcceptBoth method creates a new stage, that upon completion consumes the two results of the previous two stages by the given BiConsumer.
+
+		CompletionStage<String> stage1 = supplyAsync(() -> sleepAndGet(1, "parallel1"));
+		CompletionStage<String> stage2 = supplyAsync(() -> sleepAndGet(2, "parallel2"));
+		CompletionStage<Void> stage = stage1.thenAcceptBoth(stage2,
+			   (s1, s2) -> logger.info("consumes both: {} {}", s1, s2));
+		assertNull(stage.toCompletableFuture().get());
+The thenRun method creates a new stage, that upon completion of the single previous stage runs the given Runnable.
+
+		CompletionStage<String> stage1 = supplyAsync(() -> sleepAndGet("single"));
+		CompletionStage<Void> stage = stage1.thenRun(
+			   () -> logger.info("runs after the single"));
+		assertNull(stage.toCompletableFuture().get());
+The runAfterEither method creates a new stage, that upon completion of the first of the previous two stages, runs the given Runnable.
+
+	CompletionStage<String> stage1 = supplyAsync(() -> sleepAndGet(1, "parallel1"));
+	CompletionStage<String> stage2 = supplyAsync(() -> sleepAndGet(2, "parallel2"));
+	CompletionStage<Void> stage = stage1.runAfterEither(stage2,
+		   () -> logger.info("runs after the first"));
+	assertNull(stage.toCompletableFuture().get());
+The runAfterBoth method creates a new stage, that upon completion of the previous two stages, runs the given _ Runnable_.
+
+	CompletionStage<String> stage1 = supplyAsync(() -> sleepAndGet(1, "parallel1"));
+	CompletionStage<String> stage2 = supplyAsync(() -> sleepAndGet(2, "parallel2"));
+	CompletionStage<Void> stage = stage1.runAfterBoth(stage2,
+		   () -> logger.info("runs after both"));
+	assertNull(stage.toCompletableFuture().get());
