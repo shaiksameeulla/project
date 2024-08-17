@@ -1,6 +1,77 @@
 JPA Hibernate Association:
 -------------------------
+It is NOT @JoinColumn which indicates that this entity is the owner of the relationship. Instead, it is the @ManyToOne annotation which does this (in his example).
 
+The relationship annotations such as @ManyToOne, @OneToMany and @ManyToMany tell JPA/Hibernate to create a mapping. By default, this is done through a seperate Join Table.
+
+
+@JoinColumn
+
+The purpose of @JoinColumn is to create a join column if one does not already exist. If it does, then this annotation can be used to name the join column.
+
+
+MappedBy
+
+The purpose of the MappedBy parameter is to instruct JPA: Do NOT create another join table as the relationship is already being mapped by the opposite entity of this relationship.
+
+
+
+Remember: MappedBy is a property of the relationship annotations whose purpose is to generate a mechanism to relate two entities which by default they do by creating a join table. MappedBy halts that process in one direction.
+
+The entity not using MappedBy is said to be the owner of the relationship because the mechanics of the mapping are dictated within its class through the use of one of the three mapping annotations against the foreign key field. This not only specifies the nature of the mapping but also instructs the creation of a join table. Furthermore, the option to suppress the join table also exists by applying @JoinColumn annotation over the foreign key which keeps it inside the table of the owner entity instead.
+
+So in summary: @JoinColumn either creates a new join column or renames an existing one; whilst the MappedBy parameter works collaboratively with the relationship annotations of the other (child) class in order to create a mapping either through a join table or by creating a foreign key column in the associated table of the owner entity.
+
+To illustrate how MapppedBy works, consider the code below. If MappedBy parameter were to be deleted, then Hibernate would actually create TWO join tables! Why? Because there is a symmetry in many-to-many relationships and Hibernate has no rationale for selecting one direction over the other.
+
+We therefore use MappedBy to tell Hibernate, we have chosen the other entity to dictate the mapping of the relationship between the two entities.
+
+@Entity
+public class Driver {
+    @ManyToMany(mappedBy = "drivers")
+    private List<Cars> cars;
+}
+
+@Entity
+public class Cars {
+    @ManyToMany
+    private List<Drivers> drivers;
+}
+Adding @JoinColumn(name = "driverID") in the owner class (see below), will prevent the creation of a join table and instead, create a driverID foreign key column in the Cars table to construct a mapping:
+
+@Entity
+public class Driver {
+    @ManyToMany(mappedBy = "drivers")
+    private List<Cars> cars;
+}
+
+@Entity
+public class Cars {
+    @ManyToMany
+    @JoinColumn(name = "driverID")
+    private List<Drivers> drivers;
+}
+================
+
+@Table(name = "employee")
+public class Employee {
+    
+    @ManyToOne
+    private Employer employer;
+}
+
+@Table(name = "employer")
+public class Employer {
+ 
+    @OneToMany(mappedBy = "employer")
+    private List<Employee> employee;
+}
+
+from above Employee and Employeer Example , Need to remember below points
+1. if we just Specifiy @ManyToOne and @OneToMany, this many-to-one side foreignKey will be created and new Join table will be created with two PK of tables.
+2. if we just Specifiy @ManyToOne and @OneToMany(mappedBy), then Join table will not be created. but in @many-to-one side FK will be created.
+3. 
+===============================
 
 Uniderictional @OneToMany:
 
