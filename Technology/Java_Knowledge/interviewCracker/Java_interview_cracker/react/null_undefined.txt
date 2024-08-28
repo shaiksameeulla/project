@@ -6,6 +6,40 @@ Undefined: It means the value does not exist in the compiler
 
 JavaScript has two primitive values used to signal absent or uninitialized value: null and undefined.
 
+
+let x; // variable declared but not initialized
+console.log(x); // Output: undefined
+
+function doSomething() {
+// no return statement, so the function returns undefined
+}
+console.log(doSomething()); // Output: undefined
+
+let obj = {};
+console.log(obj.property); // Output: undefined
+
+=============
+let y = null; // variable intentionally set to null
+console.log(y); // Output: null
+
+let obj = { property: null }; // property intentionally set to null
+console.log(obj.property); // Output: null
+
+=========
+
+console.log(ktpt)
+VM777:1 Uncaught ReferenceError: ktpt is not defined
+    at <anonymous>:1:13
+=================
+Another way to distinguish the two is through the typeof operator. typeof will always return undefined for an undefined variable and object for a null variable.
+ For example
+ let z;
+ console.log(typeof z); // logs 'undefined'
+ 
+ let a=null;
+ console.log(typeof a); // logs 'object'
+
+===========	
 TypeScript has two corresponding types by the same names. How these types behave depends on whether you have the strictNullChecks option on.
 
 strictNullChecks   off

@@ -1,0 +1,46 @@
+
+Shallow vs deep copy:
+======================
+
+
+
+Here are 3 different methods for copying objects. Each method has pros and cons, so read through and pick the best for your situation
+
+Object.assign method
+=====================
+Use Object.assign, which "is used to copy the values of all enumerable own properties from one or more source objects to a target object". This copies both values and functions. At the time of writing this, browser support is good but not perfect, but this is the best method IMO of the three.
+A shallow clone is a clone that has its primitive properties cloned but his REFERENCE properties still reference the original.
+
+const obj1 = {a:1, b:2};
+const obj1Copy = Object.assign(obj1)
+
+Spread operator method
+=====================
+Alternatively, you can use the spread operator to spread from one object into another. Keep in mind that this will copy the values of keys, but if you the value of a key is a memory address (an other nested object or an array) then it will only be a shallow copy.
+
+const obj1 = {a: () => {}, b:2}
+const obj1Copy = { ...obj1 }
+
+JSON stringify/parse trick
+=====================
+If the object doesn't have any circular references or functions as values, you can use the json stringify trick:
+
+let myCopy = JSON.parse(JSON.stringify(myObject));
+No libraries required, and works very well for most objects.
+
+Note that JSON.stringify/parse always creates a plain Object, stripping out any custom methods that may have been in the original.
+and strips out any property which is undefined
+
+
+best way to  deep copy :
+======================
+
+
+You can use lodash's cloneDeep function - https://lodash.com/docs/4.16.4#cloneDeep
+
+var objects = [{ 'a': 1 }, { 'b': 2 }];
+
+var deep = _.cloneDeep(objects);
+console.log(deep[0] === objects[0]);
+// => false
+ 

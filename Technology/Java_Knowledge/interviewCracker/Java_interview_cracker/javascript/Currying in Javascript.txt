@@ -54,3 +54,65 @@ let multiply = function (a) {
 
 let multipleCurrey = multiply(3);
 let multiply2 = multipleCurrey(6);
+=====================
+
+
+advance:
+==========
+
+A variadic function is useful when you don’t know or don’t care how many arguments you’re going to receive. You can implement it to accept any number of inputs, which is handy when you’re dealing with user-input or other unpredictable data. example : function (...args)
+
+
+const sum = function (...args) {
+  let total = args.reduce((acc, arg) => acc+arg, 0)
+  function add (...args2) {
+    if (args2.length) {
+      total = args2.reduce((acc, arg) => acc+arg, total)
+      return add //look carefully its returning add method
+    }
+    return total //look carefully its returning total
+  }
+
+  return add; //look carefully its returning add method
+}
+
+document.write( sum(1)(2)() , '<br/>') // with unary params
+document.write( sum(1,2)() , '<br/>') // with binary params
+document.write( sum(1)(2)(3)() , '<br/>') // with unary params
+document.write( sum(1)(2,3)() , '<br/>') // with binary params
+document.write( sum(1)(2)(3)(4)() , '<br/>') // with unary params
+document.write( sum(1)(2,3,4)() , '<br/>') // with ternary params
+
+explanation :
+
+sum(1)(2,3,4)()
+call1 1: first sum(1) executes returns add method
+call1 2 : then add method has arguments 2,3,4
+total and given arguments would get summed in side add method (after checking size)
+then return add method again 
+call1 3 : add method called with empty array then total returns
+
+there is a drawback with this approach you must call brackets (faunction call braces) at the end of the function call, as shown above.
+===
+one way tofix is adding toString funtion as below
+
+const sum = function (...args) {
+
+  let total = args.reduce((acc, arg) => acc+arg, 0)
+  function add (...args2) {
+    if (args2.length) {
+      total = args2.reduce((acc, arg) => acc+arg, total)
+      return add
+    }
+    return total
+  }
+  add.toString=function () {
+        return total;
+    }
+
+  return add
+}
+
+===========
+
+

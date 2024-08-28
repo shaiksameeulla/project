@@ -32,4 +32,129 @@ Unmounting(Render phase)
 
          componentWillUnmount()
 
+The Component Lifecycle
+	Mounting
+		These methods are called in the following order when an instance of a component is being created and inserted into the DOM:
 
+		constructor()
+		static getDerivedStateFromProps()
+		render()
+		componentDidMount() : make API calls
+
+Updating
+	An update can be caused by changes to props or state. These methods are called in the following order when a component is being re-rendered:
+
+	static getDerivedStateFromProps()
+	shouldComponentUpdate()
+	render()
+	getSnapshotBeforeUpdate()
+	componentDidUpdate()
+	
+Unmounting
+	This method is called when a component is being removed from the DOM:
+
+	componentWillUnmount()
+	
+Error Handling
+	These methods are called when there is an error during rendering, in a lifecycle method, or in the constructor of any child component.
+
+	static getDerivedStateFromError()
+	componentDidCatch()
+
+
+===========================
+class Clock extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {date: new Date()};
+  }
+
+  componentDidMount() {
+    this.timerID = setInterval(
+      () => this.tick(),
+      1000
+    );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+  }
+
+  tick() {
+    this.setState({
+      date: new Date()
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>Hello, world!</h1>
+        <FormattedDate date={this.state.date} />
+      </div>
+    );
+  }
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<Clock />);		
+
+
+====================
+Sample example
+
+import React from "react";
+import { getDefaultPrice } from "../../service";
+
+const initialState = {
+  loading: false,
+  price: 0,
+  error: null
+}
+
+class Price extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = initialState;
+  }
+
+  componentDidMount() {
+    this.setState({ loading: true });
+    getDefaultPrice()
+      .then((data) => {
+        this.setState({ price: data.value })
+      })
+      .catch((error) => {
+        this.setState({ error })
+      })
+      .finally(() => {
+        this.setState({ loading: false });
+      })
+  }
+
+  render() {
+    const { loading, price, error } = this.state;
+    const { addOnPrice } = this.props;
+
+    return (
+      <div className="price container">
+        <div className="price__content">
+          <h1 className="price__value">
+            Total:
+            {
+              loading ?
+                <>{` loading...`}</>
+                :
+                error ?
+                  'Something went wrong. Please try again later'
+                  :
+                  <span data-testid="total-price">{` ₹${price + addOnPrice}`}</span>
+            }
+          </h1>
+        </div>
+      </div>
+    )
+  }
+}
+
+export default Price;

@@ -1,0 +1,60 @@
+Higher Order Components:
+---------------------------
+
+Higher-order components or HOC is the advanced method of reusing the component functionality logic. It simply takes the original component and returns the enhanced component.
+
+Syntax:
+
+const EnhancedComponent = higherOrderComponent(OriginalComponent);
+Reason to use Higher-Order component:
+
+Easy to handle
+Get rid of copying the same logic in every component
+Makes code more readable
+Creating React Application:
+
+Step 1: Create a React application using the following command.
+
+npx create-react-app foldername
+Step 2: After creating your project folder i.e. foldername, move to it using the following command.
+
+cd foldername
+Project Structure:
+
+
+
+Example 1: Let say, we need to reuse the same logic, like passing on the name to every component.
+
+Name.js
+import React from 'react'
+  
+const EnhancedComponent = (OriginalComponent) => { 
+    class NewComponent extends React.Component { 
+  
+        // Logic here 
+  
+        render() { 
+            // Pass the callable props to Original component 
+            return <OriginalComponent name="GeeksforGeeks"  />  
+        } 
+    } 
+    // Returns the new component 
+    return NewComponent 
+} 
+  
+export default EnhancedComponent;
+App.js
+import React from "react"; 
+import "./App.css"
+import EnhancedComponent from './Name'
+   
+class App extends React.Component { 
+  render() { 
+    // Call the props from originalComponent 
+    return <h1>{this.props.name}</h1>  
+  } 
+} 
+   
+// Passed the originalcomponent  
+export default EnhancedComponent(App);
+Output: Here, we pass the name as a prop with the value for calling out from different components
