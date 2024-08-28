@@ -58,3 +58,61 @@ class App extends React.Component {
 // Passed the originalcomponent  
 export default EnhancedComponent(App);
 Output: Here, we pass the name as a prop with the value for calling out from different components
+
+
+
+
+
+
+
+
+
+
+
+function components:
+===================
+
+import React from 'react';
+
+// Define the Higher-Order Component
+const withLoading = (WrappedComponent) => {
+	return function WithLoadingComponent(props) {
+		const [loading, setLoading] = React.useState(false);
+
+		React.useEffect(() => {
+			// Simulate loading data
+			setLoading(true);
+			const timer = setTimeout(() => {
+				setLoading(false);
+			}, 2000);
+
+			return () => clearTimeout(timer);
+		}, []);
+
+		// Pass loading state as a prop to the wrapped component
+		return <WrappedComponent
+			{...props} loading={loading} />;
+	};
+};
+
+// Define a component to be enhanced (functional component)
+const MyComponent = ({ loading }) => (
+	<div>
+		{loading ? <p>Loading...</p> :
+			<p>Data Loaded Successfully!</p>}
+	</div>
+);
+
+// Enhance the component with the HOC
+const EnhancedComponent = withLoading(MyComponent);
+
+function App() {
+	return (
+		<>
+			{/* Render the enhanced component */}
+			<EnhancedComponent />
+		</>
+	);
+}
+
+export default App;
