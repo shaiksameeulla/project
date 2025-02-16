@@ -1,0 +1,110 @@
+To send an HTTP request:
+
+	Create an XMLHttpRequest object
+	Open a URL
+	Send the request.
+
+
+sample:
+
+xhr.onload = () => {
+  // Request finished. Do processing here.
+};
+
+
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+       // Typical action to be performed when the document is ready:
+       document.getElementById("demo").innerHTML = xhttp.responseText;
+    }
+};
+xhttp.open("GET", "filename", true);
+xhttp.send();
+
+
+The Fetch API is the more flexible and powerful replacement for the XMLHttpRequest API. The Fetch API uses promises instead of events to handle asynchronous responses, integrates well with service workers, and supports advanced aspects of HTTP such as CORS. For these reasons, the Fetch API is usually used in modern web apps instead of XMLHttpRequest.
+
+
+This is the simplest usage of asynchronous XMLHttpRequest.
+
+const xhr = new XMLHttpRequest();
+xhr.open("GET", "/bar/foo.txt", true);
+xhr.onload = (e) => {
+  if (xhr.readyState === 4) {
+    if (xhr.status === 200) {
+      console.log(xhr.responseText);
+    } else {
+      console.error(xhr.statusText);
+    }
+  }
+};
+xhr.onerror = (e) => {
+  console.error(xhr.statusText);
+};
+xhr.send(null);
+
+
+The xhr.open line specifies true for its third parameter to indicate that the request should be handled asynchronously.
+
+
+Example: HTTP synchronous request
+
+This example demonstrates how to make a simple synchronous request.
+
+	const request = new XMLHttpRequest();
+	request.open("GET", "/bar/foo.txt", false); // `false` makes the request synchronous
+	request.send(null);
+
+	if (request.status === 200) {
+	  console.log(request.responseText);
+	}
+The request.send call sends the request. The null parameter indicates that no body content is needed for the GET request.
+
+
+The XMLHttpRequest.readyState property returns the state an XMLHttpRequest client is in. An XHR client exists in one of the following states:
+
+	Value	State	Description
+		0	UNSENT	Client has been created. open() not called yet.
+		1	OPENED	open() has been called.
+		2	HEADERS_RECEIVED	send() has been called, and headers and status are available.
+		3	LOADING	Downloading; responseText holds partial data.
+		4	DONE	The operation is complete.
+		
+Syntax
+	
+	send()
+	send(body)	
+	
+	
+	Example:
+	xhr.send("foo=bar&lorem=ipsum");
+	
+
+Using the Fetch API
+
+	The Fetch API provides a JavaScript interface for making HTTP requests and processing the responses.
+
+	Fetch is the modern replacement for XMLHttpRequest: unlike XMLHttpRequest, which uses callbacks, Fetch is promise-based and is integrated with features of the modern web such as service workers and Cross-Origin Resource Sharing (CORS).
+
+	With the Fetch API, you make a request by calling fetch(), which is available as a global function in both window and worker contexts. You pass it a Request object or a string containing the URL to fetch, along with an optional argument to configure the request.
+
+	The fetch() function returns a Promise which is fulfilled with a Response object representing the server's response. You can then check the request status and extract the body of the response in various formats, including text and JSON, by calling the appropriate method on the response.	
+	
+	How Fetch API Works?
+		A request is sent to the specified URL.
+		The server processes the request and sends a response.
+		The response is converted to JSON (or another format) using .json().
+		Errors are handled using .catch() or try-catch blocks.
+
+	
+	Syntax
+
+		fetch(url, options)
+			.then(response => response.json())
+			.then(data => console.log(data))
+			.catch(error => console.error('Error:', error));
+		url: The API endpoint from which data is fetched.
+		options (optional): Specifies method, headers, body, etc.
+		response.json(): Parses the response as JSON.
+		.catch(error): Handles any errors that occur during the request.
