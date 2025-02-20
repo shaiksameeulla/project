@@ -1,0 +1,146 @@
+Types of JPA Queries
+
+
+There are three basic types of JPA Queries:
+
+	Query, written in Java Persistence Query Language (JPQL) syntax
+	NativeQuery, written in plain SQL syntax
+	Criteria API Query, constructed programmatically via different methods
+	
+A Query is similar in syntax to SQL, and it’s generally used to perform CRUD operations:
+
+	public UserEntity getUserByIdWithPlainQuery(Long id) {
+    Query jpqlQuery = getEntityManager().createQuery("SELECT u FROM UserEntity u WHERE u.id=:id");
+    jpqlQuery.setParameter("id", id);
+    return (UserEntity) jpqlQuery.getSingleResult();
+}
+
+	This Query retrieves the matching record from the users table and also maps it to the UserEntity object.
+
+		There are two additional Query sub-types:
+
+		TypedQuery
+		NamedQuery
+
+TypedQuery
+	We need to pay attention to the return statement in our previous example. JPA can’t deduce what the Query result type will be, and, as a result, we have to cast.
+
+	But, JPA provides a special Query sub-type known as a TypedQuery. This is always preferred if we know our Query result type beforehand. Additionally, it makes our code much more reliable and easier to test
+
+	Let’s see a TypedQuery alternative, compared to our first example
+	
+	public UserEntity getUserByIdWithTypedQuery(Long id) {
+    TypedQuery<UserEntity> typedQuery
+      = getEntityManager().createQuery("SELECT u FROM UserEntity u WHERE u.id=:id", UserEntity.class);
+    typedQuery.setParameter("id", id);
+    return typedQuery.getSingleResult();
+	}
+ we get stronger typing for free, avoiding possible casting exceptions down the road.
+ 
+ NamedQuery
+	we can define NamedQuery on the Entity class itself, providing a centralized, quick and easy way to read and find an Entity‘s related queries.
+
+   All NamedQueries must have a unique name.
+   @Table(name = "users")
+@Entity
+@NamedQuery(name = "UserEntity.findByUserId", query = "SELECT u FROM UserEntity u WHERE u.id=:userId")
+public class UserEntity {
+
+    @Id
+    private Long id;
+    private String name;
+    //Standard constructor, getters and setters.
+
+	}
+	
+	The @NamedQuery annotation has to be grouped inside a @NamedQueries annotation if we’re using Java before version 8. From Java 8 forward, we can simply repeat the @NamedQuery annotation at our Entity class.
+
+Using a NamedQuery is very simple:
+
+public UserEntity getUserByIdWithNamedQuery(Long id) {
+    Query namedQuery = getEntityManager().createNamedQuery("UserEntity.findByUserId");
+    namedQuery.setParameter("userId", id);
+    return (UserEntity) namedQuery.getSingleResult();
+}
+
+	 NativeQuery is simply an SQL query. These allow us to unleash the full power of our database, as we can use proprietary features not available in JPQL-restricted syntax.
+
+This comes at a cost. We lose the database portability of our application with NativeQuery because our JPA provider can’t abstract specific details from the database implementation or vendor anymore
+
+	public UserEntity getUserByIdWithNativeQuery(Long id) {
+    Query nativeQuery
+      = getEntityManager().createNativeQuery("SELECT * FROM users WHERE id=:userId", UserEntity.class);
+    nativeQuery.setParameter("userId", id);
+    return (UserEntity) nativeQuery.getSingleResult();
+}
+
+
+--------------
+
+Criteria API Query
+Since Hibernate 5.2, the Hibernate Criteria API is deprecated, and new development is focused on the JPA Criteria API. We’ll explore how to use Hibernate and JPA to build Criteria Queries.
+
+Criteria API queries are programmatically-built, type-safe queries – somewhat similar to JPQL queries in syntax:
+
+		public UserEntity getUserByIdWithCriteriaQuery(Long id) {
+    CriteriaBuilder criteriaBuilder = getEntityManager().getCriteriaBuilder();
+    CriteriaQuery<UserEntity> criteriaQuery = criteriaBuilder.createQuery(UserEntity.class);
+    Root<UserEntity> userRoot = criteriaQuery.from(UserEntity.class);
+    UserEntity queryResult = getEntityManager().createQuery(criteriaQuery.select(userRoot)
+      .where(criteriaBuilder.equal(userRoot.get("id"), id)))
+      .getSingleResult();
+    return queryResult;
+}
+
+	
+		CriteriaQuery<Long> cr = cb.createQuery(Long.class);
+	Root<Item> root = cr.from(Item.class);
+	cr.select(cb.count(root));
+	Query<Long> query = session.createQuery(cr);
+	List<Long> itemProjected = query.getResultList();
+	
+	
+Starting from JPA 2.1, there’s support for performing database updates using the Criteria API.
+The new CriteriaUpdate and CriteriaDelete interfaces add the missing bulk update and delete operations to the Criteria API. From my point of view this is a small but great enhancement that allows us to use the Criteria API in even more situations. 
+   CriteriaUpdate
+   CriteriaDelete
+   
+   a "CriteriaUpdate" is a method used to construct a dynamic bulk update query using the Criteria API, allowing you to define complex filtering conditions without directly writing SQL strings, while a "query update" refers to a standard SQL UPDATE statement used to modify data in a database, typically written as a string with explicit column names and conditions. 
+   
+   CriteriaUpdate: Ideal for situations where you need to update multiple records based on complex filtering conditions that may change depending on user input. 
+    Query Update: Suitable for simple updates where you know exactly which columns to modify and how to filter the records with a clear SQL statement. 
+
+		   CriteriaUpdate<Item> criteriaUpdate = cb.createCriteriaUpdate(Item.class);
+		Root<Item> root = criteriaUpdate.from(Item.class);
+		criteriaUpdate.set("itemPrice", newPrice);
+		criteriaUpdate.where(cb.equal(root.get("itemPrice"), oldPrice));
+
+		Transaction transaction = session.beginTransaction();
+		session.createQuery(criteriaUpdate).executeUpdate();
+		transaction.commit();
+
+
+		   CriteriaDelete<Item> criteriaDelete = cb.createCriteriaDelete(Item.class);
+		Root<Item> root = criteriaDelete.from(Item.class);
+		criteriaDelete.where(cb.greaterThan(root.get("itemPrice"), targetPrice));
+
+		Transaction transaction = session.beginTransaction();
+		session.createQuery(criteriaDelete).executeUpdate();
+		transaction.commit();
+
+===========================================
+
+Using the CriteriaDefinition Utility
+
+Hibernate 6.3.0 provides a CriteriaDefinition class to simplify building criteria queries. It allows defining an initializer block of an anonymous subclass where all operations of CriteriaBuilder and CriteriaQuery can be invoked without specifying the target object.
+
+final Session session = HibernateUtil.getHibernateSession();
+final SessionFactory sessionFactory = HibernateUtil.getHibernateSessionFactory();
+CriteriaDefinition<Item> query = new CriteriaDefinition<>(sessionFactory, Item.class) {
+    {
+        JpaRoot<Item> item = from(Item.class);
+    }
+};
+List<Item> items = session.createSelectionQuery(query).list();
+
+Here’s a criteria query that retrieves all rows of “ITEM” using CriteriaDefinition
