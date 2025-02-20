@@ -1,7 +1,81 @@
 JPA Entity Graphs:
 ===================
 
+Defining an Entity Graph with Annotations
+The @NamedEntityGraph annotation allows specifying the attributes to include when we want to load the entity and the related associations.
+
+So let’s first define an Entity Graph that loads the Post and his related entities User and Comments:
+
+		@NamedEntityGraph(
+		  name = "post-entity-graph",
+		  attributeNodes = {
+			@NamedAttributeNode("subject"),
+			@NamedAttributeNode("user"),
+			@NamedAttributeNode("comments"),
+		  }
+		)
+		@Entity
+		public class Post {
+
+			@OneToMany(mappedBy = "post")
+			private List<Comment> comments = new ArrayList<>();
+			
+			//...
+		}
+		
+In this example, we’ve used the @NamedAttributeNode to define the related entities to be loaded when the root entity is loaded.
+Let’s now define a more complicated Entity Graph where we want also load the Users related to the Comments.
+For this purpose, we’ll use the @NamedAttributeNode subgraph attribute. This allows referencing a named subgraph defined through the @NamedSubgraph annotation:
+
+
+
+			@NamedEntityGraph(
+			  name = "post-entity-graph-with-comment-users",
+			  attributeNodes = {
+				@NamedAttributeNode("subject"),
+				@NamedAttributeNode("user"),
+				@NamedAttributeNode(value = "comments", subgraph = "comments-subgraph"),
+			  },
+			  subgraphs = {
+				@NamedSubgraph(
+				  name = "comments-subgraph",
+				  attributeNodes = {
+					@NamedAttributeNode("user")
+				  }
+				)
+			  }
+			)
+			@Entity
+			public class Post {
+
+				@OneToMany(mappedBy = "post")
+				private List<Comment> comments = new ArrayList<>();
+				//...
+			}
+
+
+
+Defining an Entity Graph with the JPA API
+=========================================
+We can also define the Entity Graph through the EntityManager API by calling the createEntityGraph() method:
+
+EntityGraph<Post> entityGraph = entityManager.createEntityGraph(Post.class);
+
+To specify the attributes of the root entity, we use the addAttributeNodes() method.
+
+entityGraph.addAttributeNodes("subject");
+entityGraph.addAttributeNodes("user");
+
+Similarly, to include the attributes from the related entity, we use the addSubgraph() to construct an embedded Entity Graph and then we the addAttributeNodes() as we did above.
+
+entityGraph.addSubgraph("comments")
+  .addAttributeNodes("user");
+
+Now that we have seen how to create the Entity Graph, we’ll explore how to use it in the next section.	
+
+
 Types of Entity Graphs
+===================
 JPA defines two properties or hints by which the persistence provider can choose in order to load or fetch the Entity Graph at runtime:
 
 ==>jakarta.persistence.fetchgraph – Only the specified attributes are retrieved from the database. As we are using Hibernate in this tutorial, we can note that in contrast to the JPA specs, attributes statically configured as EAGER are also loaded.
@@ -28,9 +102,8 @@ from
     Post post0_ 
 where
     post0_.id=?
-	
 	As we can see from the log, the User and Comment entities are not loaded.
-
+	
 We can override this default behavior by invoking the overloaded find() method which accepts hints as a Map. We can then provide the graph type which we want to load:
 	
 		EntityGraph entityGraph = entityManager.getEntityGraph("post-entity-graph");
@@ -85,3 +158,8 @@ And finally, let’s have a look at a Criteria API example:
 		Post post = typedQuery.getSingleResult();
 		
 		In each of these, the graph type is given as a hint. While in the first example, we used the Map, in the two later examples we’ve used the setHint() method.
+		
+
+
+
+	
