@@ -118,6 +118,61 @@ Thread virtualThread = ...; //Create virtual thread
 Virtual threads are not active members of thread groups. When invoked on a virtual thread, Thread.getThreadGroup() returns a placeholder thread group with the name “VirtualThreads“.
 Virtual threads do not support the stop(), suspend(), or resume() methods. These methods throw an UnsupportedOperationException when invoked on a virtual thread.
 
+public class VirtualThredsDemo {
+
+	public static void main(String[] args) throws InterruptedException {
+		// TODO Auto-generated method stub
+		ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+
+        executor.submit(() -> {
+            System.out.println("Running in a virtual thread : "+Thread.currentThread().isVirtual());
+        });
+Thread.sleep(Duration.ofSeconds(10));
+        executor.shutdown();
+	}
+
+}
+output : Running in a virtual thread true
+But when we use 
+So when you initiate the parallel stream operation from a virtual thread, the parallel stream will use the common pool for the operation. In other words, you are still using platform threads except for the one initiating virtual thread, as the Stream implementation also performs work in the caller thread.
+
+So when I use the following program
+
+public class ParallelStreamInsideVirtualThread {
+    public static void main(String[] args) throws Exception {
+        var executorService = Executors.newVirtualThreadPerTaskExecutor();
+        var job = executorService.submit(
+            () -> {
+              Thread init = Thread.currentThread();
+              return IntStream.rangeClosed(0, 10).parallel()
+                 .peek(x -> printThread(init))
+                 .mapToObj(String::valueOf)
+                 .toList();
+            });
+        job.get();
+    }
+  
+    static void printThread(Thread initial) {
+        Thread t = Thread.currentThread();
+        System.out.println((t.isVirtual()? "Virtual  ": "Platform ")
+            + (t == initial? "(initiator)": t.getName()));
+    }
+}
+it will print something like
+
+Virtual  (initiator)
+Virtual  (initiator)
+Platform ForkJoinPool.commonPool-worker-1
+Platform ForkJoinPool.commonPool-worker-3
+Platform ForkJoinPool.commonPool-worker-2
+Platform ForkJoinPool.commonPool-worker-4
+Virtual  (initiator)
+Platform ForkJoinPool.commonPool-worker-1
+Platform ForkJoinPool.commonPool-worker-3
+Platform ForkJoinPool.commonPool-worker-5
+Platform ForkJoinPool.commonPool-worker-2
+In short, you are not measuring the performance of virtual threads at all.
+
 
 A sequenced collection is a Collection whose elements have a defined encounter order. The new SequencedCollection interface provides methods to add, retrieve, or remove elements at both ends of the collection, along with a method to get a reverse-ordered view of the collection.
 
