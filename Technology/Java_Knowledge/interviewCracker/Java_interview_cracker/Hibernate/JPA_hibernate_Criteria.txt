@@ -28,7 +28,7 @@ List<Item> results = query.getResultList();
 The above query is a simple demonstration of how to get all the items. Let's see it step by step:
 
 
-freestar
+
 Create an instance of Session from the SessionFactory object
 Create an instance of CriteriaBuilder by calling the getCriteriaBuilder() method
 Create an instance of CriteriaQuery by calling the CriteriaBuilder createQuery() method
@@ -47,7 +47,7 @@ cr.select(root).where(cb.gt(root.get("itemPrice"), 1000));
 Next, getting items having itemPrice less than 1000:
 
 
-freestar
+
 cr.select(root).where(cb.lt(root.get("itemPrice"), 1000));
 Items having itemName contain Chair:
 
@@ -96,7 +96,7 @@ In the next section, we will have a look at how to do aggregate functions.
 Now let's see the different aggregate functions.
 
 Get row count:
-
+CriteriaBuilder cb = session.getCriteriaBuilder();
 CriteriaQuery<Long> cr = cb.createQuery(Long.class);
 Root<Item> root = cr.from(Item.class);
 cr.select(cb.count(root));
@@ -105,7 +105,7 @@ List<Long> itemProjected = query.getResultList();
 The following is an example of aggregate functions — Aggregate function for Average:
 
 
-freestar
+CriteriaBuilder cb = session.getCriteriaBuilder();
 CriteriaQuery<Double> cr = cb.createQuery(Double.class);
 Root<Item> root = cr.from(Item.class);
 cr.select(cb.avg(root.get("itemPrice")));

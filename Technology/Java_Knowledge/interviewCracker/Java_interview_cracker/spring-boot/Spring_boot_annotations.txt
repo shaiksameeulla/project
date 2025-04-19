@@ -77,4 +77,88 @@ Use @Import annotations to import auto-configuration classes instead of relying 
 Example:
 If you have a library that provides auto-configuration, you should ensure it's loaded through META-INF/spring.factories and not rely on the application's component scanning to find it. 
 The application class, annotated with @SpringBootApplication, will scan the packages under its location by default, and you can use @ComponentScan to scan other packages if neede
+=============
 
+@ConfigurationProperties
+If we have properties that are grouped together, we can make use of the @ConfigurationProperties annotation, which will map these property hierarchies into Java objects graphs.
+
+Let’s take some properties used to configure a database connection:
+
+database.url=jdbc:postgresql:/localhost:5432/instance
+database.username=foo
+database.password=bar
+
+And then let’s use the annotation to map them to a database object:
+
+@ConfigurationProperties(prefix = "database")
+public class Database {
+    String url;
+    String username;
+    String password;
+
+    // standard getters and setters
+}
+
+Spring 3.1 also introduces the new @PropertySource annotation as a convenient mechanism for adding property sources to the environment.
+
+We can use this annotation in conjunction with the @Configuration annotation: (otherwise it wont work)
+
+@Configuration
+@PropertySource("classpath:foo.properties")
+public class PropertiesWithJavaConfig {
+    //...
+}
+Another very useful way to register a new properties file is using a placeholder, which allows us to dynamically select the right file at runtime:
+
+
+@PropertySource({ 
+  "classpath:persistence-${envTarget:mysql}.properties"
+})
+...
+
+Using/Injecting Properties
+
+======
+
+
+
+@Value("${spring.application.name}") @Value will throw exception if there no matching key in application.properties/yml file. It strictly injects property value.
+
+For example: @Value("${spring.application.namee}") throws below exception, as namee field doesn't exists in properties file.
+
+application.properties file
+----------------------
+spring:
+  application:
+    name: myapplicationname
+
+
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'testValue': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'spring.application.namee' in value "${spring.application.namee}"
+
+Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'spring.application.namea' in value "${spring.application.namee}"
+@ConfigurationProperties(prefix = "myserver.allvalues") injects POJO properties, it's not strict, it ignores the property if there is no key in properties file.
+
+For example:
+
+@ConfigurationProperties(prefix = "myserver.allvalues")
+public class TestConfigurationProperties {
+    private String value;
+    private String valuenotexists; // This field doesn't exists in properties file
+                                   // it doesn't throw error. It gets default value as null
+}
+
+application.properties file
+----------------------
+myserver:
+  allvalues:
+    value:  sampleValue
+
+Injecting a property with the @Value annotation is straightforward:
+
+@Value( "${jdbc.url}" )
+private String jdbcUrl;
+
+We can also specify a default value for the property:
+
+@Value( "${jdbc.url:aDefaultUrl}" )
+private String jdbcUrl;

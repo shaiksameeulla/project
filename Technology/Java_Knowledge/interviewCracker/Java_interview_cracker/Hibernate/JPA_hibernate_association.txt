@@ -22,36 +22,7 @@ The entity not using MappedBy is said to be the owner of the relationship becaus
 
 So in summary: @JoinColumn either creates a new join column or renames an existing one; whilst the MappedBy parameter works collaboratively with the relationship annotations of the other (child) class in order to create a mapping either through a join table or by creating a foreign key column in the associated table of the owner entity.
 
-To illustrate how MapppedBy works, consider the code below. If MappedBy parameter were to be deleted, then Hibernate would actually create TWO join tables! Why? Because there is a symmetry in many-to-many relationships and Hibernate has no rationale for selecting one direction over the other.
 
-We therefore use MappedBy to tell Hibernate, we have chosen the other entity to dictate the mapping of the relationship between the two entities.
-
-@Entity
-public class Driver {
-    @ManyToMany(mappedBy = "drivers")
-    private List<Cars> cars;
-}
-
-@Entity
-public class Cars {
-    @ManyToMany
-    private List<Drivers> drivers;
-}
-Adding @JoinColumn(name = "driverID") in the owner class (see below), will prevent the creation of a join table and instead, create a driverID foreign key column in the Cars table to construct a mapping:
-
-@Entity
-public class Driver {
-    @ManyToMany(mappedBy = "drivers")
-    private List<Cars> cars;
-}
-
-@Entity
-public class Cars {
-    @ManyToMany
-    @JoinColumn(name = "driverID")
-    private List<Drivers> drivers;
-}
-================
 
 @Table(name = "employee")
 public class Employee {
@@ -374,3 +345,38 @@ If orphanRemoval=true is specified the disconnected Address instance is automati
 If only cascade=CascadeType.REMOVE is specified, no automatic action is taken since disconnecting a relationship is not a remove operation.
 
 To avoid dangling references as a result of orphan removal, this feature should only be enabled for fields that hold private non shared dependent objects.
+
+
+Many to many
+=================
+
+To illustrate how MapppedBy works, consider the code below. If MappedBy parameter were to be deleted, then Hibernate would actually create TWO join tables! Why? Because there is a symmetry in many-to-many relationships and Hibernate has no rationale for selecting one direction over the other.
+
+We therefore use MappedBy to tell Hibernate, we have chosen the other entity to dictate the mapping of the relationship between the two entities.
+
+@Entity
+public class Driver {
+    @ManyToMany(mappedBy = "drivers")
+    private List<Cars> cars;
+}
+
+@Entity
+public class Cars {
+    @ManyToMany
+    private List<Drivers> drivers;
+}
+Adding @JoinColumn(name = "driverID") in the owner class (see below), will prevent the creation of a join table and instead, create a driverID foreign key column in the Cars table to construct a mapping:
+
+@Entity
+public class Driver {
+    @ManyToMany(mappedBy = "drivers")
+    private List<Cars> cars;
+}
+
+@Entity
+public class Cars {
+    @ManyToMany
+    @JoinColumn(name = "driverID")
+    private List<Drivers> drivers;
+}
+================
