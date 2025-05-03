@@ -1,0 +1,16 @@
+ConditionalOnProperty annotation is used to check if specified property available in the environment or it matches some specific value so it can control the execution of some part of code like bean creation. It may be useful in many cases for example enable/disable service if specific property is available. Below are the attributes which can be used for property check.
+havingValue - Provide the value which need to check against specified property otherwise it will check that value should not be false.
+matchIfMissing - If true it will match the condition and execute the annotated code when property itself is not available in environment.
+name - Name of the property to be tested. If you want to test single property then you can directly put the property name as string like "property.name" and if you have multiple properties to test then you can put the names like {"prop.name1","prop.name2"}
+prefix - It can be use when you want to apply some prefix to all properties. For example in case of above properties we can mention like (prefix="prop", name={"name1","name2"}.
+Below are some cases for the property value checks which I copied from Spring java documentation.
+The havingValue attribute can be used to specify the value that the property should have. The table below shows when a condition matches according to the property value and the havingValue() attribute: Having values
+Property Value	havingValue=""	havingValue="true"	havingValue="false"	havingValue="foo"
+"true"	yes	yes	no	no
+"false"	no	no	yes	no
+"foo"	yes	no	no	yes
+
+Here we will learn how to enable disable JAX-RS service basis on a property value, like enable JAX-RS service registration when that property is having true value. If property has false value then JAX-RS service registration will not happen and those REST resources will not be accessible even though our service class is present.
+application.properties
+Add below key/value pair to this property file.
+jaxrs.enabled=false

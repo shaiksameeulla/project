@@ -1,0 +1,37 @@
+Git Merge vs Rebase vs Cherrypick
+===========================
+
+Use merge when you want to combine branches while preserving a clear integration history.
+Use rebase when you want to maintain a linear commit history and incorporate changes from one branch onto another.
+
+Use cherry-pick when you want to apply specific commits from one branch onto another.
+
+
+
+
+it rebase indeed transplants a series of commits from "experiment" to the tip of "master",
+
+
+
+Git Rebase and Git Merge Similarities
+Both the rebase and merge commands exist for the same reason: they combine the work of multiple developers into a single entity, integrating changes between branches. That about sums up their similarities. On the other hand, their differences are considerably more profound.
+
+What’s the Difference Between Merge and Rebase?
+The main difference between git merge and git rebase is that git merge is a way of combining changes from one branch (source branch) into another branch (target branch) where as git rebase is a way of moving the changes from one branch onto another branch.
+
+
+
+Merge
+Rebase
+Git Merge lets you merge different Git branches.
+Git Merge logs show you the complete history of commit merging.
+All the commits on a feature branch are combined into a single commit on the master branch.
+Merge is best used when the target branch is supposed to be shared.
+Merge preserves history.
+
+Git Rebase allows you to integrate the changes from one branch into another.
+Git Rebase logs are linear. As the commits are rebased, the history is altered to reflect this.
+All commits are rebased, and the same number of commits are added to the master branch.
+Rebase is best used when the target branch is private.
+Rebase rewrites history.
+

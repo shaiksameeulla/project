@@ -1,0 +1,163 @@
+How LinkedIn improved their latency by 60%
+
+LinkedIn has improved its latency by caching its entire profile dataset in every data center, making it available all the time. This is a good option because the profile payload is small, with the 95th percentile being less than 24 KB. 
+
+Here are some other techniques that can help reduce latency:
+Reduce packet size
+Smaller packets can travel faster and more efficiently through the network, reducing transmission and processing delays. Compression techniques, such as codecs or algorithms, can be used to reduce packet size.
+Monitor and test performance
+Regularly and systematically monitor and test an app's performance to identify and fix issues that may affect latency, such as memory leaks, CPU usage, network errors, or slow queries. 
+
+
+How LinkedIn Reduced Latency with JSON
+An overview of Protobuf and how it's used at LinkedIn. Plus, how SMS Fraud works and how to guard against it, things DBs don't do and more.
+
+Why LinkedIn switched from JSON to Protobuf
+LinkedIn has over 900 million members in 200 countries. To serve this traffic, they use a microservices architecture with thousands of backend services. These microservices combine to tens of thousands of individual API endpoints across their system.
+
+As you might imagine, this can lead to quite a few headaches if not managed properly.
+
+To simplify the process of creating and interacting with these services, LinkedIn built (and open-sourced) Rest.li, a Java framework for writing RESTful clients and servers.
+
+To create a web server with Rest.li, all you have to do is define your data schema and write the business logic for how the data should be manipulated/sent with the different HTTP requests (GET, POST, etc.).
+
+Rest.li will create Java classes that represent your data model with the appropriate getters, setters, etc. It will also use the code you wrote for handling the different HTTP endpoints and spin up a highly scalable web server.
+
+For creating a client, Rest.li handles things like
+
+Service Discovery - Translates a URI to the proper address - http://myD2service.something.com:9520/.
+
+Type Safety - Uses the schema created when building the server to check types for requests/responses.
+
+Load Balancing - Balancing request load between the different servers that are running a certain backend service.
+
+Common Request Patterns - You can do things like make parallel Scatter-Gather requests, where you get data from all the nodes in a cluster.
+
+and more.
+
+To learn more about Rest.li, you can check out the docs here.
+
+JSON
+Since it was created, Rest.li has used JSON as the default serialization format for sending data between clients and servers.
+
+{
+
+  "id": 43234,
+
+  "type": "post",
+
+  "authors": [
+
+    "jerry",
+
+    "tom"
+  ]
+}
+JSON has tons of benefits
+
+Human Readable - Makes it much easier to work with than looking at 08 96 01 (binary-encoded message). If something’s not working, you can just log the JSON message.
+
+Broad Support - Every programming language has libraries for working with JSON. (I actually tried looking for a language that didn’t and couldn’t find one. Here’s a JSON library for Fortran.)
+
+Flexible Schema - The format of your data doesn’t have to be defined in advance and you can dynamically add/remove fields as necessary. However, this flexibility can also be a downside since you don’t have type safety.
+
+Huge amount of Tooling - There’s a huge amount of tooling developed for JSON like linters, formatters/beautifiers, logging infrastructure and more.
+
+However, the downside that LinkedIn kept running into was with performance.
+
+With JSON, they faced
+
+Increased Network Bandwidth Usage - plaintext is pretty verbose and this resulted in large payload sizes. The increased network bandwidth usage was hurting latency and placing excess load on LinkedIn’s backend.
+
+Serialization and Deserialization Latency - Serializing and deserializing an object to JSON can be suboptimal due to how verbose the messages are. This is not an issue for the majority of applications, but at Linkedin’s volume it was becoming a problem.
+
+To reduce network usage, engineers tried integrating compression algorithms like gzip to reduce payload size. However, this just made the serialization/deserialization latency worse.
+
+Instead, LinkedIn looked at several formats as an alternative to JSON.
+================================================================
+
+They considered
+
+	Protocol Buffers (Protobuf) - Protobuf is a widely used message-serialization format that encodes your message in binary. It’s very efficient, supported by a wide range of languages and also strongly typed (requires a predefined schema). We’ll talk more about this below.
+
+ Flatbuffers - A serialization format that was also open-sourced by Google. It’s similar to Protobuf but also offers “zero-copy deserialization”. This means that you don’t need to parse/unpack the message before you access data.
+
+	MessagePack - Another binary serialization format with wide language support. However, MessagePack doesn’t require a predefined schema so this can cause it to be less safe and less performant than Protobuf.
+
+	CBOR - A binary serialization format that was inspired by MessagePack. CBOR extends MessagePack and adds some features like distinguishing text strings from byte strings. Like MessagePack, it does not require a predefined schema.
+
+And a couple other formats.
+
+
+They ran some benchmarks and also looked at factors like language support, community and tooling. Based on their examination, they went with Protobuf.
+
+Overview of Protobuf
+===================
+Protocol Buffers (Protobuf) are a language-agnostic, binary serialization format created at Google in 2001. Google needed an efficient way for storing structured data to send across the network, store on disk, etc.
+
+Language agnostic means not being tied to a specific programming language. It can refer to software paradigms, tools, libraries, or systems that can be used with multiple languages. 
+
+Protobuf is strongly typed. You start by defining how you want your data to be structured in a .proto file.
+
+The proto file for serializing a user object might look like…
+
+syntax = "proto3";
+
+message Person {
+
+  string name = 1;
+
+  int32 id = 2;
+
+  repeated string email = 3;
+
+}
+They support a huge variety of types including: bools, strings, arrays, maps, etc. You can also update your schema later without breaking deployed programs that were compiled against the older formats.
+
+Once you define your schema in a .proto file, you use the protobuf compiler (protoc) to compile this to data access classes in your chosen language. You can use these classes to read/write protobuf messages.
+
+Some of the benefits of Protobuf are
+
+Smaller Payload - Encoding is much more efficient. If you have {“id”:59} in JSON, then this takes around 10 bytes assuming no whitespace and UTF-8 encoding. In protobuf, that message would be 0x08 0x3b (hexadecimal), and it would only take 2 bytes.
+
+Fast Serialization/Deserialization - Because the payload is much more compact, serializing and deserializing it is also faster. Additionally, knowing what format to expect for each message allows for more optimizations when deserializing.
+
+Type Safety - As we discussed, having a schema means that any deviations from this schema are caught at compile time. This leads to a better experience for users and (hopefully) fewer 3 am calls.
+
+Language Support - There’s wide language support with tooling for Python, Java, Objective-C, C++, Kotlin, Dart, and more.
+
+Results
+Using Protobuf resulted in an increase in throughput for response and request payloads. For large payloads, LinkedIn saw improvements in latency of up to 60%.
+
+They didn’t see any statistically significant degradations when compared to JSON for any of their services.
+
+Here’s the P99 latency comparison chart from benchmarking Protobuf against JSON for servers under heavy load.
+
+
+Protocol Buffers (Protobuf) and JSON are both data formats used for serializing structured data, but they have different strengths and are better suited for different use cases:
+
+Protobuf
+	This Google-developed format is smaller and faster than JSON, and is ideal for performance-critical environments that require fast data processing. Protobuf's binary format allows for quick serialization and deserialization of messages, and it's possible to retrieve specific areas of data without decrypting the entire organization. For example, in one comparison, a Protobuf message was 62 bytes, while a JSON message was 91 bytes.
+JSON
+	This text-based format is human-readable, making it easier to debug and develop. JSON's universal language support also makes it highly interoperable, simplifying data exchange across different systems and platforms. JSON is therefore well-suited for web interfaces and configurations, or for scenarios that prioritize ease of use.
+	
+	
+	Key Differences
+	
+Format and Readability: JSON and XML are text-based and more human-readable, while Protobuf is binary and more efficient but less human-readable. Verbosity: XML is the most verbose, JSON is less verbose and more readable, and Protobuf is the least verbose and most efficient.
+
+
+When to use JSON
+	You need or want data to be human readable
+	Data from the service is directly consumed by a web browser
+	Your server side application is written in JavaScript
+	You aren’t prepared to tie the data model to a schema
+	You don’t have the bandwidth to add another tool to your arsenal
+	The operational burden of running a different kind of network service is too great
+Pros of ProtoBuf
+	Relatively smaller size
+	Guarantees type-safety
+	Prevents schema-violations
+	Gives you simple accessors
+	Fast serialization/deserialization
+	Backward compatibility

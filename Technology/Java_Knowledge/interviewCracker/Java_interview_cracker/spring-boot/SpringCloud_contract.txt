@@ -1,0 +1,258 @@
+Spring Cloud Contract
+-------------------
+
+Spring Cloud Contract is a project that, simply put, helps us write Consumer-Driven Contracts (CDC).
+
+This ensures the contract between a Producer and a Consumer, in a distributed system – for both HTTP-based and message-based interactions.
+
+Features
+	When trying to test an application that communicates with other services then we could do one of two things:
+
+      1. deploy all microservices and perform end to end tests
+
+      2. mock other microservices in unit / integration tests
+
+Both have their advantages but also a lot of disadvantages. Let’s focus on the latter. 
+
+Deploy all microservices and perform end to end tests
+--------------------------------------------------
+  Advantages:
+
+		simulates production
+
+		tests real communication between services
+
+   Disadvantages:
+
+		to test one microservice we would have to deploy 6 microservices, a couple of databases etc.
+
+		the environment where the tests would be conducted would be locked for a single suite of tests (i.e. nobody else would be able to run the tests in the meantime).
+
+		long to run
+
+		very late feedback
+
+		extremely hard to debug
+
+Mock other microservices in unit / integration tests
+-------------------------------------------
+
+   Advantages:
+
+		very fast feedback
+
+		no infrastructure requirements
+
+   Disadvantages:
+
+	the implementor of the service creates stubs thus they might have nothing to do with the reality
+
+	you can go to production with passing tests and failing production
+
+To solve the aforementioned issues Spring Cloud Contract Verifier with Stub Runner were created. Their main idea is to give you very fast feedback, without the need to set up the whole world of microservices.
+
+Spring Cloud Contract Verifier features:
+------------------------------------
+
+ ensure that HTTP / Messaging stubs (used when developing the client) are doing exactly what actual server-side implementation will do
+
+	promote acceptance test driven development method and Microservices architectural style
+
+	to provide a way to publish changes in contracts that are immediately visible on both sides of the communication
+
+	to generate boilerplate test code used on the server side
+	
+
+
+2. Producer – Server Side
+We’re going to write a producer side CDC, in the form of an EvenOddController – which just tells whether the number parameter is even or odd:
+
+@RestController
+public class EvenOddController {
+
+    @GetMapping("/validate/prime-number")
+    public String isNumberPrime(@RequestParam("number") Integer number) {
+        return Integer.parseInt(number) % 2 == 0 ? "Even" : "Odd";
+    }
+}
+
+2.1. Maven Dependencies
+For our producer side, we’ll need the spring-cloud-starter-contract-verifier dependency:
+
+
+freestar
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-contract-verifier</artifactId>
+    <version>2.1.1.RELEASE</version>
+    <scope>test</scope>
+</dependency>
+
+And we’ll need to configure spring-cloud-contract-maven-plugin with the name of our base test class, which we’ll describe in the next section:
+
+<plugin>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-contract-maven-plugin</artifactId>
+    <version>2.1.1.RELEASE</version>
+    <extensions>true</extensions>
+    <configuration>
+        <baseClassForTests>
+            com.baeldung.spring.cloud.springcloudcontractproducer.BaseTestClass
+        </baseClassForTests>
+    </configuration>
+</plugin>
+
+2.2. Producer Side Setup
+We need to add a base class in the test package that loads our Spring context:
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@DirtiesContext
+@AutoConfigureMessageVerifier
+public class BaseTestClass {
+
+    @Autowired
+    private EvenOddController evenOddController;
+
+    @Before
+    public void setup() {
+        StandaloneMockMvcBuilder standaloneMockMvcBuilder 
+          = MockMvcBuilders.standaloneSetup(evenOddController);
+        RestAssuredMockMvc.standaloneSetup(standaloneMockMvcBuilder);
+    }
+}
+
+In the /src/test/resources/contracts/ package, we’ll add the test stubs, such as this one in the file shouldReturnEvenWhenRequestParamIsEven.groovy:
+
+import org.springframework.cloud.contract.spec.Contract
+Contract.make {
+    description "should return even when number input is even"
+    request{
+        method GET()
+        url("/validate/prime-number") {
+            queryParameters {
+                parameter("number", "2")
+            }
+        }
+    }
+    response {
+        body("Even")
+        status 200
+    }
+}
+
+When we run the build, the plugin automatically generates a test class named ContractVerifierTest that extends our BaseTestClass and puts it in /target/generated-test-sources/contracts/.
+
+The names of the test methods are derived from the prefix “validate_” concatenated with the names of our Groovy test stubs. For the above Groovy file, the generated method name will be “validate_shouldReturnEvenWhenRequestParamIsEven”.
+
+Let’s have a look at this auto-generated test class:
+
+public class ContractVerifierTest extends BaseTestClass {
+
+@Test
+public void validate_shouldReturnEvenWhenRequestParamIsEven() throws Exception {
+    // given:
+    MockMvcRequestSpecification request = given();
+
+    // when:
+    ResponseOptions response = given().spec(request)
+      .queryParam("number","2")
+      .get("/validate/prime-number");
+
+    // then:
+    assertThat(response.statusCode()).isEqualTo(200);
+    
+    // and:
+    String responseBody = response.getBody().asString();
+    assertThat(responseBody).isEqualTo("Even");
+}
+
+The build will also add the stub jar in our local Maven repository so that it can be used by our consumer.
+
+Stubs will be present in the output folder under stubs/mapping/.
+
+3. Consumer – Client Side
+The consumer side of our CDC will consume stubs generated by the producer side through HTTP interaction to maintain the contract, so any changes on the producer side would break the contract.
+
+We’ll add BasicMathController, which will make an HTTP request to get the response from the generated stubs:
+
+@RestController
+public class BasicMathController {
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @GetMapping("/calculate")
+    public String checkOddAndEven(@RequestParam("number") Integer number) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "application/json");
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange(
+          "http://localhost:8090/validate/prime-number?number=" + number,
+          HttpMethod.GET,
+          new HttpEntity<>(httpHeaders),
+          String.class);
+
+        return responseEntity.getBody();
+    }
+}
+
+3.1. The Maven Dependencies
+For our consumer, we’ll need to add the spring-cloud-contract-wiremock and spring-cloud-contract-stub-runner dependencies:
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-contract-wiremock</artifactId>
+    <version>2.1.1.RELEASE</version>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-contract-stub-runner</artifactId>
+    <version>2.1.1.RELEASE</version>
+    <scope>test</scope>
+</dependency>
+
+3.2. Consumer Side Setup
+Now it’s time to configure our stub runner, which will inform our consumer of the available stubs in our local Maven repository:
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@AutoConfigureMockMvc
+@AutoConfigureJsonTesters
+@AutoConfigureStubRunner(
+  stubsMode = StubRunnerProperties.StubsMode.LOCAL,
+  ids = "com.baeldung.spring.cloud:spring-cloud-contract-producer:+:stubs:8090")
+public class BasicMathControllerIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    public void given_WhenPassEvenNumberInQueryParam_ThenReturnEven()
+      throws Exception {
+ 
+        mockMvc.perform(MockMvcRequestBuilders.get("/calculate?number=2")
+          .contentType(MediaType.APPLICATION_JSON))
+          .andExpect(status().isOk())
+          .andExpect(content().string("Even"));
+    }
+}
+
+Note that the ids property of the @AutoConfigureStubRunner annotation specifies:
+
+com.baeldung.spring.cloud — the groupId of our artifact
+spring-cloud-contract-producer — the artifactId of the producer stub jar
+8090 — the port on which the generated stubs will run
+4. When the Contract Is Broken
+If we make any changes on the producer side that directly impact the contract without updating the consumer side, this can result in contract failure.
+
+For example, suppose we’re to change the EvenOddController request URI to /validate/change/prime-number on our producer side.
+
+If we fail to inform our consumer of this change, the consumer will still send its request to the /validate/prime-number URI, and the consumer side test cases will throw org.springframework.web.client.HttpClientErrorException: 404 Not Found.
+
+
+https://docs.spring.io/spring-cloud-contract/docs/3.0.0-SNAPSHOT/reference/html/using.html#using
+https://spring.io/guides/gs/contract-rest/
+https://dzone.com/articles/consumer-driven-contract-testing-with-spring-cloud-contract
+https://spring.io/blog/2018/02/13/spring-cloud-contract-in-a-polyglot-world

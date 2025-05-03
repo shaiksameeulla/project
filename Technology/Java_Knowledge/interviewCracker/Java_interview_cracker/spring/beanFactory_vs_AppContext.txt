@@ -1,0 +1,56 @@
+
+
+the BeanFactory interface is the root interface for accessing a Spring IoC container.
+It provides basic functionality for managing beans, such as instantiation, configuration, and dependency injection.
+BeanFactory implementations, such as DefaultListableBeanFactory, LazyInitBeanFactory, and XmlBeanFactory, are available in Spring.
+Bean factory implementations should support the standard bean lifecycle interfaces as far as possible. The BeanFactory is a central registry of application beans, their configurations, and dependencies.
+	
+	
+What is ApplicationContext?
+	Spring IoC container is responsible for instantiating, wiring, configuring, and managing the entire life cycle of objects. BeanFactory and ApplicationContext represent the Spring IoC Containers. ApplicationContext is the sub-interface of BeanFactory. BeanFactory provides basic functionalities and is recommended to use for lightweight applications like mobile and applets. ApplicationContext provides basic features in addition to enterprise-specific functionalities which are as follows:
+
+	Publishing events to registered listeners by resolving property files.
+	Methods for accessing application components.
+	Supports Internationalization.
+	Loading File resources in a generic fashion.
+	
+	ApplicationContext is a sub-interface of the BeanFactory and provides enhanced functionality and features.
+It is a more advanced container that supports additional enterprise-specific features, such as internationalization, event propagation, and application lifecycle events.
+
+		ApplicationContext implementations, such as 
+		ClassPathXmlApplicationContext,
+		AnnotationConfigApplicationContext,
+		    FileSystemXmlApplicationContext,
+		and WebApplicationContext, are commonly used in Spring applications.
+Java
+
+	
+
+IoC – Inversion of Control means, we don’t have the control to create the dependencies rather the framework does it for us. The code that is responsible for doing the dependency injection is known as IoC Container.
+
+  
+What is WebApplicationContext?
+		WebApplicationContext in Spring is a web-aware ApplicationContext i.e it has Servlet Context information. In a single web application, there can be multiple WebApplicationContext. That means each DispatcherServlet is associated with a single WebApplicationContext. The WebApplicationContext configuration file *-servlet.xml is specific to the DispatcherServlet and a web application can have more than one DispatcherServlet configured to handle the requests and each DispatcherServlet would have a separate *-servlet.xml file to configure.
+		
+		
+		Difference Between ApplicationContext and WebApplicationContext in Spring MVC
+		
+Factor 1: ApplicationContext is used to create standalone applications. But for the web applications, we have to deal with a container called WebApplicationContext.
+
+A. Standalone App
+
+// Creating container objects manually
+ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+// Destroying container object manually
+context.close();
+B. Web App
+
+You don’t need to create and destroy the container object. The container object will be created automatically with the server startup and destroyed when we stop the server. 
+
+Factor 2: One more interesting difference is both ApplicationContext and WebApplicationContext are the spring containers where WebApplicationContext is the child of the ApplicationContext interface.
+
+public interface WebApplicationContext 
+extends ApplicationContext 
+{
+  ...............
+}

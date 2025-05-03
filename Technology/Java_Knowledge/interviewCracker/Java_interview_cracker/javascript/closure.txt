@@ -1,0 +1,24 @@
+Closure:
+
+In other words, closure is created when a child function keep the environment of the parent scope even after the parent function has already executed 
+
+Note: Closure is the concept of function + lexical environment in which function it was created. so every function declared within another function then it has access to the scope chain of the outer function and the variables created within the scope of the outer function will not get destroyed.
+
+
+function foo(outer_arg) {
+ 
+    function inner(inner_arg) {
+        return outer_arg + inner_arg;
+    }
+    return inner;
+}
+let get_func_inner = foo(5);
+ 
+console.log(get_func_inner(4));
+console.log(get_func_inner(3));
+
+
+Output: In the above example we used a parameter function rather than a default one. Not even when we are done with the execution of foo(5) we can access the outer_arg variable from the inner function. And on the execution of the inner function produce the summation of outer_arg and inner_arg as desired. 
+
+9
+8

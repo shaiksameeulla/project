@@ -1,0 +1,283 @@
+SPring boot :
+------------------
+application.properties vs application.yml
+
+what happens if both are in classpath : 
+
+application.yml-->application.properties-> application-profile.properties
+, meaning yml loads first and properties later. Any application-profile.properties will be added even later. This is a nice way to override values in application.properties
+
+Dispatcher Servlet  configured in Sprnig boot:
+------------------------------------------
+Spring-boot-web-starter : it going to have spring-web and spring-webmvc
+
+There are 2 annotaiton : SpringBootapplication = configuration+autoconfigurtation+ Component scan
+
+There will be Spring-bootautconfigrer jar --> Meta-INF folder --> sprint.factories-->EnableAutoconfiguration
+
+Springboot-starter has springbootautoconfiguer jar
+
+it has DispatcherServletAutocongiration: it check if it has Dispatcherservlet in the class path
+
+===========================
+How will you handle a Bad gateway exception when thrown from a rest client ?
+
+will this exception go to controller advice?
+
+You want to create a class that implements ResponseErrorHandler and then use an instance of it to set the error handling of your rest template:
+
+public class MyErrorHandler implements ResponseErrorHandler {
+  @Override
+  public void handleError(ClientHttpResponse response) throws IOException {
+    // your error handling here
+  }
+
+  @Override
+  public boolean hasError(ClientHttpResponse response) throws IOException {
+     ...
+  }
+}
+
+[...]
+
+public static void main(String args[]) {
+  RestTemplate restTemplate = new RestTemplate();
+  restTemplate.setErrorHandler(new MyErrorHandler());
+}
+Also, Spring has the class DefaultResponseErrorHandler, which you can extend instead of implementing the interface, in case you only want to override the handleError method.
+
+public class MyErrorHandler extends DefaultResponseErrorHandler {
+  @Override
+  public void handleError(ClientHttpResponse response) throws IOException {
+    // your error handling here
+  }
+}
+
+
+=============
+
+
+Handling Exception in Spring:
+------------------------
+
+With Error Handlers
+We have three ways to use @ResponseStatus to convert an Exception to an HTTP response status:
+
+	using @ExceptionHandler
+	using @ControllerAdvice
+	marking the Exception class
+In order to use the first two solutions, we have to define an error handler method. You can read more about this topic in this article.
+
+n addition, we can just understand it as:
+
+@RestControler = @Controller + @ResponseBody
+
+@RestControllerAdvice = @ControllerAdvice + @ResponseBody.
+
+Keeping in mind that @RestControllerAdvice is more convenient annotation for handling Exception with RestfulApi.
+
+Example os usage:
+
+@RestControllerAdvice
+public class WebRestControllerAdvice {
+  
+  @ExceptionHandler(CustomNotFoundException.class)
+  public ResponseMsg handleNotFoundException(CustomNotFoundException ex) {
+    ResponseMsg responseMsg = new ResponseMsg(ex.getMessage());
+    return responseMsg;
+  }
+}
+In that case any exception instanceOf CustomNotFoundException will be thrown in body of response.
+
+
+
+Error Handling for REST with Spring
+------------------------------
+We can use @ResponseStatus with these error handler methods the same way we did with regular MVC methods in the previous section.
+
+Before Spring 3.2, the two main approaches to handling exceptions in a Spring MVC application were HandlerExceptionResolver or the @ExceptionHandler annotation. Both have some clear downsides.
+
+Since 3.2, we've had the @ControllerAdvice annotation to address the limitations of the previous two solutions and to promote a unified exception handling throughout a whole application.
+
+Now Spring 5 introduces the ResponseStatusException class — a fast way for basic error handling in our REST APIs.
+
+All of these do have one thing in common: They deal with the separation of concerns very well. The app can throw exceptions normally to indicate a failure of some kind, which will then be handled separately.
+
+
+ Solution 1: the Controller-Level @ExceptionHandler
+ 
+		The first solution works at the @Controller level. We will define a method to handle exceptions and annotate that with @ExceptionHandler:
+
+		public class FooController{
+			
+			//...
+			@ExceptionHandler({ CustomException1.class, CustomException2.class })
+			public void handleException() {
+				//
+			}
+		}
+		This approach has a major drawback: The @ExceptionHandler annotated method is only active for that particular Controller, not globally for the entire application. Of course, adding this to every controller makes it not well suited for a general exception handling mechanism.
+
+		We can work around this limitation by having all Controllers extend a Base Controller class.
+
+		However, this solution can be a problem for applications where, for whatever reason, that isn't possible. For example, the Controllers may already extend from another base class, which may be in another jar or not directly modifiable, or may themselves not be directly modifiable.
+
+		Next, we'll look at another way to solve the exception handling problem — one that is global and doesn't include any changes to existing artifacts such as Controllers.
+
+3. Solution 2: the HandlerExceptionResolver
+	
+		The second solution is to define an HandlerExceptionResolver. This will resolve any exception thrown by the application. It will also allow us to implement a uniform exception handling mechanism in our REST API.
+
+		Before going for a custom resolver, let's go over the existing implementations.
+
+Solution 3: @ControllerAdvice
+
+	Spring 3.2 brings support for a global @ExceptionHandler with the @ControllerAdvice annotation.
+
+		This enables a mechanism that breaks away from the older MVC model and makes use of ResponseEntity along with the type safety and flexibility of @ExceptionHandler:
+
+		@ControllerAdvice
+		public class RestResponseEntityExceptionHandler 
+		  extends ResponseEntityExceptionHandler {
+
+			@ExceptionHandler(value 
+			  = { IllegalArgumentException.class, IllegalStateException.class })
+			protected ResponseEntity<Object> handleConflict(
+			  RuntimeException ex, WebRequest request) {
+				String bodyOfResponse = "This should be application specific";
+				return handleExceptionInternal(ex, bodyOfResponse, 
+				  new HttpHeaders(), HttpStatus.CONFLICT, request);
+			}
+		}
+		The@ControllerAdvice annotation allows us to consolidate our multiple, scattered @ExceptionHandlers from before into a single, global error handling component.
+
+		The actual mechanism is extremely simple but also very flexible:
+
+		It gives us full control over the body of the response as well as the status code.
+		It provides mapping of several exceptions to the same method, to be handled together.
+		It makes good use of the newer RESTful ResposeEntity response.
+		One thing to keep in mind here is to match the exceptions declared with @ExceptionHandler to the exception used as the argument of the method.
+
+		If these don't match, the compiler will not complain — no reason it should — and Spring will not complain either.
+
+		However, when the exception is actually thrown at runtime, the exception resolving mechanism will fail with:
+
+		java.lang.IllegalStateException: No suitable resolver for argument [0] [type=...]
+		HandlerMethod details: 
+
+
+Exceptionhandler :
+The @ExceptionHandler value can be set to an array of Exception types. If an exception is thrown matches one of the types in the list, then the method annotated with the matching @ExceptionHandler will be invoked. If the annotation value is not set then the exception types listed as method arguments are used. See the documentation for details.
+
+
+ Exception handler method example
+@ExceptionHandler(NullPointerException.class)
+public ModelAndView handleException(NullPointerException ex)
+{
+  //Do something additional if required
+  ModelAndView modelAndView = new ModelAndView();
+  modelAndView.setViewName("error");
+  modelAndView.addObject("message", ex.getMessage());
+  return modelAndView;
+}
+Now every time, controller encounter NullPointerException in request processing for any web request in this controller, control will automatically come to this handler method.
+
+
+Solution 4: ResponseStatusException (Spring 5 and Above)
+
+	Spring 5 introduced the ResponseStatusException class.
+
+	We can create an instance of it providing an HttpStatus and optionally a reason and a cause:
+
+	@GetMapping(value = "/{id}")
+	public Foo findById(@PathVariable("id") Long id, HttpServletResponse response) {
+		try {
+			Foo resourceById = RestPreconditions.checkFound(service.findOne(id));
+
+			eventPublisher.publishEvent(new SingleResourceRetrievedEvent(this, response));
+			return resourceById;
+		 }
+		catch (MyResourceNotFoundException exc) {
+			 throw new ResponseStatusException(
+			   HttpStatus.NOT_FOUND, "Foo Not Found", exc);
+		}
+	}
+	What are the benefits of using ResponseStatusException?
+
+	Excellent for prototyping: We can implement a basic solution quite fast.
+	One type, multiple status codes: One exception type can lead to multiple different responses. This reduces tight coupling compared to the @ExceptionHandler.
+	We won't have to create as many custom exception classes.
+	We have more control over exception handling since the exceptions can be created programmatically.
+	And what about the tradeoffs?
+
+	There's no unified way of exception handling: It's more difficult to enforce some application-wide conventions as opposed to @ControllerAdvice, which provides a global approach.
+	Code duplication: We may find ourselves replicating code in multiple controllers.
+	We should also note that it's possible to combine different approaches within one application.
+
+	For example, we can implement a @ControllerAdvice globally but also ResponseStatusExceptions locally.
+
+	However, we need to be careful: If the same exception can be handled in multiple ways, we may notice some surprising behavior. A possible convention is to handle one specific kind of exception always in one way.
+
+	For more details and further examples, see our tutorial on ResponseStatusException.
+	
+	
+	Spring Boot Support
+Spring Boot provides an ErrorController implementation to handle errors in a sensible way.
+
+In a nutshell, it serves a fallback error page for browsers (a.k.a. the Whitelabel Error Page) and a JSON response for RESTful, non-HTML requests:
+
+{
+    "timestamp": "2019-01-17T16:12:45.977+0000",
+    "status": 500,
+    "error": "Internal Server Error",
+    "message": "Error processing the request!",
+    "path": "/my-endpoint-with-exceptions"
+}
+As usual, Spring Boot allows configuring these features with properties:
+
+server.error.whitelabel.enabled: can be used to disable the Whitelabel Error Page and rely on the servlet container to provide an HTML error message
+server.error.include-stacktrace: with an always value; includes the stacktrace in both the HTML and the JSON default response
+server.error.include-message: since version 2.3, Spring Boot hides the message field in the response to avoid leaking sensitive information; we can use this property with an always value to enable it
+Apart from these properties, we can provide our own view-resolver mapping for /error, overriding the Whitelabel Page.
+
+We can also customize the attributes that we want to show in the response by including an ErrorAttributes bean in the context. We can extend the DefaultErrorAttributes class provided by Spring Boot to make things easier:
+
+@Component
+public class MyCustomErrorAttributes extends DefaultErrorAttributes {
+
+    @Override
+    public Map<String, Object> getErrorAttributes(
+      WebRequest webRequest, ErrorAttributeOptions options) {
+        Map<String, Object> errorAttributes = 
+          super.getErrorAttributes(webRequest, options);
+        errorAttributes.put("locale", webRequest.getLocale()
+            .toString());
+        errorAttributes.remove("error");
+
+        //...
+
+        return errorAttributes;
+    }
+}
+If we want to go further and define (or override) how the application will handle errors for a particular content type, we can register an ErrorController bean.
+
+Again, we can make use of the default BasicErrorController provided by Spring Boot to help us out.
+
+For example, imagine we want to customize how our application handles errors triggered in XML endpoints. All we have to do is define a public method using the @RequestMapping, and stating it produces application/xml media type:
+
+@Component
+public class MyErrorController extends BasicErrorController {
+
+    public MyErrorController(
+      ErrorAttributes errorAttributes, ServerProperties serverProperties) {
+        super(errorAttributes, serverProperties.getError());
+    }
+
+    @RequestMapping(produces = MediaType.APPLICATION_XML_VALUE)
+    public ResponseEntity<Map<String, Object>> xmlError(HttpServletRequest request) {
+        
+    // ...
+
+    }
+}
+Note: here we're still relying on the server.error.* Boot properties we might have been defined in our project, which are bound to the ServerProperties bean.

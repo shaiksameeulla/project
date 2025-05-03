@@ -1,0 +1,58 @@
+throttling
+==========
+for expensive function we want to limit the frequency of function invocation.
+
+With throttling, you limit the frequency of function invocations. For example, you might decide to execute a function at most once every 1500 milliseconds. This prevents the function from being called too frequently and helps maintain a smoother performance.
+
+Example: In this example, a button with the id ‘throttle’ is equipped with a throttling mechanism using a custom throttle function. When clicked, the associated callback function, logging ‘button is clicked’ to the console, is throttled to execute at most once every 1500 milliseconds.
+
+
+
+Advantages of throttling function: 
+It prevents frequent calling of the function.
+It makes the website faster and controls the rate at which a particular function is called.
+Performance Optimization.
+Improved Responsiveness.
+
+
+
+
+<button id="throttle">Click Me</button>
+
+
+    <script>
+        const btn = document.querySelector("#throttle");
+ 
+        // Throttling Function
+        const throttleFunction = (func, delay) => {
+ 
+            // Previously called time of the function
+            let prev = 0;
+            return (...args) => {
+                // Current called time of the function
+                let now = new Date().getTime();
+ 
+                // Logging the difference
+                // between previously 
+                // called and current called timings
+                console.log(now - prev, delay);
+ 
+                // If difference is greater
+                // than delay call
+                // the function again.
+                if (now - prev > delay) {
+                    prev = now;
+ 
+                    // "..." is the spread
+                    // operator here 
+                    // returning the function with the 
+                    // array of arguments
+                    return func(...args);
+                }
+            }
+        }
+        btn.addEventListener("click",
+            throttleFunction(() => {
+                console.log("button is clicked")
+            }, 1500));
+    </script>

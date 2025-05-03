@@ -1,0 +1,61 @@
+
+Data base Design & it's capabilities
+=============================
+
+
+Caching Capabilities : Redis
+Blob: S3 , CDN
+
+Text Search :  Elastic Search , Solar,
+
+Metrix to capture , Monitoring :  Time series
+  we need appended write data
+   we need  a timeseris database
+   we need range of some date to read
+   Ex: Open timeseries Database
+   
+   
+   
+   Big data base for analytics.... need various reports, statistics... warehourse data
+   ex: Hadoop
+   
+   
+   Two kinds of DB
+   1. Structure DB
+			do we need ACID Yes then RDBMS
+			ex: mysql, postgresql, sql server
+			
+			Payment : db, 
+			Atomity , consistency, Integratiry , Durabality
+   2.  unstructure DB
+       -->  like catalog for amazon,  ex item can be shirt, refreigirator,milk 
+          lot of datatypes and many wide range queries
+          then it's Document DB :  Mango DB, Couch base.		  
+       --> ever increasing data,  finite queries
+	        huge data and finite queries
+			 then it's  Column DB, cassandra, Hbase
+   
+   Take example for Amazon Ecommerce
+   -------------------------------
+   
+   FOr INventory management : it should be  RDBMS, once its' delievred after few days 
+   
+   then we can purge them in  cassandra for 
+   
+   then if we want to read range of user recommendations then for queries we can use mongo db
+   
+   
+   ==========
+   
+   Huge Read intensive --Need to do caching
+   Huge write intesive--
+		Maybe this question is better suited for https://softwarerecs.stackexchange.com/
+
+		Apart from that, Cassandra performs quite well with many inserts when you have a look on async inserts and batches that hit only one node. We do this every day with >100GB of data.
+
+		Keep in mind that you will need a strategy to get rid of old data in any database you choose. One thing cassandra can't handle for you is a "huge" transaction that makes the data visible after the complete inserts done. You have to do this on application side - we use a "marker insert" for this and only do processing in clients when the marker was set already.
+
+		Also some guys at Instagram combinded RocksDB and Cassandra to Rocksandra:
+
+		https://github.com/Instagram/cassandra/tree/rocks_3.0 https://instagram-engineering.com/open-sourcing-a-10x-reduction-in-apache-cassandra-tail-latency-d64f86b43589
+   

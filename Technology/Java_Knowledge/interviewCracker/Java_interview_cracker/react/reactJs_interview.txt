@@ -1,0 +1,231 @@
+ReactJs Interviews:
+------------------
+1.What is Hoisting in JS? How it works?
+   JavaScript Hoisting refers to the process whereby the interpreter appears to move the declaration of functions, variables or classes to the top of their scope, prior to execution of the code.
+
+    Hoisting is not a term normatively defined in the ECMAScript specification
+	
+	The JavaScript engine doesn’t hoist the function expressions
+		( let result = add(x,y); let add = function(x, y) {  return x + y;}) 
+and arrow functions(let add = (x, y) => x + y; ).
+
+      The javascript mechanism in which variables and function declarations are moved to the top of their scope before code execution is called Hoisting.
+		Hoisting gives us an advantage that variables and functions can be accessed before they are declared.
+		Function expressions and arrow functions cannot be hoisted.
+		The sequence of variable declaration and initialization or the lifecycle of a variable is as follows: Declaration -> Initialization -> Assignment.
+		All variables in javascript are hoisted, but var variables are hoisted in one way and let , const are hoisted in another way.
+
+
+
+2. What is difference between let and var?
+   var, let, and const Variable Declaration in JavaScript
+	The differences between var, let, and const variable declaration in JavaScript include:
+	Variables declared with var and const are scoped to the immediate function body.
+	Variables declared with the var keyword are hoisted. Hoisting means that the variable can be accessed in their enclosing scope even before they are declared.
+	Variables declared with the let keyword are block-scoped, which means the variables will have scope to the immediate enclosing block.
+
+3. What is Event Loop? 
+
+4. What is precedence in Event Loop? 
+
+5.What is difference between setTimeout and setInterval?
+
+ Where do you use Rest Operator?
+ the rest operator is used to put the rest of some specific user-supplied values into a JavaScript array. So, for instance, here is the rest syntax: ... yourValues
+ The main difference between rest and spread is that the rest operator puts the rest of some specific user-supplied values into a JavaScript array. But the spread syntax expands iterables into individual elements.
+eval ?
+	eval() is a global function in JavaScript that evaluates a specified string as JavaScript code and executes it.
+
+	Example: eval
+	eval("alert('this is executed by eval()')");
+
+ Have you heard of array.reverse?
+ The reverse() method reverses an array in place and returns the reference to the same array, the first array element now becoming the last, and the last array element becoming the first. In other words, elements order in the array will be turned towards the direction opposite to that previously stated.
+ 
+ he reverse() method reverses an array in place and returns the reference to the same array, the first array element now becoming the last, 
+
+ What is meant by Shallow copy and Deep copy?
+ 
+	Shallow Copy: When a reference variable is copied into a new reference variable using the assignment operator, a shallow copy of the referenced object is created. In simple words, a reference variable mainly stores the address of the object it refers to. When a new reference variable is assigned the value of the old reference variable, the address stored in the old reference variable is copied into the new one. This means both the old and new reference variable point to the same object in memory. As a result if the state of the object changes through any of the reference variables it is reflected for both.
+		var employeeDetailsOriginal = {  name: 'Manjula', age: 25, Profession: 'Software Engineer' };
+		var employeeDetailsDuplicate = employeeDetailsOriginal; //Shallow copy!
+		If we change a value:   employeeDetailsDuplicate.name = 'NameChanged';
+
+ 
+	Deep Copy: Unlike the shallow copy, deep copy makes a copy of all the members of the old object, allocates separate memory location for the new object and then assigns the copied members to the new object. In this way, both the objects are independent of each other and in case of any modification to either one the other is not affected. Also, if one of the objects is deleted the other still remains in the memory. Now to create a deep copy of an object in JavaScript we use JSON.parse() and JSON.stringify() methods. Let us take an example to understand it better.
+	
+			var employee = {
+			eid: "E102",
+			ename: "Jack",
+			eaddress: "New York",
+			salary: 50000
+		}
+		console.log("=========Deep Copy========");
+		var newEmployee = JSON.parse(JSON.stringify(employee));
+
+ What are Closure?
+ A closure is the combination of a function bundled together (enclosed) with references to its surrounding state (the lexical environment). 
+	A function can return another function in JavaScript. A function which is assigned to a variable is called function expression.
+	Closure is useful in hiding implementation detail in JavaScript. In other words, it can be useful to create private variables or functions.
+	
+	Example: Closure                                       |   var innerFunc = OuterFunction();
+function OuterFunction() {
+    var outerVariable = 100;                               |   innerFunc(); // 100
+    function InnerFunction() {
+        alert(outerVariable);                              |
+    }
+    return InnerFunction;}
+
+hof vs callback in javascript
+------------------------------
+
+A higher-order function is a function that takes another function(s) as an argument(s) and/or returns a function to its callers.
+
+
+
+
+A callback function is a function that is passed to another function with the expectation that the other function will call it.
+
+So a callback is not necessarily itself a higher-order function, but a function that receives a callback as an argument is.
+
+
+Higher-Order functions basically mean two things:
+
+		Functions can take other functions as an argument/input
+		Functions can return functions
+This is what is meant by higher-order functions.
+
+// this function takes a function as an argument
+function myFunc(anotherFunc) {
+  // executes and returns its result as the output which happens to be a function (myFunc)
+  return anotherFunc();
+}
+
+// let's call myFunc with an anonymous function
+myFunc(function() { 
+ // this returns a function as you see
+ return myFunc;
+});
+As for your example, it demonstrates higher-order functions by returning a function. It also demonstrates the notion of closure.
+
+Closure is closing over a scoped variable, in this case the input argument n.
+
+function greaterThan(n) {
+  // n is closed over (embedded into and accessible within) the function returned below
+  return function(m) { return m > n; };
+}
+
+// greatherThan10 reference points to the function returned by the greaterThan function
+// with n set to 10
+// Notice how greaterThan10 can reference the n variable and no-one else can
+// this is a closure
+var greaterThan10 = greaterThan(10);
+
+console.log(greaterThan10(11));
+// → true
+
+=====
+
+
+8:08 Have you used reduce function in JS?
+
+8:19 What is the difference between map and reduce?
+
+9:24 What are the parameters map function accepts?
+
+9:49 What is difference between a Promise and a Callback?
+
+10:23 What position attributes in CSS have you used?  (absolute,relative FIXED, sticky)
+
+10:35 What is the difference between them?
+
+ Parent(position relative)--> child--> subchild(position:absolute)---subchild align with Parent or Super Prent?
+ Parent--> child--> subchild(position:absolute)---subchild align with Parent or Super Prent?
+
+12: 32 What is Flexbox? 
+
+13:13 What is difference between display=none and visibility=hidden? 
+
+13:48 What are the Hooks you have used? functional Hooks
+
+14:34 What is the purpose of useMemo and useCallback?
+
+14:48 What are Class based Lifecycle methods?  (constructor-->)
+
+			Mounting
+				These methods are called in the following order when an instance of a component is being created and inserted into the DOM:
+
+				constructor()
+				static getDerivedStateFromProps()
+				render()
+				componentDidMount()
+			
+			Updating
+				An update can be caused by changes to props or state. These methods are called in the following order when a component is being re-rendered:
+
+				static getDerivedStateFromProps()
+				shouldComponentUpdate()
+				render()
+				getSnapshotBeforeUpdate()
+				componentDidUpdate()
+			Unmounting
+				This method is called when a component is being removed from the DOM:
+
+				componentWillUnmount()
+			Error Handling
+				These methods are called when there is an error during rendering, in a lifecycle method, or in the constructor of any child component.
+
+				static getDerivedStateFromError()
+				componentDidCatch()
+
+  render() will not be invoked if shouldComponentUpdate() returns false.
+
+
+
+16:37 How would you be able to achieve componentDidMount, componentDidUpdate & componentDidUnMount in functional based component? 17:58
+
+What are Pure Components and its purpose?
+			React.PureComponent
+		React.PureComponent is similar to React.Component. The difference between them is that React.Component doesn’t implement shouldComponentUpdate(), but React.PureComponent implements it with a shallow prop and state comparison.
+
+		If your React component’s render() function renders the same result given the same props and state, you can use React.PureComponent for a performance boost in some cases.
+
+		Note
+
+		React.PureComponent’s shouldComponentUpdate() only shallowly compares the objects. If these contain complex data structures, it may produce false-negatives for deeper differences. Only extend PureComponent when you expect to have simple props and state, or use forceUpdate() when you know deep data structures have changed. Or, consider using immutable objects to facilitate fast comparisons of nested data.
+
+		Furthermore, React.PureComponent’s shouldComponentUpdate() skips prop updates for the whole component subtree. Make sure all the children components are also “pure”.
+
+19:27 What are Higher Order components?
+			A higher-order component (HOC) is an advanced technique in React for reusing component logic. HOCs are not part of the React API, per se. They are a pattern that emerges from React’s compositional nature.
+
+				Concretely, a higher-order component is a function that takes a component and returns a new component.
+
+				const EnhancedComponent = higherOrderComponent(WrappedComponent);
+				Whereas a component transforms props into UI, a higher-order component transforms a component into another component.
+
+				HOCs are common in third-party React libraries, such as Redux’s connect and Relay’s createFragmentContainer.
+20:07 What HOCs have you used?
+
+20:29 Have you used Context API? 20:46
+
+Already have state management in React, so why go for Redux? 21:06
+
+How Redux works?
+
+22:27 Have you used any Middlewares?
+		=> Saga and Thunk
+
+22:42 What is the purpose of using middlewares?
+
+		Both Redux Thunk and Redux Saga take care of dealing with side effects. In very simple terms, applied to the most common scenario (async functions, specifically AJAX calls) Thunk allows Promises to deal with them, Saga uses Generators. Thunk is simple to use and Promises are familiar to many developers, Saga/Generators are more powerful but you will need to learn them. When Promises are just good enough, so is Thunk, when you deal with more complex cases on a regular basis, Saga gives you better tools.
+
+			As an example, what happens when you start an AJAX call in a route/view and then the user moves to a different one? Can you safely let the reducer change the state anyway? Saga makes it trivial to cancel the effect, Thunk requires you to take care of it, with solutions that don't scale as nicely.
+
+			In practical terms choosing one or the other one really depends (tautologically) on the project.
+
+			One thing to keep in mind is that the two middlewares can coexist, so you can start with Thunks and introduce Sagas when/if you need them (and then choose how/what to refactor with hands on experience... A solution that especially fits "learning projects", MVPs, et similia) In general terms, Sagas are more powerful and easier to test, but they introduce many new concepts, that can be a bit overwhelming if you're also learning other technologies (Redux especially).
+
+			Specifically, while dealing with the simple and effective Redux philosophy (actions (literal objects) fed into reducers (pure functions)), you can deal with side effects with Thunk that is more limited but easy to grasp (Promise.then().error()), or with Saga that requires you to face the (powerful) notion that you can do more complex things with those actions.
+
+			It's also worth mentioning (redux-)observable has an even more complex (and even more powerful) paradigm to deal with side effects, just in case you are unfamiliar with it (if you already are, it might be easier to use than learning Saga).

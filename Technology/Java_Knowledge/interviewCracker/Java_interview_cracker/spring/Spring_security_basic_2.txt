@@ -1,0 +1,102 @@
+ DelegatingFilterProxy that allows bridging between the Servlet container’s lifecycle and Spring’s ApplicationContext. (if we use xml we define in the web.xml file:)
+ DelegatingFilterProxy’s doFilter() method will delegate all calls to a Spring bean, enabling us to use all Spring features within our filter bean.
+ 
+ DelegatingFilterProxy : Proxy for a standard Servlet Filter, delegating to a Spring-managed bean that implements the Filter interface. Supports a "targetBeanName" filter init-param in web.xml, specifying the name of the target bean in the Spring application context.
+ web.xml will usually contain a DelegatingFilterProxy definition, with the specified filter-name corresponding to a bean name in Spring's root application context. All calls to the filter proxy will then be delegated to that bean in the Spring context, which is required to implement the standard Servlet Filter interface.
+
+This approach is particularly useful for Filter implementations with complex setup needs, allowing to apply the full Spring bean definition machinery to Filter instances. Alternatively, consider standard Filter setup in combination with looking up service beans from the Spring root application context.
+
+Since the DelegatingFilterProxy acts as a proxy for our filter, and accepts the requests and passes (delegates) it to our filter, it is called DelegatingFilterProxy.
+ 
+ FilterChainProxy is a special Filter provided by Spring Security that allows delegating to many Filter instances through SecurityFilterChain. Since FilterChainProxy is a Bean, it is typically wrapped in a DelegatingFilterProxy.
+ 
+ SecurityFilterChain is used by FilterChainProxy to determine which Spring Security Filter instances should be invoked for the current request.
+ 
+ 
+ Now, let’s look at the core components that take part in the filter chain:
+
+1. DelegatingFilterProxy It is a servlet filter provided by Spring that acts as a bridge between the Servlet container and the Spring Application Context. The DelegatingFilterProxy class is responsible for wiring any class that implements javax.servlet.Filter into the filter chain.
+3. FilterChainProxy Spring security internally creates a FilterChainProxy bean named springSecurityFilterChain wrapped in DelegatingFilterProxy. The FilterChainProxy is a filter that chains multiple filters based on the security configuration. Thus, the DelegatingFilterProxy delegates request the FilterChainProxy which determines the filters to be invoked.
+3. SecurityFilterChain: The security filters in the SecurityFilterChain are beans registered with FilterChainProxy. An application can have multiple SecurityFilterChain. FilterChainProxy uses the RequestMatcher interface on HttpServletRequest to determine which SecurityFilterChain needs to be called
+
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+                .httpBasic();
+        return http.build();
+    }
+}
+
+Additional Notes on Spring Security Chain
+> The default fallback filter chain in a Spring Boot application has a request matcher /**, meaning it will apply to all requests.
+> The default filter chain has a predefined @Order SecurityProperties.BASIC_AUTH_ORDER.
+> We can exclude this complete filter chain by setting security.basic.enabled=false.
+> We can define the ordering of multiple filter chains. For instance, to call a custom filter chain before the default one, we need to set a lower @Order. Example @Order(SecurityProperties.BASIC_AUTH_ORDER - 10).
+> We can plugin a custom filter within the existing filter chain (to be called at all times or for specific URL patterns) using the FilterRegistrationBean or by extending OncePerRequestFilter.
+>  For the defined custom filter, if no @Order is specified, it is the last in the security chain. (Has the default order LOWEST_PRECEDENCE.)
+We can also use methods addFilterAfter(), addFilterAt() and addFilterBefore() to have more control over the ordering of our defined custom filter.
+
+How to add multiple securityfilter chain
+=========================================
+
+// Applies only to the specified security-matchers
+    @Bean
+    @Order(1)
+    public SecurityFilterChain basicAuthSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.securityMatcher("/v1/info/**");
+        return http
+                .authenticationManager(authProviderManager())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(POST, "/v1/info", "/v1/info/{user}").hasRole("user")
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(withDefaults())
+                .build();
+    }
+    
+    // this one has lowest precedence (higher order) and no security matcher 
+    // => behaves as default when higher precedence (lower order) ones security matchers did not match 
+    @Bean
+    @Order(2)
+    public SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(POST, "/v1/transaction/**")
+                        .hasAnyRole("poweruser", "admin")
+                        .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer()
+                .jwt()
+                .and().and().build();
+    }
+	
+	
+	Adding custom filter:
+	
+	@Bean
+SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        // ...
+        .addFilterBefore(new TenantFilter(), AuthorizationFilter.class); 
+    return http.build();
+}
+Use HttpSecurity#addFilterBefore to add the TenantFilter before the AuthorizationFilter.
+
+Be careful when you declare your filter as a Spring bean, either by annotating it with @Component or by declaring it as a bean in your configuration, because Spring Boot will automatically register it with the embedded container. That may cause the filter to be invoked twice, once by the container and once by Spring Security and in a different order.
+
+If you still want to declare your filter as a Spring bean to take advantage of dependency injection for example, and avoid the duplicate invocation, you can tell Spring Boot to not register it with the container by declaring a FilterRegistrationBean bean and setting its enabled property to false:
+
+@Bean
+public FilterRegistrationBean<TenantFilter> tenantFilterRegistration(TenantFilter filter) {
+    FilterRegistrationBean<TenantFilter> registration = new FilterRegistrationBean<>(filter);
+    registration.setEnabled(false);
+    return registration;
+}

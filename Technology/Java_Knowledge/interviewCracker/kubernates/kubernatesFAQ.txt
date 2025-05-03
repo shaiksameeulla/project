@@ -1,0 +1,88 @@
+
+1. Let’s say a Kubernetes job should finish in 40 seconds, however on a rare occasion it takes 5 minutes, How can I make sure to stop the application if it exceeds more than 40 ?
+		   apiVersion: batch/v1
+		kind: CronJob
+		metadata:
+		  name: hello
+		spec:
+		  schedule: "* */1 * * *"
+		  activeDeadlinesSeconds: 40
+		  jobTemplate:
+			spec:
+			  template:
+				spec:
+				  containers:
+				  - name: hello
+					image: busybox:1.28
+					imagePullPolicy: IfNotPresent
+					command:
+					- /bin/sh
+					- -c
+					- date; echo Hello from the Kubernetes cluster
+				  restartPolicy: OnFailure
+
+		kubectl get cronjob hello
+		kubectl get jobs --watch
+
+
+2. How do you test a manifest without actually executing it?
+
+	kubectl create -f xyzz.yml --dry-run
+
+
+3. How do you initiate a rollback for an application?
+
+	kubectl rollout undo  deploy nginx
+
+4. How do you package Kubernetes applications?
+
+	  helm is the packagemanager  which allows user to  package ,configure,and  deploy applications and services to  the Kubernetes cluster.
+	   the packages  we install through the client is called  charts. theny bundled and templatised manifest. all the templating work is doneby Tiller.
+5. What are init containers?
+a pod can have many container, init containers would get  executed before any other containers run in the pod
+
+6. What is node affinity and pod affinity?
+
+7. How do you drain the traffic from a Pod during maintenance?
+		When we take the node for maintenance, pods inside the nodes also take a hit. 
+
+		However, we can avoid it by using the below command
+
+		kubectl drain <nodename>
+		When we run the above command it marks the node unschedulable for newer pods then the existing pods are evicted if the API Server supports eviction else it deletes the pods
+		
+		Once the node is up and running and you want to add it in rotation we can run the below command
+
+		kubectl uncordon <nodename>
+
+8. I have one POD and inside 2 containers are running one is Nginx and another one is  wordpress So, how can access these 2 containers from the Browser with IP address?
+		To start, it's useful to note and remember that in Kubernetes, every pod gets its own ip address from 10.*, that is usable only within the cluster. Now, the port-forward feature of kubectl simply tunnels the traffic from a specified port at your local host machine to the specified port on the specified pod. API server then becomes, in a sense, a temporary gateway between your local port and the Kubernetes cluster.
+
+		kubectl port-forward forwards connections to a local port to a port on a pod. Compared to kubectl proxy, kubectl port-forward is more generic as it can forward TCP traffic while kubectl proxy can only forward HTTP traffic.
+
+		kubectl port-forward is useful for testing/debugging purposes so you can access your service locally without exposing it.
+
+		Below is the name of the pod and it will forward it's port 6379 to localhost:6379.
+
+		kubectl port-forward redis-master-765d459796-258hz 6379:6379 
+		which is the same as
+
+		kubectl port-forward pods/redis-master-765d459796-258hz 6379:6379
+		or
+
+		kubectl port-forward deployment/redis-master 6379:6379 
+
+9. If I have multiple containers running inside a pod, and I want to wait for a specific container to start before starting another one.
+
+
+10. What is the impact of upgrading kubelet if we leave the pods on the worker node - will it break running pods? why?
+
+11. How service that selects apps based on the label and has an externalIP?
+
+12. Does the container restart When applying/updating the secret object (kubectl apply -f mysecret.yml)?  If not, how is the new password applied to the database?
+
+13. How should you connect an app pod with a database pod?
+
+14. How to configure a default ImagePullSecret for any deployment?
+
+15. If you have a pod that is using a ConfigMap which you updated, and you want the container to be updated with those changes, what should you do?

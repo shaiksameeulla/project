@@ -1,0 +1,62 @@
+Resilience4j has its own customizer types which can be used as shown above:
+====================================================
+Resilienc4j Type		Instance Customizer class
+=====================================================
+Circuit breaker			CircuitBreakerConfigCustomizer
+Retry					RetryConfigCustomizer
+Rate limiter			RateLimiterConfigCustomizer
+Bulkhead				BulkheadConfigCustomizer
+ThreadPoolBulkhead		ThreadPoolBulkheadConfigCustomizer
+Time Limiter			TimeLimiterConfigCustomizer
+=====================================================
+
+Circuit Breaker — fault tolerance :The Circuit Breaker pattern helps us in preventing a cascade of failures when a remote service is down.
+Rate Limiter — block too many requests : this functionality allows limiting access to some service.
+Time Limiter — limit time while calling remote operations ex: setting timeout
+Retry Mechanism — automatic retry for failed operations 
+Bulkhead — limit number of concurrent requests : to limit the number of concurrent calls to a particular service.
+Cache — store results of costly remote operations
+
+1.1.1. Starters
+There are two starters for the Resilience4J implementations, one for reactive applications and one for non-reactive applications.
+
+org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j - non-reactive applications
+
+org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j - reactive applications
+
+
+We’ve seen how to use the Resilience4j implementation to create one or more circuit breakers with Spring Cloud Circuit Breaker.
+
+However, there are other implementations supported by Spring Cloud Circuit Breaker that we can leverage in our application:
+
+Hystrix
+Sentinel
+Spring Retry
+It’s worth mentioning that we can mix and match different circuit breaker implementations in our application. We’re not just limited to one library.
+
+The above libraries have more capabilities than we’ve explored here. However, Spring Cloud Circuit Breaker is an abstraction over only the circuit breaker part. For example, Resilience4j also provides other modules like RateLimiter, Bulkhead, Retry in addition to the CircuitBreaker and TimeLimiter modules used in this article.
+
+example:
+========
+
+1. <dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+		</dependency>
+		
+2.	spring-boot-starter-actuator
+	
+3.  @CircuitBreaker(name = "randomActivity", fallbackMethod = "fallbackRandomActivity")
+
+    public String getDefaultAllProducts(Throwable exception) {
+		return "Default all Products"+exception.getMessage();
+	}
+	
+4.		    management.health.circuitbreakers.enabled=true
+			resilience4j.retry.instances.customerService.max-attempts: 3
+			resilience4j.retry.instances.customerService.wait-duration: 5s
+			management.endpoint.health.show-details= ALWAYS
+			management.health.ratelimiters.enabled: true
+			resilience4j.circuitbreaker.configs.default.registerHealthIndicator: true
+			resilience4j.circuitbreaker.configs.allProducts.register-health-indicator=true
+			resilience4j.circuitbreaker.configs.allProducts.slidingWindowSize= 200

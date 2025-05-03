@@ -1,0 +1,177 @@
+
+Configure SSL in SPRING boot:
+----------------------------
+SSL can be configured declaratively by setting the various server.ssl.* properties, typically in application.properties or application.yaml. The following example shows setting SSL properties using a Java KeyStore file:
+
+	PropertiesYaml
+	server.port=8443
+	server.ssl.key-store=classpath:keystore.jks
+	server.ssl.key-store-password=secret
+	server.ssl.key-password=another-secret
+
+The following example shows setting SSL properties using PEM-encoded certificate and private key files:
+
+	PropertiesYaml
+	server.port=8443
+	server.ssl.certificate=classpath:my-cert.crt
+	server.ssl.certificate-private-key=classpath:my-cert.key
+	server.ssl.trust-certificate=classpath:ca-cert.crt
+
+Alternatively, the SSL trust material can be configured in an SSL bundle and applied to the web server as shown in this example:
+
+	PropertiesYaml
+	server.port=8443
+	server.ssl.bundle=example
+
+
+
+
+Configure and Enable SSL for your Spring Boot Application:
+-------------------------------------------------------
+12.1. Configuring SSL With Java KeyStore Files
+ 
+ When used to secure an embedded web server, a keystore is typically configured with a Java KeyStore containing a certificate and private key as shown in this example:
+
+		PropertiesYaml
+		spring.ssl.bundle.jks.mybundle.key.alias=application
+		spring.ssl.bundle.jks.mybundle.keystore.location=classpath:application.p12
+		spring.ssl.bundle.jks.mybundle.keystore.password=secret
+		spring.ssl.bundle.jks.mybundle.keystore.type=PKCS12
+
+When used to secure a client-side connection, a truststore is typically configured with a Java KeyStore containing the server certificate as shown in this example:
+
+	PropertiesYaml
+	spring.ssl.bundle.jks.mybundle.truststore.location=classpath:server.p12
+	spring.ssl.bundle.jks.mybundle.truststore.password=secret
+
+Configuring SSL With PEM-encoded Certificates
+------------------------------------------
+
+
+When used to secure an embedded web server, a keystore is typically configured with a certificate and private key as shown in this example:
+
+	PropertiesYaml
+	spring.ssl.bundle.pem.mybundle.keystore.certificate=classpath:application.crt
+	spring.ssl.bundle.pem.mybundle.keystore.private-key=classpath:application.key
+
+	When used to secure a client-side connection, a truststore is typically configured with the server certificate as shown in this example:
+
+	PropertiesYaml
+	spring.ssl.bundle.pem.mybundle.truststore.certificate=classpath:server.crt
+	
+	
+Applying SSL Bundles
+========================
+Once configured using properties, SSL bundles can be referred to by name in configuration properties for various types of connections that are auto-configured by Spring Boot. See the sections on embedded web servers, data technologies, and REST clients for further information. [see following sections]
+
+
+12.4. Using SSL Bundles
+======================
+Spring Boot auto-configures a bean of type SslBundles that provides access to each of the named bundles configured using the spring.ssl.bundle properties
+
+The SslBundle provides a layered approach of obtaining these SSL objects:
+
+getStores() provides access to the key store and trust store java.security.KeyStore instances as well as any required key store password.
+
+getManagers() provides access to the java.net.ssl.KeyManagerFactory and java.net.ssl.TrustManagerFactory instances as well as the java.net.ssl.KeyManager and java.net.ssl.TrustManager arrays that they create.
+
+createSslContext() provides a convenient way to obtain a new java.net.ssl.SSLContext instance.
+
+In addition, the SslBundle provides details about the key being used, the protocol to use and any option that should be applied to the SSL engine.
+
+
+import javax.net.ssl.SSLContext;
+
+import org.springframework.boot.ssl.SslBundle;
+import org.springframework.boot.ssl.SslBundles;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyComponent {
+
+    public MyComponent(SslBundles sslBundles) {
+        SslBundle sslBundle = sslBundles.getBundle("mybundle");
+        SSLContext sslContext = sslBundle.createSslContext();
+        // do something with the created sslContext
+    }
+
+}
+
+
+RestTemplate SSL Support
+==========================
+If you need custom SSL configuration on the RestTemplate, you can apply an SSL bundle to the RestTemplateBuilder as shown in this example:
+
+JavaKotlin
+@Service
+public class MyService {
+
+    private final RestTemplate restTemplate;
+
+    public MyService(RestTemplateBuilder restTemplateBuilder, SslBundles sslBundles) {
+        this.restTemplate = restTemplateBuilder.setSslBundle(sslBundles.getBundle("mybundle")).build();
+    }
+
+    public Details someRestCall(String name) {
+        return this.restTemplate.getForObject("/{name}/details", Details.class, name);
+    }
+
+}
+
+
+WebClient SSL Support
+=====================
+If you need custom SSL configuration on the ClientHttpConnector used by the WebClient, you can inject a WebClientSsl instance that can be used with the builder’s apply method.
+
+The WebClientSsl interface provides access to any SSL bundles that you have defined in your application.properties or application.yaml file.
+
+
+import reactor.core.publisher.Mono;
+
+import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientSsl;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+
+@Service
+public class MyService {
+
+    private final WebClient webClient;
+
+    public MyService(WebClient.Builder webClientBuilder, WebClientSsl ssl) {
+        this.webClient = webClientBuilder.baseUrl("https://example.org").apply(ssl.fromBundle("mybundle")).build();
+    }
+
+    public Mono<Details> someRestCall(String name) {
+        return this.webClient.get().uri("/{name}/details", name).retrieve().bodyToMono(Details.class);
+    }
+
+}
+
+Adding ssl tomcat
+================
+Configure SSL
+SSL can be configured declaratively by setting the various server.ssl.* properties, typically in application.properties or application.yaml. The following example shows setting SSL properties using a Java KeyStore file:
+
+PropertiesYaml
+server.port=8443
+server.ssl.key-store=classpath:keystore.jks
+server.ssl.key-store-password=secret
+server.ssl.key-password=another-secret
+
+The following example shows setting SSL properties using PEM-encoded certificate and private key files:
+
+PropertiesYaml
+server.port=8443
+server.ssl.certificate=classpath:my-cert.crt
+server.ssl.certificate-private-key=classpath:my-cert.key
+server.ssl.trust-certificate=classpath:ca-cert.crt
+
+Alternatively, the SSL trust material can be configured in an SSL bundle and applied to the web server as shown in this example:
+
+PropertiesYaml
+server.port=8443
+server.ssl.bundle=example
+
+See Ssl for details of all of the supported properties.
+
+Using configuration such as the preceding example means the application no longer supports a plain HTTP connector at port 8080. Spring Boot does not support the configuration of both an HTTP connector and an HTTPS connector through application.properties. If you want to have both, you need to configure one of them programmatically. We recommend using application.properties to configure HTTPS, as the HTTP connector is the easier of the two to configure programmatically.

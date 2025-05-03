@@ -1,0 +1,120 @@
+WHAT IS CURRYING IN JAVASCRIPT?
+==========================
+Currying in JavaScript transforms a function with multiple arguments into a nested series of functions, each taking a single argument. Currying helps you avoid passing the same variable multiple times, and it helps you create a higher order function.
+
+That is, when we turn a function call sum(1,2,3) into sum(1)(2)(3). 
+
+Why Is Currying in JavaScript Useful?
+1. Currying helps you avoid passing the same variable again and again.
+2. It helps to create a higher order function.
+
+Currying transforms a function with multiple arguments into a sequence/series of functions, each taking a single argument.
+
+For example:
+
+function sum(a, b, c) {
+    return a + b + c;
+}
+sum(1,2,3); // 6
+As you can see, this is a function with full arguments. Let’s create a curried version of the function and see how we would call the same function (and get the same result) in a series of calls:
+
+function sum(a) {
+    return (b) => {
+        return (c) => {
+            return a + b + c
+        }
+    }
+}
+console.log(sum(1)(2)(3)) // 6
+We could even separate this sum(1)(2)(3) to understand it better:
+
+const sum1 = sum(1);
+const sum2 = sum1(2);
+const result = sum2(3);
+console.log(result); // 6
+
+
+example:
+let multiply = function (a, b) {
+  console.log(a * b);
+};
+
+
+let multipleCurrey = multiply.bind(this, 3);
+let multiply2 = multipleCurrey(6);
+
+another example using closures
+------------
+
+let multiply = function (a) {
+  return function (b) {
+    console.log(a * b);
+  };
+};
+
+let multipleCurrey = multiply(3);
+let multiply2 = multipleCurrey(6);
+=====================
+
+
+advance:
+==========
+
+A variadic function is useful when you don’t know or don’t care how many arguments you’re going to receive. You can implement it to accept any number of inputs, which is handy when you’re dealing with user-input or other unpredictable data. example : function (...args)
+
+
+const sum = function (...args) {
+  let total = args.reduce((acc, arg) => acc+arg, 0)
+  function add (...args2) {
+    if (args2.length) {
+      total = args2.reduce((acc, arg) => acc+arg, total)
+      return add //look carefully its returning add method
+    }
+    return total //look carefully its returning total
+  }
+
+  return add; //look carefully its returning add method
+}
+
+document.write( sum(1)(2)() , '<br/>') // with unary params
+document.write( sum(1,2)() , '<br/>') // with binary params
+document.write( sum(1)(2)(3)() , '<br/>') // with unary params
+document.write( sum(1)(2,3)() , '<br/>') // with binary params
+document.write( sum(1)(2)(3)(4)() , '<br/>') // with unary params
+document.write( sum(1)(2,3,4)() , '<br/>') // with ternary params
+
+explanation :
+
+remember that here args is not array, but 0 or more arguments
+
+sum(1)(2,3,4)()
+call1 1: first sum(1) executes returns add method
+call1 2 : then add method has arguments 2,3,4
+total and given arguments would get summed in side add method (after checking size)
+then return add method again 
+call1 3 : add method called with empty array then total returns
+
+there is a drawback with this approach you must call brackets (faunction call braces) at the end of the function call, as shown above.
+===
+one way tofix is adding toString funtion as below
+
+const sum = function (...args) {
+
+  let total = args.reduce((acc, arg) => acc+arg, 0)
+  function add (...args2) {
+    if (args2.length) {
+      total = args2.reduce((acc, arg) => acc+arg, total)
+      return add
+    }
+    return total
+  }
+  add.toString=function () {
+        return total;
+    }
+
+  return add
+}
+
+===========
+
+

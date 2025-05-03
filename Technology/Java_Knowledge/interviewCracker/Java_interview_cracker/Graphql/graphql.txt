@@ -1,0 +1,233 @@
+
+Graphql:
+==========
+What is GraphQL?
+GraphQL is a query language and server runtime.
+
+Query language: GraphQL is a query language for API. In GraphQL, you design API based on its type system. A GraphQL API is expressed as a statically typed schema.
+
+Server runtime: On the service side, a GraphQL service provides a runtime layer that describes the structure of data exposed by API, and this runtime layer is responsible for parsing GraphQL requests and calling the appropriate data fetcher (also called resolver) for each field.
+In short, GraphQL is a query language for API and a server-side runtime for executing queries. Also, it’s not tied to any specific programming language, database, or storage engine.
+
+GraphQL Schema
+===============
+
+The GraphQL Schema defines how data is requested and returned from the server and is governed by GraphQL Schema Definition Language (SDL). A GraphQL schema may contain operations, variables, and directives.
+
+GraphQL is an API query language and a server-side runtime for querying and updating the existing data stored in any kind of data storage. It was initially developed by Facebook and later moved to open source GraphQL Foundation.
+
+GraphQL Operation
+===============
+
+A GraphQL service can support the following operations
+
+Queries: Queries represent READ operations.
+Mutation: Mutation involves WRITE then READ operation.
+Subscription: A subscription is used for continuous READ (for example, over WebSocket).
+
+Example of a GraphQL book-catalog API
+
+type Query {
+    books: [Book]
+    bookById(id : ID) : Book
+}
+
+type Book {
+    id : ID
+    name : String
+    author: String
+    price: Float
+    ratings: [Rating]
+}
+
+type Rating {
+    id: ID
+    rating: Int
+    comment: String
+    user: String
+}
+
+GraphQL Dependency
+=====================
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-graphql'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
+	testImplementation 'org.springframework.graphql:spring-graphql-test'
+}
+
+we will discuss the @Controller, @QueryMapping, and @SchemaMapping of Spring for GraphQL.
+
+Controller
+===========================
+Like REST API, Spring Boot offers @Controller annotation to implement GraphQL APIs. All you need to do is to annotate your controller class with @Controller annotation and define either @QueryMapping or @SchemaMapping annotation on the handler method.
+
+
+Spring detects @Controller beans and registers their annotated handler methods ( @QueryMapping or @SchemaMapping) as DataFetchers (also known as a resolver).
+
+A resolver/DataFetcher is a function that’s responsible for populating the data for a single field in your GraphQL schema.
+
+SchemaMapping Annotation
+===========================
+The @SchemaMapping annotation maps a handler method to a field in the GraphQL schema as DataFetcher. All you need to do is to define the typeName and, optionally, the field with @SchemaMapping.
+
+@SchemaMapping(typeName = "Query", field = "books")
+public Collection<Book> books() {
+  return bookCatalogService.getBooks();
+}
+Additionally, if you keep the method name as same as the field name then you can omit the field from @SchemaMapping.
+
+
+@SchemaMapping(typeName = "Query")
+public Collection<Book> books() {
+  return bookCatalogService.getBooks();
+}
+
+What happens if you don’t specify the typeName with @SchemaMapping (as shown below) ?
+
+@SchemaMapping()
+public Collection<Book> books() {
+  return bookCatalogService.getBooks();
+}
+In this case, Spring can’t figure out which parent-type field books belong to; therefore, it’ll throw BeanCreationException, at the application startup, with a helpful error message.
+
+No parentType specified, and a source/parent method argument was also not found: BooksCatalogController#books[0 args]
+Similarly, for the field bookById, you can define a data fetcher as:
+
+@SchemaMapping(typeName = "Query")
+public Book bookById(@Argument("id") Integer id) {
+  return bookCatalogService.bookById(id);
+}
+Here, we have used @Argument annotation to map argument id as @Argument("id") Integer id.
+
+
+Data Fetcher for the child ‘Type’ field
+If you query GraphQL service with the ratings field of Book the response includes "ratings": null?
+
+
+If you don’t specify a Data Fetcher for a field the GraphQL Java assigns a default PropertyDataFetcher. Subsequently, at the runtime this PropertyDataFetcher looks for public getRatings() field in the Book POJO (as field ratings belongs to the Book).
+
+To solve this, you can define a Data Fetcher for ratings. As the field ratings belongs to parent type Book, you need to pass Book in the argument.
+
+@SchemaMapping(typeName = "Book", field = "ratings")
+public List<Rating> ratings(Book book) {
+  return bookCatalogService.ratings(book);
+}
+While GraphQL Java is executing a query, it calls the appropriate DataFetcher for each field it encounters in the query. If you don’t define any DataFetcher it assigns PropertyDataFetcher as default.
+
+And, you can write without specifying the field as:
+
+@SchemaMapping(typeName = "Book")
+public List<Rating> ratings(Book book) {
+  return bookCatalogService.ratings(book);
+}
+Also as:
+
+@SchemaMapping
+public List<Rating> ratings(Book book) {
+  return bookCatalogService.ratings(book);
+}
+In @SchemaMapping you can also leave out typeName and field attributes, in which case the field name defaults to the method name, while the type name defaults to the simple class name of the source/parent object injected into the method.
+
+QueryMapping annotation
+======================
+Instead of using @SchemaMapping, you can use @QueryMapping. Effectively, this is a shortcut annotation to bind annotated methods for fields under the Query type.
+
+@QueryMapping(name = "books")
+public Collection<Book> books() {
+  return bookCatalogService.getBooks();
+}
+Moreover, you can skip the name from annotation. In that case, Spring derives the query field from the method name.
+
+@QueryMapping
+public Collection<Book> books() {
+  return bookCatalogService.getBooks();
+}
+Similarly, for the Query field bookById:
+
+@QueryMapping
+public Book bookById(@Argument Integer id) {
+  return bookCatalogService.bookById(id);
+}
+You can’t use @QueryMapping for the field ratings as it doesn’t belong to the type Query.
+
+Configuration
+======================
+By default, the Boot starter checks in src/main/resources/graphql for GraphQL schema files with extensions “.graphqls” or “.gqls“. To override this behavior, you can change the following property.
+
+spring.graphql.schema.locations=classpath:graphql/ 
+spring.graphql.schema.fileExtensions=.graphqls, .gqls
+
+
+
+Mutation
+=====================
+A mutation is used for creating, updating or deleting data. Like queries, if a mutation returns back an object, we can ask for nested fields. For example, to update a book object, we can specify a mutation as follows:
+
+Mutation query example with default values
+mutation {
+  updateBook(id: 1, title: "GraphQL Overview Revised Edition") {
+    id
+    title
+    pages
+    author {
+      name
+    }
+  }
+}
+
+Here we update a book using the id specified and return back the book object which is updated.
+
+
+=============================================================
+
+@SchemaMapping
+
+The @SchemaMapping is used to map a handler method to a type and field pair. It takes in two arguments: typeName and value.
+
+typeName: It is the operation Query or Mutation. It can be defined at the class or method level.
+value: It is the name of the field as its defined in the GraphQL schema. If not specified, defaults to the method name.
+To map the “allBooks” query to a handler method, we could define it as follows:
+
+@SchemaMapping(typeName = "Query", value="allBooks")
+public List<Book> getAllBooks() {
+	return bookRepository.allBooks();
+}
+
+5.2. @QueryMapping
+
+@QueryMapping is a composite annotation to indicate the typeName as Query.
+
+Let’s define the ‘bookById’ query handler method. This query takes an ID argument. This can be defined using the @Argument annotation which binds a named GraphQL argument onto a method parameter.
+
+@QueryMapping
+public Book bookById(@Argument Integer id) {
+	return bookRepository.bookById(id);
+}
+
+5.3. @MutationMapping
+As the name indicates, @MutationMapping is a composite annotation for Mutation types.
+
+@MutationMapping
+public Book updateBook(@Argument Integer id, @Argument String title) {
+	return bookRepository.updateBook(id, title);
+}
+
+6. How to Test the APIs?
+Run the Spring Boot Application. GraphQL APIs would be exposed by default at localhost:8080/graphql. We would need an API testing tool like Postman to test the APIs.
+
+To test the allBooks query, we can use the following payload in a POST query:
+
+Test Payload
+{
+  allBooks {
+    id
+    title
+    pages
+    author {
+      name
+    }
+  }
+}

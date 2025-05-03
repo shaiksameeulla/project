@@ -1,0 +1,301 @@
+Lazy Loading vs. Eager Loading
+BeanFactory loads beans on-demand, while ApplicationContext loads all beans at startup. Thus, BeanFactory is lightweight as compared to ApplicationContext. Let's understand it with an example.
+The beans defined in our BeanFactory will be loaded only when we explicitly call the getBean() method.
+
+ApplicationContext is considered a heavy IOC container because its eager-loading strategy loads all the beans at startup. BeanFactory is lightweight by comparison and could be handy in memory-constrained systems. Nevertheless, we'll see in the next sections why ApplicationContext is preferred for most use cases.
+
+How to write custom Annotation using Spring
+------------------------------------
+1. Define annotation
+2. implements BeanPostProcessor 
+	a. This will be called for every bean, 
+	b. Reflection logic whether the bean present  annotation. field.isAnnotationPresent(DataAccess.class
+	c. ReflectionUtils.makeAccessible(field);
+	d. proceed !configurableListableBeanFactory.containsBean(beanName)
+	     daoInstance = configurableListableBeanFactory.initializeBean(toRegister, beanName);
+            configurableListableBeanFactory.autowireBeanProperties(daoInstance, AUTOWIRE_MODE, true);
+            configurableListableBeanFactory.registerSingleton(beanName, daoInstance);
+	e. if bean exist return the bean
+
+ What is dependency Injection?
+The process of injecting dependent bean objects into target bean objects is called dependency injection.
+
+Setter Injection: The IOC container will inject the dependent bean object into the target bean object by calling the setter method.
+Constructor Injection: The IOC container will inject the dependent bean object into the target bean object by calling the target bean constructor.
+Field Injection: The IOC container will inject the dependent bean object into the target bean object by Reflection API.
+34. What is an IOC container?
+IoC Container is a framework for implementing automatic dependency injection. It manages object creation and its life-time and also injects dependencies into the class.
+ 
+ Instantiating a Container
+The location path or paths supplied to an ApplicationContext constructor are resource strings that let the container load configuration metadata from a variety of external resources, such as the local file system, the Java CLASSPATH, and so on.
+
+ApplicationContext context = new ClassPathXmlApplicationContext("services.xml", "daos.xml");
+
+ Using the Container
+ -----------------
+ The ApplicationContext is the interface for an advanced factory capable of maintaining a registry of different beans and their dependencies. By using the method T getBean(String name, Class<T> requiredType), you can retrieve instances of your beans.
+
+The ApplicationContext lets you read bean definitions and access them, as the following example shows:
+/ create and configure beans
+ApplicationContext context = new ClassPathXmlApplicationContext("services.xml", "daos.xml");
+
+// retrieve configured instance
+PetStoreService service = context.getBean("petStore", PetStoreService.class);
+
+// use configured instance
+List<String> userList = service.getUsernameList();
+
+Combining Lifecycle Mechanisms
+--------------------------
+
+Multiple lifecycle mechanisms configured for the same bean, with different initialization methods, are called as follows:
+ 1.Methods annotated with @PostConstruct
+
+  2.afterPropertiesSet() as defined by the InitializingBean callback interface
+
+  3. A custom configured init() method
+
+   Destroy methods are called in the same order:
+
+1.Methods annotated with @PreDestroy
+
+2.destroy() as defined by the DisposableBean callback interface
+
+3. A custom configured destroy() method
+
+Lifecycle  interface
+---------
+Startup and Shutdown Callbacks
+The Lifecycle interface defines the essential methods for any object that has its own lifecycle requirements (such as starting and stopping some background process):
+
+public interface Lifecycle {
+
+    void start();
+
+    void stop();
+
+    boolean isRunning();
+}
+Any Spring-managed object may implement the Lifecycle interface. Then, when the ApplicationContext itself receives start and stop signals (for example, for a stop/restart scenario at runtime), it cascades those calls to all Lifecycle implementations defined within that context. It does this by delegating to a LifecycleProcessor, shown in the following listing:
+
+public interface LifecycleProcessor extends Lifecycle {
+
+    void onRefresh();
+
+    void onClose();
+}
+Notice that the LifecycleProcessor is itself an extension of the Lifecycle interface. It also adds two other methods for reacting to the context being refreshed and closed.
+
+Note that the regular org.springframework.context.Lifecycle interface is a plain contract for explicit start and stop notifications and does not imply auto-startup at context refresh time. For fine-grained control over auto-startup of a specific bean (including startup phases), consider implementing org.springframework.context.SmartLifecycle instead.
+
+Also, please note that stop notifications are not guaranteed to come before destruction. On regular shutdown, all Lifecycle beans first receive a stop notification before the general destruction callbacks are being propagated. However, on hot refresh during a context’s lifetime or on stopped refresh attempts, only destroy methods are called.
+
+The order of startup and shutdown invocations can be important. If a “depends-on” relationship exists between any two objects, the dependent side starts after its dependency, and it stops before its dependency. However, at times, the direct dependencies are unknown. You may only know that objects of a certain type should start prior to objects of another type. In those cases, the SmartLifecycle interface defines another option, namely the getPhase() method as defined on its super-interface, Phased. The following listing shows the definition of the Phased interface:
+
+public interface Phased {
+
+    int getPhase();
+}
+The following listing shows the definition of the SmartLifecycle interface:
+
+public interface SmartLifecycle extends Lifecycle, Phased {
+
+    boolean isAutoStartup();
+
+    void stop(Runnable callback);
+}
+When starting, the objects with the lowest phase start first. When stopping, the reverse order is followed. Therefore, an object that implements SmartLifecycle and whose getPhase() method returns Integer.MIN_VALUE would be among the first to start and the last to stop. At the other end of the spectrum, a phase value of Integer.MAX_VALUE would indicate that the object should be started last and stopped first (likely because it depends on other processes to be running). When considering the phase value, it is also important to know that the default phase for any “normal” Lifecycle object that does not implement SmartLifecycle is 0. Therefore, any negative phase value indicates that an object should start before those standard components (and stop after them). The reverse is true for any positive phase value.
+
+The stop method defined by SmartLifecycle accepts a callback. Any implementation must invoke that callback’s run() method after that implementation’s shutdown process is complete. That enables asynchronous shutdown where necessary, since the default implementation of the LifecycleProcessor interface, DefaultLifecycleProcessor, waits up to its timeout value for the group of objects within each phase to invoke that callback. The default per-phase timeout is 30 seconds. You can override the default lifecycle processor instance by defining a bean named lifecycleProcessor within the context. If you want only to modify the timeout, defining the following would suffice:
+
+<bean id="lifecycleProcessor" class="org.springframework.context.support.DefaultLifecycleProcessor">
+    <!-- timeout value in milliseconds -->
+    <property name="timeoutPerShutdownPhase" value="10000"/>
+</bean>
+As mentioned earlier, the LifecycleProcessor interface defines callback methods for the refreshing and closing of the context as well. The latter drives the shutdown process as if stop() had been called explicitly, but it happens when the context is closing. The 'refresh' callback, on the other hand, enables another feature of SmartLifecycle beans. When the context is refreshed (after all objects have been instantiated and initialized), that callback is invoked. At that point, the default lifecycle processor checks the boolean value returned by each SmartLifecycle object’s isAutoStartup() method. If true, that object is started at that point rather than waiting for an explicit invocation of the context’s or its own start() method (unlike the context refresh, the context start does not happen automatically for a standard context implementation). The phase value and any “depends-on” relationships determine the startup order as described earlier.
+
+Shutting Down the Spring IoC Container Gracefully in Non-Web Applications
+This section applies only to non-web applications. Spring’s web-based ApplicationContext implementations already have code in place to gracefully shut down the Spring IoC container when the relevant web application is shut down.
+
+If you use Spring’s IoC container in a non-web application environment (for example, in a rich client desktop environment), register a shutdown hook with the JVM. Doing so ensures a graceful shutdown and calls the relevant destroy methods on your singleton beans so that all resources are released. You must still configure and implement these destroy callbacks correctly.
+
+To register a shutdown hook, call the registerShutdownHook() method that is declared on the ConfigurableApplicationContext interface, as the following example shows:
+
+JavaKotlin
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public final class Boot {
+
+    public static void main(final String[] args) throws Exception {
+        ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
+
+        // add a shutdown hook for the above context...
+        ctx.registerShutdownHook();
+
+        // app runs here...
+
+        // main method exits, hook is called prior to the app shutting down...
+    }
+}
+
+
+In order to have full control over our beans, we could combine the above mechanisms together.
+
+This is the order of execution:
+
+constructor
+@PostConstruct annotated methods
+InitializingBean's afterPropertiesSet() method
+initialization method specified as init-method in XML
+Let's create a Spring bean that combines all mechanisms:
+
+
+freestar
+@Component
+@Scope(value = "prototype")
+public class AllStrategiesExampleBean implements InitializingBean {
+
+    private static final Logger LOG 
+      = Logger.getLogger(AllStrategiesExampleBean.class);
+
+    public AllStrategiesExampleBean() {
+        LOG.info("Constructor");
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        LOG.info("InitializingBean");
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        LOG.info("PostConstruct");
+    }
+
+    public void init() {
+        LOG.info("init-method");
+    }
+}
+If we try to instantiate this bean, we can see logs that match the order specified above:
+
+[main] INFO o.b.startup.AllStrategiesExampleBean - Constructor
+[main] INFO o.b.startup.AllStrategiesExampleBean - PostConstruct
+[main] INFO o.b.startup.AllStrategiesExampleBean - InitializingBean
+[main] INFO o.b.startup.AllStrategiesExampleBean - init-method
+
+Container extension points
+Typically, an application developer does not need to subclass any ApplicationContext implementation classes. You can extend The Spring IoC container infinitely by plugging in implementations of special integration interfaces. The next few sections describe these integration interfaces.
+
+3.8.1 Customizing beans using the BeanPostProcessor Interface
+The BeanPostProcessor interface defines callback methods that you can implement to provide your own (or override the container's default) instantiation logic, dependency-resolution logic, and so forth. If you want to implement some custom logic after the Spring container finishes instantiating, configuring, and otherwise initializing a bean, you can plug in one or more BeanPostProcessor implementations.
+
+You can configure multiple BeanPostProcessor interfaces. You can control the order in which these BeanPostProcessor interfaces execute by setting the order property. You can set this property only if the BeanPostProcessor implements the Ordered interface; if you write your own BeanPostProcessor you should consider implementing the Ordered interface too. For more details, consult the Javadoc for the BeanPostProcessor and Ordered interfaces.
+
+[Note]	Note
+BeanPostProcessors operate on bean (or object) instances; that is to say, the Spring IoC container instantiates a bean instance and then BeanPostProcessor interfaces do their work.
+
+BeanPostProcessor interfaces are scoped per-container. This is only relevant if you are using container hierarchies. If you define a BeanPostProcessor in one container, it will only do its work on the beans in that container. Beans that are defined in one container are not post-processed by a BeanPostProcessor in another container, even if both containers are part of the same hierarchy.
+
+To change the actual bean definition (that is, the recipe that defines the bean), you instead need to use a BeanFactoryPostProcessor, described below in Section 3.8.2, “Customizing configuration metadata with BeanFactoryPostProcessor interface”.
+
+The org.springframework.beans.factory.config.BeanPostProcessor interface consists of exactly two callback methods. When such a class is registered as a post-processor with the container, for each bean instance that is created by the container, the post-processor gets a callback from the container both before container initialization methods (such as afterPropertiesSet and any declared init method) are called, and also afterwards. The post-processor can take any action with the bean instance, including ignoring the callback completely. A bean post-processor typically checks for callback interfaces, or may wrap a bean with a proxy. Some Spring AOP infrastructure classes are implemented as bean post-processors and they do this proxy-wrapping logic.
+
+An ApplicationContext automatically detects any beans that are defined in the configuration metadata it receives that implement the BeanPostProcessor interface. The ApplicationContext registers these beans as post-processors, to be then called appropriately by the container upon bean creation. You can then deploy the post-processors as you would any bean.
+
+public interface BeanPostProcessor {
+
+	/**
+	 * Apply this BeanPostProcessor to the given new bean instance <i>before</i> any bean
+	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
+	 * or a custom init-method). The bean will already be populated with property values.
+	 * The returned bean instance may be a wrapper around the original.
+	 * <p>The default implementation returns the given {@code bean} as-is.
+	 * @param bean the new bean instance
+	 * @param beanName the name of the bean
+	 * @return the bean instance to use, either the original or a wrapped one;
+	 * if {@code null}, no subsequent BeanPostProcessors will be invoked
+	 * @throws org.springframework.beans.BeansException in case of errors
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
+	 */
+	@Nullable
+	default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		return bean;
+	}
+
+	/**
+	 * Apply this BeanPostProcessor to the given new bean instance <i>after</i> any bean
+	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
+	 * or a custom init-method). The bean will already be populated with property values.
+	 * The returned bean instance may be a wrapper around the original.
+	 * <p>In case of a FactoryBean, this callback will be invoked for both the FactoryBean
+	 * instance and the objects created by the FactoryBean (as of Spring 2.0). The
+	 * post-processor can decide whether to apply to either the FactoryBean or created
+	 * objects or both through corresponding {@code bean instanceof FactoryBean} checks.
+	 * <p>This callback will also be invoked after a short-circuiting triggered by a
+	 * {@link InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation} method,
+	 * in contrast to all other BeanPostProcessor callbacks.
+	 * <p>The default implementation returns the given {@code bean} as-is.
+	 * @param bean the new bean instance
+	 * @param beanName the name of the bean
+	 * @return the bean instance to use, either the original or a wrapped one;
+	 * if {@code null}, no subsequent BeanPostProcessors will be invoked
+	 * @throws org.springframework.beans.BeansException in case of errors
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
+	 * @see org.springframework.beans.factory.FactoryBean
+	 */
+	@Nullable
+	default Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		return bean;
+	}
+
+Customizing configuration metadata with BeanFactoryPostProcessor interface
+-----
+The next extension point that we will look at is the org.springframework.beans.factory.config.BeanFactoryPostProcessor. The semantics of this interface are similar to the BeanPostProcessor, with one major difference: BeanFactoryPostProcessors operate on the bean configuration metadata; that is, the Spring IoC container allows BeanFactoryPostProcessors to read the configuration metadata and potentially change it before the container instantiates any beans other than BeanFactoryPostProcessors.
+
+You can configure multiple BeanFactoryPostProcessors. You can control the order in which these BeanFactoryPostProcessors execute by setting the order property. However, you can only set this property if the BeanFactoryPostProcessor implements the Ordered interface. If you write your own BeanFactoryPostProcessor, you should consider implementing the Ordered interface too; consult the Javadoc for the BeanFactoryPostProcessor and Ordered interfaces for more details.
+
+[Note]	Note
+If you want to change the actual bean instances (the objects that are created from the configuration metadata), then you instead need to use a BeanPostProcessor (described above in the section entitled Section 3.8.1, “Customizing beans using the BeanPostProcessor Interface ”.
+
+@FunctionalInterface
+public interface BeanFactoryPostProcessor {
+
+	/**
+	 * Modify the application context's internal bean factory after its standard
+	 * initialization. All bean definitions will have been loaded, but no beans
+	 * will have been instantiated yet. This allows for overriding or adding
+	 * properties even to eager-initializing beans.
+	 * @param beanFactory the bean factory used by the application context
+	 * @throws org.springframework.beans.BeansException in case of errors
+	 */
+	void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException;
+
+}
+
+Also, BeanFactoryPostProcessors are scoped per-container. This is only relevant if you are using container hierarchies. If you define a BeanFactoryPostProcessor in one container, it will only do its stuff on the bean definitions in that container. Bean definitions in another container will not be post-processed by BeanFactoryPostProcessors in another container, even if both containers are part of the same hierarchy.
+
+ Example: the PropertyPlaceholderConfigurer
+You use the PropertyPlaceholderConfigurer to externalize property values from a bean definition into another separate file in the standard Java Properties format. Doing so enables the person deploying an application to customize environment-specific properties such as database URLs and passwords, without the complexity or risk of modifying the main XML definition file or files for the container.
+
+Consider the following XML-based configuration metadata fragment, where a DataSource with placeholder values is defined. The example shows properties configured from an external Properties file. At runtime, a PropertyPlaceholderConfigurer is applied to the metadata that will replace some properties of the DataSource. The values to replace are specified as 'placeholders' of the form ${property-name} which follows the Ant / Log4J / JSP EL style.
+
+<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations" value="classpath:com/foo/jdbc.properties"/>
+    </property>
+</bean>
+
+<bean id="dataSource" destroy-method="close"
+      class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="${jdbc.driverClassName}"/>
+    <property name="url" value="${jdbc.url}"/>
+    <property name="username" value="${jdbc.username}"/>
+    <property name="password" value="${jdbc.password}"/>
+</bean>
+The actual values come from another file in the standard Java Properties format:
+
+jdbc.driverClassName=org.hsqldb.jdbcDriver
+jdbc.url=jdbc:hsqldb:hsql://production:9002
+jdbc.username=sa
+jdbc.password=root
+

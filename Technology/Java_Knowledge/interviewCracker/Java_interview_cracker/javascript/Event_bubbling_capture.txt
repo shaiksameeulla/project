@@ -1,0 +1,68 @@
+1. What is Event Bubbling, Capturing, Trickling explained thoroughly
+2. Which order are event handlers are called while Event Trickling & Bubbling?
+3. How to Capture instead of Bubbling?
+4. Demo of code to demonstrate each of them with examples
+5. How to stop the propagation of events while Event bubbling and Capturing? 
+
+
+=============
+
+Bubbling and Capturing (aka Trickling) are the two phases of propagation. In their simplest definitions, bubbling travels from the target to the root, and capturing travels from the root to the target.
+The event needs to pass through every node on the DOM until it reaches the end, or if it is forcibly stopped.
+
+
+We can see that the event capturing of event listeners happened first and then the event bubbling happened. This means the propagation of event listeners first goes from outside to inside and then from inside to outside in the DOM. 
+
+
+
+How to stop event bubbling and event capturing?
+
+In the above example, we can see a parameter “e” (or sometimes called as “event”) in the callback function of addEventListener(). It is an event object which automatically defines when we add an event listener to an element. This object ‘e’ has a function called stopPropagation() which helps to prevent this annoying behavior.
+===========
+
+An event listener contains three parameters and it can be defined using the following syntax.
+
+<element>.addEventListener(<eventName>, 
+    <callbackFunction>, {capture : boolean});
+defaults to false.
+
+document.querySelector("#grandparent")
+  .addEventListener('click', (e) => {
+    console.log("Grandparent capturing!");
+    //e.stopPropagation();
+  }, true);
+
+  document.querySelector("#parent")
+  .addEventListener('click', (e) => {
+    console.log("Parent capturing!");
+  }, true);
+
+  document.querySelector("#child")
+  .addEventListener('click', (e) => {
+    console.log("Child capturing!");
+  }, true);
+  
+  
+  document.querySelector("#grandparent")
+  .addEventListener('click', (e) => {
+    console.log("Grandparent Bubbing!");
+    //e.stopPropagation();
+  }, false);
+
+  document.querySelector("#parent")
+  .addEventListener('click', (e) => {
+    console.log("Parent Bubbing!");
+  }, false);
+
+  document.querySelector("#child")
+  .addEventListener('click', (e) => {
+    console.log("Child Bubbing!");
+  }, false);
+
+
+
+  <div id="grandparent">
+    <div id="parent">
+      <div id="child"></div>
+    </div>
+  </div>

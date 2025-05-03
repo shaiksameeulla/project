@@ -1,0 +1,193 @@
+Factory vs construction functions:
+----------------------------------
+
+factory functions:
+------------
+One advantage to factory functions is when the object to be returned could be of several different types depending on some parameter
+
+function factoryFunction() {
+   var obj = {
+      someProp1 : "1",
+      someProp2 : "2",
+      someMethod: function() { /* whatever */ }
+   };
+   // other code to manipulate obj in some way here
+   return obj;
+}
+
+      or
+		function User(name, age) {
+		  return {
+			name,
+			age,
+		  }
+		};
+
+		let user = User("Tom", 23);
+Of course you can make factory functions much more complicated than that simple example.
+
+One advantage to factory functions is when the object to be returned could be of several different types depending on some parameter
+-----------------
+When Should You Use JavaScript Factory Function?
+
+	Before using a factory function in your JavaScript code, you need to know the problems it solves or the requirements that it fulfills.
+
+	Requirement 1: If you need multiple objects with similar types of properties and methods with little difference.
+
+	For example, you want to create an object that describes a person. But you need similar types of objects for John, Max, Bob, etc.
+	
+	
+	const person = (personName, personAge) => {
+    return {
+        name: personName,
+        age: personAge,
+        greet() {
+            return `Hello, my name is ${personName}`;
+        },
+        getAge() {
+            return `I am ${personAge} years old`;
+        },
+        setAge(newAge) {
+            personAge = newAge;
+        },
+        setName(newName) {
+            personName = newName;
+        },
+    };
+};
+
+const bob = person('Bob', 23)
+const john = person('John', 30)
+const max = person('Max', 25)
+How do factory functions provide data privacy?
+
+In those objects, you have access to name and age properties. But if you update those properties directly, it will not have any effect on methods.
+
+
+bob.name = 'Sam'
+bob.age = 26
+
+console.log(bob.greet())
+// Hello, my name is Bob
+
+console.log(bob.getAge())
+// I am 23 years old
+I am setting new values for name and age properties. But when I call greet() and getAge() methods, it will show the previous texts. So, these methods had no effect.
+
+Because if you see the person factory function, methods are using function parameters personName and personAge directly. When I update the name and age properties in the object, it does not change anything in the methods.
+
+
+To get updated values from greet() and getAge() methods, you have to use setName() and setAge() methods. With these methods, you can update the values of function parameters. Therefore, greet() and getAge() methods will give updated values.
+
+
+Use Prototypal Inheritance in JavaScript Factory Function with Object.create()
+	The factory function does not use inheritance by default. That means every object you create using person() function will be completely separate. Even though all those objects have some common.
+
+	All the methods across those objects are the same, only properties have different values. Then why should we copy the same functions over and over again?
+
+When we create objects, they get stored in our computer memory. As our objects have copies of the same methods, it will take more memory space. It's definitely not an efficient memory management system.
+
+How can you solve the issue?
+
+You can add inheritance with the factory function in order to use the same methods across all objects that you create. In this way, methods will be stored in your computer memory just once.
+
+All the objects you create will use a reference of the same method in the memory. Therefore, your objects created by a factory function will use less memory space.
+
+
+You need to use Object.create() method to add inheritance. This method creates a new object using an existing object. 
+
+const personMethods = {
+    greet() {
+        return `Hello, my name is ${this.name}`;
+    },
+    getAge() {
+        return `I am ${this.age} years old`;
+    },
+    setAge(newAge) {
+        this.age = newAge;
+    },
+    setName(newName) {
+        this.name = newName;
+    },
+};
+
+const person = (personName, personAge) => {
+    let person = Object.create(personMethods);
+
+    person.name = personName;
+    person.age = personAge;
+
+    return person;
+};
+Here, I have created a personMethods object that contains all the methods. Then in the factory function, I am using Object.create() method and passing the personMethods object in it.
+
+Note : You have to use this keyword to access properties with Object.create() method.
+
+This method is returning a new person object. Now I can add my properties to this object and return it.
+
+Now you can see all the methods are not directly inside the main object. Instead, they are inside the Prototype object. You are successfully using inheritance with your factory function.
+
+
+constructor-function-vs-factory-functions
+-----------------------------------------
+
+The basic difference is that a constructor function is used with the new keyword (which causes JavaScript to automatically create a new object, set this within the function to that object, and return the object):
+
+var objFromConstructor = new ConstructorFunction();
+A factory function is called like a "regular" function:
+
+var objFromFactory = factoryFunction();
+But for it to be considered a "factory" it would need to return a new instance of some object: you wouldn't call it a "factory" function if it just returned a boolean or something. This does not happen automatically like with new, but it does allow more flexibility for some cases.
+
+In a really simple example the functions referenced above might look something like this:
+
+function ConstructorFunction() {
+   this.someProp1 = "1";
+   this.someProp2 = "2";
+}
+ConstructorFunction.prototype.someMethod = function() { /* whatever */ };
+
+
+-----------------
+
+Benefits of using constructors
+
+	Most books teach you to use constructors and new
+
+	this refers to the new object
+
+	Some people like the way var myFoo = new Foo(); reads.
+
+
+Drawbacks
+	Details of instantiation get leaked into the calling API (via the new requirement), so all callers are tightly coupled to the constructor implementation. If you ever need the additional flexibility of the factory, you'll have to refactor all callers (admittedly the exceptional case, rather than the rule).
+
+	Forgetting new is such a common bug, you should strongly consider adding a boilerplate check to ensure that the constructor is called correctly ( if (!(this instanceof Foo)) { return new Foo() } ). EDIT: Since ES6 (ES2015) you can't forget new with a class constructor, or the constructor will throw an error.
+
+	If you do the instanceof check, it leaves ambiguity as to whether or not new is required. In my opinion, it shouldn't be. You've effectively short circuited the new requirement, which means you could erase drawback #1. But then you've just got a factory function in all but name, with additional boilerplate, a capital letter, and less flexible this context.
+	
+	Constructors break the Open / Closed Principle
+		But my main concern is that it violates the open/closed principle. You start out exporting a constructor, users start using the constructor, then down the road you realize you need the flexibility of a factory, instead (for instance, to switch the implementation to use object pools, or to instantiate across execution contexts, or to have more inheritance flexibility using prototypal OO).
+		
+-----------------------
+Benefits of using factories
+	Less code - no boilerplate required.
+
+	You can return any arbitrary object, and use any arbitrary prototype - giving you more flexibility to create various types of objects which implement the same API. For example, a media player that can create instances of both HTML5 and flash players, or an event library which can emit DOM events or web socket events. Factories can also instantiate objects across execution contexts, take advantage of object pools, and allow for more flexible prototypal inheritance models.
+
+	You'd never have a need to convert from a factory to a constructor, so refactoring will never be an issue.
+
+	No ambiguity about using new. Don't. (It will make this behave badly, see next point).
+
+	this behaves as it normally would - so you can use it to access the parent object (for example, inside player.create(), this refers to player, just like any other method invocation would. call and apply also reassign this, as expected. If you store prototypes on the parent object, that can be a great way to dynamically swap out functionality, and enable very flexible polymorphism for your object instantiation.
+
+	No ambiguity about whether or not to capitalize. Don't. Lint tools will complain, and then you'll be tempted to try to use new, and then you'll undo the benefit described above.
+
+	Some people like the way var myFoo = foo(); or var myFoo = foo.create(); reads.
+
+Drawbacks
+  new doesn't behave as expected (see above). Solution: don't use it.
+
+this doesn't refer to the new object (instead, if the constructor is invoked with dot notation or square bracket notation, e.g. foo.bar() - this refers to foo - just like every other JavaScript method -- see benefits).
+
+		You're stuck, though. You can't make the change without breaking all the code that calls your constructor with new. You can't switch to using object pools for performance gains, for instance.

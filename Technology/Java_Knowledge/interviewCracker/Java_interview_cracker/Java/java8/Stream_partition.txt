@@ -1,0 +1,212 @@
+Stream Partition
+===========
+
+
+======================
+Collectors.partitioningBy() using a Predicate
+======================
+In its essential form - the partitioningBy() method accepts a predicate:
+
+public static <T> Collector<T,?,Map<Boolean,List<T>>> partitioningBy(Predicate<? super T> predicate)
+Each of the elements from the Stream are tested against the predicate, and based on the resulting boolean value, this Collector groups the elements into two sets and returns the result as Map<Boolean, List<T>>.
+
+
+Note: There are no guarantees on the type, mutability, serializability, or thread-safety of the Map returned.
+
+
+internal code:
+													
+public static <T>
+    Collector<T, ?, Map<Boolean, List<T>>> partitioningBy(Predicate<? super T> predicate) {
+        return partitioningBy(predicate, toList());
+    }
+
+Syntax 2:
+---------
+
+
+ public static <T, D, A>
+    Collector<T, ?, Map<Boolean, D>> partitioningBy(Predicate<? super T> predicate,
+                                                    Collector<? super T, A, D> downstream) {}
+
+
+
+// Partition students into passing and failing
+     Map<Boolean, List<Student>> passingFailing =
+         students.stream()
+                 .collect(Collectors.partitioningBy(s -> s.getGrade() >= PASS_THRESHOLD));
+				 
+
+
+
+partitioningBy will always return a map with two entries, one for where the predicate is true and one for where it is false. It is possible that both entries will have empty lists, but they will exist.
+
+That's something that groupingBy will not do, since it only creates entries when they are needed.
+
+At the extreme case, if you send an empty stream to partitioningBy you will still get two entries in the map whereas groupingBy will return an empty map.				 
+
+
+partitioningBy is slightly more efficient, using a special Map implementation optimized for when the key is just a boolean.
+
+(It might also help to clarify what you mean; partitioningBy helps to effectively get across that there's a boolean condition being used to partition the data.)
+
+======================
+
+Guide to Collectors.partitioningBy()
+=================================
+======================
+The Collectors class is vast and versatile, and allows us to collect streams in a myriad of ways. To collect elements, partitioning the stream into partitions, given a certain predicate - we use Collectors.partitioningBy().
+
+Two overloaded versions of the method are at our disposal - but both return a Collector which partitions the input elements according to a Predicate, and organizes them into a Map<Boolean, List<T>>.
+
+
+The partitioningBy() method always returns a Map with two entries - one for where the Predicate is true, and one for when it's false. Both entries can have empty lists, but they will be present.
+
+Let's define a simple Student class to use in the code examples:
+
+private String name;
+private String surname;
+private String city;
+private double avgGrade;
+private int age;
+
+// Constructors, Getters, Setters, toString()
+And make a list of students to partition later:
+
+
+
+List<Student> students = Arrays.asList(
+        new Student("John", "Smith", "Miami", 7.38, 19),
+        new Student("Jane", "Miles", "New York", 8.4, 21),
+        new Student("Michael", "Peterson", "New York", 7.5, 20),
+        new Student("Gabriella", "Robertson", "Miami", 9.1, 20),
+        new Student("Kyle", "Miller", "Miami", 9.83, 20)
+);
+
+Before applying the method on our student list - let's try partitioning a list of names based on whether their length surpasses 4 or not:
+
+List<String> names = Arrays.asList("John", "Jane", "Michael", "Anna", "James");
+Map<Boolean, List<String>> partitionByNameLength = names.stream()
+        .collect(Collectors.partitioningBy(name -> name.length() > 4));
+
+System.out.println(partitionByNameLength);
+For every element of the List that has a greater length than 4, the predicate returns true and otherwise false. Based on these results - the partitioningBy() method collects the elements accordingly:
+
+{false=[John, Jane, Anna], true=[Michael, James]}
+Using the method on our custom Student class is really no different - we're just accessing a different field via a different method. The predicate we'll be using now will test our Student objects by the length of their name and their average grade:
+
+Map<Boolean, List<Student>> partitionByNameAvgGrade = students.stream()
+    .collect(Collectors.partitioningBy(student->student.getName().length() > 8 
+                                       && student.getAvgGrade() > 8.0));
+
+System.out.println(partitionByNameAvgGrade);
+This will partition the students on two predicates - whether their name is longer than 8 characters and whether their average grade is above 8:
+
+
+
+
+
+{
+false=[Student{name='John', surname='Smith', city='Miami', avgGrade=7.38, age=19}, Student{name='Jane', surname='Miles', city='New York', avgGrade=8.4, age=21}, Student{name='Michael', surname='Peterson', city='New York', avgGrade=7.5, age=20}, Student{name='Kyle', surname='Miller', city='Miami', avgGrade=9.83, age=20}], 
+true=[Student{name='Gabriella', surname='Robertson', city='Miami', avgGrade=9.1, age=20}]
+}
+
+The predicate can be any function or a lambda expression that returns a boolean value.
+
+If you'd like to read more about functional interfaces, lambda functions and predicates - read our Complete Guide to Java 8 Predicates!
+
+======================
+Collectors.partitioningBy() using a Predicate and a Downstream Collector
+======================
+Instead of providing just a predicate, which already gives us quite a bit of flexibility in terms of ways to test objects - we can supply a downstream collector as well.
+
+This collector can be used to reduce values in each partition according to another Collector and organizes the final map into a Map<Boolean, D> where the values of D are the results of the downstream collector:
+
+public static <T,D,A> Collector<T,?,Map<Boolean,D>> 
+    partitioningBy(Predicate<? super T> predicate,
+                   Collector<? super T,A,D> downstream)
+Let's take a look at a few different downstream collectors and how they can be used to enable partitioningBy() to be used in a more versatile manner. It's worth noting that there's no real restriction on the type of collector you can use here - as long as it makes sense to use for your task.
+
+======================
+Using Collectors.mapping() as a Downstream Collector
+======================
+Collectors.mapping() is a very common collector - and we can perform mapping on the elements after partitioning them. For instance, let's partition a stream of names based on their length, and then map the names to their uppercase counterparts and finally collect them back to a list:
+
+List<String> names = Arrays.asList("John", "Mike", "Michael", "Joe", "James");
+
+Map<Boolean, List<String>> partitionByNameLength = names.stream()
+    .collect(Collectors.partitioningBy(name -> name.length() > 4,
+            Collectors.mapping(String::toUpperCase, Collectors.toList())));
+
+
+System.out.println(partitionByNameLength);
+The Collectors.mapping() method is used as a downstream collector, which accepts two parameters itself - a mapper (function to be applied on the input elements), and its own downstream collector which accepts the mapped values.
+
+After applying the toUpperCase() function on each element of the stream, the results are accumulated and collected into a list:
+
+{false=[JOHN, JANE, ANNA], true=[MICHAEL, JAMES]}
+The result is naturally the same as before - however, we've passed these strings through a transformative mapping function.
+
+Following up, we can also use it on our Student class as well:
+
+
+Map<Boolean, List<String>> partitionStudentsByName = students.stream()
+    .collect(Collectors.partitioningBy(student->student.getName().length() > 8
+                                       && student.getAvgGrade() > 8.0,
+             Collectors.mapping(Student::getName, Collectors.toList())));
+
+System.out.println(partitionStudentsByName);
+Here, we've reduced the students to their names - instead of having the toString() method take over for the objects after being collected into a map. This way - we can format the output much more nicely than before, as we might not want to extract the entire object's information anyway:
+
+{false=[John, Jane, Michael, Kyle], true=[Gabriella]}
+Using Collectors.counting() as a Downstream Collector
+The counting() collector is yet another reduction collector, which reduces a vector of elements into a scalar value - the count of elements in the stream.
+
+If you'd like to read more about the counting collector - read our Guide to Java 8 Collectors: counting()!
+
+This collector can easily be supplied as the downstream collector to count the number of objects that pass the predicate, and the number of those that don't:
+
+Map<Boolean, Long> partitionByAvgGrade = students.stream()
+    .collect(Collectors.partitioningBy(student->student.getAvgGrade() > 8.0,
+             Collectors.counting()));
+
+System.out.println(partitionByAvgGrade);
+The pair in our Map<K, V> that represents the key-value pair is a little bit different than the earlier. Up to now, we always had a <K, V> that was represented as <Boolean, List<T>> (T being String or Student in our examples), but now we're using Long.
+
+This is because the counting() method always returns a Long, so we're just adjusting the map accordingly:
+
+{false=2, true=3}
+Similarities and Differences Between partitioningBy() And groupingBy()
+If you're familiar with the groupingBy() family of methods from the same Collectors class, you might have noticed the similarities it has with partitioningBy(), and might've asked yourself: _what's the actual difference? _
+
+If you aren't familiar with the groupingBy() family of methods, read up about them in our Guide to Java 8 Collectors: groupingBy()!
+
+groupingBy() has three different overloads within the Collectors class:
+
+Grouping with a Classification Function
+Grouping with a Classification Function and Downstream Collector
+Grouping with a Classification Function, Downstream Collector and Supplier
+The first two of these are, however, very similar to the partitioningBy() variants we already described within this guide.
+
+The partitioningBy() method takes a Predicate, whereas groupingBy() takes a Function.
+
+
+We've used a lambda expression a few times in the guide:
+
+name -> name.length() > 4
+Based on the context it's used in - it can serve as a Predicate or Function. Predicates accept input values and return a boolean value after applying its test() method on the input. Functions accept input values and return a transformed value, applying the apply() method on the input.
+
+In both of these cases, the test() and apply() method bodies are the lambda expression we've supplied.
+
+Let's talk about the differences now. The first major one is that the partitioningBy() will always map with two entries, one for which the predicate's test resulted with true, the other one being false. Both of these entries can be empty lists and they'll still exist. On the other hand, that's something that groupingBy() won't do - since it only creates entries when they're needed.
+
+Additionally, if we have a predefined Predicate<T>, it can only be passed on to the partitioningBy() method. Similarly, if we have a predefined Function<T, Boolean>, it can only be passed on to the groupingBy() method.
+
+======================
+Conclusion
+======================
+In this article, we talked about the partitioningBy() method from the Collectors class extensively. We showed how we can use it both on a simple List of Strings, and on a more custom, user-defined class.
+
+We also showcased how we can use different downstream collectors in our examples to achieve better partitioning of our data, with reduced lists instead of entire objects.
+
+Finally, we discussed similarities and differences between the groupingBy() and partitioningBy() methods, and what usages they both have in code

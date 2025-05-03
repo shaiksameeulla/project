@@ -1,0 +1,142 @@
+Spring Boot takes a different approach :
+--------------------------------
+
+The spring-boot-loader modules allows Spring Boot to support executable jar and war files. If you’re using the Maven or Gradle plugin, executable jars are automatically generated and you generally won’t need to know the details of how they work.
+
+Spring Boot:
+------------
+ A)Spring boot app can be started in one of below ways.
+  a) Spring initializer    b) Spring boot CLI    c) STS IDE
+  
+ B) Configuration
+
+
+1.  @SpringBootApplication :
+   The @SpringBootApplication annotation is equivalent to using @Configuration, @EnableAutoConfiguration and @ComponentScan with their default attributes.
+   @SpringBootApplication // same as @Configuration @EnableAutoConfiguration @ComponentScan
+   public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+		//Sets default configuration
+	//Starts  Spring application context
+	//performs classpath scan
+	//start tomcat embedded container
+    }
+
+   }
+ 2.Disabling restart :
+ public static void main(String[] args) {
+    System.setProperty("spring.devtools.restart.enabled", "false");
+    SpringApplication.run(MyApp.class, args);
+}
+3.application.properties
+	it's for tomcat custom configuration.
+4. To make Spring boot application ready for war deployment to Java EE containers.
+
+Spring boot application should extend SpringBootServletInitializer
+
+@SpringBootApplication
+public class CourseApiApp extends SpringBootServletInitializer{
+
+	public static void main(String[] args) {
+	SpringApplication.run(CourseApiApp.class, args);
+	//Sets default configuration
+	//Starts  Spring application context
+	//performs classpath scan
+	//start tomcat embedded container
+	
+	}
+	
+	 @Override
+	    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+	        return application.sources(CourseApiApp.class);
+	    }
+
+}
+
+5. Spring actuator :
+--------------------
+
+Spring Boot Actuator is a sub-project of Spring Boot. It adds several production grade services to your application with little effort on your part. 
+
+**IMP***********used to check health to the api.*********
+
+6> How to configure XMLs in Spring boot application.
+
+
+Use @ImportResource to Import XML Configuration
+
+
+@SpringBootApplication
+@ImportResource("classpath:app-config.xml")
+public class MyApplication {  
+	public static void main(String[] args) {
+		SpringApplication.run(MyApplication.class, args);
+        }       
+} 
+
+7)
+
+@Configuration
+@PropertySource("classpath:configprops.properties")
+@ConfigurationProperties(prefix = "mail")
+public class ConfigProperties {
+    // previous code
+}
+That’s it! Now any properties defined in the property file that has the prefix mail and the same name as one of the properties are automatically assigned to this object.
+
+Also, by default, a relaxed binding scheme is adopted for the binding, so all of the following variations are bound to the property authMethod of the Credentials class:
+
+mail.credentials.auth_method
+mail.credentials.auth-method
+mail.credentials_AUTH_METHOD
+mail.CREDENTIALS_AUTH_METHOD
+
+FailureAnalyzer is a great way to intercept an exception on startup and turn it into a human-readable message, wrapped in a FailureAnalysis. Spring Boot provides such an analyzer for application-context-related exceptions, JSR-303 validations, and more. You can also create your own.
+
+AbstractFailureAnalyzer is a convenient extension of FailureAnalyzer that checks the presence of a specified exception type in the exception to handle. You can extend from that so that your implementation gets a chance to handle the exception only when it is actually present. If, for whatever reason, you cannot handle the exception, return null to give another implementation a chance to handle the exception.
+
+FailureAnalyzer implementations must be registered in META-INF/spring.factories. The following example registers ProjectConstraintViolationFailureAnalyzer:
+
+org.springframework.boot.diagnostics.FailureAnalyzer=\
+com.example.ProjectConstraintViolationFailureAnalyzer
+
+
+Set the Active Spring Profiles
+----------------
+The Spring Environment has an API for this, but you would normally set a System property (spring.profiles.active) or an OS environment variable (SPRING_PROFILES_ACTIVE). Also, you can launch your application with a -D argument (remember to put it before the main class or jar archive), as follows:
+
+$ java -jar -Dspring.profiles.active=production demo-0.0.1-SNAPSHOT.jar
+
+In Spring Boot, you can also set the active profile in application.properties, as shown in the following example:
+
+PropertiesYaml
+spring.profiles.active=production
+
+Configure SSL
+============
+SSL can be configured declaratively by setting the various server.ssl.* properties, typically in application.properties or application.yml. The following example shows setting SSL properties in application.properties:
+
+PropertiesYaml
+server.port=8443
+server.ssl.key-store=classpath:keystore.jks
+server.ssl.key-store-password=secret
+server.ssl.key-password=another-secret
+
+See Ssl for details of all of the supported properties.
+
+Add a Servlet, Filter, or Listener to an Application
+=============================
+
+In a servlet stack application, that is with the spring-boot-starter-web, there are two ways to add Servlet, Filter, ServletContextListener, and the other listeners supported by the Servlet API to your application:
+
+In the case of filters and servlets, you can also add mappings and init parameters by adding a FilterRegistrationBean or a ServletRegistrationBean instead of or in addition to the underlying component.
+
+If no dispatcherType is specified on a filter registration, REQUEST is used. This aligns with the servlet specification’s default dispatcher typ
+
+Add Servlets, Filters, and Listeners by Using Classpath Scanning
+======================================
+@WebServlet, @WebFilter, and @WebListener annotated classes can be automatically registered with an embedded servlet container by annotating a @Configuration class with @ServletComponentScan and specifying the package(s) containing the components that you want to register. By default, @ServletComponentScan scans from the package of the annotated class.
+
+https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.webserver.add-servlet-filter-listener.spring-bean.disable

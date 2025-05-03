@@ -1,0 +1,71 @@
+null and undefined
+====================
+
+Null: It is the intentional absence of the value. It is one of the primitive values of JavaScript.
+Undefined: It means the value does not exist in the compiler
+
+JavaScript has two primitive values used to signal absent or uninitialized value: null and undefined.
+
+
+let x; // variable declared but not initialized
+console.log(x); // Output: undefined
+
+function doSomething() {
+// no return statement, so the function returns undefined
+}
+console.log(doSomething()); // Output: undefined
+
+let obj = {};
+console.log(obj.property); // Output: undefined
+
+=============
+let y = null; // variable intentionally set to null
+console.log(y); // Output: null
+
+let obj = { property: null }; // property intentionally set to null
+console.log(obj.property); // Output: null
+
+=========
+
+console.log(ktpt)
+VM777:1 Uncaught ReferenceError: ktpt is not defined
+    at <anonymous>:1:13
+=================
+Another way to distinguish the two is through the typeof operator. typeof will always return undefined for an undefined variable and object for a null variable.
+ For example
+ let z;
+ console.log(typeof z); // logs 'undefined'
+ 
+ let a=null;
+ console.log(typeof a); // logs 'object'
+
+===========	
+TypeScript has two corresponding types by the same names. How these types behave depends on whether you have the strictNullChecks option on.
+
+strictNullChecks   off
+
+	With strictNullChecks off, values that might be null or undefined can still be accessed normally, and the values null and undefined can be assigned to a property of any type. This is similar to how languages without null checks (e.g. C#, Java) behave. The lack of checking for these values tends to be a major source of bugs; we always recommend people turn strictNullChecks on if it’s practical to do so in their codebase.
+
+strictNullChecks on
+===================
+	With strictNullChecks on, when a value is null or undefined, you will need to test for those values before using methods or properties on that value. Just like checking for undefined before using an optional property, we can use narrowing to check for values that might be null:
+
+			function doSomething(x: string | null) {
+			  if (x === null) {
+				// do nothing
+			  } else {
+				console.log("Hello, " + x.toUpperCase());
+			  }
+			}
+Try
+
+Non-null Assertion Operator (Postfix!)
+=====================================
+TypeScript also has a special syntax for removing null and undefined from a type without doing any explicit checking. Writing ! after any expression is effectively a type assertion that the value isn’t null or undefined:
+
+function liveDangerously(x?: number | null) {
+  // No error
+  console.log(x!.toFixed());
+}
+Try
+  Just like other type assertions, this doesn’t change the runtime behavior of your code, so it’s important to only use ! when you know that the value can’t be null or undefined.

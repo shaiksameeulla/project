@@ -1,0 +1,164 @@
+@Configuration and @Component are both annotations used in Spring Framework, but they serve different purposes.
+
+@Configuration is a type-level annotation that indicates that a class declares one or more @Bean methods and may be processed by the Spring container to generate bean definitions and service requests for those beans at runtime. Classes annotated with @Configuration are usually used as sources of bean definitions.
+
+@Component is a class-level annotation that indicates that an annotated class is a "component". Such classes are considered as candidates for auto-detection when using annotation-based configuration and classpath scanning. It is a generic stereotype for any Spring-managed component or bean.
+
+In simple terms, @Configuration is used for defining beans and their dependencies, whereas @Component is used for general-purpose auto-detection of components.
+
+In most cases, you would use @Configuration to define beans for complex configurations and @Component to define simple beans that are used throughout your application.
+
+
+Difference Between @ComponentScan and @EnableAutoConfiguration in Spring Boot
+
+@SpringBootApplication annotation, which is a combination of the three annotations @Configuration, @EnableAutoConfiguration, and@ComponentScan with their default attributes:
+
+
+@ComponentScan scans for Spring components 
+while @EnableAutoConfiguration is used for auto-configuring beans present in the classpath in Spring Boot applications.
+
+@ComponentScan
+While developing an application, we need to tell the Spring framework to look for Spring-managed components. @ComponentScan enables Spring to scan for things like configurations, controllers, services, and other components we define.
+
+In particular, the @ComponentScan annotation is used with @Configuration annotation to specify the package for Spring to scan for component
+
+@Configuration
+@ComponentScan
+public class EmployeeApplication {
+    public static void main(String[] args) {
+        ApplicationContext context = SpringApplication.run(EmployeeApplication.class, args);
+        // ...
+    }
+}
+
+
+@EnableAutoConfiguration
+The @EnableAutoConfiguration annotation enables Spring Boot to auto-configure the application context. Therefore, it automatically creates and registers beans based on both the included jar files in the classpath and the beans defined by us.
+
+
+What's the difference between Spring Boot's @Configuration and @AutoConfiguration?
+
+
+@Configuration is a spring framework annotation and not strictly bound to spring-boot. It was introduced when spring started to allow programmatic creation of spring-beans as to move forward from xml definitions of beans. proxyBeanMethods is true by default;
+
+@AutoConfiguration is a spring-boot specific annotation not commonly available in spring framework. The reason it exists, is for external providers that cooperate with spring-boot to be able to mark some classes in some libraries they provide with this annotation as to inform spring-boot that those classes could be parsed and make some initializations during start up of spring application automatically.
+
+So if some regular programmer that develops some application happens to have kafka in dependencies then some beans will automatically be created and added in application context and will be ready for the programmer to use, although he has not defined any configuration for them. Spring-boot already knows this as the kafka provider has already informed by marking some class in the jar they provide with the annotation @AutoConfiguration.
+
+For this reason @AutoConfiguration has some more powerful configurations available as before, after, beforeName, afterName as to allow the provider to specify when the configuration is applied during application startup if some order is necessary.
+
+So this annotation is not to be used from some regular programmer that develops an application using spring-boot. It is for someone that develops a library that other users might use with spring-boot. One such example is kafka library.
+
+For this to work in a spring-boot project @EnableAutoConfiguration is needed as well, to enable auto configuration.
+
+usually, @AutoConfiguration classes automatically configure an application based on the dependencies that are present on the classpath. Those classes are generally marked as @ConditionalOnClass and @ConditionalOnMissingBean annotations that detect the presence or absence of specific classes
+
+@Autoconfiguration internally uses configuration annotation with proxyBeanMethods= false,
+@Configuration(proxyBeanMethods = false)
+
+
+============
+
+In Spring Boot, auto-configurations should not be scanned by @ComponentScan and instead are loaded by being named in the imports file, ensuring they are defined in a specific package space. 
+Here's a more detailed explanation:
+
+Auto-configuration Loading:
+	Spring Boot auto-configurations are loaded through the META-INF/spring.factories file, which is read early in the application's lifecycle. 
+	in Spring boot 2.7/3.x it looks for META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
+Component Scanning Order:
+	Component scanning happens later in the process, after the user configuration has been parsed. 
+Why not use @ComponentScan?
+	Using @ComponentScan on an auto-configuration class would move it to the "User Configuration Phase," which can lead to unexpected behavior and conflicts with the intended auto-configuration process. 
+Best Practices:
+	Auto-configurations should be defined in a specific package space and never be the target of component scanning. 
+Use @Import annotations to import auto-configuration classes instead of relying on component scanning. 
+
+	Avoid using @ComponentScan within auto-configuration classes. 
+Example:
+If you have a library that provides auto-configuration, you should ensure it's loaded through META-INF/spring.factories and not rely on the application's component scanning to find it. 
+The application class, annotated with @SpringBootApplication, will scan the packages under its location by default, and you can use @ComponentScan to scan other packages if neede
+=============
+
+@ConfigurationProperties
+If we have properties that are grouped together, we can make use of the @ConfigurationProperties annotation, which will map these property hierarchies into Java objects graphs.
+
+Let’s take some properties used to configure a database connection:
+
+database.url=jdbc:postgresql:/localhost:5432/instance
+database.username=foo
+database.password=bar
+
+And then let’s use the annotation to map them to a database object:
+
+@ConfigurationProperties(prefix = "database")
+public class Database {
+    String url;
+    String username;
+    String password;
+
+    // standard getters and setters
+}
+
+Spring 3.1 also introduces the new @PropertySource annotation as a convenient mechanism for adding property sources to the environment.
+
+We can use this annotation in conjunction with the @Configuration annotation: (otherwise it wont work)
+
+@Configuration
+@PropertySource("classpath:foo.properties")
+public class PropertiesWithJavaConfig {
+    //...
+}
+Another very useful way to register a new properties file is using a placeholder, which allows us to dynamically select the right file at runtime:
+
+
+@PropertySource({ 
+  "classpath:persistence-${envTarget:mysql}.properties"
+})
+...
+
+Using/Injecting Properties
+
+======
+
+
+
+@Value("${spring.application.name}") @Value will throw exception if there no matching key in application.properties/yml file. It strictly injects property value.
+
+For example: @Value("${spring.application.namee}") throws below exception, as namee field doesn't exists in properties file.
+
+application.properties file
+----------------------
+spring:
+  application:
+    name: myapplicationname
+
+
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'testValue': Injection of autowired dependencies failed; nested exception is java.lang.IllegalArgumentException: Could not resolve placeholder 'spring.application.namee' in value "${spring.application.namee}"
+
+Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'spring.application.namea' in value "${spring.application.namee}"
+@ConfigurationProperties(prefix = "myserver.allvalues") injects POJO properties, it's not strict, it ignores the property if there is no key in properties file.
+
+For example:
+
+@ConfigurationProperties(prefix = "myserver.allvalues")
+public class TestConfigurationProperties {
+    private String value;
+    private String valuenotexists; // This field doesn't exists in properties file
+                                   // it doesn't throw error. It gets default value as null
+}
+
+application.properties file
+----------------------
+myserver:
+  allvalues:
+    value:  sampleValue
+
+Injecting a property with the @Value annotation is straightforward:
+
+@Value( "${jdbc.url}" )
+private String jdbcUrl;
+
+We can also specify a default value for the property:
+
+@Value( "${jdbc.url:aDefaultUrl}" )
+private String jdbcUrl;

@@ -1,0 +1,132 @@
+Java 8 Streams:
+=================
+https://www.javabrahman.com/java-8/java-8-java-util-stream-collector-basics-tutorial-with-examples/
+
+
+1.An array can also be the source of a stream:
+====================================
+
+  Stream<String> streamOfArray = Stream.of("a", "b", "c");
+  We can also create a stream out of an existing array or of part of an array:
+
+	String[] arr = new String[]{"a", "b", "c"};
+	Stream<String> streamOfArrayFull = Arrays.stream(arr);
+	Stream<String> streamOfArrayPart = Arrays.stream(arr, 1, 3);
+
+2. Stream.builder()
+======================
+
+  When builder is used, the desired type should be additionally specified in the right part of the statement, otherwise the build() method will create an instance of the Stream<Object>:
+
+Stream<String> streamBuilder =
+  Stream.<String>builder().add("a").add("b").add("c").build();
+
+3. Stream.generate()
+================
+The generate() method accepts a Supplier<T> for element generation. As the resulting stream is infinite, the developer should specify the desired size, or the generate() method will work until it reaches the memory limit:
+
+Stream<String> streamGenerated =
+  Stream.generate(() -> "element").limit(10);
+The code above creates a sequence of ten strings with the value “element.”
+
+Stream.generate(new Random()::nextInt)
+    .limit(5).forEach(System.out::println);
+	
+4.Stream.iterate()
+===========
+Another way of creating an infinite stream is by using the iterate() method:
+
+Stream<Integer> streamIterated = Stream.iterate(40, n -> n + 2).limit(20);
+The first element of the resulting stream is the first parameter of the iterate() method. When creating every following element, the specified function is applied to the previous element. In the example above the second element will be 42.
+
+Note how their signatures are different:
+
+IntGenerator generate takes a IntSupplier, which means that you are supposed to generate ints without being given anything. Example usages include creating a constant stream of the same integer, creating a stream of random integers. Notice how each element in the stream do not depend on the previous element.
+
+iterate takes a seed and a IntUnaryOperator, which means that you are supposed to generate each element based on the previous element. This is useful for creating a inductively defined sequence, for example. In this case, each element is supposed to depend on the previous one.
+
+IntStream.iterate returns an ordered IntStream on the other hand IntStream.generate returns an unordered IntStream which can help in speeding up parallel stream pipelines.
+IntStream.generate are preferred to generate random or constant values as specified in the Javadoc, I would guess most likely for the characteristics of the stream returned.
+
+Aside from order, also the usage is a bit different. Let's look at the method signatures:
+
+iterate(int seed, IntUnaryOperator f)
+generate(IntSupplier s)
+Iterate has explicitly given starting value as parameter and unary operator which is used to generate next value from previous. Here operator can easily be immutable without internal state and can be reused in multiple places in parallel without any issue.
+
+Generate uses supplier. Those can either provide constant or random numbers or need to have internal state to provide series like (1, 2, 3, ...).
+
+
+
+5. Stream of Primitives
+=================
+
+Java 8 offers the possibility to create streams out of three primitive types: int, long and double. As Stream<T> is a generic interface, and there is no way to use primitives as a type parameter with generics, three new special interfaces were created: IntStream, LongStream, DoubleStream.
+
+Using the new interfaces alleviates unnecessary auto-boxing, which allows for increased productivity:
+
+IntStream intStream = IntStream.range(1, 3);
+LongStream longStream = LongStream.rangeClosed(1, 3);
+The range(int startInclusive, int endExclusive) method creates an ordered stream from the first parameter to the second parameter. It increments the value of subsequent elements with the step equal to 1. The result doesn't include the last parameter, it is just an upper bound of the sequence.
+
+The rangeClosed(int startInclusive, int endInclusive) method does the same thing with only one difference, the second element is included. We can use these two methods to generate any of the three types of streams of primitives.
+
+Since Java 8, the Random class provides a wide range of methods for generating streams of primitives. For example, the following code creates a DoubleStream, which has three elements:
+
+Random random = new Random();
+DoubleStream doubleStream = random.doubles(3);
+
+
+Map<Integer,String> empMap  = st.collect(Collectors.toMap(Employee::getEmpId, Employee::getEmpName));
+Map<Integer,String> empMap  = st.collect(Collectors.toMap(Employee::getEmpId, Employee::getEmpName,(e1,e2)->e1));  //to avoid duplicate key exception
+
+
+		Map<Integer,Set<Employee>> setToEmpMap= baseList.stream().collect(Collectors.groupingBy(Employee::getEmpId,Collectors.toSet()));
+		System.out.println("setToEmpMap "+setToEmpMap);
+		
+
+		Map<Integer,Set<String>> setToEmpNameMap= baseList.stream().collect(Collectors.groupingBy(Employee::getEmpId,Collectors.mapping(Employee::getEmpName, Collectors.toSet())));
+		
+		
+		List<Employee> baseList = str.collect(Collectors.toList());
+		System.out.println("------------------------------------------");
+		System.out.println("Baselist "+baseList);
+		List<Employee> employeeList1=baseList.stream().filter(emp->emp.getEmpName().startsWith(S)).sorted((e1,e2)->e1.getEmpId().compareTo(e2.getEmpId())).collect(Collectors.toList());
+		System.out.println("------------------------------------------");
+		System.out.println("Sort Based on employee id (FI comparator)");
+		employeeList1.forEach(emp->System.out.println(emp));
+		
+		List<Employee> employeeList2=baseList.stream().filter(emp->emp.getEmpName().startsWith(S)).sorted(Comparator.comparingInt(Employee::getEmpId)).collect(Collectors.toList());
+		System.out.println("Sort Based on employee id (new Comparator)");
+		System.out.println("------------------------------------------");
+		employeeList2.forEach(emp->System.out.println(emp));
+		List<Employee> employeeList3=baseList.stream().filter(emp->emp.getEmpName().startsWith(S)).sorted(Comparator.comparing(Employee::getEmpId).thenComparing(Comparator.comparing(Employee::getEmpName))).collect(Collectors.toList());
+		System.out.println("Sort Based on employee id  and then emp name(new Comparator)");
+		System.out.println("------------------------------------------");
+		employeeList3.forEach(emp->System.out.println(emp));
+		
+		System.out.println("------------------------------------------");
+		System.out.println("END employee");
+		
+		
+		List<List<String>> listofListOfCities=Arrays.asList(Arrays.asList("Delhi","Mumbai"),
+        Arrays.asList("Beijing","Shanghai","Tianjin"),
+        Arrays.asList("Kathmandu","Lalitpur"),
+        Arrays.asList("Thimphu","Phuntsholing"));
+System.out.println(listofListOfCities);
+
+List<String> result = listofListOfCities.stream().flatMap(cities->cities.stream()).collect(Collectors.toList());
+
+
+
+System.out.println(result);
+
+//Creating a List of Strings
+List<String> list = Arrays.asList("5.6", "7.4", "4",
+                                  "1", "2.3");
+
+// Using Stream flatMap(Function mapper)
+list.stream().flatMap(num -> Stream.of(num)).
+                 forEach(System.out::println);
+	}
+

@@ -1,0 +1,121 @@
+Api.fetchUser is a function, where should be performed api ajax call and it should return promise.
+
+In your case, this promise should resolve user data variable.
+
+For example:
+
+// services/api.js
+export function fetchUser(userId) {
+  // `axios` function returns promise, you can use any ajax lib, which can
+  // return promise, or wrap in promise ajax call
+  return axios.get('/api/user/' + userId);
+};
+Then is sagas:
+
+function* fetchUserSaga(action) {
+  // `call` function accepts rest arguments, which will be passed to `api.fetchUser` function.
+  // Instructing middleware to call promise, it resolved value will be assigned to `userData` variable
+  const userData = yield call(api.fetchUser, action.userId);
+  // Instructing middleware to dispatch corresponding action.
+  yield put({
+    type: 'FETCH_USER_SUCCESS',
+    userData
+  });
+}
+call, put are effects creators functions. They not have something familiar with GET or POST requests.
+
+call function is used to create effect description, which instructs middleware to call the promise. put function creates effect, in which instructs middleware to dispatch an action to the store.
+
+
+Example Usage
+================
+
+1. Dispatch an action
+
+
+	Suppose we have a UI to fetch some user data from a remote server when a button is clicked. (For brevity, we'll just show the action triggering code.)
+
+	class UserComponent extends React.Component {
+	  ...
+	  onSomeButtonClicked() {
+		const { userId, dispatch } = this.props
+		dispatch({type: 'USER_FETCH_REQUESTED', payload: {userId}})
+	  }
+	  ...
+	}
+
+
+
+2. Initiate a side effect
+
+
+		import { call, put, takeEvery, takeLatest } from 'redux-saga/effects'
+		import Api from '...'
+
+		// Worker saga will be fired on USER_FETCH_REQUESTED actions
+		function* fetchUser(action) {
+		   try {
+			  const user = yield call(Api.fetchUser, action.payload.userId);
+			  yield put({type: "USER_FETCH_SUCCEEDED", user: user});
+		   } catch (e) {
+			  yield put({type: "USER_FETCH_FAILED", message: e.message});
+		   }
+		}
+
+		// Starts fetchUser on each dispatched USER_FETCH_REQUESTED action
+		// Allows concurrent fetches of user
+		function* mySaga() {
+		  yield takeEvery("USER_FETCH_REQUESTED", fetchUser);
+		}
+		
+		
+		
+		
+3. Connect to the store
+
+		To run our Saga, we have to connect it to the Redux store using the redux-saga middleware.
+
+		import { createStore, applyMiddleware } from 'redux'
+		import createSagaMiddleware from 'redux-saga'
+
+		import reducer from './reducers'
+		import mySaga from './sagas'
+
+		// Create the saga middleware
+		const sagaMiddleware = createSagaMiddleware()
+		// Mount it on the Store
+		const store = createStore(
+		  reducer,
+		  applyMiddleware(sagaMiddleware)
+		)
+
+		// Then run the saga
+		sagaMiddleware.run(mySaga)
+
+		// Render the application		
+		
+
+4. Connect to the store (new version)		
+		
+		This is the new version of running saga by using configureStore from reduxjs/toolkit instead of createStore from Redux.
+
+			import { configureStore } from '@reduxjs/toolkit'
+			import createSagaMiddleware from 'redux-saga'
+
+			import reducer from './reducers'
+			import mySaga from './sagas'
+
+			// Create the saga middleware
+			const sagaMiddleware = createSagaMiddleware()
+			const middleware = [sagaMiddleware]
+			// Mount it on the Store
+			const store = configureStore({
+			  reducer,
+			  middleware: (getDefaultMiddleware) =>
+				  getDefaultMiddleware().concat(middleware),
+			})
+
+			// Then run the saga
+			sagaMiddleware.run(mySaga)
+
+			// Render the application

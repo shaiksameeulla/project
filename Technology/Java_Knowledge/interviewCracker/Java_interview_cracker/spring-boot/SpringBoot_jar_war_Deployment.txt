@@ -1,0 +1,76 @@
+ 
+
+Traditional Deployment
+========================================
+Traditional deployments are another way of saying WAR and EAR deployments when we speak about web applications or enterprise applications.
+
+An opinionated WebApplicationInitializer to run a SpringApplication from a traditional WAR deployment. Binds Servlet, Filter and ServletContextInitializer beans from the application context to the servlet container.
+To configure the application either override the configure(SpringApplicationBuilder) method (calling SpringApplicationBuilder.sources(Object...)) or make the initializer itself a @Configuration. If you are using SpringBootServletInitializer in combination with other WebApplicationInitializers you might also want to add an @Ordered annotation to configure a specific startup order.
+
+
+To force a Spring Boot application to deploy as a war, the very least you should do is extend SpringBootServletInitializer and override it’s configure method. It will add Servlet 3.0 support into this web application.
+
+@SpringBootApplication 
+public class MyApplication extends SpringBootServletInitializer {
+  public static void main(String[] args) {
+    SpringApplication.run(MyApplication.class, args);
+  }
+@Override
+  protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+    return application.sources(MyApplication.class);
+  }
+}
+and change the packaging of the application from JAR to WAR in your build scrtipt.
+
+Here we have extended the SpringBootServletInitializer class which is necessary to run a WAR application. This will bind the application context to the server. We have also override the SpringApplicationBuilder configure to define the class with main() method as the source class.
+
+As we are going to use the embedded Tomcat server, let’s change the scope of the embedded Tomcat server. To do that, add the following dependency of tomcat and change the Scope as provided.
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+		
+
+Nontraditional Deployment
+========================================
+
+SpringApplicationBuilder
+
+SpringApplicationBuilder is a good way to control and build your Spring Boot Application yourself while taking care of context hierarchy. You can customize many things with it.
+Examples:
+
+new SpringApplicationBuilder(ParentConfig.class)
+           .child(ChildConfig.class).run(args);
+---
+new SpringApplicationBuilder(Application.class)
+           .profiles("server")
+           .properties("transport=local").run(args);
+---
+new SpringApplicationBuilder(AdminApplication.class) 
+           .web(true).run(args);
+---
+SpringApplicationBuilder appBuilder = 
+          new SpringApplicationBuilder().sources(Parent.class);
+appBuilder.child(Application1.class).run(args);
+   appBuilder.child(Application2.class).run(args);
+
+
+SpringApplication
+=============================================
+The most common and convenient of all, which applies convention over configuration the best is SpringApplication. It bootstraps a Spring application and starts it from main method.
+
+It does the following
+
+1. Creates an appropriate ApplicationContext instance
+2. Registers a CommandLinePropertySource to expose command line 
+   arguments as Spring properties
+3. Refreshes the application context, loading all singleton beans
+4. Triggers any CommandLineRunner beans
+@Configuration
+@EnableAutoConfiguration //or use @SpringBootApplication
+ public class MyApplication  {
+   public static void main(String[] args) throws Exception {
+     SpringApplication.run(MyApplication.class, args);
+   }
+ }

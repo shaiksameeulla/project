@@ -1,0 +1,214 @@
+The Thread.yield() : method prevents the currently executing thread from running and allows other threads to execute
+
+
+Thread Priorities
+In the Java programming language, every thread has a priority. By default, a thread inherits the priority of its parent thread. You can increase or decrease the priority of any thread with the setPriority method. You can set the priority to any value between MIN_PRIORITY (defined as 1 in the Thread class) and MAX_PRIORITY (defined as 10). NORM_PRIORITY is defined as 5 (which is default).
+
+Whenever the thread-scheduler has a chance to pick a new thread, it generally picks the highest-priority thread that is currently runnable.
+
+Important Notes :
+1)	Wait()/notify()/notifyAll() will only be called if the current thread has lock on this object, otherwise it will throw IllegalMonitorStateException. (Runitime Exception)
+2)if wait() method is called by thread then it immediately release the lock and entered into wait state of the thread.
+3)if a thread calls notify() method on any object, it releases the lock of that object but may not immediately.
+  except wait()/notify()/notifyAll() there is no other method which releases the lock of the object.
+
+  difference between notify and notifyAll:
+  --------------------------------------
+  Java provides two methods notify and notifyAll for waking up threads waiting on some condition and you can use any of them but there is a subtle difference between notify and notifyAll in Java which makes it one of the popular multi-threading interview questions in Java. When you call notify only one of waiting for the thread will be woken and it's not guaranteed which thread will be woken, it depends on upon Thread scheduler. While if you call notifyAll method, all threads waiting on that lock will be woken up, but again all woken thread will fight for lock before executing remaining code and that's why wait is called on loop because if multiple threads are woken up, the thread which will get lock will first execute and it may reset waiting for condition, which will force subsequent threads to wait. So key difference between notify and notifyAll is that notify() will cause only one thread to wake up while notifyAll method will make all thread to wake up.
+--------
+
+
+  
+  Thread acquires the intrinsic lock when it enters a synchronized method. Thread inside the synchronized method is set as the owner of the lock and is in RUNNABLE state. Any thread that attempts to enter the locked method becomes BLOCKED.
+
+When thread calls wait it releases the current object lock (it keeps all locks from other objects) and than goes to WAITING state.
+
+When some other thread calls notify or notifyAll on that same object the first thread changes state from WAITING to BLOCKED, Notified thread does NOT automatically reacquire the lock or become RUNNABLE, in fact it must fight for the lock with all other blocked threads.
+
+WAITING and BLOCKED states both prevent thread from running, but they are very different.
+
+WAITING threads must be explicitly transformed to BLOCKED threads by a notify from some other thread.
+
+WAITING never goes directly to RUNNABLE.
+
+When RUNNABLE thread releases the lock (by leaving monitor or by waiting) one of BLOCKED threads automatically takes its place.
+
+So to summarize, thread acquires the lock when it enters synchronized method or when it reenters the synchronized method after the wait.
+
+public synchronized guardedJoy() {
+    // must get lock before entering here
+    while(!joy) {
+        try {
+            wait(); // releases lock here
+            // must regain the lock to reentering here
+        } catch (InterruptedException e) {}
+    }
+    System.out.println("Joy and efficiency have been achieved!");
+}
+  
+  
+  -------------------------
+Deadlock : only reason is not correctly using synchronized keyword
+
+class A{                           class B{
+
+synchronized m1(B b){         synchronized m1(A a){
+b.m2();									a.m2();
+}									}
+
+synchronized m2 (){             synchronized m2 (){
+
+}												}
+
+
+}                                          }
+
+
+class Deadlock  extends Thread{
+
+A a = new A();
+B b = new B();
+
+void m1(){
+this.start();
+a.m1(b);
+}
+void run(){
+b.m1(a);
+}
+psmv (String s[]){
+Deadlock d= new Deadlock();d.m1();
+}}
+
+
+Deadlock vs starvation :
+
+
+Deadlock : waiting never ends.
+starvation : waiting end at certain time.
+
+Daemon threads :
+---------------
+Thread executing in the background is called DaemonThread. ex: gc , AttachListener, Signal Dispatcher.
+
+we can change the daemon nature before starting the thread , otherwise we'll get IllegalThreadStateException
+
+public boolean isDaemon();
+public void setDaemon(boolean)
+
+By default main thread is always non-daemon and for all remaining threads daemon nature will be inherited from parent threads.
+
+Since Main thread has already started by JVM hence we can not set main thread as daemon thread.
+if Main/last non daemon thread thread is terminated then child thread will also be terminated immediately, see below example
+
+Ex: Mythread extends Thread{                 psmv(String s[]){
+public void run(){								Mythread t= new Mythread();
+for(int i=0;i<10;i++)							t.setDaemon(true);
+{ sop("child thread"+i);						t.start(); sop(" Main thread");
+this.sleep(2000);
+}}}													}
+
+}
+
+Only possible o/p are below:
+
+1. Main Thread   or 2. child Thread  Main thread or 3. Main thread Child Thread 
+--------
+
+setDaemon(false) : default
+// When false, (i.e. when it's a user thread),
+        // the Worker thread continues to run.
+        // When true, (i.e. when it's a daemon thread),
+        // the Worker thread terminates when the main 
+        // thread terminates.
+        setDaemon(true); 
+
+FAQ :
+
+Multiple threading is implemented in 2 ways 1. Green Thread Model 2. Nativ OS Model
+
+Green Thread Model: JVM takes complete responsibility of managing threads without taking any support from underlying OS
+very few OS provides Green Thread model, But it's deprecated ex: sunSolaris
+Nativ OS Model : ex : windows
+
+How to Stop a Thread :
+--------------------
+stop () : terminate the thread execution.
+stop() method deprecated method.
+
+How to suspend() and resume() thread :
+-----------------------------------
+suspend() : deprecated
+resume () : deprecated.
+
+ThreadGroup :
+-------------
+1. is used to perform common operations on a group, like setPriority, destroy..etc
+2. if we dont provide ThreadGroup then it takes Parent thread group.
+
+ThreadGroup g= new ThreadGroup(string gname);
+ThreadGroup g= new ThreadGroup(ThreadGroup parent,string gname);
+
+add(Thread t);
+
+int activeCount();   void interrupt(), void destroy()
+int getMaxPriorty()
+void setMaxPriorty(int)
+
+Default Priority for the Group : Thread.MAX_PRIORITY
+
+Threads in the ThreadGroup , that already higher priority wont be affected but for newly added threads, this max priority is applicable.
+
+
+int  enumerate(Thread[]) :Copies into the specified array every active thread in this thread group and its subgroups.
+public int enumerate(Thread list[], boolean recurse) :
+
+EX:
+ ThreadGroup system= Thread.currentThread().getThreadGroup().getParent();
+ Thread t[]= new Thread[system.activeCount];
+ system.enumerate(t);
+ for(Thread tn:t){
+ sop(t.getName()+ ""+t.isDaemon())
+ }
+--> o/p:
+ ReferenceHandler true
+ Finalizer true
+ SignalDispatcher true
+ AttachListener  true
+ Main false;
+-->o/p end
+ -------
+ On starting a JVM instance on my machine, with a simple class running infinite sleep in main(), I see four key threads (apart from the main thread) in the JVM:
+
+Attach Listener
+Reference Handler
+Finalizer
+Signal Dispatcher
+DestroyJavaVM
+I am curious to understand purpose of each of these core JVM threads. From a quick internet search, I found the following details on these threads:
+
+1. Attach Listener: Dynamic attach has an attach listener thread in the target JVM. This is a thread that is started when the first attach request occurs.
+
+2.Signal Dispatcher: When the OS raises a signal to the JVM, the signal dispatcher thread will pass the signal to the appropriate handler.
+
+3.Reference Handler: High-priority thread to enqueue pending References. The GC creates a simple linked list of references which need to be processed and this thread quickly adds them to a proper queue and notifies ReferenceQueue listeners.
+
+4.Finalizer: The Finalizer thread calls finalizer methods.
+5.DestroyJavaVM: This thread unloads the Java VM on program exit. Most of the time it should be waiting.
+ 
+ 
+ 
+ ---------------------
+ 
+ ThreadLocal :
+ ----------
+ Each thread holds an implicit reference to its copy of a thread-local variable as long as the thread is alive and the ThreadLocal instance is accessible; after a thread goes away, all of its copies of thread-local instances are subject to garbage collection (unless other references to these copies exist).
+ 
+ Object get():
+ Object initialValue(); By default is null, we can override this method.
+ set(Object)
+ remove() : 
+ 
+ InheritableThreadLocal :
+  which is subclass of threadLocal class.
+ 

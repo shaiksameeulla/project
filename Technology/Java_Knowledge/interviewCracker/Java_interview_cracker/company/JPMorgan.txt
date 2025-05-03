@@ -1,0 +1,301 @@
+mysql-
+top 3 salary from employee table
+most frequent salary from each department
+java-
+first repeated char from a string
+why string is immutable
+if you want to store password which one to prefer string or charArray
+is charArray immutable
+what is tree datastructure
+write the pojo for internal datastructure of Linkedlist
+difference between git pull and fetch
+internal implementation of HashMap
+
+ 
+
+ 
+
+SingleLinkedList add node at first delete node at last and print list
+
+ 
+
+How concurrenthasmap internally work 
+
+ 
+
+ 
+
+The questions were basically on :
+
+ 
+
+1.Implementation of Singly LinkedList for deletion.
+
+2.Internal working of HashMap. 
+
+3.Overriding and Overloading.
+
+ 
+
+ 
+
+ 
+
+ 
+
+1 – Design Employee and Dept table
+
+2 – Asked about joins and constrains
+
+3 – Write sql to find out the name of managers having 5 employees
+
+4 – Write java8 code to find the name of managers having 5 employees
+
+1).Write Employee class with all syntax and sort all employees based on the age o
+
+2). Write Rest Endpoint and get the all employees names whose age is greater than 50 Years 
+
+3). Difference between Java and Springboot framework
+
+Q.Solid Principle in java
+
+Q.How to create Database and Table stucture .complete flow from db prospective.
+
+Q.some scenario based db question how employee and address are related?
+
+Q.How manager is a employee .explain relatioship between .Did you go same table or two different table?
+
+Q.Sping Boot flow for web based application?
+
+Q.what are constaint used
+
+ Questions with solution
+
+ 
+
+Q .Emp  id,emp name ,manager id  //find manager name who have 5 employee reporting in sql query.
+
+ChatGPT
+
+To retrieve the names of managers who have 5 or more employees reporting to them, you can use a SQL query. Assuming you have a table named employees with columns emp_id, emp_name, and manager_id, you can use the following query:
+
+ 
+
+sql
+
+Copy code
+
+SELECT e1.emp_name AS manager_name
+
+FROM employees e1
+
+INNER JOIN (
+
+    SELECT manager_id, COUNT(*) AS emp_count
+
+    FROM employees
+
+    GROUP BY manager_id
+
+    HAVING COUNT(*) >= 5
+
+) e2 ON e1.emp_id = e2.manager_id;
+
+This query first calculates the count of employees for each manager using a subquery and then selects only those managers who have 5 or more employees reporting to them. It retrieves the manager's name based on the manager_id from the employees table.
+
+ 
+
+User
+
+emp  id,emp name ,manager id
+
+                             //manager name who have 5 emp reporting in java8
+
+ 
+
+ 
+
+ 
+
+ChatGPT
+
+Q. To find the managers who have 5 or more employees reporting using Java 8, you can follow these steps:
+
+ 
+
+Group the employees by their manager IDs.
+
+Filter the groups to include only those with 5 or more employees.
+
+Map the manager IDs to their corresponding manager names.
+
+Collect the manager names into a list.
+
+Here's how you can implement this in Java 8:
+
+ 
+
+java
+
+Copy code
+
+import java.util.*;
+
+import java.util.stream.Collectors;
+
+ 
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Employee> employees = Arrays.asList(
+
+            new Employee(1, "John", 101),
+
+            new Employee(2, "Alice", 101),
+
+            new Employee(3, "Bob", 102),
+
+            new Employee(4, "Carol", 102),
+
+            new Employee(5, "David", 102),
+
+            new Employee(6, "Emma", 103),
+
+            new Employee(7, "Frank", 103),
+
+            new Employee(8, "Grace", 103),
+
+            new Employee(9, "Henry", 103),
+
+            new Employee(10, "Ivy", 103),
+
+            new Employee(11, "Jack", 104),
+
+            new Employee(12, "Kate", 104)
+
+        );
+
+ 
+
+        Map<Integer, Long> managerEmployeeCount = employees.stream()
+
+                .collect(Collectors.groupingBy(Employee::getManagerId, Collectors.counting()));
+
+ 
+
+        List<String> managersWithFiveOrMoreEmployees = managerEmployeeCount.entrySet().stream()
+
+                .filter(entry -> entry.getValue() >= 5)
+
+                .map(entry -> getManagerName(entry.getKey(), employees))
+
+                .collect(Collectors.toList());
+
+ 
+
+        System.out.println("Managers with 5 or more employees reporting: " + managersWithFiveOrMoreEmployees);
+
+    }
+
+ 
+
+    public static String getManagerName(int managerId, List<Employee> employees) {
+
+        Optional<Employee> manager = employees.stream()
+
+                .filter(e -> e.getEmpId() == managerId)
+
+                .findFirst();
+
+        return manager.isPresent() ? manager.get().getEmpName() : "Unknown";
+
+    }
+
+}
+
+ 
+
+class Employee {
+
+    private int empId;
+
+    private String empName;
+
+    private int managerId;
+
+ 
+
+    public Employee(int empId, String empName, int managerId) {
+
+        this.empId = empId;
+
+        this.empName = empName;
+
+        this.managerId = managerId;
+
+    }
+
+ 
+
+    public int getEmpId() {
+
+        return empId;
+
+    }
+
+ 
+
+    public String getEmpName() {
+
+        return empName;
+
+    }
+
+ 
+
+    public int getManagerId() {
+
+        return managerId;
+
+    }
+
+}
+
+This program will output the names of managers who have 5 or more employees reporting. Adjust the Employee class and the sample data according to your actual data structure.
+
+ 
+
+ 
+
+ 
+
+Tell about yourself and technologies used.
+Which design patterns you have used.
+Diff btwn @restcontroller vs @controller
+How microservices interacts each other.
+Diff btwn @componentscan vs @enableautoconfiguration
+New features of Java 8 in terms of memory and in concurrent hashmap
+What is default method in Java 8
+Diff btwn consumer , supplier, predicate and function in java 8
+What is complitablefuture in threads
+Diff btwn wait() and sleep()
+What is thread deadlock and how to avoid producer and consumer problem
+Diff btwn POST,PUT and PATCH
+Which components you have used in AWS
+WAP to add odd numbers, which is greater than a given number in the list using stream
+What is SOLID principle
+What is builder design pattern.
+
+ 
+
+1.Implementation of Singly LinkedList for deletion.
+
+2.Internal working of HashMap. 
+
+3.Overriding and Overloading.
+
+SingleLinkedList add node at first delete node at last and print list
+
+How concurrenthasmap internally work 

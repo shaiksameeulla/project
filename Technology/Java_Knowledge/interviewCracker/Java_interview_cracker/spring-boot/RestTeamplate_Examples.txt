@@ -1,0 +1,97 @@
+
+Example for RestTemplate Request and Path params
+=========================================
+RestTemplate rest= new RestTemplate();
+		ResponseEntity<String> response=null;
+	 response  = rest.getForEntity("https://dummyjson.com/products", String.class);
+		
+		 
+		return response.getBody();
+		============================
+
+RestTemplate rest= new RestTemplate();
+		ResponseEntity<String> response=null;
+		 
+				 RequestEntity requestEntity = RequestEntity
+				     .get(URI.create("https://dummyjson.com/products"))
+				     .accept(MediaType.APPLICATION_JSON).build();
+
+				 response = rest.exchange(requestEntity, String.class);
+		return response.getBody();
+		============================
+		
+		RestTemplate rest= new RestTemplate();
+		ResponseEntity<String> response=null;
+		 
+				Map<String,Object> map= new HashMap<>();
+				map.put("productId", productId);
+
+				 response = rest.getForEntity("https://dummyjson.com/products/{productId}", String.class, map);
+		return response.getBody();
+		
+		============================
+		
+		RestTemplate rest= new RestTemplate();
+		ResponseEntity<String> response=null;
+		Map<String,Object> map= new HashMap<>();
+		map.put("productId", productId);
+		UriComponents uricomp=	UriComponentsBuilder.fromHttpUrl("https://dummyjson.com/products/{productId}").buildAndExpand(map);
+
+				 response = rest.getForEntity(uricomp.toUriString(), String.class);
+		return response.getBody();
+		
+		================
+		
+		
+		String urlTemplate = UriComponentsBuilder.fromHttpUrl(url)
+        .queryParam("msisdn", "{msisdn}")
+        .queryParam("email", "{email}")
+        .queryParam("clientVersion", "{clientVersion}")
+        .queryParam("clientType", "{clientType}")
+        .queryParam("issuerName", "{issuerName}")
+        .queryParam("applicationName", "{applicationName}")
+        .encode()
+        .toUriString();
+
+Map<String, ?> params = new HashMap<>();
+params.put("msisdn", msisdn)
+params.put("email", email)
+params.put("clientVersion", clientVersion)
+params.put("clientType", clientType)
+params.put("issuerName", issuerName)
+params.put("applicationName", applicationName);
+
+HttpEntity<String> response = restOperations.exchange(
+        urlTemplate,
+        HttpMethod.GET,
+        entity,
+        String.class,
+        params
+);
+
+
+
+Submit Form Data
+========================
+Next, let’s look at how to submit a form using the POST method.
+
+First, we need to set the Content-Type header to application/x-www-form-urlencoded.
+
+This makes sure that a large query string can be sent to the server, containing name/value pairs separated by &:
+
+HttpHeaders headers = new HttpHeaders();
+headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+We can wrap the form variables into a LinkedMultiValueMap:
+
+MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+map.add("id", "1");
+
+Next, we build the Request using an HttpEntity instance:
+
+HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+
+Finally, we can connect to the REST service by calling restTemplate.postForEntity() on the Endpoint: /foos/form
+
+ResponseEntity<String> response = restTemplate.postForEntity(
+  fooResourceUrl+"/form", request , String.class);

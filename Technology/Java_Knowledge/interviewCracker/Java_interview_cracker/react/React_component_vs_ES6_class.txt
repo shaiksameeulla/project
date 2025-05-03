@@ -1,0 +1,239 @@
+React Class Components :
+----------------
+
+React developers are often confused when they encounter two different styles for declaring React components. The React ecosystem is currently split between the React.createClass component declaration:
+
+const MyComponent = React.createClass({
+  render() {
+    return <p>I am a component!</p>;
+  }
+});
+And the ES6 class component declaration:
+
+class MyComponent extends React.Component {
+  render() {
+    return <p>I am a component, too!</p>;
+  }
+}
+
+History:
+--------
+As a prototypical language, JavaScript didn't have classes for much of its existence. ES6, the latest version of JavaScript finalized in June 2015, introduced classes as "syntactic sugar."
+Because JavaScript didn't have classes, React included its own class system. React.createClass allows you to generate component "classes." Under the hood, your component class is using a bespoke class system implemented by React.
+
+More details:
+-------------
+When using React's createClass() method, we pass in an object as an argument. So we can write a component using createClass that looks like this:
+
+const ToggleCheckbox = React.createClass({
+  getInitialState() {
+    return {
+      checked: false,
+    };
+  },
+
+  toggleChecked() {
+    this.setState((prevState) => (
+      { checked: !prevState.checked }
+    ));
+  },
+
+  render() {
+    const className = this.state.checked ?
+      'toggle checkbox checked' : 'toggle checkbox';
+    return (
+      <div className={className}>
+        <input
+          type='checkbox'
+          name='public'
+          onClick={this.toggleChecked}
+        >
+        <label>Subscribe to weekly newsletter</label>
+      </div>
+    );
+  }
+});
+
+Using an ES6 class to write the same component is a little different. Instead of using a method from the react library, we extend an ES6 class that the library defines, Component.
+
+Let's write a first draft of this ES6 class component. We won't define toggleChecked just yet:
+
+class ToggleCheckbox extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+
+    this.state = {
+      checked: false
+    };
+  }
+
+  render() {
+    // ... same as component above
+  }
+}
+constructor() is a special function in a JavaScript class. JavaScript invokes constructor() whenever an object is created via a class. If you've never worked with an object-oriented language before, it's sufficient to know that React invokes constructor() first thing when initializing our component. React invokes constructor() with the component's props and context.
+
+We invoke super() at the top of constructor(). This invokes the constructor() function defined by React.Component which executes some necessary setup code for our component. It's important to call super() whenever we define a constructor() function. Furthermore, it's good practice to call it on the first line.
+
+Because our component doesn't use props or context, it's OK to not pass those along:
+
+class ToggleCheckbox extends React.Component {
+  constructor() {
+    super();
+    // ...
+  }
+}
+
+
+How to bind method:
+-------------------
+
+In this scenario, we just bind methods by hand on the constructor.
+
+class Logger {
+  constructor () {
+    this.printName = this.printName.bind(this);
+  }
+
+  printName (name = 'there') {
+    this.print(`Hello ${name}`);
+  }
+
+  print (text) {
+    console.log(text); 
+  }
+}
+
+====================================
+as per React website
+=========================
+
+Normally you would define a React component as a plain JavaScript class:
+
+class Greeting extends React.Component {
+  render() {
+    return <h1>Hello, {this.props.name}</h1>;
+  }
+}
+If you don’t use ES6 yet, you may use the create-react-class module instead:
+
+var createReactClass = require('create-react-class');
+var Greeting = createReactClass({
+  render: function() {
+    return <h1>Hello, {this.props.name}</h1>;
+  }
+});
+The API of ES6 classes is similar to createReactClass() with a few exceptions.
+
+
+Declaring Default Props
+With functions and ES6 classes defaultProps is defined as a property on the component itself:
+
+class Greeting extends React.Component {
+  // ...
+}
+
+Greeting.defaultProps = {
+  name: 'Mary'
+};
+With createReactClass(), you need to define getDefaultProps() as a function on the passed object:
+
+var Greeting = createReactClass({
+  getDefaultProps: function() {
+    return {
+      name: 'Mary'
+    };
+  },
+
+  // ...
+
+});
+Setting the Initial State
+In ES6 classes, you can define the initial state by assigning this.state in the constructor:
+
+class Counter extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {count: props.initialCount};
+  }
+  // ...
+}
+With createReactClass(), you have to provide a separate getInitialState method that returns the initial state:
+
+var Counter = createReactClass({
+  getInitialState: function() {
+    return {count: this.props.initialCount};
+  },
+  // ...
+});
+Autobinding
+In React components declared as ES6 classes, methods follow the same semantics as regular ES6 classes. This means that they don’t automatically bind this to the instance. You’ll have to explicitly use .bind(this) in the constructor:
+
+class SayHello extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {message: 'Hello!'};
+    // This line is important!
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    alert(this.state.message);
+  }
+
+  render() {
+    // Because `this.handleClick` is bound, we can use it as an event handler.
+    return (
+      <button onClick={this.handleClick}>
+        Say hello
+      </button>
+    );
+  }
+}
+With createReactClass(), this is not necessary because it binds all methods:
+
+var SayHello = createReactClass({
+  getInitialState: function() {
+    return {message: 'Hello!'};
+  },
+
+  handleClick: function() {
+    alert(this.state.message);
+  },
+
+  render: function() {
+    return (
+      <button onClick={this.handleClick}>
+        Say hello
+      </button>
+    );
+  }
+});
+This means writing ES6 classes comes with a little more boilerplate code for event handlers, but the upside is slightly better performance in large applications.
+
+If the boilerplate code is too unattractive to you, you may use ES2022 Class Properties syntax:
+
+class SayHello extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {message: 'Hello!'};
+  }
+  
+  // Using an arrow here binds the method:
+  handleClick = () => {
+    alert(this.state.message);
+  };
+
+  render() {
+    return (
+      <button onClick={this.handleClick}>
+        Say hello
+      </button>
+    );
+  }
+}
+You also have a few other options:
+
+Bind methods in the constructor.
+Use arrow functions, e.g. onClick={(e) => this.handleClick(e)}.
+Keep using createReactClass.

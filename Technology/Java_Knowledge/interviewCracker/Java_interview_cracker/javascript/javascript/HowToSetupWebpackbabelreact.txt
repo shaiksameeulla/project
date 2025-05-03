@@ -1,0 +1,260 @@
+https://www.valentinog.comblogbabel
+
+
+utorial: How to set up React, webpack, and Babel from scratch (2020)
+ads via Carbon
+Limited time offer: Get 10 free Adobe Stock images.
+ADS VIA CARBON
+Learn how to set up React, webpack, and Babel. Why? You'll be able to scratch your own itch, or even configure a frontend project from zero.
+
+How to set up React, webpack, and Babel from scratch
+
+How to set up React, Webpack, and Babel: what you will learn
+In this tutorial you'll learn:
+
+how to install and configure webpack
+how to install and configure Babel
+how to install React
+how to include the resulting bundle into an HTML page
+how to install and configure webpack dev server
+Enjoy the reading!
+
+How to set up React, webpack, and Babel: setting up the project
+To start off create a directory for the project:
+
+mkdir webpack-react-tutorial && cd $_
+Create a minimal directory structure for holding the code:
+
+mkdir -p src
+Initialize the project by running:
+
+npm init -y
+and you’re good to go.
+
+How to set up React, webpack, and Babel: setting up webpack
+webpack it's an incredibly powerful (and complex) tool. You can get by without touching a single line of configuration, but there will be a time for some custom setup of sort. Sooner or later you may want to learn webpack. Why not starting now?
+
+Learning webpack is valuable not only for working with React, but for configuring every frontend project as well. Here webpack will ingest raw React components for producing JavaScript code that (almost) every browser can understand.
+
+Let's install webpack and webpack-cli by running:
+
+npm i webpack webpack-cli --save-dev
+Now add the webpack command inside package.json:
+
+"scripts": {
+  "build": "webpack --mode production"
+}
+At this point there is no need to define a configuration file for webpack. Older webpack versions would automatically look for a configuration file. Since version 4 that is no longer the case.
+
+In the next section we'll install and configure Babel for transpiling our code.
+
+How to set up React, webpack, and Babel: setting up Babel
+React components are mostly written in modern JavaScript syntax. Take the class keyword for example. Stateful React components can be declared as classes, or as arrow (or regular functions). But older browsers don't understand ECMAScript 2015, thus we need some kind of transformation.
+
+That transformation is called transpiling. Webpack per-se doesn’t know how to transform JavaScript. Instead it relies on loaders: think of them as of transformers. A webpack loader takes something as the input and produces an output, called bundle.
+
+babel-loader is the webpack loader responsible for talking to Babel. Babel on the other hand must be configured to use presets. We need two of them:
+
+babel preset env for compiling modern Javascript down to ES5
+babel preset react for compiling JSX and other stuff down to Javascript
+Let's pull in the dependencies with:
+
+npm i @babel/core babel-loader @babel/preset-env @babel/preset-react --save-dev
+Next up configure Babel. Create a new file named .babelrc inside the project folder with the following code:
+
+{
+  "presets": ["@babel/preset-env", "@babel/preset-react"]
+}
+At this point we're ready to define a minimal webpack configuration. Create a file named webpack.config.js and fill it like so:
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader"
+        }
+      }
+    ]
+  }
+};
+The configuration is quite minimal. For every file with a js or jsx extension Webpack pipes the code through babel-loader. With this in place we're ready to write a React.
+
+Head over the next section!
+
+How to set up React, webpack, and Babel: writing React components
+We'll build a super simple React form with a single text input. Before touching any code let's pull in React:
+
+npm i react react-dom
+A question I get a lot is "should I install react and react-dom as dev dependencies or not?". It doesn’t matter for the final result. webpack will still produce your bundle.
+
+Now create a minimal directory structure for holding the component:
+
+mkdir -p src/js/components/
+Next up let's create a React component that:
+
+has its own state
+renders an HTML form
+Create the component in src/js/components/Form.js:
+
+import React, { Component } from "react";
+import ReactDOM from "react-dom";
+
+class Form extends Component {
+  constructor() {
+    super();
+
+    this.state = {
+      value: ""
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    const { value } = event.target;
+    this.setState(() => {
+      return {
+        value
+      };
+    });
+  }
+
+  render() {
+    return (
+      <form>
+        <input
+          type="text"
+          value={this.state.value}
+          onChange={this.handleChange}
+        />
+      </form>
+    );
+  }
+}
+
+export default Form;
+
+const wrapper = document.getElementById("container");
+wrapper ? ReactDOM.render(<Form />, wrapper) : false;
+And now it's time to wire things up. webpack expects the entry point in src/index.js. Create the file and place an import directive into it for requiring your React component:
+
+import Form from "./js/components/Form";
+With this in place we're ready to create our bundle by running:
+
+npm run build
+Give webpack a second and see the bundle come to life in dist/main.js. Now let's bring our experiment to life by including the bundle into an HTML page.
+
+How to set up React, webpack, and Babel: the HTML webpack plugin
+To display our React form we must tell webpack to produce an HTML page. The resulting bundle will be placed inside a <script> tag.
+
+webpack needs two additional components for processing HTML: html-webpack-plugin and html-loader. Add the dependencies with:
+
+npm i html-webpack-plugin html-loader --save-dev
+Then update webpack's configuration:
+
+const HtmlWebPackPlugin = require("html-webpack-plugin");
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader"
+        }
+      },
+      {
+        test: /\.html$/,
+        use: [
+          {
+            loader: "html-loader"
+          }
+        ]
+      }
+    ]
+  },
+  plugins: [
+    new HtmlWebPackPlugin({
+      template: "./src/index.html",
+      filename: "./index.html"
+    })
+  ]
+};
+Next up create an HTML file in src/index.html:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>How to set up React, Webpack, and Babel</title>
+</head>
+<body>
+<div id="container"></div>
+</body>
+</html>
+One last thing is missing. We must tell our React component to hook itself into the HTML document. Open up src/js/components/Form.js and add the following code at the bottom of the file:
+
+const wrapper = document.getElementById("container");
+wrapper ? ReactDOM.render(<Form />, wrapper) : false;
+Close and save the file. Now run the build again with:
+
+npm run build
+and take a look at the dist folder. You should see the resulting HTML. With webpack there's no need to include your JavaScript inside the HTML file: the bundle is automatically injected into the page.
+
+Open up dist/index.html in your browser: you should see the React form!
+
+Configuring the webpack dev server
+You don't want to type npm run build every time you change a file. It takes only 3 lines of configuration to have a development server up and running.
+
+Once configured webpack will launch your application inside a browser. Also, every time you save a file after a modification webpack dev server will refresh the browser's window.
+
+To set up webpack dev server install the package with:
+
+npm i webpack-dev-server --save-dev
+Open up package.json and add the start script:
+
+"scripts": {
+  "start": "webpack-dev-server --open --mode development",
+  "build": "webpack --mode production"
+}
+save and close the file. Now, by running:
+
+npm start
+you should see webpack launching your application inside the browser.
+
+How to set up React, webpack, and Babel: wrapping up
+create-react-app is the way to go for starting off a new React project. Almost everything is configured out of the box. But sooner or later you may want to extend or tweak webpack a bit.
+
+If you learn how to set up React, webpack, and babel by hand you'll be able to scratch your own itch, or even configure a frontend project from zero. This knowledge is also valuable when you don't need a full blown SPA but you still want to build and distribute modern JavaScript.
+
+In thise guide we've seen:
+
+how to install and configure webpack
+how to install and configure Babel
+how to install React
+how to include the resulting bundle into an HTML page
+how to install and configure webpack dev server
+By the end you should be able to start from scratch with React, webpack and Babel.
+
+Thanks for reading and stay tuned!
+
+Valentino Gagliardi
+Hi! I’m Valentino! Educator and consultant, I help people learning to code with on-site and remote workshops. Looking for JavaScript and Python training? Let’s get in touch!
+
+More from the blog:
+var, let, and const in JavaScript: a cheatsheet.
+How to build an URL and its search parameters with JavaScript
+How babel preset-env, core-js, and browserslistrc work together
+You might not need switch in JavaScript
+Code documentation for JavaScript with JSDoc: an introduction
+Cos'è JavaScript e perché studiarlo?
+A look at generator functions and asynchronous generators in JavaScript.
+What does it mean "event-driven" in JavaScript and Node.js?
+All I need to know about ECMAScript modules
+A mostly complete guide to error handling in JavaScript.
+Formatting dates in JavaScript with Intl.DateTimeFormat
+

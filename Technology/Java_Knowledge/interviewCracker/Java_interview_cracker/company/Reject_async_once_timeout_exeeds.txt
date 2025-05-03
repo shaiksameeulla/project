@@ -1,0 +1,72 @@
+
+Reject the async call once the request as reached a certain timeout.
+Impl timeout mechanism for async calls
+============================
+
+
+Promise.race() : Settles when any of the promises settles. In other words, fulfills when any of the promises fulfills; rejects when any of the promises rejects.
+
+
+
+------
+function resolveAfter2Seconds() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('resolved');
+    }, 2000);
+  });
+}
+
+async function asyncCall() {
+  console.log('calling');
+  const result = await resolveAfter2Seconds();
+  console.log(result);
+  // Expected output: "resolved"
+}
+
+asyncCall();
+
+
+/**
+ * Call an async function with a maximum time limit (in milliseconds) for the timeout
+ * @param {Promise<any>} asyncPromise An asynchronous promise to resolve
+ * @param {number} timeLimit Time limit to attempt function in milliseconds
+ * @returns {Promise<any> | undefined} Resolved promise for async function call, or an error if time limit reached
+ */
+const asyncCallWithTimeout = async (asyncPromise, timeLimit) => {
+    let timeoutHandle;
+
+    const timeoutPromise = new Promise((_resolve, reject) => {
+        timeoutHandle = setTimeout(
+            () => reject(new Error('Async call timeout limit reached')),
+            timeLimit
+        );
+    });
+
+    return Promise.race([asyncPromise, timeoutPromise]).then(result => {
+        clearTimeout(timeoutHandle);
+        return result;
+    })
+}
+
+
+
+const axios = require('axios');
+
+const timeoutFunc = axios.get('https://baconipsum.com/api/?type=meat-and-filler');
+
+const willTimeout = async () => {
+    try {
+        const { data } = await asyncCallWithTimeout(timeoutFunc, 1);
+        console.log(data);
+    }
+    catch (err) {
+        console.error(err);
+    }
+}
+willTimeout();
+
+
+
+=
+=========

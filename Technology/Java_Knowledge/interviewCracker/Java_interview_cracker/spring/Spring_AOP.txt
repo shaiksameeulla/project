@@ -1,0 +1,315 @@
+SPring AOP:
+============
+
+Spring provides simple and powerful ways of writing custom aspects by using
+ 1.  either a schema-based approach 
+ 2. or the @AspectJ annotation style. 
+ Both of these styles offer fully typed advice and use of the AspectJ pointcut language while still using Spring AOP for weaving.
+ 
+ 
+ AOP Concepts
+ ============
+ 
+ own terminology.
+
+Aspect: 
+    A modularization of a concern that cuts across multiple classes. Transaction management is a good example of a crosscutting concern in enterprise Java applications. In Spring AOP, aspects are implemented by using regular classes (the schema-based approach) or 
+    regular classes annotated with the @Aspect annotation (the @AspectJ style).
+
+Join point: 
+    A point during the execution of a program, such as the execution of a method or the handling of an exception. In Spring AOP, a join point always represents a method execution.
+
+Advice:
+   Action taken by an aspect at a particular join point. Different types of advice include “around”, “before” and “after” advice. (Advice types are discussed later.) Many AOP frameworks, including Spring, model an advice as an interceptor and maintain a chain of interceptors around the join point.
+
+Pointcut: 
+    A predicate that matches join points. Advice is associated with a pointcut expression and runs at any join point matched by the pointcut (for example, the execution of a method with a certain name). The concept of join points as matched by pointcut expressions is central to AOP, and Spring uses the AspectJ pointcut expression language by default.
+
+Introduction: 
+     Declaring additional methods or fields on behalf of a type. Spring AOP lets you introduce new interfaces (and a corresponding implementation) to any advised object. For example, you could use an introduction to make a bean implement an IsModified interface, to simplify caching. (An introduction is known as an inter-type declaration in the AspectJ community.)
+
+Target object:
+	An object being advised by one or more aspects. Also referred to as the “advised object”. Since Spring AOP is implemented by using runtime proxies, this object is always a proxied object.
+
+AOP proxy: 
+	An object created by the AOP framework in order to implement the aspect contracts (advise method executions and so on). In the Spring Framework, an AOP proxy is a JDK dynamic proxy or a CGLIB proxy.
+
+Weaving:
+   linking aspects with other application types or objects to create an advised object. This can be done at compile time (using the AspectJ compiler, for example), load time, or at runtime. Spring AOP, like other pure Java AOP frameworks, performs weaving at runtime.
+
+Spring AOP includes the following types of advice:
+
+Before advice: Advice that runs before a join point but that does not have the ability to prevent execution flow proceeding to the join point (unless it throws an exception).
+
+After returning advice: Advice to be run after a join point completes normally (for example, if a method returns without throwing an exception).
+
+After throwing advice: Advice to be run if a method exits by throwing an exception.
+
+After (finally) advice: Advice to be run regardless of the means by which a join point exits (normal or exceptional return).
+
+Around advice: Advice that surrounds a join point such as a method invocation. This is the most powerful kind of advice. Around advice can perform custom behavior before and after the method invocation. It is also responsible for choosing whether to proceed to the join point or to shortcut the advised method execution by returning its own return value or throwing an exception.
+
+
+
+
+@AspectJ support
+===============
+1.@AspectJ refers to a style of declaring aspects as regular Java classes annotated with annotations. 
+2.The @AspectJ support can be enabled with XML- or Java-style configuration. In either case, you also need to ensure that AspectJ’s aspectjweaver.jar library is on the classpath of your application (version 1.8 or later). 
+3. To enable @AspectJ support with Java @Configuration, add the @EnableAspectJAutoProxy annotation, as the following example shows:
+
+JavaKotlin
+@Configuration
+@EnableAspectJAutoProxy
+public class AppConfig {
+
+}
+
+4. Enabling @AspectJ Support with XML Configuration
+To enable @AspectJ support with XML-based configuration, use the aop:aspectj-autoproxy element, as the following example shows:
+
+<aop:aspectj-autoproxy/>
+This assumes that you use schema support as described in XML Schema-based configuration. See the AOP schema for how to import the tags in the aop namespace.
+
+
+Declaring an Aspect
+===================
+1.The first of the two example shows a regular bean definition in the application context that points to a bean class that has the @Aspect annotation:
+
+<bean id="myAspect" class="org.xyz.NotVeryUsefulAspect">
+    <!-- configure properties of the aspect here -->
+</bean>
+The second of the two examples shows the NotVeryUsefulAspect class definition, which is annotated with the org.aspectj.lang.annotation.Aspect annotation;
+
+JavaKotlin
+package org.xyz;
+import org.aspectj.lang.annotation.Aspect;
+
+@Aspect
+public class NotVeryUsefulAspect {
+
+}
+2 Aspects (classes annotated with @Aspect) can have methods and fields, the same as any other class. They can also contain pointcut, advice, and introduction (inter-type) declarations.
+
+3. You can register aspect classes as regular beans in your Spring XML configuration, via @Bean methods in @Configuration classes, or have Spring autodetect them through classpath scanning — the same as any other Spring-managed bean. However, note that the @Aspect annotation is not sufficient for autodetection in the classpath. For that purpose, you need to add a separate @Component annotation (or, alternatively, a custom stereotype annotation that qualifies, as per the rules of Spring’s component scanner).
+
+Declaring a Pointcut
+===================
+1.Spring AOP only supports method execution join points for Spring beans, so you can think of a pointcut as matching the execution of methods on Spring beans.
+2. A pointcut declaration has two parts: a signature comprising a name and any parameters and a pointcut expression that determines exactly which method executions we are interested in.
+3.@Pointcut("execution(* transfer(..))") // the pointcut expression
+private void anyOldTransfer() {} // the pointcut signature
+
+Spring AOP supports the following AspectJ pointcut designators (PCD) for use in pointcut expressions:
+
+execution: For matching method execution join points. This is the primary pointcut designator to use when working with Spring AOP.
+
+within: Limits matching to join points within certain types (the execution of a method declared within a matching type when using Spring AOP).
+
+this: Limits matching to join points (the execution of methods when using Spring AOP) where the bean reference (Spring AOP proxy) is an instance of the given type.
+
+target: Limits matching to join points (the execution of methods when using Spring AOP) where the target object (application object being proxied) is an instance of the given type.
+
+args: Limits matching to join points (the execution of methods when using Spring AOP) where the arguments are instances of the given types.
+
+@target: Limits matching to join points (the execution of methods when using Spring AOP) where the class of the executing object has an annotation of the given type.
+
+@args: Limits matching to join points (the execution of methods when using Spring AOP) where the runtime type of the actual arguments passed have annotations of the given types.
+
+@within: Limits matching to join points within types that have the given annotation (the execution of methods declared in types with the given annotation when using Spring AOP).
+
+@annotation: Limits matching to join points where the subject of the join point (the method being run in Spring AOP) has the given annotation.
+
+
+Combining Pointcut Expressions
+----------------------------
+	You can combine pointcut expressions by using &&, || and !. You can also refer to pointcut expressions by name. The following example shows three pointcut expressions:
+
+Java
+@Pointcut("execution(public * *(..))")
+private void anyPublicOperation() {} -1
+
+@Pointcut("within(com.xyz.myapp.trading..*)")
+private void inTrading() {} -2
+
+@Pointcut("anyPublicOperation() && inTrading()")
+private void tradingOperation() {}  -3
+
+1. anyPublicOperation matches if a method execution join point represents the execution
+of any public method.
+2. inTrading matches if a method execution is in the trading module.
+3. tradingOperation matches if a method execution represents any public method in the
+trading module.
+
+
+Declaring Advice
+---------------
+
+Advice is associated with a pointcut expression and runs before, after, or around method executions matched by the pointcut. The pointcut expression may be either a simple reference to a named pointcut or a pointcut expression declared in place.
+
+Before Advice
+You can declare before advice in an aspect by using the @Before annotation:
+
+JavaKotlin
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+
+@Aspect
+public class BeforeExample {
+
+    @Before("com.xyz.myapp.CommonPointcuts.dataAccessOperation()")
+    public void doAccessCheck() {
+        // ...
+    }
+}
+If we use an in-place pointcut expression, we could rewrite the preceding example as the following example:
+
+JavaKotlin
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+
+@Aspect
+public class BeforeExample {
+
+    @Before("execution(* com.xyz.myapp.dao.*.*(..))")
+    public void doAccessCheck() {
+        // ...
+    }
+}
+
+
+Introductions
+--------------
+Introductions (known as inter-type declarations in AspectJ) enable an aspect to declare that advised objects implement a given interface, and to provide an implementation of that interface on behalf of those objects.
+
+You can make an introduction by using the @DeclareParents annotation. This annotation is used to declare that matching types have a new parent (hence the name). For example, given an interface named UsageTracked and an implementation of that interface named DefaultUsageTracked, the following aspect declares that all implementors of service interfaces also implement the UsageTracked interface (e.g. for statistics via JMX):
+
+JavaKotlin
+@Aspect
+public class UsageTracking {
+
+    @DeclareParents(value="com.xzy.myapp.service.*+", defaultImpl=DefaultUsageTracked.class)
+    public static UsageTracked mixin;
+
+    @Before("com.xyz.myapp.CommonPointcuts.businessService() && this(usageTracked)")
+    public void recordUsage(UsageTracked usageTracked) {
+        usageTracked.incrementUseCount();
+    }
+
+}
+The interface to be implemented is determined by the type of the annotated field. The value attribute of the @DeclareParents annotation is an AspectJ type pattern. Any bean of a matching type implements the UsageTracked interface. Note that, in the before advice of the preceding example, service beans can be directly used as implementations of the UsageTracked interface. If accessing a bean programmatically, you would write the following:
+
+JavaKotlin
+UsageTracked usageTracked = (UsageTracked) context.getBean("myService");
+
+ Schema-based AOP Support
+ ----------------------
+ 1. Declaring an Aspect
+    <aop:config>
+    <aop:aspect id="myAspect" ref="aBean">
+        ...
+    </aop:aspect>
+</aop:config>
+
+<bean id="aBean" class="...">
+    ...
+</bean>
+The bean that backs the aspect (aBean in this case) can of course be configured and dependency injected just like any other Spring bean.
+
+
+ 2.
+ A pointcut that represents the execution of any business service in the service layer can be defined as follows:
+
+<aop:config>
+
+    <aop:pointcut id="businessService"
+        expression="execution(* com.xyz.myapp.service.*.*(..))"/>
+
+</aop:config>
+ 
+
+Proxying Mechanisms
+---------------------
+Spring AOP uses either JDK dynamic proxies or CGLIB to create the proxy for a given target object. JDK dynamic proxies are built into the JDK, whereas CGLIB is a common open-source class definition library (repackaged into spring-core).
+
+If the target object to be proxied implements at least one interface, a JDK dynamic proxy is used. All of the interfaces implemented by the target type are proxied. If the target object does not implement any interfaces, a CGLIB proxy is created.
+
+If you want to force the use of CGLIB proxying (for example, to proxy every method defined for the target object, not only those implemented by its interfaces), you can do so. However, you should consider the following issues:
+
+With CGLIB, final methods cannot be advised, as they cannot be overridden in runtime-generated subclasses.
+
+As of Spring 4.0, the constructor of your proxied object is NOT called twice anymore, since the CGLIB proxy instance is created through Objenesis. Only if your JVM does not allow for constructor bypassing, you might see double invocations and corresponding debug log entries from Spring’s AOP support.
+
+To force the use of CGLIB proxies, set the value of the proxy-target-class attribute of the <aop:config> element to true, as follows:
+
+<aop:config proxy-target-class="true">
+    <!-- other beans defined here... -->
+</aop:config>
+To force CGLIB proxying when you use the @AspectJ auto-proxy support, set the proxy-target-class attribute of the <aop:aspectj-autoproxy> element to true, as follows:
+
+<aop:aspectj-autoproxy proxy-target-class="true"/>
+
+
+
+Understanding AOP Proxies
+-----------------------
+Spring AOP is proxy-based. It is vitally important that you grasp the semantics of what that last statement actually means before you write your own aspects or use any of the Spring AOP-based aspects supplied with the Spring Framework.
+
+Consider first the scenario where you have a plain-vanilla, un-proxied, nothing-special-about-it, straight object reference, as the following code snippet shows:
+
+JavaKotlin
+public class SimplePojo implements Pojo {
+
+    public void foo() {
+        // this next method invocation is a direct call on the 'this' reference
+        this.bar();
+    }
+
+    public void bar() {
+        // some logic...
+    }
+}
+If you invoke a method on an object reference, the method is invoked directly on that object reference, as the following image and listing show:
+
+aop proxy plain pojo call
+JavaKotlin
+public class Main {
+
+    public static void main(String[] args) {
+        Pojo pojo = new SimplePojo();
+        // this is a direct method call on the 'pojo' reference
+        pojo.foo();
+    }
+}
+Things change slightly when the reference that client code has is a proxy. Consider the following diagram and code snippet:
+
+aop proxy call
+JavaKotlin
+public class Main {
+
+    public static void main(String[] args) {
+        ProxyFactory factory = new ProxyFactory(new SimplePojo());
+        factory.addInterface(Pojo.class);
+        factory.addAdvice(new RetryAdvice());
+
+        Pojo pojo = (Pojo) factory.getProxy();
+        // this is a method call on the proxy!
+        pojo.foo();
+    }
+}
+The key thing to understand here is that the client code inside the main(..) method of the Main class has a reference to the proxy. This means that method calls on that object reference are calls on the proxy. As a result, the proxy can delegate to all of the interceptors (advice) that are relevant to that particular method call. However, once the call has finally reached the target object (the SimplePojo reference in this case), any method calls that it may make on itself, such as this.bar() or this.foo(), are going to be invoked against the this reference, and not the proxy. This has important implications. It means that self-invocation is not going to result in the advice associated with a method invocation getting a chance to run.
+
+
+spring-framework-configurable-vs-configuration
+==============================================
+
+You use @Configuration as a replacement to the XML based configuration for configuring spring beans. So instead of an xml file we write a class and annotate that with @Configuration and define the beans in it using @Bean annotation on the methods.
+
+And finally you use AnnotationConfigApplicationContext to register this @Configuration class and thus spring manages the beans defined. Small example you can find at Spring Configuration Documentaion.
+
+Quoting from the above link
+
+It is just another way of configuration Indicates that a class declares one or more @Bean methods and may be processed by the Spring container to generate bean definitions and service requests for those beans at runtime.
+
+And @Configurable is an annotation that injects dependencies into objects that are not managed by Spring using aspectj libraries. i.e., you still use old way of instantiation with plain new operator to create objects but the spring will take care of injecting the dependencies into that object automatically for you.
+

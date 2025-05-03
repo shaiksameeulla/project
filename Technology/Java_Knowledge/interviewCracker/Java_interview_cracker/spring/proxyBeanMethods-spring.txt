@@ -1,0 +1,49 @@
+proxybeanmethods:
+=========
+50
+
+Something like this:
+
+@Configuration(proxyBeanMethods=true)
+public class SomeConfiguration {
+    @Bean
+    ServiceA serviceA(){
+      return new ServiceA(sharedService());
+    }
+
+    @Bean
+    ServiceB serviceB(){
+      return new ServiceB(sharedService());
+    }
+
+    @Bean
+    ServiceC sharedService(){
+      return new ServiceC();
+    }
+}
+Here, the proxyBeanMethods will assure that the 'sharedService' method will be intercepted and its result re-used. If you would follow the normal java logic, when calling serviceA() and serviceB(), there would be two different instances of ServiceC, and when calling sharedService() directly, a third instance would be created. Then proxy interceptor will make sure the actual method is only called once, so only one instance of the shared ServiceC is created, and both ServiceA and ServiceB will get the shared instance.
+
+However proxyBeanMethods=true has a performance cost during startup, especially for libraries with a lot of @ Configuration classes, like spring-boot's internal libraries. See e.g. https://github.com/spring-projects/spring-boot/issues/9068#issuecomment-461520814 for the impact on Spring WebFlux. They couldn't change it to false by default, since that would break backwards compatibility. See links in the original question.
+
+You can use different configuration patterns to avoid this, which is probably what auto-configuration classes do.
+
+One way to do this is auto-wiring the service via method parameters instead of nested method calls. It makes less sence in normal Java, but it works in Spring configurations:
+
+@Configuration(proxyBeanMethods=false)
+public class SomeSmarterConfiguration {
+
+    @Bean
+    ServiceC sharedService(){
+      return new ServiceC();
+    }
+
+    @Bean
+    ServiceA serviceA(ServiceC sharedService){
+      return new ServiceA(sharedService);
+    }
+
+    @Bean
+    ServiceB serviceB(ServiceC sharedService){
+      return new ServiceB(sharedService);
+    }
+}

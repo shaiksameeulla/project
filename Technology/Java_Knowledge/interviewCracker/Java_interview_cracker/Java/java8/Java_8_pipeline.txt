@@ -1,0 +1,141 @@
+Java Streams Pipeline
+==================
+To perform a sequence of operations over the elements of the data source and aggregate their results, 
+we need three parts: 
+		the source, 
+		intermediate operation(s) 
+		and a terminal operation.
+
+Intermediate operations return a new modified stream. For example, to create a new stream of the existing one without few elements, the skip() method should be used:
+
+Stream<String> onceModifiedStream =
+  Stream.of("abcd", "bbcd", "cbcd").skip(1);
+  
+If we need more than one modification, we can chain intermediate operations.
+
+ Let's assume that we also need to substitute every element of the current Stream<String> with a sub-string of the first few chars. We can do this by chaining the skip() and map() methods:
+
+Stream<String> twiceModifiedStream =
+  stream.skip(1).map(element -> element.substring(0, 3));
+As we can see, the map() method takes a lambda expression as a parameter. If we want to learn more about lambdas, we can take a look at our tutorial Lambda Expressions and Functional Interfaces: Tips and Best Practices.
+
+A stream by itself is worthless; the user is interested in the result of the terminal operation, which can be a value of some type or an action applied to every element of the stream. We can only use one terminal operation per stream.
+
+The correct and most convenient way to use streams is by a stream pipeline, which is a chain of the stream source, intermediate operations, and a terminal operation:
+
+List<String> list = Arrays.asList("abc1", "abc2", "abc3");
+long size = list.stream().skip(1)
+  .map(element -> element.substring(0, 3)).sorted().count();
+  
+  
+  Terminal Operations:
+  
+  toArray()
+collect()
+count()
+reduce()
+forEach()
+forEachOrdered()
+min()
+max()
+anyMatch()
+allMatch()
+noneMatch()
+findAny()
+findFirst()
+
+
+ForEach and ForEachOrdered
+============================
+A possible use case of a stream could be to update a property of some, or all, elements or why not just print them out for debugging purposes. In either way, we are not interested in collecting or counting the output, but rather by generating a side-effect without returning value.
+
+This is the purpose of forEach() or forEachOrdered(). They both take a Consumer and terminates the Stream without returning anything. The difference between these operations simply being that forEachOrdered() promises to invoke the provided Consumer in the order the elements appear in the Stream whereas forEach() only promises to invoke the Consumer but in any order. The latter variant is useful for "*****parallel Streams*****".
+
+In the simple case below, we print out every element of the Stream in one single line.
+Stream.of("Monkey", "Lion", "Giraffe", "Lemur", "Lion").forEachOrdered(System.out::print);
+
+This will produce the following output:
+MonkeyLionGiraffeLemurLion
+Stream.of("AAA","BBB","CCC").parallel().forEach(s->System.out.println("Output:"+s));
+Stream.of("AAA","BBB","CCC").parallel().forEachOrdered(s->System.out.println("Output:"+s));
+hereas the first one is not guaranted since the order is not kept. forEachOrdered will processes the elements of the stream in the order specified by its source, regardless of whether the stream is sequential or parallel.
+
+Collect to Array
+=============
+Since an Array is a fixed size container rather than a flexible Collection, there are good reasons to have a special terminal operation, toArray(), to create and store the elements in an Array. Note that just calling toArray() will result in an Array of Objects since the method has no way to create a typed array by itself. Below, we show how a constructor of a String array can be used to give a typed array String[].
+
+String[] toArray = Stream.of("Monkey", "Lion", "Giraffe", "Lemur", "Lion").toArray(String[]::new);
+
+toArray: [Monkey, Lion, Giraffe, Lemur, Lion]
+
+========
+
+Map<String, Integer> toMap = Stream.of(
+    "Monkey", "Lion", "Giraffe", "Lemur", "Lion"
+)
+   .distinct()
+   .collect(Collectors.toMap(
+       Function.identity(),   //Function<String, K> keyMapper
+       s -> (int) s.chars().distinct().count()// Function<String, V> valueMapper
+   ));
+   O/P:
+   
+   toMap: {Monkey=6, Lion=4, Lemur=5, Giraffe=6}   (*)
+
+
+ong nrOfAnimals = Stream.of(
+    "Monkey", "Lion", "Giraffe", "Lemur"
+)
+ .count();
+ 
+ int sum = IntStream.of(1, 2, 3).sum();
+ 
+ 
+ Operations for Calculation
+ ======================
+Several terminal operations output the result of a calculation. The simplest calculation we can perform being count(), which can be applied to any Stream. It can, for example, be used to count the number of animals:
+
+1
+long nrOfAnimals = Stream.of(
+2
+    "Monkey", "Lion", "Giraffe", "Lemur"
+3
+)
+4
+ .count();
+1
+nrOfAnimals: 4
+
+Although, some terminal operations are only available for the special Stream implementations that we mentioned in the first article; IntStream, LongStream and DoubleStream. Having access to a Stream of such type, we can simply sum all the elements like this:
+
+1
+int sum = IntStream.of(1, 2, 3).sum();
+1
+sum: 6
+
+Or why not compute the average value of the integers with.average():
+
+1
+OptionalDouble average = IntStream.of(1, 2, 3).average();
+1
+average: OptionalDouble[2.0]
+
+Or retrieve the maximal value with.max().
+
+1
+int max = IntStream.of(1, 2, 3).max().orElse(0);
+1
+max: 3
+
+Like average(), the result of the max() operator is an Optional, hence by stating .orElse(0), we automatically retrieve the value if its present or fall back to 0 as our default. The same solution can be applied to the average-example if we rather deal with a primitive return type.
+
+In case we are interested in all of these statistics, it is quite cumbersome to create several identical streams and apply different terminal operations for each one. Luckily, there is a handy operation called summaryStatistics(), which allows several common statistical properties to be combined in a SummaryStatistics object.
+
+1
+IntSummaryStatistics statistics = IntStream.of(1, 2, 3).summaryStatistics();
+1
+statistics: IntSummaryStatistics{count=3, sum=6, min=1, average=2.000000, max=3}
+
+
+Exercises
+Hopefully

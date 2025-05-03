@@ -1,0 +1,280 @@
+1. difference visibility : hidden and display:none
+
+display:none: will not appear in the page but still can interact with dom and does not occupy any space on UI
+visibility : hideen : tag is not visibile but occupy space on page for the element
+
+
+2. CSS and SCSS
+ 
+		 CSS is the styling language that any browser understands to style webpages.
+		 
+		 SCSS is a special type of file for SASS, a program written in Ruby that assembles CSS style sheets for a browser, and for information, SASS adds lots of additional functionality to CSS like variables, nesting and more which can make writing CSS easier and faster.
+		SCSS files are processed by the server running a web app to output a traditional CSS that your browser can understand.
+
+		Sass – Syntactically Awesome Style Sheets ,SASS can be written in two different syntaxes using SASS or SCSS
+
+		Sass is a language that provides features to make it easier to deal with complex styling compared to editing raw .css. An example of such a feature is allowing definition of variables that can be re-used in different styles.
+
+		The language has two alternative syntaxes:
+
+			A JSON like syntax that is kept in files ending with .scss (Sassy Cascading Style Sheets)
+			A YAML like syntax that is kept in files ending with .sass (Syntactically Awesome Style Sheets)
+			Either of these must be compiled to .css files which are recognized by browsers.
+
+ 
+
+3. maging vs padding
+ margin is a space around the element 
+ Margins, as defined by the CSS margin property, create spaces around an element, setting it apart from neighbouring elements.
+ padding refers to the space b/w  element and content inside it
+ Padding represents the amount of inner space an element has, while the margin is whitespace available surrounding an element
+ 
+ box model = margin==> border==> Padding==> element content
+ 
+ In CSS, padding and margin are properties that control the space around an element, but they serve different purposes:
+
+Padding: This property defines the space between the content of an element and its border. It is usually used to create extra space around the content inside an element. Padding is included within the background color or background image of the element and holds the border outside the actual content.
+Margin: This property defines the space around the outside of an element, between the element and its surrounding elements. It is used for creating space between elements, and it is transparent. Margin is situated outside the border, so if an element has a background color or image, it won't influence the margin.
+
+
+ 4.How many ways CSS can be included in HTML?
+
+Inline - by using the style attribute inside HTML elements. ex: <h1 style="color:blue;">A Blue Heading</h1>
+Internal - by using a <style> element in the <head> section.
+			<style>
+				body {background-color: powderblue;}
+				h1   {color: blue;}
+				p    {color: red;}
+				</style>
+External - by using a <link> element to link to an external CSS file.
+
+		<head>
+		  <link rel="stylesheet" href="styles.css">
+		</head>
+box-sizing
+
+content-box	Default. 
+border-box	The width and height properties (and min/max properties) includes content, padding and border
+	The box-sizing property allows us to include the padding and border in an element's total width and height.
+
+	If you set box-sizing: border-box; on an element, padding and border are included in the width and height:
+	
+	By default, the width and height of an element is calculated like this:
+
+width + padding + border = actual width of an element
+height + padding + border = actual height of an element
+
+This means: When you set the width/height of an element, the element often appears bigger than you have set (because the element's border and padding are added to the element's specified width/height)
+
+The box-sizing property solves this problem.
+The box-sizing property allows us to include the padding and border in an element's total width and height.
+
+
+If you set box-sizing: border-box; on an element, padding and border are included in the width and height:
+
+
+
+		
+5. what is CSS selector?
+	In CSS, selectors are used to target the HTML elements on our web pages that we want to style. There are a wide variety of CSS selectors available, allowing for fine-grained precision when selecting elements to style. 
+
+Types of selectors 
+	1.	Type(element), class, and ID selectors
+		h1 {}, .box {} ,#unique {}	
+   2. Attribute selectors :  a[title] {}
+   3. Pseudo-classes and pseudo-elements: a:hover {}   p::first-line {}
+   4. Combinators : article > p {}
+   5. universal selectors : *{}
+   
+ 6. what is RWD ?
+	Responsive web design or responsive design is an approach to web design that aims to make web pages render well on a variety of devices and window or screen sizes from minimum to maximum display size to ensure usability and satisfaction.
+7. whatis doctype?
+	It is an "information" to the browser about what document type to expect. In HTML 5, the declaration is simple: <!DOCTYPE html>. Browser ...
+8. what are data attributes?
+	The data-* attribute is used to store custom data private to the page or application.
+
+		The data-* attribute consist of two parts:
+
+		The attribute name should not contain any uppercase letters, and must be at least one character long after the prefix "data-"
+		The attribute value can be any string
+	Applies to : The data-* attribute is a Global Attribute, and can be used on any HTML element.
+			<ul>
+		  <li data-animal-type="bird">Owl</li>
+		  <li data-animal-type="fish">Salmon</li>
+		  <li data-animal-type="spider">Tarantula</li>
+		</ul>
+9. what is SVG?
+  SVG stands for Scalable Vector Graphics. SVG is used to define graphics for the Web.
+  SVG has several methods for drawing paths, boxes, circles, text, and graphic images.
+
+10. Difference Between Local Storage, Session Storage And Cookies
+    The difference between sessionStorage and localStorage is that localStorage data does not expire, whereas sessionStorage data is cleared when the page session ends.
+   local storage: localStorage.setItem(key, value), localStorage.getItem(key),localStorage.removeItem(key)
+   
+11. Top Features of HTML5 With Examples
+    What is HTML5?
+		Top HTML5 Features
+		Nav Tag
+		Audio & Video Tags
+		Header
+		Footer
+		Figure and figcaption
+		Canvas Tag
+		Mark
+		Main Tag
+		Progress Tag
+		Section Tag
+12. what is css preprocessor
+		CSS preprocessors are scripting languages that extend the default capabilities of CSS. They enable us to use logic in our CSS code, such as variables, nesting, inheritance, mixins, functions, and mathematical operations.
+13 : why do we use @import at the top?
+   The @import rule allows you to import a style sheet into another style sheet. The @import rule must be at the top of the document (but after any @charset declaration). The @import rule also supports media queries, so you can allow the import to be media-dependent.
+   this is to avoid any overriding rules.
+14. z-index?
+	The z-index property specifies the stack order of an element.
+    An element with greater stack order is always in front of an element with a lower stack order.
+    
+	Note: z-index only works on positioned elements (position: absolute, position: relative, position: fixed, or position: sticky) and flex items (elements that are direct children of display:flex elements).
+
+   Note: If two positioned elements overlap without a z-index specified, the element positioned last in the HTML code will be shown on top
+   
+   
+   z-index(the viewer axis) is used for specifying the vertical stacking of the overlapping elements that occur at the time of its positioning. It specifies the vertical stack order of the elements positioned that helps to define how the display of elements should happen in cases of overlapping.
+
+			The default value of this property is 0 and can be either positive or negative. Apart from 0, the values of the z-index can be:
+
+			Auto: The stack order will be set equal to the parent.
+			Number: The number can be positive or negative. It defines the stack order.
+			Initial: The default value of 0 is set to the property.
+			Inherit: The properties are inherited from the parent.
+			The elements having a lesser value of z-index is stacked lower than the ones with a higher z-index.
+
+15 Does margin-top or margin-bottom have an effect on inline elements?
+No, it doesn’t affect the inline elements. Inline elements flow with the contents of the page
+
+
+16. What is the difference between inline, inline-block, and block?
+Block Element: The block elements always start on a new line. They will also take space for an entire row or width. List of block elements are <div>, <p>.
+
+Inline Elements: Inline elements don't start on a new line, they appear on the same line as the content and tags beside them. Some examples of inline elements are <a>, <span> , <strong>, and <img> tags. 
+
+Inline Block Elements: Inline-block elements are similar to inline elements, except they can have padding and margins and set height and width values.
+
+
+How do you apply CSS styles to only the first letter of a paragraph?
+
+	To apply CSS styles to only the first letter of a paragraph, you can use the ::first-letter pseudo-element. It allows you to target and style the first letter of a text element without altering the HTML structure. Here's an example:
+
+	p::first-letter {
+	  font-size: 2em;
+	  font-weight: bold;
+	  color: blue;
+	}
+	
+	12.
+How do you apply CSS styles inline?
+
+	To apply CSS styles inline, you can use the ‘style’ attribute directly on an HTML element. Inline styles are written as part of the element's opening tag, and the CSS properties are defined within the ‘style’ attribute. Here's an example:
+
+	<p style="font-size: 18px; color: red; font-weight: bold;">This paragraph has inline CSS styles applied to it.</p>
+	In this example, the ‘< p >’ element has inline styles that set the font size to 18 pixels, the color to red, and the font weight to bold.
+	
+.
+How do you create a hyperlink style in CSS	
+		To create a hyperlink style in CSS, target the anchor element and apply the desired styles to the different hyperlink states - unvisited (link), visited, hover, and active. The common hyperlink states and their CSS pseudo-classes are:
+
+	:link - targets unvisited links
+	:visited - targets visited links
+	:hover - targets links when being hovered by the mouse cursor
+	:active - targets links when being clicked or activated by keyboard
+	
+	
+	
+Explain the difference between px, %, em, and rem units in CSS.
+
+Hide Answer
+In CSS, different units of measurement are used to define lengths, dimensions, and sizes. Some commonly used units are px, %, em, and rem. Each has its own unique characteristics:
+
+	px (pixels): One of the most commonly used units, a px represents an absolute length or size in terms of screen pixels. 1px is equal to one dot on the screen. The actual physical size of a pixel may vary depending on screen resolution, but px provides a consistent measurement across devices and displays.
+
+	% (percentage): Percentage values are relative to another value, such as the width or height of a parent element. As a result, they offer a more fluid and responsive approach to sizing elements.
+
+	em: The em unit is relative to the font size of the element itself or the nearest parent element with a specified font size. 1em is equal to the current font size, so if the font-size of the document is 16px, then 1em will equal 16px.
+
+	rem: Similar to em, the rem unit is relative to the font size. However, rem is always relative to the base (root) font size of the document, usually defined on the element. This unit provides a consistent way to scale elements based on the overall font size of the page, without being affected by the font size of parent elements.
+	
+	
+	
+Explain the difference between position: relative; and position: absolute;.
+
+
+	position: relative; and position: absolute; are both CSS positioning properties that determine how an element is positioned in a webpage. They offer different methods for controlling an element's placement:
+
+	position: relative: When an element has position: relative;, its position is calculated based on its normal position in the document flow (i.e., its static position). You can then use the top, right, bottom, and left properties to adjust the element's position relative to its original location, without affecting the placement of other elements around it.
+
+	position: absolute: When an element has position: absolute;, it is taken out of the normal document flow and positioned relative to the nearest positioned ancestor element (the nearest element with a specified position other than static). If it does not have a positioned ancestor, the element is positioned relative to the initial containing block, usually the initial viewport or document body. You can use the top, right, bottom, and left properties to set the position of the absolute element relative to its positioned ancestor.
+	
+	
+	What is the purpose of the CSS opacity property?
+
+
+	The CSS opacity property is used to control the transparency of an element. It accepts a value between 0 (completely transparent) and 1 (fully opaque). It can be used to create subtle transparency effects or fade animations.
+	
+	
+	Explain the difference between nth-child() and:nth-of-type() selectors.
+
+
+		Both :nth-child() and :nth-of-type() are CSS pseudo-class selectors that allow you to target specific elements based on their position in a group of siblings. However, they differ in the way they determine which elements to select.
+
+		:nth-child() selects elements based on their position in the group of all sibling elements, regardless of their type (e.g., < div >, < p >, < li >). The syntax is :nth-child(an+b), where a and b are integers and n is a counter that starts from 0.
+
+	:nth-of-type() selects elements based on their position in a group of siblings with the same element type. The syntax for :nth-of-type() is almost identical to :nth-child(): :nth-of-type(an+b).
+	
+	
+	
+	How do you create a horizontal navigation menu using CSS?
+
+
+		To create a horizontal navigation menu using CSS, you can follow these steps:
+
+		HTML:
+
+		First, define the HTML structure of the menu using an unordered list (< ul >) and list items (< li >). Wrap each list item in an anchor tag (< a >) to create a link:
+
+		<nav>
+		  <ul class="navigation-menu">
+			<li><a href="#home">Home</a></li>
+			<li><a href="#about">About</a></-li>
+			<li><a href="#services">Services</a>li>
+			<li><a href="#contact">Contact</a></-ti>
+		  </ul>
+		</nav>
+		CSS:
+
+		Next, apply CSS styles to convert the vertical list into a horizontal navigation menu:
+
+		/* Remove list style and padding */
+		.navigation-menu {
+		  list-style: none;
+		  margin: 0;
+		  padding: 0;
+		  display: flex; /* Display the list items in a row */
+		}
+
+		/* Style list items and links */
+		.navigation-menu li {
+		  margin: 0; /* Adjust margins as needed */
+		}
+
+		.navigation-menu a {
+		  display: block; /* Make the link fill the entire list item */
+		  padding: 10px; /* Add padding around the link text */
+		  text-decoration: none; /* Remove the default link underline */
+		  color: #000; /* Set link color */
+		}
+
+		/* Add hover effect on links */
+		.navigation-menu a:hover {
+		  background-color: #f2f2f2; /* Change the background color on link hover */
+		  color: #333; /* Change the link text color on hover */
+		}
+		In this example, we've created a basic horizontal navigation menu with links and a simple hover effect. You can modify the styles as needed to match your preferred design.

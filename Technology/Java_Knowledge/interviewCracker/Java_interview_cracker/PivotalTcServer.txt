@@ -1,0 +1,34 @@
+Pivotal tc Server contains all of vanilla Tomcat, and has a few optional extensions designed to make it easier to deploy and maintain. Broken out into three groups, the diff looks like this:
+
+Configuration extensions (No altered code, just config changes we implement)
+
+Multi-Instance using shared binaries
+Trivial to change Tomcat versions while preserving app and configuration
+Variable Substitution in config files
+Async Logging
+Mild Security Tuning (ports, mgmt apps, JMX)
+Code Extensions
+
+Patch version releases – fix flaws in current release [e.g. tomcat-7.0.32.B.RELEASE]
+Extended JMX interface
+Additional Metrics
+Application Deployment
+Diagnostics Valve - good troubleshooting info when there's a slowdown
+Config Templates – including custom-created
+Change log level on the fly
+Advanced Session replication (Gemfire)
+Oracle DB Connection Proxy
+Add-Ons
+
+Windows Service Wrapper
+RPM / Apt-Get / Debian installers (linux)
+Startup scripts (linux)
+Chef Recipes
+Puppet Scripts
+Password Encryption
+Spring Insight for performance tuning
+Here's a deck I put together with a little more detail: http://www.slideshare.net/dcarwin/00-pivotaltc-serverextendsasftomcatexternalssv
+
+FYI on the tag thing, there's still the old "springsource-tc-server" tag. SpringSource is now Pivotal. (Can/should we update the tag or add a new one?)
+
+Hope this helps.

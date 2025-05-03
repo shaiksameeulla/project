@@ -1,0 +1,226 @@
+How to enable Spring data JPA?
+
+we need to add spring-boot-starter-data-jpa to pom.xml and must include below configurations in application.xml
+
+spring.datasource.driver-class-name=
+spring.datasource.url=
+spring.datasource.username=
+spring.datasource.password=
+Hibernate concepts:
+==============
+JPA Repository interface: CrudRepository , PagingAndSortingRepository  and JpaRepository
+we can create Custom Repository by extending  interfaces Repository,CrudRepository , PagingAndSortingRepository  and JpaRepository
+
+diff PagingAndSortingRepository vs JpaRepository
+CrudRepository :
+	it act as a foundation of Spring Data repository. It offers a collection of standard methods for performing the fundamental CRUD actions on entities such as Create, Read, Update, and Delete. 
+
+PagingAndSortingRepository :
+	By adding pagination and sorting features to CrudRepository, PagingAndSortingRepository improves your ability to get data.
+JpaRepository : JPA-specific Operations
+Just like the other two interfaces, JpaRepository is an interface that takes the Spring Data repository to the next level. Internally, it extends the CRUDRepository interface. It provide range of handy JPA-specific methods that help seamless operation with the underlying persistence layer.
+
+JpaRepository not only perform routine tasks like saving entities, erasing entities, and locating entities by their main keys but also provides assistance for running customized queries via method names or annotations like @Query.
+Repository , CrudRepository,PagingAndSortingRepository : belongs to Spring  Data commons 
+JpaRepository : Spring data Jpa sepcific repository
+
+
+JpaRepository: works for only relations Database
+PagingAndSortingRepository and CrudRepository: its work forboth Sql and NoSql Database
+
+PagingAndSortingRepository extends  CrudRepository
+
+=> Predefined Methods given by Repository
+Save(), delete(), findById()findAll(),findAll(Sort),findAll(Pageable) deleteByid(),count(),existById ,
+=> finder methods in Spring Data Repository
+syntax : <returnType> findBy<variableName>(DataType params)
+
+@Query annotation:
+=========================================
+
+@Query annotation  is used to write custom query , using this @Query we can write JPQL/HQL which is written by using Class and variableName isntead of Table name
+JPQL : specification o and HQL is implementation of the Query
+@Query Can used to write Select and non select (Udpate/delete) but not insert
+we can even write JPQL and Native Sql aswell
+if we you are writing update/Delete then you should also include @Modifiying annotation aswell because @Query default to select operations
+
+@Query Example :
+
+@Query("select e from Employee e where e.name=?1")
+List<Employee> getEmployeeBasedONname(String name);
+
+above method is abstract and should be inside interface of Repository interface.
+
+what are the collection supported by JPA?
+=========================================
+JPA supports List, Set and Map
+ and it also supports @ElementCollection but better avoid this
+ 
+ An @ElementCollection enables you to map a Collection of values that are not an entity itself. This might seem like an easy solution for lists of basic attributes, like the phone numbers of a person. In the database, Hibernate maps the @ElementCollection to a separate table. Each value of the collection gets stored as a separate record.
+ 
+ @Entity
+public class Author {
+ 
+    @ElementCollection
+    private List<String> phoneNumbers = new ArrayList<>();
+ 
+    public List<String> getPhoneNumbers() {
+        return phoneNumbers;
+    }
+ 
+    public void setPhoneNumbers(List<String> phoneNumbers) {
+        this.phoneNumbers = phoneNumbers;
+    }
+ 
+    ...
+}
+
+ But the mapping as an @ElementCollection has a downside: The elements of the collection don’t have their own identity and lifecycle. They are a part of the surrounding entity. This often becomes a performance issue if you need to change the elements in the collection. Because they don’t have their own identity, all elements of an @ElementCollection are always read, removed, and written, even if you only add, change, or remove one of them. This makes write operations on an @ElementCollection much more expensive than the same operation on a mapped association.
+ I, therefore, recommend modeling an additional entity and a one-to-many association instead of an @ElementCollection. This enables you to use lazy loading and to update these values independently of each other. Doing that requires only a minimum amount of code but provides much better performance.
+ 
+ Prefer java.util.Set Over java.util.List
+ =========================================
+Another typical mistake is the mapping of a many-to-many association as a java.util.List. A List might seem like the most efficient and obvious mapping in your Java code. But as I showed in great detail before, Hibernate handles this association very inefficiently when you change its elements. Instead of adding only the new or deleting only the removed association between 2 entities, Hibernate removes all of them before inserting all remaining ones. Depending on the association’s size, this can result in tens or even hundreds of unnecessary database operations and significantly slows down your application.
+
+
+PlatformTransactionManager
+=========================================
+its Interface PlatformTransactionManager extends TransactionManager
+This is the central interface in Spring's imperative transaction infrastructure. Applications can use this directly, but it is not primarily meant as an API: Typically, applications will work with either TransactionTemplate or declarative transaction demarcation through AOP.
+
+A classic implementation of this strategy interface is JtaTransactionManager. However, in common single-resource scenarios, Spring's specific transaction managers for e.g. JDBC, JPA, JMS are preferred choices
+it enable @Transactional annotation to commit or rollback
+
+diff findById and findOne()
+=========================================
+findById available in CrudRepository and if data is not found then it returns null
+findOne available in JpaRepository and it throw EntityNotFoundException if data not found 
+
+Fetch types:
+=========================================
+Eager : load child along with Parent entity many-to-one /one-to-one
+Lazy : load child till specifically access child from parent default : one-to-many / many-to-many 
+
+logs
+=========================================
+spring.jpa.show-sql=true (default false)
+
+JPQL Join Syntax
+=========================================
+select <variable> from Parent p [join_type] p.hasvariable as c  where condition
+
+=> Explicit Inner Join With Single-Valued Association:
+
+	example : one-to-one : SELECT d FROM Employee e JOIN e.department d
+
+	We can also specify an optional INNER keyword:
+
+	SELECT d FROM Employee e INNER JOIN e.department d
+
+	 JPA only creates an implicit inner join when we specify a path expression.
+
+=>Explicit Inner Join With Collection-Valued Associations	 
+  SELECT e.phones FROM Employee e
+  Moreover, if we want to filter Phone entities in the WHERE clause, JPA won’t allow that. This is because a path expression can’t continue from a collection-valued association. So for example, e.phones.number isn’t valid.
+
+Instead, we should create an explicit inner join and create an alias for the Phone entity. Then we can specify the Phone entity in the SELECT or WHERE clause:
+	TypedQuery<Phone> query 
+      = entityManager.createQuery(
+          "SELECT ph FROM Employee e JOIN e.phones ph WHERE ph LIKE '1%'", Phone.class);
+    List<Phone> resultList = query.getResultList();
+
+Outer Join
+ 
+ When two or more entities are outer-joined, the records that satisfy the join condition, as well as the records in the left entity, are collected in the result:
+	TypedQuery<Department> query 
+		  = entityManager.createQuery(
+			  "SELECT DISTINCT d FROM Department d LEFT JOIN d.employees e", Department.class);
+		List<Department> resultList = query.getResultList();
+
+JPA right joins doesnot support:
+
+This is also referred to as a left outer join. JPA doesn’t provide right joins where we also collect non-matching records from the right entity. Although, we can simulate right joins by swapping entities in the FROM clause.
+
+Joins in the WHERE Clause
+=======================
+	5.1. With a Condition
+	We can list two entities in the FROM clause and then specify the join condition in the WHERE clause.
+
+	This can be handy, especially when database level foreign keys aren’t in place:
+
+	@Test
+	public void whenEntitiesAreListedInFromAndMatchedInWhere_ThenCreatesJoin() {
+		TypedQuery<Department> query 
+		  = entityManager.createQuery(
+			  "SELECT d FROM Employee e, Department d WHERE e.department = d", Department.class);
+		List<Department> resultList = query.getResultList();
+		
+		// Assertions...
+	}
+
+	Here, we’re joining Employee and Department entities, but this time specifying a condition in the WHERE clause.
+
+	5.2. Without a Condition (Cartesian Product)
+	Similarly, we can list two entities in the FROM clause without specifying any join condition. In this case, we’ll get a cartesian product back. This means that every record in the first entity is paired with every other record in the second entity:
+
+	@Test
+	public void whenEntitiesAreListedInFrom_ThenCreatesCartesianProduct() {
+		TypedQuery<Department> query
+		  = entityManager.createQuery(
+			  "SELECT d FROM Employee e, Department d", Department.class);
+		List<Department> resultList = query.getResultList();
+		
+		// Assertions...
+	}
+		As we can guess, these kinds of queries won’t perform well.
+
+	6. Multiple Joins
+	So far, we’ve used two entities to perform joins, but this isn’t a rule. We can also join multiple entities in a single JPQL query:
+
+	@Test
+	public void whenMultipleEntitiesAreListedWithJoin_ThenCreatesMultipleJoins() {
+		TypedQuery<Phone> query
+		  = entityManager.createQuery(
+			  "SELECT ph FROM Employee e
+		  JOIN e.department d
+		  JOIN e.phones ph
+		  WHERE d.name IS NOT NULL", Phone.class);
+		List<Phone> resultList = query.getResultList();
+		
+		// Assertions...
+	}
+	
+	Here we’re selecting all Phones of all Employees that have a Department. Similar to other inner joins, we’re not specifying conditions since JPA extracts this information from mapping metadata.
+	
+Fetch Joins
+=========================================
+fetch joins :  primary usage is for fetching lazy-loaded associations eagerly for the current query.
+
+Here we’ll eagerly load Employees association:
+
+	@Test
+	public void whenFetchKeywordIsSpecified_ThenCreatesFetchJoin() {
+		TypedQuery<Department> query 
+		  = entityManager.createQuery(
+			  "SELECT d FROM Department d JOIN FETCH d.employees", Department.class);
+		List<Department> resultList = query.getResultList();
+		
+		// Assertions...
+	}
+
+Although this query looks very similar to other queries, there is one difference; the Employees are eagerly loaded. This means that once we call getResultList in the test above, the Department entities will have their employees field loaded, thus saving us another trip to the database.
+
+However, we must be aware of the memory trade-off. We may be more efficient because we only performed one query, but we also loaded all Departments and their employees into memory at once.
+
+We can also perform the outer fetch join in a similar way to outer joins, where we collect records from the left entity that don’t match the join condition. In addition, it eagerly loads the specified association:
+
+	@Test
+	public void whenLeftAndFetchKeywordsAreSpecified_ThenCreatesOuterFetchJoin() {
+		TypedQuery<Department> query 
+		  = entityManager.createQuery(
+			  "SELECT d FROM Department d LEFT JOIN FETCH d.employees", Department.class);
+		List<Department> resultList = query.getResultList();
+		
+		// Assertions...
+	}
+=========================================

@@ -1,0 +1,87 @@
+
+
+
+Java 8 brought about important changes in the way ConcurrentHashMap. The map was restructured to use red black trees after the certain size increase( which is 8) HashMap , but with additional concurrency controls
+
+HashMap is the part of Java Collection Framework since JDK 1.2 where as ConcurrentHashMap is introduced in JDK 1.5. ConcurrentHashMap is thread safe, most suitable for concurrent multi threaded environment. HashMap is not thread safe, hence most suitable for single threaded applications. In this post, we will see the differences between HashMap Vs ConcurrentHashMap in Java.
+
+
+
+Changes in the Java 8 implementation:
+To improve the working of HashMap, Java 8 made updates to the internal implementation workflow. Once a certain threshold level is reached, the values are now automatically stored in a tree( red-black tree ) manner rather than a linked list. So instead of O(n) retrieval time, we now have better O(log n) retrieval performance. Java only does this when there is a performance gain. This can be seen in the representation below.
+
+
+The ConcurrentHashMap class provides a concurrent version of the standard HashMap. So its functionality is similar to a HashMap, except that it has internally maintained concurrency. Depending upon the level of concurrency required the concurrent HashMap is internally divided into segments. If the level of concurrency required is not specified then it is takes 16 as the default value. So internally the ConcurrentHashMap will be divided into 16 segments. Each Segment behaves independently. We will take a look at the segments in the below examples
+
+
+		Map<String, Integer> conMap = new ConcurrentHashMap<>();
+As no concurrency level has been set explictity, the ConcurrentHashMap gets divided into 16 segments. And each segment acts as an independent HashMap. During write operation the Lock is obtained on this particular segment and not on the entire HashMap Debug the code when it reaches the for Loop above and check the conMap details-
+
+
+=========================================================
+
+Differences Between HashMap And ConcurrentHashMap In Java :
+
+1) Thread Safe
+
+The main difference between HashMap and ConcurrentHashMap is that ConcurrentHashMap is internally synchronized and hence it is thread safe. Where as HashMap is not synchronized internally and it is not thread safe. You can make HashMap synchronized externally using Collections.synchronizedMap() method.
+
+2) Internal Structure
+
+Not all the operations in ConcurrentHashMap are synchronized. Only modifying operations like add and delete are synchronized. Read operations are not synchronized. This will make ConcurrentHashMap a first choice map for concurrent multi threaded applications than the externally synchronized HashMap.
+
+
+Because, when you make HashMap synchronized externally using Collections.synchronizedMap() method, all the operations will be synchronized. This will slow down the application.
+
+3) Introduction Into Java Collection Framework
+
+HashMap is the part of Java Collection Framework since JDK 1.2. ConcurrentHashMap is introduced later as a part of concurrency package into Java Collection Framework. ConcurrentHashMap is largely treated as an alternative to HashTable which is the legacy class.
+
+4) Null Keys And Null Values
+
+HashMap allows maximum one null key and any number of null values. ConcurrentHashMap doesn’t allow even a single null key and a null value.
+
+5) Fail-Fast Vs Fail-Safe
+
+Iterators returned by HashMap are fail-fast in nature. Because they throw ConcurrentModificationException if the map is modified after the creation of iterator. Where as iterators returned by ConcurrentHashMap are fail-safe in nature. They don’t throw any exceptions if the map is modified after the creation of iterator.
+
+6) Performance
+
+Only modifying operations on ConcurrentHashMap are synchronized. Hence, add or remove operations on ConcurrentHashMap are slower than on HashMap. The read operations on both, ConcurrentHashMap and HashMap, give same performance as read operations on both maps are not synchronized.
+
+7) When To Use What?
+
+
+As ConcurrentHashMap is internally synchronized and hence it is most suitable for concurrent multi threaded applications. HashMap is not synchronized internally and it is most suitable for single threaded applications.
+
+
+
+=====================
+
+Difference between TreeMap, HashMap, LinkedHashMap, and HashTable in Java:
+All of the above helps us to store data in key: value format. The important distinction is between the ordering and time complexity of the retrieval of data.
+
+HashMap:
+
+HashMap offers O(1) insertion and retrieval time.
+It contains value based on keys.
+The ordering of keys is random
+It uses a linked list to store the data.
+It contains only unique elements
+It may have one null key and multiple null values
+It is not thread-safe
+LinkedHashMap:
+
+LinkedHashMap is the same as HashMap but maintains the insertion order.
+The other properties align with that of HashMap.
+TreeMap:
+
+TreeMap offers O(log N) insertion and retrieval time.
+It cannot have a null key but can have multiple null values.
+It maintains ascending order of keys.
+The rest of the properties align with that of HashMap.
+Hashtable:
+
+It is thread-safe.
+Since it is thread-safe the performance might be low
+Null is not allowed for both key and value

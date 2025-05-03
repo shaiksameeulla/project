@@ -1,0 +1,239 @@
+https://hacksoft.io/split-your-webpack-configuration-development-and-production/
+
+
+n my previous article I promised you to write about how we split our webpack configurations for production and for development. This post is a continuation to the previous one and I will use the webpack.config.js file from there. You had better check it out if you haven’t yet!
+
+Why do we need to separate the webpack configuration?
+Well, like the most things in programming you may want to use a different configuration for your production files and for development. If you think your webpack.config.js is good enough for both cases then this article is not for you.
+
+If you are from the ones that want to have different configurations – like minifying your bundle file only for production and stuff like that – then let’s dive in!
+
+Convert the configuration object to function
+As I told you in the previous article you have two options to export in your webpack.config.js: – An object where you define the desired behaviour of your configuration; – A function that returns such object.
+
+Here is how our file starts looking like:
+
+var path = require('path');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+var webpack = require('webpack');
+var APP_DIR = path.resolve(__dirname, './src');
+var BUILD_DIR = path.resolve(__dirname, './dist');
+function buildConfig() {
+  return {
+    entry: APP_DIR + '/index.jsx',
+    output: {
+      path: BUILD_DIR,
+      filename: 'bundle.js',
+      publicPath: '/'
+    },
+    resolve: {
+      extensions: ['.js', '.jsx']
+    },
+    module: {
+      rules :[
+        {
+          test: /\.css$/,
+          use: [ 'style-loader', 'css-loader' ]
+        },
+        {
+          test: /\.jsx$/,
+          use : 'babel-loader'
+        }
+      ]
+    },
+    devServer: {
+      historyApiFallback: true
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+          template: APP_DIR + '/index.html'
+      }),
+      new webpack.optimize.UglifyJsPlugin({ minimize: true })
+    ]
+  };
+};
+module.exports = buildConfig;
+You may be a bit confused now – I mean we haven’t achieved anything by converting the configuration from an object to a function, have we?
+
+Yes, we are on the same state at the moment. The reason for using a function is that it can take arguments.
+
+Clarification
+And so what? Where would these arguments come from? How would this help us with splitting the file?
+
+To answer these questions that you may ask yourself at the moment let’s just pass an argument to the function and console.log() it.
+
+First of all add the argument to the buildConfig function:
+
+function buildConfig(arg) {
+  console.log('The argument: ', arg);
+  // configuration here
+}
+module.exports = buildConfig;
+Now we have to pass this arg – this is done by passing an argument with the same name as the one that your function expects when calling a command.
+
+For example, let’s add it to our build command: $ npm run build --arg=test. You will see The argument: test printed in your console.
+
+Make a plan to solve the problem
+OK, we know how to pass an argument to the webpack configuration. Let’s think of how can we actually use it to solve our problem.
+
+What I imagine is to have 2 different files – one for production and one for development – and to use the one that we need depending on what argument we’ve passed to the function.
+
+Different configuration files
+Firstly, we have to create these files. Make a directory called config/ in your main app directory and put two files in it:
+
+cd path/to/main/app/
+mkdir config
+cd config && touch prod.js dev.js
+Now open the prod.js file and copy-paste everything from webpack.config.js. Do the same for dev.js but remove the plugin for minifying the JS (to keep the example simple, this will be the only difference between our configurations).
+
+Update webpack.config.js
+Since webpack uses its webpack.config.js file when it is called, this is the right place for us to map which configuration file to be used.
+
+Here is how our buildConfig function looks like now:
+
+function buildConfig(env) {
+  if (env === 'dev' || env === 'prod') {
+    return require('./config/' + env + '.js');
+  } else {
+    console.log("Wrong webpack build parameter. Possible choices: 'dev' or 'prod'.")
+  }
+}
+module.exports = buildConfig;
+Update package.json
+Now we can update our commands in the package.json file so we can use the different configurations with npm:
+
+{
+  "scripts": {
+    "build:prod": "webpack -p --env=prod",
+    "build:dev": "webpack -d --env=dev",
+    "serve": "webpack-dev-server -d --open"
+  }
+}
+And you can simply use npm run build:dev to test it – the bundle.js file shouldn’t be minified!
+
+Oops!
+We’ve just broken the configuration! Why?
+
+The problem is that we are using path.resolve(__dirname, './src') in our new files. Since they are in a directory which is one step deeper in our directory tree, path.resolve(__dirname, './src') is resolved to path/to/main/app/config/src/ which doesn’t really exist. We want it to be resolved to path/to/main/app/src/ as it was before.
+
+Fix the bug
+There are several solutions to our new problem – we can hard code some paths, patch path.resolve, etc. I prefer to make it a little bit more reusable and beautiful.
+
+Since we can define functions in our dev.js and prod.js files, we can use this power to pass an argument – the directories from the webpack.config.js:
+
+var path = require('path');
+var BUILD_DIR = path.resolve(__dirname, './dist');
+var APP_DIR = path.resolve(__dirname, './src');
+const configDirs = {
+  BUILD_DIR: BUILD_DIR,
+  APP_DIR: APP_DIR
+}
+function buildConfig(env) {
+  if (env === 'dev' || env === 'prod') {
+    return require('./config/' + env + '.js')(configDirs);
+  } else {
+    console.log("Wrong webpack build parameter. Possible choices: 'dev' or 'prod'.")
+  }
+}
+module.exports = buildConfig;
+Now update your configuration files so the functions in them expect the configDirs argument. Here is how the dev.js file will look like for example:
+
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+var webpack = require('webpack');
+function buildConfig(configDirs) {
+  return {
+    entry: configDirs.APP_DIR + '/index.jsx',
+    output: {
+      path: configDirs.BUILD_DIR,
+      filename: 'bundle.js',
+      publicPath: '/'
+    },
+    resolve: {
+      extensions: ['.js', '.jsx']
+    },
+    module: {
+      rules :[
+        {
+          test: /\.css$/,
+          use: [ 'style-loader', 'css-loader' ]
+        },
+        {
+          test: /\.jsx$/,
+          use : 'babel-loader'
+        }
+      ]
+    },
+    devServer: {
+      historyApiFallback: true
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+          template: configDirs.APP_DIR + '/index.html'
+      }),
+      new webpack.optimize.UglifyJsPlugin({ minimize: true })
+    ]
+  };
+};
+module.exports = buildConfig;
+Make it better!
+This is pretty much everything – we have two configuration files and we can successfully use it. Congratulations!
+
+The only thing that still bothers me (and maybe you, too) is that there is almost the same code in our two different configurations which makes them not that different at all.
+
+Let’s stick to the DRY principles and think of something better.
+
+Create common.js
+A pretty obvious solution is to put the common lines of code somewhere so we can “import” them in our configurations.
+
+Let’s create a common.js in order to have such place:
+
+cd /path/to/main/app/config/ && touch common.js
+
+Now open the dev.js file and copy-paste everything from it into the common.js (as we assume that the common lines of code are in the dev.js).
+
+Once you’ve done this, go back to dev.js and prod.js and import the common.js. As our example is simple enough, in the dev.js file you just need to import the object from common.js and return it.
+
+const webpack = require('webpack');
+module.exports = function(configDirs) {
+  const devConfig = Object.assign({}, require('./common')(configDirs));
+  console.log('\x1b[36m%s\x1b[0m', 'Building for development...');
+  return devConfig;
+};
+In the prod.js file it’s a little bit different. You need to mutate the common.js object so it has the features you want. Here is how it looks like:
+
+const webpack = require('webpack');
+module.exports = function(configDirs) {
+  // Adds everything from "common.js" to a new object called prodConfig
+  let prodConfig = Object.assign({}, require('./common')(configDirs));
+  prodConfig.plugins.push(new webpack.optimize.UglifyJsPlugin({ minimize: true }));
+  console.log('\x1b[36m%s\x1b[0m', 'Building for production ...');
+  return prodConfig;
+};
+We are ready
+We are ready at last. If you have any other environments(staging for example) you can use the same techniques to achieve your goals.
+
+You look completely set up to build your new application. Go on and do it!
+
+Before we finish
+!!! UPDATED !!!
+
+Here I want to touch one such big problem with the bundle.js that you will bump into. I’m talking about it’s size.
+
+Regarding this problem we haven’t reached any great success. We will blog more about this in future but let me introduce you some points we’ve found so you can try sticking to them.
+
+Pay attention to the command line parameters! You may think this one is not that important and actually copy-paste the same command for all of your commands in package.json. That’s what I did. A little change in a letter just resized our bundle from 14MB to less than 1MB. What am I talking about? Let’s take a look at our new scripts in the package.json file:
+{
+  "scripts": {
+   "build:prod": "webpack -p --env=prod",
+    "build:dev": "webpack -d --env=dev",
+    "serve": "webpack-dev-server -d --open"
+  }
+}
+As you see, we use -d for local development and -p for production. These are actually shortcuts that come from Webpack. What I did as a mistake is to use -d for production. This flag actually overwrites the UglifyJS plugin behaviour and Webpack doesn’t really use it. Again, if your bundle.js is enourmously big check out your command line parameters, first!
+
+Import only the things you need! This comes from the way Webpack constructs the dependency graph and how imports in JS work. For example, let’s take lodash (I’m pretty sure all of you use it).
+Forget import _ from 'lodash';! Thereby you import the whole lodash in your file even though you use only one or two if it’s methods. Instead, go to the documentation and install only the methods you need by npm. You will be amazed how much this will drop off from the size of the bundle.js (we removed 1MB).
+Take a look at Preact. Almost everyone from the articles I’ve read has recommended it. Preact is the lightweight version of React (just 3KB) and has the same API. Going out from their documentations they have a lot of add-ons and external libraries that follow the same “lightweight paradigm” but we haven’t played around with it. Subscribe for our newsletter as we are going to blog more about the theme in the near future.
+Webpack has several plugins that can take off some KBs from your bundle.js, too. For example, you can give ie8: false to the UglifyJSPlugin in order to remove the compatibility with IE8. You’ll need some deep exploration here to fit your needs.
+I’ve read this blog post in Medium where the author explains the problem with the imports in more details. TL;DR Once your project is at the final stage go over all of the external libraries you use and carefully check what exactly you use. After that go and remove all other features that the library gives you. This will definitely decrease the size of your bundle.js but is such a hard job to do.
+Consult with a senior front-end developer as his advice would be from his personal experience and it’s a good chance that he’s had the same problems before.

@@ -1,0 +1,26 @@
+
+
+How is takeWhile different from filter?
+
+
+filter will remove all items from the stream that do not satisfy the condition.
+
+takeWhile will abort the stream on the first occurrence of an item which does not satisfy the condition.
+
+e.g.
+
+Stream.of(1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1)
+    .filter(i -> i < 4 )
+    .forEach(System.out::print);
+will print
+
+123321
+
+but
+
+Stream.of(1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1)
+    .takeWhile(i -> i < 4 )
+    .forEach(System.out::print);
+will print
+
+123

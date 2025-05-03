@@ -1,0 +1,146 @@
+What is an event loop in JavaScript?
+
+The event loop is the secret behind JavaScript’s asynchronous programming. JS executes all operations on a single thread, but using a few smart data structures, it gives us the illusion of multi-threading. Let’s take a look at what happens on the back-end.
+
+
+
+The call stack is responsible for keeping track of all the operations in line to be executed. Whenever a function is finished, it is popped from the stack.
+
+
+The event queue is responsible for sending new functions to the stack for processing. It follows the queue data structure to maintain the correct sequence in which all operations should be sent for execution.
+
+Whenever an async function is called, it is sent to a browser API. These are APIs built into the browser. Based on the command received from the call stack, the API starts its own single-threaded operation.
+
+An example of this is the setTimeout method. When a setTimeout operation is processed in the stack, it is sent to the corresponding API which waits till the specified time to send this operation back in for processing.
+
+Where does it send the operation? The event queue. Hence, we have a cyclic system for running async operations in JavaScript. The language itself is single-threaded, but the browser APIs act as separate threads.
+
+The event loop facilitates this process; it constantly checks whether or not the call stack is empty. If it is empty, new functions are added from the event queue. If it is not, then the current function call is processed.
+
+
+JavaScript is single-threaded: only one task can run at a time. 
+
+callstack will execute the tasks, and heap memory holds the memory creation of the objects/functions.
+
+
+In JavaScript, the execution of asynchronous operations is managed through the event loop, which utilizes different queues to handle tasks. These queues include the callback queue (also known as the task queue or macro task queue) and the microtask queue.
+
+Macro Task Queue (Callback Queue)
+ It is used for managing macro tasks, which are operations that take a longer time to execute. Examples of macro tasks include:
+ setTimeout and setInterval callbacks
+ I/O operations (e.g., network requests, file access)
+ User interface events (e.g., click, scroll)
+  When an external script <script src="..."> loads, the task is to execute it.
+   When a user moves their mouse, the task is to dispatch mousemove event and execute handlers.
+
+Microtask Queue
+ It is used for managing microtasks, which are operations that need to be executed with higher priority, immediately after the current task and before the  browser has a chance to re-render. 
+
+Examples of microtasks include: Promises then and catch callbacks, Mutation Observer callbacks, and queueMicrotask().
+                           Execution of async function bodies following await.
+
+
+Execution Order
+
+ 1. Current task: The currently executing script or function is completed.
+
+ 2. Microtask queue: All available microtasks in the microtask queue are executed one after another until the queue is empty.
+
+ 3. Macro task queue: The event loop picks the oldest task from the macro task queue and executes it.
+
+Steps 2 and 3 repeat until both queues are empty.
+
+Microtasks have higher priority than macro tasks. This means that if both queues have tasks, the microtask queue will be processed first. This ensures that important updates and side effects are handled promptly before the browser proceeds with less urgent tasks
+
+One go-around of the event loop will have exactly one task being processed from the macrotask queue 
+(this queue is simply called the task queue in the WHATWG specification). 
+After this macrotask has finished, all available microtasks will be processed, namely within the same go-around cycle.
+
+ While these microtasks are processed, they can queue even more microtasks, which will all be run one by one, until the microtask queue is exhausted.
+
+
+JS has three "stacks":
+
+> standard stack for all synchronous calls (one function calls another, etc)
+
+> microtask queue (or job queue or microtask stack) for all async operations with higher priority (process.nextTick, Promises, Object.observe, MutationObserver)
+
+> macrotask queue (or event queue, task queue, macrotask queue) for all async operations with lower priority (setTimeout, setInterval, setImmediate, requestAnimationFrame, I/O, UI rendering)
+
+
+I created an event loop pseudocode following the 4 concepts:
+
+a. Macrotasks: These include tasks like setTimeout, setInterval, setImmediate, requestAnimationFrame, I/O operations, and UI rendering. They form the macrotask queue, where each task is processed sequentially, starting with the oldest.
+
+b. Microtasks: Microtasks encompass operations such as process.nextTick, Promises, Object.observe, and MutationObserver. These tasks reside in the microtask queue and are processed after macrotasks, including those generated during the current iteration.
+
+c. Animation Queue: The animation queue holds tasks related to animations. All tasks in this queue are processed, except for any new additions made during the current iteration. The rendering pipeline aims to render at approximately 60 frames per second, which translates to roughly every 16 milliseconds.
+
+d.Rendering Pipeline: The rendering pipeline’s goal is to render changes to the web page. It is triggered when approximately 16 milliseconds have passed since the last render. During this phase, any necessary animation tasks are executed, followed by a repaint to update the visible page.
+
+The rendering pipeline will try to render 60 times a second (every 16 ms)
+
+ while (true){
+    // 1. Get one macrotask (oldest) task item
+    task = macroTaskQueue.pop(); 
+    execute(task);
+
+   // 2. Go and execute microtasks while they have items in their queue (including those which were added during this iteration)
+    while (microtaskQueue.hasTasks()){
+        const microTask = microtaskQueue.pop();
+        execute(microTask);
+    }
+
+    // 3. If 16ms have elapsed since last time this condition was true
+    if (isPaintTime()){
+    // 4. Go and execute animationTasks while they have items in their queue (not including those which were added during this iteration) 
+        const animationTasks = animationQueue.getTasks();
+        for (task in animationTasks){
+            execute(task);
+        }
+
+        repaint(); // render the page changes (via the render pipeline)
+    }
+}
+
+Promise.resolve().then(()=>console.log(1))
+setTimeout(()=>console.log(2),10)
+queueMicrotask(()=> {console.log(3)
+    queueMicrotask(()=> {console.log(4)})
+})
+console.log(5)
+
+o/p : 5 1 3 4 2
+
+Problems:
+------------
+
+Understanding Task Starvation:
+
+Now, imagine this: if micro tasks keep popping up without allowing other tasks a chance to run, what happens next? Well, in this scenario, the Callback Queue won’t get an opportunity to execute its tasks. This situation is what we call the starvation of tasks in the Callback Queue.
+
+To avoid starvation of a callback queue, ensure that long-running tasks are executed asynchronously, breaking them down into smaller chunks if necessary, and utilize techniques like "setTimout" to allow the event loop to process other tasks in between, preventing any single task from monopolizing the queue for extended periods. 
+
+Key strategies to prevent callback queue starvation:
+
+Use Promises and async/await:
+By leveraging the Promise-based asynchronous pattern, you can chain operations in a more readable way, ensuring that the event loop can handle other tasks while waiting for asynchronous operations to complete. 
+
+Prioritize short-running tasks:
+For critical tasks that need immediate attention, prioritize them in your code to ensure they are processed promptly by the event loop. 
+
+Throttle and debounce events:
+If dealing with high-frequency events, implement throttling or debouncing mechanisms to limit the number of callback functions queued at once. 
+Utilize Worker Threads:
+
+For computationally intensive tasks, offload them to separate worker threads to prevent blocking the main event loop. 
+
+Monitor queue length:
+Implement monitoring to track the length of the callback queue and identify potential bottlenecks or situations where a single task is dominating the queue. 
+What causes callback queue starvation?
+
+Long-running synchronous operations:
+If a single callback function performs a lengthy operation without yielding control back to the event loop, it can block other tasks from executing, leading to starvation. 
+
+Excessive nested callbacks ("callback hell"):
+Deeply nested callback functions can make it difficult to manage the flow of asynchronous operations and can easily lead to a single long-running chain of callbacks. 

@@ -1,0 +1,121 @@
+Context API:
+--------
+Context provides a way to pass data through the component tree without having to pass props down manually at every level.
+Context is designed to share data that can be considered “global” for a tree of React components, such as the current authenticated user, theme, or preferred language. 
+
+Before You Use Context
+----------------------
+If you only want to avoid passing some props through many levels, component composition is often a simpler solution than context.
+
+More details
+-----------
+
+const MyContext = React.createContext(defaultValue);
+Creates a Context object. When React renders a component that subscribes to this Context object it will read the current context value from the closest matching Provider above it in the tree.
+
+The defaultValue argument is only used when a component does not have a matching Provider above it in the tree. This default value can be helpful for testing components in isolation without wrapping them. Note: passing undefined as a Provider value does not cause consuming components to use defaultValue.
+
+
+Context.Provider
+
+<MyContext.Provider value={/* some value */}>
+
+Context.Consumer
+<MyContext.Consumer>
+  {value => /* render something based on the context value */}
+</MyContext.Consumer>
+A React component that subscribes to context changes. Using this component lets you subscribe to a context within a function component.
+
+
+
+==============================Example Real time===============
+
+inerface TransactionContextProps{
+selectedInvestment?:Investment
+setSelectedInvestment?:(data:Investment)=>void
+selectedTransactionTypes?:DropDownTypes[]
+setSelectedTransactionTypes?:(data:DropDownTypes[])=>void
+
+}
+
+export const TransactionContext=createContext<TransactionContextProps>({
+selectedInvestment:DEFAULT_DATA
+selectedTransactionTypes:[]
+});
+
+export function TransactionProvider(props:any){
+
+const [selectedInvestment,setSelectedInvestment] =useState<Investment>(DEFAULT_DATA);
+const [selectedTransactionTypes,setSelectedTransactionTypes] =useState<DropDownTypes[]>([]);
+
+
+const values ={selectedInvestment,setSelectedInvestment,selectedTransactionTypes,setSelectedTransactionTypes
+};
+
+return <TransactionContext.Provider  values={values}>props.children </TransactionContext.Provider>
+}
+
+enabling:
+===========
+
+<TransactionProvider>
+ <component>
+</TransactionProvider>
+
+usage :
+=======
+
+const {selectedInvestment,setSelectedInvestment,selectedTransactionTypes,setSelectedTransactionTypes}:TransactionContextProps =useContext(TransactionContext);
+
+==================================== END of example ============================================================================================================
+Consuming Multiple Contexts
+====================================
+To keep context re-rendering fast, React needs to make each context consumer a separate node in the tree.
+
+// Theme context, default to light theme
+const ThemeContext = React.createContext('light');
+
+// Signed-in user context
+const UserContext = React.createContext({
+  name: 'Guest',
+});
+
+class App extends React.Component {
+  render() {
+    const {signedInUser, theme} = this.props;
+
+    // App component that provides initial context values
+    return (
+      <ThemeContext.Provider value={theme}>
+        <UserContext.Provider value={signedInUser}>
+          <Layout />
+        </UserContext.Provider>
+      </ThemeContext.Provider>
+    );
+  }
+}
+
+function Layout() {
+  return (
+    <div>
+      <Sidebar />
+      <Content />
+    </div>
+  );
+}
+
+// A component may consume multiple contexts
+function Content() {
+  return (
+    <ThemeContext.Consumer>
+      {theme => (
+        <UserContext.Consumer>
+          {user => (
+            <ProfilePage user={user} theme={theme} />
+          )}
+        </UserContext.Consumer>
+      )}
+    </ThemeContext.Consumer>
+  );
+}
+If two or more context values are often used together, you might want to consider creating your own render prop component that provides both.

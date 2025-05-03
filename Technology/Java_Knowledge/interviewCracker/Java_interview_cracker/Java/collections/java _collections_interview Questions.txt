@@ -1,0 +1,432 @@
+java :
+
+collections :
+
+collection --1. set --Hashset,linkedHashSet,TreeSet(it uses sorted set)
+			2. List -ArrayList,Vector,linkedList,Stack (Stack extends Vector)
+			3. Queue -LinkedList,PriorityQueue
+			4.Map -HashMap,LinkedHashMap,TreeMap
+			5.Deque (First-in, first-out (FIFO) like a queue or last-in, first-out(LIFO) like a stack)ArrayDeque & LinkedList
+
+From this table we can conclude the following characteristics of the main collections in Java Collection Frameworks:
+
+          All lists allow duplicate elements which are ordered by index.
+          All sets and maps do not allow duplicate elements.
+          All list elements are not sorted.
+          Generally, sets and maps do not sort its elements, except TreeSet and 
+		  TreeMap – which sort elements by natural order or by a comparator.
+          Generally, elements within sets and maps are not ordered, except for:
+   LinkedHashSet and LinkedHashMap have elements ordered by insertion order.
+      TreeSet and TreeMap have elements ordered by natural order or by a comparator.
+          There are only two collections are thread-safe: Vector and Hastable. The rest is not thread-safe.
+		  
+		  
+		  ---------------------
+		  
+		  
+		  linked Hash set:
+		  
+		  LinkedHashSet size 16
+		  
+		  LinkedHashSet is an extended version of HashSet. HashSet doesn’t follow any order where as LinkedHashSet maintains insertion order. HashSet uses HashMap object internally to store it’s elements where as LinkedHashSet uses LinkedHashMap object internally to store and process it’s elements. 
+		  In this article, we will see how LinkedHashSet works internally and how it maintains insertion order.
+		  
+		  LinkedHashSet doesn’t have it’s own methods. All methods are inherited from it’s super class i.e HashSet. So. all operations on LinkedHashSet work in the same manner as that of HashSet. The only change is the internal object used to store the elements. In hashSet, elements you insert are stored as keys of HashMap object. Where as in LinkedHashSet, elements you insert are stored as keys of LinkedHashMap object.
+		  The values of these keys will be the same constant i.e “PRESENT
+-----------
+
+ How HashMap works in Java?
+ constructs an empty HashMap with the default initial capacity (16) and the default load factor (0.75).
+
+HashMap  works on principle of hashing, we have put() and get() method for storing and retrieving object form HashMap .
+When we pass an both key and value to put() method to store on HashMap ,
+ it uses key object hashcode() method to calculate hashcode and they by applying hashing on that hashcode it identifies bucket location for storing value object. 
+ While retrieving it uses key object equals method to find out correct key value pair and return value object associated with that key. 
+ HashMap  uses linked list in case of collision and object will be stored in next node of linked list.
+ Also HashMap stores both key and value tuple in every node of linked list in form of Map.Entry object. 
+
+Hash collisions have negative impact on the lookup time of HashMap. When multiple keys end up in the same bucket, then values along with their keys are placed in a linked list. In case of retrieval, linked list has to be traversed to get the entry. In worst case scenario, when all keys are mapped to the same bucket, the lookup time of HashMap increases from O(1) to O(n).
+
+Java 8 has come with the following improvements/changes of HashMap objects in case of high collisions.
+
+The alternative String hash function added in Java 7 has been removed.
+Buckets containing a large number of colliding keys will store their entries in a balanced tree instead of a linked list after certain threshold is reached.
+Above changes ensure performance of O(log(n)) in worst case scenarios (hash function is not distributing keys properly) and O(1) with proper hashCode().
+
+How linked list is replaced with binary tree?
+
+In Java 8, HashMap replaces linked list with a binary tree when the number of elements in a bucket reaches certain threshold. While converting the list to binary tree, hashcode is used as a branching variable. If there are two different hashcodes in the same bucket, one is considered bigger and goes to the right of the tree and other one to the left. But when both the hashcodes are equal, HashMap assumes that the keys are comparable, and compares the key to determine the direction so that some order can be maintained. It is a good practice to make the keys of HashMap comparable.
+
+This JDK 8 change applies only to HashMap, LinkedHashMap and ConcurrentHashMap.
+
+The hashing algorithm changed. This means that you cannot rely on the iteration order of java.util.HashMap. This shouldn't come as a surprise, the JDK never gave any such guarantees in the first place. If order is important to you, use TreeMap or LinkedHashMap.
+And in Java 8 the hashing algorithm changed back to the Java 5 version again! A bit of history: The Java 7 algorithm was a fix for a vulnerability where an attacker could cause really bad performance of the HashMap by causing a lot of collisions. In Java 8 another fix was introduced, using search trees for bins with a lot of collisions. – 
+
+
+Based on a simple experiment of creating HashMaps of different sizes and performing put and get operations by key, the following results have been recorded.
+
+What is difference between fail-fast and fail-safe Iterators?
+This is relatively new collection interview questions and can become trick if you hear the term fail-fast and fail-safe first time. Fail-fast Iterators throws ConcurrentModificationException when one Thread is iterating over collection object and other thread structurally modify Collection either by adding, removing or modifying objects on underlying collection. They are called fail-fast because they try to immediately throw Exception when they encounter failure. On the other hand fail-safe Iterators works on copy of collection instead of original collection
+
+
+Important point about Iterator in Java:
+
+1) Iterator in Java support generics so always use Generic version of Iterator rather than using Iterator with raw type.
+
+2) If you want to remove objects from Collection than don't use for-each loop instead use Iterator's remove() method to avoid any ConcurrentModificationException.
+
+3) Iterating over collection using Iterator is subject to ConcurrentModificationException if Collection is modified after Iteration started, but this only happens in case of fail-fast Iterators.
+
+4) There are two types of Iterators in Java, fail-fast and fail-safe, check difference between fail-safe and fail-fast Iterator for more details.
+
+5) List collection type also supports ListIterator which has add() method to add elements in collection while Iterating. There are some more differences between Iterator and ListIterator like bidirectional traversing, which we have discussed above. Also why ListIterator has add() method is a popular Java Collection Interview question.
+
+***************(((((((((((((((((((((((((((((())))))))))))))))))))))))))))))
+Why does not Iterator have add method whereas List Iterator has one in Java:
+-*************************************_____________________________
+I think a better reason for not having insert in Iterator is that it would have a meaning only in ordered data structures (such as lists). For example, there is no meaning to adding an element to a Set via an iterator of that Set.
+
+-->We can use ListIterator to traverse List only, we cannot traverse Set using ListIterator.
+-----------------
+
+
+Arraylist vs Vector in Java
+
+
+1.  Synchronization and Thread-Safe
+
+Vector is  synchronized while ArrayList is not synchronized  . Synchronization and thread safe means at a time only one thread can access the code .In Vector class all the methods are synchronized .Thats why the Vector object is already synchronized when it is created .
+
+2.  Performance
+
+Vector is slow as it is thread safe . In comparison ArrayList is fast as it is non synchronized . Thus     in ArrayList two or more threads  can access the code at the same time  , while Vector is limited to one thread at a time.
+
+3. Automatic Increase in Capacity
+
+A Vector defaults to doubling size of its array . While when you insert an element into the ArrayList ,      it increases
+its Array size by 50%  .
+
+
+By default ArrayList size is 10 . It checks whether it reaches the       last  element then it will create the new array ,copy the new data of last array to new array ,then old array     is garbage collected by the Java Virtual Machine (JVM) . 
+
+4. Set Increment Size
+
+ArrayList does not define the increment size . Vector defines the increment size .
+
+You can find the following method in Vector Class
+
+public synchronized void setSize(int i) { //some code  }
+
+There is no setSize() method or any other method in ArrayList which can manually set the increment size.
+
+5. Enumerator
+
+Other than Hashtable ,Vector is the only other class which uses both Enumeration and Iterator .While ArrayList can only use Iterator for traversing an ArrayList .
+
+6.  Introduction in Java 
+
+java.util.Vector  class was there in java since the very first version of the java development kit (jdk).
+java.util.ArrayList  was introduced in java version 1.2 , as part of Java Collections framework . In java version 1.2 , Vector class has been refactored to implement the List Inteface 
+___________________
+Difference between fail-safe and fail-fast Iterator
+ is becoming favorite core java interview questions day by day, reason
+it touches concurrency a bit and interviewee can go deep on it to ask how fail-safe or fail-fast behavior is implemented.
+In this article article we will see what is fail-safe and fail fast iterators in java and differences between fail-fast and fail-safe iterators . 
+Concept of fail-safe iterator are relatively new in Java and first introduced with Concurrent Collections in Java 5 like ConcurrentHashMap and CopyOnWriteArrayList.
+
+ 
+Difference between fail-fast Iterator vs fail-safe Iterator in Java
+
+fail-fast Iterators in Java
+
+Difference between fail-safe vs fail-fast iterator in javaAs name suggest fail-fast Iterators fail as soon as they realized that structure of Collection has been changed since iteration has begun. 
+Structural changes means adding, removing or updating any element from collection while one thread is Iterating over that collection. 
+fail-fast behavior is implemented by keeping a modification count and if iteration thread realizes the change in modification count it throws ConcurrentModificationException.
+
+Java doc says this is not a guaranteed behavior instead its done of "best effort basis", So application programming can not  rely on this behavior. 
+Also since multiple threads are involved while updating and checking modification count and this check  is done without synchronization, there is a chance that Iteration thread still sees a stale value and might not be able to detect any change done by parallel threads. Iterators returned by most of JDK1.4 collection are fail-fast including Vector, ArrayList, HashSet etc. to read more about Iterator see my post What is Iterator in Java.
+
+fail-safe Iterator in java
+
+Contrary to fail-fast Iterator, fail-safe iterator doesn't throw any Exception if Collection is modified structurally
+while one thread is Iterating over it because they work on clone of Collection instead of original collection and that’s why they are called as fail-safe iterator. 
+Iterator of CopyOnWriteArrayList is an example of fail-safe Iterator also iterator written by ConcurrentHashMap keySet is also fail-safe iterator and never throw ConcurrentModificationException in Java.
+
+
+That’s all on difference between fail-safe vs fail-fast Iterator in Java, As I said due to there confusing or not to easy differentiation they are quickly becoming popular java collection questions asked on various level of java interview. Let me know if you are aware of any other difference between fail-fast and fail-safe iterator.
+-------------------------------
+How ConcurrentHashMap is implemented in Java
+
+ConcurrentHashMap is introduced as an alternative of Hashtable and provided all functions supported by Hashtable with additional feature called "concurrency level", which allows ConcurrentHashMap to partition Map. ConcurrentHashMap allows multiple readers to read concurrently without any blocking. This is achieved by partitioning Map into different parts based on concurrency level and locking only a portion of Map during updates. Default concurrency level is 16, and accordingly Map is divided into 16 part and each part is governed with different lock. This means, 16 thread can operate on Map simultaneously, until they are operating on different part of Map. This makes ConcurrentHashMap high performance despite keeping thread-safety intact.  Though, it comes with caveat. Since update operations like put(), remove(), putAll() or clear() is not synchronized, concurrent retrieval may not reflect most recent change on Map.
+
+In case of putAll() or clear(), which operates on whole Map, concurrent read may reflect insertion and removal of only some entries. Another important point to remember is iteration over CHM, Iterator returned by keySet of ConcurrentHashMap are weekly consistent and they only reflect state of ConcurrentHashMap and certain point and may not reflect any recent change. Iterator of ConcurrentHashMap's keySet area also fail-safe and doesn’t throw ConcurrentModificationExceptoin..
+
+Default concurrency level is 16 and can be changed, by providing a number which make sense and work for you while creating ConcurrentHashMap. Since concurrency level is used for internal sizing and indicate number of concurrent update without contention, so, if you just have few writers or thread to update Map keeping it low is much better. ConcurrentHashMap also uses ReentrantLock to internally lock its segments.
+
+The concurrent hash map divides its contents into segments, to reduce writer lock contention.
+
+The concurrencyLevel parameter defines the number of segments. It's 16 by default
+As no concurrency level has been set explictity, the ConcurrentHashMap gets divided into 16 segments. And each segment acts as an independent HashMap. During wright operation the Lock is obtained on this particular segment and not on the entire HashMap 
+
+The main idea is that when the number of items in a hash is larger than a certain value, the hash will change from using a linked list of elements or entries to a balanced tree, this will improve the worst case performance from O(n) to O(log n).
+
+ConcurrentHashMap is the out-of-box ready ConcurrentMap implementation.
+
+For better performance, it consists of an array of nodes as table buckets (used to be table segments prior to Java 8) under the hood, and mainly uses compare-and-swap  operations during updating.
+
+The table buckets are initialized lazily, upon the first insertion. Each bucket can be independently locked by locking the very first node in the bucket. Read operations do not block, and update contentions are minimized.
+
+The number of segments required is relative to the number of threads accessing the table so that the update in progress per segment would be no more than one most of time.
+
+Before Java 8,
+=============== the number of “segments” required was relative to the number of threads accessing the table so that the update in progress per segment would be no more than one most of time.
+However, since Java 8, the constructors are only present for backward compatibility: the parameters can only affect the initial size of the map.
+The casTabAt() method is used to atomically set a map entry using compare-and-swap operation for object references. You can still see the typical CAS loop in practically all places where casTabAt() is used - you construct the object that you want to put and then try to CAS it in its rightful place. If it feels weird that a complex construction can precede the CAS attempt, you can take a look at Jeff Preshing's You Can Do Any Kind of Atomic Read-Modify-Write Operation.
+
+The table buckets are initialized lazily, upon the first insertion. Each bucket can be independently locked by locking the very first node in the bucket. Read operations do not block, and update contentions are minimized.
+
+The number of segments required is relative to the number of threads accessing the table so that the update in progress per segment would be no more than one most of time.
+
+Before Java 8, the number of “segments” required was relative to the number of threads accessing the table so that the update in progress per segment would be no more than one most of time.
+
+In a sense, ConcurrentHashMap still uses striped locking, but with finer lock granularity (the contended area is now minimized from multi-bin segments to individual bins) and with locks being almost entirely replaced by CAS operations.
+
+
+compare-and-swap CAS is generally much faster than locking, but it does depend on the degree of contention. Because CAS may force a retry if the value changes between reading and comparing, a thread can theoretically get stuck in a busy-wait if the variable in question is being hit hard by many other threads (or if it is expensive to compute a new value from the old value (or both)).
+
+The main issue with CAS is that it is much more difficult to program with correctly than locking. Mind you, locking is, in turn, much harder to use correctly than message-passing or STM, so don't take this as a ringing endorsement for the use of locks.
+
+But Java 8 has come with the following new strategy for HashMap objects in case of high collisions.
+
+To address this issue, Java 8 hash elements use balanced trees instead of linked lists after a certain threshold (TREEIFY_THRESHOLD = 8) is reached. Which means HashMap starts with storing Entry objects in a linked list but after the number of items in a hash becomes larger than a certain threshold. The hash will change from using a linked list to a balanced tree.
+Above changes ensure the performance of O(log(n)) in worst case scenarios and O(1) with proper hashCode().
+The alternative String hash function added in Java 7 has been removed.
+
+----------------------
+Difference between ConcurrentHashMap and Hashtable
+
+So what is the difference between Hashtable and ConcurrentHashMap , both can be used in multithreaded environment but once the size of Hashtable becomes considerable large performance degrade because for iteration it has to be locked for longer duration.
+
+Since ConcurrentHashMap introduced concept of segmentation , how large it becomes only certain part of it get locked to provide thread safety so many other readers can still access map without waiting for iteration to complete. 
+
+In Summary ConcurrentHashMap only locked certain portion of Map while Hashtable lock full map while doing iteration. This will be more clear by looking at this diagram which explains internal working of ConcurrentHashMap in Java.
+
+------------------------------
+Difference between ConcurrentHashMap and Collections.synchronizedMap
+
+ConcurrentHashMap is designed for concurrency and improve performance while HashMap which is non synchronized by nature can be synchronized by applying a wrapper using synchronized Map. Here are some of common differences between ConcurrentHashMap and synchronized map in Java
+
+ConcurrentHashMap do not allow null keys or null values while synchronized HashMap allows one null keys.
+
+
+--------------
+Difference between HashMap and Hashtable in Java
+
+Both HashMap and Hashtable implements Map interface but there are some significant difference between them which is important to remember before deciding whether to use HashMap or Hashtable in Java. Some of them is thread-safety, synchronization and speed. here are those differences :
+
+1.The HashMap class is roughly equivalent to Hashtable, except that it is non synchronized and permits nulls. (HashMap allows null values as key and value whereas Hashtable doesn't allow nulls).
+
+2. One of the major differences between HashMap and Hashtable is that HashMap is non synchronized whereas Hashtable is synchronized, which means Hashtable is thread-safe and can be shared between multiple threads but HashMap can not be shared between multiple threads without proper synchronization. Java 5 introduces ConcurrentHashMap which is an alternative of Hashtable and provides better scalability than Hashtable in Java.
+
+3. Another significant difference between HashMap vs Hashtable is that Iterator in the HashMap is  a fail-fast iterator  while the enumerator for the Hashtable is not and throw ConcurrentModificationException if any other Thread modifies the map structurally  by adding or removing any element except Iterator's own remove() method. But this is not a guaranteed behavior and will be done by JVM on best effort. This is also an important difference between Enumeration and Iterator in Java. 
+
+4. One more notable difference between Hashtable and HashMap is that because of thread-safety and synchronization Hashtable is much slower than HashMap if used in Single threaded environment. So if you don't need synchronization and HashMap is only used by one thread, it out perform Hashtable in Java.
+
+5. HashMap does not guarantee that the order of the map will remain constant over time.
+-----------------------
+PriorityQueue:
+
+PriorityQueue()
+Creates a PriorityQueue with the default initial capacity (11) that orders its elements according to their natural ordering.
+
+The offer method inserts an element if possible, otherwise returning false. This differs from the Collection.add method, which can fail to add an element only by throwing an unchecked exception. The offer method is designed for use when failure is a normal, 
+rather than exceptional occurrence, for example, in fixed-capacity (or "bounded") queues.
+
+ the add() internally calls the offer() 
+ 
+PriorityQueue is an unbounded Queue implementation in Java, which is based on priority heap.
+ PriorityQueue allows you to keep elements in a particular order, according to there natural order or custom order defined by Comparator interface in Java.
+ Head of priority queue data structure will always contain least element with respect to specified ordering. 
+ For example, in this post, we will create a PriorityQueue of Items, which are ordered based upon there price, this will allow us to process Items, starting from lowest price. 
+ Priority queue is also very useful in implementing Dijkstra algorithm in Java. You can use to PriorityQueue to keep unsettled nodes for processing. One of the key thing to remember about PriorityQueue in Java is that it's Iterator doesn't guarantee any order, if you want to traverse in ordered fashion, better use Arrays.sort(pq.toArray()) method. PriorityQueue is also not synchronized, which means can not be shared safely between multiple threads, instead it's concurrent counterpart PriorityBlockingQueue is thread-safe and should be used in multithreaded environment.
+ Priority queue provides O(log(n)) time performance for common enqueing and dequeing methods e.g. offer(), poll() and add(), but constant time for retrieval methods e.g. peek() and element().
+
+The poll() method is used to retrieve and remove the head of this queue, or returns null if this queue is empty
+
+
+ it's clear that PriorityQueue keeps least value element at head, where ordering is determined using compareTo() method. It doesn't keep all elements in that order though, only head being least value element is guaranteed. This is in fact main difference between TreeSet and PriorityQueue in Java, former keeps all elements in a particular sorted order, while priority queue only keeps head in sorted order. Another important point to note is that PriorityQueue  doesn't permit null elements and trying to add null elements will result in NullPointerException, as shown below :
+-------------
+ArrayDeque
+
+Resizable-array implementation of the Deque interface.
+ Array deques have no capacity restrictions; they grow as necessary to support usage. 
+ They are not thread-safe; in the absence of external synchronization, 
+ they do not support concurrent access by multiple threads. Null elements are prohibited. This class is likely to be faster than Stack when used as a stack, and faster than LinkedList when used as a queue.
+Most ArrayDeque operations run in amortized constant time. Exceptions include remove, removeFirstOccurrence, removeLastOccurrence, contains, iterator.remove(), and the bulk operations, all of which run in linear time.
+
+The iterators returned by this class's iterator method are fail-fast: 
+If the deque is modified at any time after the iterator is created, in any way except through the iterator's own remove method,
+ the iterator will generally throw a ConcurrentModificationException. 
+ Thus, in the face of concurrent modification, the iterator fails quickly and cleanly, rather than risking arbitrary,
+ non-deterministic behavior at an undetermined time in the future.
+
+Note that the fail-fast behavior of an iterator cannot be guaranteed as it is, generally speaking, impossible to make any hard guarantees in the presence of unsynchronized concurrent modification. Fail-fast iterators throw ConcurrentModificationException on a best-effort basis. Therefore, it would be wrong to write a program that depended on this exception for its correctness: the fail-fast behavior of iterators should be used only to detect bugs.
+
+-----------------------
+
+interface BlockingQueue<E>
+extends Queue<E>
+
+All Known Subinterfaces: BlockingDeque<E>, TransferQueue<E>
+
+various implementation of BlockingQueue like ArrayBlockingQueue, LinkedBlockingQueue 
+ArrayBlockingQueue, DelayQueue, LinkedBlockingDeque, LinkedBlockingQueue, LinkedTransferQueue, PriorityBlockingQueue, SynchronousQueue
+
+A Queue that additionally supports operations that wait for the queue to become non-empty when retrieving an element, and wait for space to become available in the queue when storing an element.
+BlockingQueue methods come in four forms, with different ways of handling operations that cannot be satisfied immediately, but may be satisfied at some point in the future: one throws an exception, the second returns a special value (either null or false, depending on the operation), the third blocks the current thread indefinitely until the operation can succeed, and the fourth blocks for only a given maximum time limit before giving up. 
+
+A BlockingQueue does not accept null elements. Implementations throw NullPointerException on attempts to add, put or offer a null. A null is used as a sentinel value to indicate failure of poll operations.
+
+A BlockingQueue may be capacity bounded. At any given time it may have a remainingCapacity beyond which no additional elements can be put without blocking. A BlockingQueue without any intrinsic capacity constraints always reports a remaining capacity of Integer.MAX_VALUE.
+
+BlockingQueue implementations are designed to be used primarily for producer-consumer queues, but additionally support the Collection interface. So, for example, it is possible to remove an arbitrary element from a queue using remove(x). However, such operations are in general not performed very efficiently, and are intended for only occasional use, such as when a queued message is cancelled.
+
+BlockingQueue implementations are thread-safe. All queuing methods achieve their effects atomically using internal locks or other forms of concurrency control. However, the bulk Collection operations addAll, containsAll, retainAll and removeAll are not necessarily performed atomically unless specified otherwise in an implementation. So it is possible, for example, for addAll(c) to fail (throwing an exception) after adding only some of the elements in c.
+
+A BlockingQueue does not intrinsically support any kind of "close" or "shutdown" operation to indicate that no more items will be added. The needs and usage of such features tend to be implementation-dependent. For example, a common tactic is for producers to insert special end-of-stream or poison objects, that are interpreted accordingly when taken by consumers.
+
+Usage example, based on a typical producer-consumer scenario. Note that a BlockingQueue can safely be used with multiple producers and multiple consumers.
+
+ class Producer implements Runnable {
+   private final BlockingQueue queue;
+   Producer(BlockingQueue q) { queue = q; }
+   public void run() {
+     try {
+       while (true) { queue.put(produce()); }
+     } catch (InterruptedException ex) { ... handle ...}
+   }
+   Object produce() { ... }
+ }
+
+ class Consumer implements Runnable {
+   private final BlockingQueue queue;
+   Consumer(BlockingQueue q) { queue = q; }
+   public void run() {
+     try {
+       while (true) { consume(queue.take()); }
+     } catch (InterruptedException ex) { ... handle ...}
+   }
+   void consume(Object x) { ... }
+ }
+
+ class Setup {
+   void main() {
+     BlockingQueue q = new SomeQueueImplementation();
+     Producer p = new Producer(q);
+     Consumer c1 = new Consumer(q);
+     Consumer c2 = new Consumer(q);
+     new Thread(p).start();
+     new Thread(c1).start();
+     new Thread(c2).start();
+   }
+ }
+ 
+Memory consistency effects: As with other concurrent collections, actions in a thread prior to placing an object into a BlockingQueue happen-before actions subsequent to the access or removal of that element from the BlockingQueue in another thread.
+
+1) BlockingQueue in Java doesn't allow null elements, various implementation of BlockingQueue like ArrayBlockingQueue, LinkedBlockingQueue throws NullPointerException when you try to add null on queue.
+A bounded {@linkplain BlockingQueue blocking queue} backed by an  array.  This queue orders elements FIFO (first-in-first-out).  The head of the queue is that element that has been on the queue the longest time.  
+
+BlockingQueue<String> bQueue = new ArrayBlockingQueue<String>(10);
+//bQueue.put(null); //NullPointerException - BlockingQueue in Java doesn't allow null
+      
+bQueue = new LinkedBlockingQueue<String>();
+bQueue.put(null);
+
+Exception in thread "main" java.lang.NullPointerException
+        at java.util.concurrent.LinkedBlockingQueue.put(LinkedBlockingQueue.java:288)
+
+ An optionally-bounded {@linkplain BlockingQueue blocking queue} based on 
+ * linked nodes.
+ * This queue orders elements FIFO (first-in-first-out).
+ * The <em>head</em> of the queue is that element that has been on the
+ * queue the longest time.
+ * The <em>tail</em> of the queue is that element that has been on the
+ * queue the shortest time. New elements
+ * are inserted at the tail of the queue, and the queue retrieval
+ * operations obtain elements at the head of the queue.
+ * Linked queues typically have higher throughput than array-based queues but
+ * less predictable performance in most concurrent applications.
+
+The optional capacity bound constructor argument serves as a
+ * way to prevent excessive queue expansion. The capacity, if unspecified,
+ * is equal to {@link Integer#MAX_VALUE}.  Linked nodes are
+ * dynamically created upon each insertion unless this would bring the
+ * queue above capacity.
+2) BlockingQueue can be bounded or unbounded. A bounded BlockingQueue is one which is initialized with initial capacity and call to put() will be blocked if BlockingQueue is full and size is equal to capacity. This bounding nature makes it ideal to use a shared queue between multiple threads like in most common Producer consumer solutions in Java. An unbounded Queue is one which is initialized without capacity, actually by default it initialized with Integer.MAX_VALUE. most common example of BlockingQueue uses bounded BlockingQueue as shown in below example.
+
+BlockingQueue<String> bQueue = new ArrayBlockingQueue<String>(2);
+bQueue.put("Java");
+System.out.println("Item 1 inserted into BlockingQueue");
+bQueue.put("JDK");
+System.out.println("Item 2 is inserted on BlockingQueue");
+bQueue.put("J2SE");
+System.out.println("Done");
+
+Output:
+Item 1 inserted into BlockingQueue
+Item 2 is inserted on BlockingQueue
+
+
+This code will only insert Java and JDK into BlockingQueue and then it will block while inserting 3rd element J2SE because size of BlockingQueue is 2 here.
+
+3)BlockingQueue implementations like ArrayBlockingQueue, LinkedBlockingQueue and PriorityBlockingQueue are thread-safe. All queuing method uses concurrency control and internal locks to perform operation atomically. Since BlockingQueue also extend Collection, bulk Collection operations like addAll(), containsAll() are not performed atomically until any BlockingQueue implementation specifically supports it. So call to addAll() may fail after inserting couple of elements.
+
+4) Common methods of BlockingQueue is are put() and take() which are blocking methods in Java and used to insert and retrive elements from BlockingQueue in Java. put() will block if BlockingQueue is full and take() will block if BlockingQueue is empty, call to take() removes element from head of Queue as shown in following example:
+
+BlockingQueue<String> bQueue = new ArrayBlockingQueue<String>(2);
+bQueue.put("Java"); //insert object into BlockingQueue
+System.out.println("BlockingQueue after put: " + bQueue);
+bQueue.take(); //retrieve object from BlockingQueue in Java
+System.out.println("BlockingQueue after take: " + bQueue);
+
+Output:
+BlockingQueue after put: [Java]
+BlockingQueue after take: []
+
+
+5) BlockingQueue interface extends Collection, Queue and Iterable interface which provides it all Collection and Queue related methods like poll(), and peak(), unlike take(), peek() method returns head of the queue without removing it, poll() also retrieves and removes elements from head but can wait till specified time if Queue is empty.
+
+BlockingQueue<String> linkedBQueue = new LinkedBlockingQueue<String>(2);
+linkedBQueue.put("Java"); //puts object into BlockingQueue
+System.out.println("size of BlockingQueue before peek : " + linkedBQueue.size());       
+System.out.println("example of peek() in BlockingQueue: " + linkedBQueue.peek());
+System.out.println("size of BlockingQueue after peek : " + linkedBQueue.size());
+System.out.println("calling poll() on BlockingQueue: " + linkedBQueue.poll());
+System.out.println("size of BlockingQueue after poll : " + linkedBQueue.size());
+
+Output:
+size of BlockingQueue before peek : 1
+example of peek() in BlockingQueue: Java
+size of BlockingQueue after peek : 1
+calling poll() on BlockingQueue: Java
+size of BlockingQueue after poll : 0
+
+6)Other important methods from BlockingQueue in Java is remainingCapacity() and offer(), former returns number remaining space in BlockingQueue, which can be filled without blocking while later insert object into queue if possible and return true if success and false if fail unlike add() method which throws IllegalStateException if it fails to insert object into BlockingQueue. Use offer() over add() wherever possible.
+
+Usage of BlockingQueue in Java
+There can be many creative usage of BlockingQueue in Java given its flow control ability. Two of the most common ways I see programmer uses BlockingQueue is to implement Producer Consumer design pattern and implementing Bounded buffer in Java. It surprisingly made coding and inter thread communication over a shared object very easy.
+
+ArrayBlockingQueue and LinkedBlockingQueue in Java
+ArrayBlockingQueue and LinkedBlockingQueue are common implementation of BlockingQueue<E> interface. ArrayBlockingQueue is backed by array  and Queue impose orders as FIFO. head of the queue is the oldest element in terms of time and tail of the queue is youngest element. ArrayBlockingQueue is also fixed size bounded buffer on the other hand LinkedBlockingQueue is an optionally bounded queue built on top of Linked nodes. In terms of throughput LinkedBlockingQueue provides higher throughput than ArrayBlockingQueue in Java.
+
+
+That’s all on What is BlockingQueue in Java and How to use it. We have seen two convenient implementation of BlockingQueue i.e. ArrayBlockingQueue and LinkedBlockingQueue which comes along with Java API. If you are implementing Producer Consumer design pattern in Java, consider using BlockingQueue, it not only make coding easy but also performs better and provide better robustness and stability than writing your own BlockingQueue or using naked wait and notify method.
+
+
+
+
+
+
+
+
+

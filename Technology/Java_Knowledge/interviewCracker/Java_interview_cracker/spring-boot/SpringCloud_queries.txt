@@ -1,0 +1,227 @@
+Spring cloud
+============
+
+1. Explain Spring cloud? or, What is Spring Cloud?
+Answer: Spring cloud is a set of tools that can be used by developers to quickly build some common patterns in distributed systems such as service discovery, configuration management, intelligent routing, etc.
+
+
+2. What are the common features of Spring cloud?
+Answer: Here is a list of some of the most common features of the Spring Cloud framework, which greatly help in developing cloud-native apps and Microservices:
+
+a) Service registration and discovery
+b) Routing
+c) Service to service calls
+d) Distributed and versioned configuration
+e) load balancing and circuit breakers 
+
+If you are interested to learn more about these spring cloud features then you can further see Spring Boot Microservices with Spring Cloud Beginner to Guru Udemy course by John Thompson, which provides a practical introduction to Spring Cloud for beginners. 
+
+Top 15 Spring Cloud questions for interview Questions with Answers
+
+
+
+3. Explain load balancing? or What is load balancing?
+Answer: Load balancing is a technique used to improve the distribution of workloads across several computing resources, such as a computer cluster, CPUs, network lines, and disk drives.
+
+
+4. How load balancing is implemented in the Spring cloud?
+Answer: We can implement load balancing in the Spring cloud using Netflix Ribbon.
+
+
+5. What is the meaning of Service registration and discovery?
+Answer: At the starting of a project, we usually have the entire configurations in the "properties" file. As the project proceeds and more services are developed and deployed, adding them to the properties file becomes complex. 
+
+It can affect the already deployed services creating problems such as services going down or the location of some might change. Changing the properties manually can create more issues. Service registration and discovery are useful in such situations. The changes can be handled by service registration and discovery. 
+
+
+6. What is Hystrix?
+Answer: Hystrix is a fault-tolerance and latency library designed for isolating points of access to remote systems, third-party libraries, services, stopping cascading failures, and enabling resilience in complex distributed systems where failure is common and cannot be avoided. 
+
+
+7. Explain Netflix feign.
+Answer: It is a Java to HTTP client binder. It is inspired by JAXRS-2.0, WebSocket, and Retrofit.
+
+
+8. Why do we use Netflix feign?
+Answer: Netflix feign is used to reduce the complexity by binding denominator uniformly to HTTP APIs regardless of the RESTfulness.
+
+
+9. What is the use of the Spring cloud bus?
+Answer: The spring cloud bus provides a helpful feature to refresh configurations across several multiple instances.
+
+
+10. What are the advantages of Spring cloud?
+Answer:  Here are key advantages of Spring Cloud 
+a) Spring cloud helps in resolving complexity-associated issues with distributed systems.
+b) It provides service discovery which is a very helpful tool.
+c) It reduces redundancy.
+d) Load balancing is another helpful technique of Spring cloud.
+
+
+11. What is PCF?
+Answer: PCF stands for Pivotal Cloud Foundry. It is an open-source, multi-platform cloud foundry.
+
+
+12. What is the purpose of the Hystrix circuit breaker?
+Answer: The purpose of the Hystrix circuit breaker is to provide the first-page method or any other methods that the method on the first page might be calling and is causing the exception to recover. The chances of exception to recovery may increase because of less load. You can further see Master Microservices with Spring Boot and Spring Cloud course to learn more about Fault tolerance with Hysteric. 
+
+spring cloud interview questions with answers
+
+
+
+
+13. Name the services that provide service registration and discovery.
+Answer: Eureka and zookeeper. 
+
+
+14. Give the benefits of Eureka and Zookeeper?
+Answer: Eureka guarantees high availability and usability while Zookeeper guarantees consistency and partition fault tolerance. 
+
+
+15. What is the major difference between Spring Cloud and Spring boot?
+Answer: Spring cloud is a microservice management and coordination framework used to integrate and manage individual microservices while Spring boot is used to develop these microservices. 
+
+
+16. What are some common Spring cloud annotations?  (answer)
+Answer: here is a list of some of the most essential Spring cloud annotations for Java developers
+@EnableConfigServer 
+@EunableEurekaServer
+@EnableDiscoveryClient
+@EnableCircuitBreaker
+@HystricCommand
+You can further see the answer for a detailed explanation of these Spring cloud annotations with examples. 
+ What is Netﬂix Feign? What are its advantages?
+Feign is a java client binding program inspired by Retrofit, JAXRS-2.0 and WebSocket. Feign’s first goal is to unify the complexity of the constraint denominator into http apis, regardless of its stability. In the employee-consumer example, we used the emplo e-producer to use the REST service exposed by the REST template.
+But we have to write a lot of code to perform the following steps
+1. Use the functional area for load balancing.
+2. Get the service instance, and then get the basic URL.
+3. Use the REST template to use the service. The previous code is as follows
+The previous code, with chances of exceptions like NullPointer, is not optimal. We will see how to use Netﬂix Fe n to make calling easier and cleaner. If Netﬂix Ribbon depends on the dependency path, Feign will also load balance by default.
+8. What is Spring Cloud Bus? Do we need it?
+Consider the following scenario: We have multiple applications that use Sprng Cloud Conﬁg to read properties, while S Ring Cloud Conﬁg reads these properties from GIT.
+In the following example, multiple employee producer modules obtain Eureka registered property from the Employee Conﬁg Module
+What happens if you assume that the Eureka registration attribute in GIT is changed to point to another Eureka server. In this case, we will have to restart the service to get the updated properties. There is another way to use actuator endpoints/refresh. But we will have to call this url separately for each module. For example, if Employee Producer1 is deployed on port 8080, call http: //localhost:8080/refresh. Also for Employee Producer2 http: //localhost:8081 /refresh and so on. This is troublesome again. This is where Spring Cloud Bus comes into play.
+Spring Cloud Bus provides the ability to refresh the configuration across multiple instances. Therefore, in the above, if we refresh Employee Producer1, it will automatically flash all other necessary modules. This is especially useful if we have a microservice up and running. This is achieved by connecting all microservices to a single message broker. Whenever an instance is refreshed, this event will be subscribed to all microservices listening to this agent, and they will also be refreshed. Can refresh any single instance by using endpoint/bus/refresh
+9. What is microservice
+Microservice architecture is an architectural pattern or an architectural style. It advocates the division of a single application into a set of small services. Each service runs in its own process. The services coordinate and coordinate with each other. Cooperate to provide users with ultimate value. Lightweight communication mechanisms are used to communicate with each other (usually HTTP-based RESTful API). Each service is built around a specific business and can be independently constructed in a production environment or production-like environment. In addition, a unified and centralized service management mechanism should be avoided. For a specific service, the appropriate language and tools should be selected according to the business context to build it. There can be a very lightweight centralized management to To coordinate these services, you can use different languages ​​to write services, or you can use different data stores.
+10. What is a service fuse? What is service degradation
+The fuse mechanism is a microservice link protection mechanism that responds to the avalanche effect. When a microservice is unavailable or the response time is too long, the service will be downgraded, and then the call of the microservice of the node will be fused, and the “error” response information will be quickly returned. After detecting that the node microservice call response is normal, the call link is restored. In the Spring Cloud framework, the fuse mechanism is implemented through Hystrix. Hystrix will monitor the status of calls between microservices. When a failed call reaches a certain threshold, the default is 20 calls within 5 seconds. If it fails, the fuse mechanism will be activated.
+Service degradation is generally considered from the overall load. That is, when a service is broken, the server will no longer be called, at this time the client can prepare a local fallback callback and return a default value. In doing so, although the level drops, it is still available anyway, which is better than just hanging it out.
+11. Both Eureka and zookeeper can provide service registration and discovery functions, please tell us the difference between the two?
+Zookeeper guarantees CP (C: consistency, P: partition fault tolerance), Eureka guarantees AP (A: high availability)
+(1) When querying the registration center for a list of services, we can tolerate the information returned by the registration center a few minutes ago, but we cannot tolerate the direct down and unavailability. That is to say, the service registration function has high requirements for high availability, but zk will have such a situation. When the master node loses contact with other nodes due to network failure, the remaining nodes will re-select the leader. The problem is that the leader selection time is too long, 30 ~ 120s, and the zk cluster is not available during the selection period, which will cause the registration service to be paralyzed during the selection period. In a cloud deployment environment, it is a high probability that the zk cluster loses the master node due to network problems. Although the service can be restored, the long-term selection time caused by the long-term unavailability of the registration cannot be tolerated.
+(2) Eureka guarantees usability. Each node of Eureka is equal. If several nodes hang up, it will not affect the work of normal nodes. The remaining nodes can still provide registration and query services. Eureka’s client fails to register with Eureka or discovers that it will automatically switch to other nodes. As long as there is one Eureka still in place, the registration service is available, but the information found may not be the latest. In addition, Eureka also has a self-protection mechanism. If more than 85% of the nodes do not have a normal heartbeat within 15 minutes, then Eureka thinks that a network failure has occurred between the client and the registration center. At this time, the following situations will occur:
+① Eureka does not remove the service that should be expired because it has not received a heartbeat for a long time.
+② Eureka is still able to accept registration and query requests for new services, but it will not be synchronized to other nodes (ie to ensure that the current node is still available)
+③ When the network is stable, the new registration information of the current instance will be synchronized to other nodes. Therefore, Eureka can well cope with the situation where some nodes lose contact due to network failures, instead of paralyzing the entire microservice like Zookeeper.
+12. What is the difference between SpringBoot and SpringCloud?
+SpringBoot focuses on the rapid and convenient development of individual microservices.
+SpringCloud is a global microservice coordination and management framework that integrates and manages individual microservices developed by SpringBoot to provide various microservices, configuration management, service discovery, circuit breakers, routing, micro proxy, Event bus, global lock, decision campaign, distributed session, etc. Integration services SpringBoot can leave SpringCloud to use development projects independently, but SpringCloud is inseparable from SpringBoot and belongs to the dependency relationship.
+SpringBoot focuses on the rapid and convenient development of individual microservices, and SpringCloud focuses on the overall governance framework
+13. What is a Hystrix circuit breaker? Do we need it
+For some reasons, the employee-consumer public service will cause an exception. In the case of Hystrix, we have defined a fallback method. If an exception occurs in the public service, the fallback method returns some default values.
+If the exception in the ﬁrstPage method() continues to occur, the Hystrix circuit will be interrupted, and the employee user will skip the ﬁrtsPage method together and directly call the fallback method. The purpose of the circuit breaker is to allow time for the first page method or other methods that the first page method may call, and cause abnormal recovery. What may happen is that under light load conditions, there is a better chance of recovery from the problem that caused the exception.
+14. Talk about the implementation principle of RPC
+First, there is a module that handles network connection communication, which is responsible for connection establishment, management, and message transmission. Secondly, there needs to be a codec module, because the network communication is transmitted byte code, we need to serialize and deserialize the objects we use. The rest is the client and server side. The server side exposes the service interface to be opened. The client calls a proxy implementation of the service interface. This proxy implementation is responsible for collecting data, encoding and transmitting it to the server and waiting for the result to return.
+15. The advantages and disadvantages of microservices? Let me talk about the pits encountered in development projects?
+advantage:
+(1) Each service is directly cohesive enough, the code is easy to understand
+(2) High development efficiency, one service only does one thing, suitable for small team development
+(3) Loosely coupled, functionally meaningful services.
+(4) Can be developed in different languages, oriented to interface programming.
+(5) Easy third-party integration
+(6) Microservices are just the code of business logic, not with HTML, CSS or other circles
+(7) Can be flexibly matched, connect to public library/connect to independent library
+Disadvantages:
+(1) Responsibility of distributed system
+(2) The difficulty of multi-service operation and maintenance is increasing.
+(3) System deployment dependency, communication cost between services, consistent data, system integration testing, performance monitoring.
+16. What is the difference between spring cloud and d bbo?
+(1) Service calling method dubbo is RPC spri cloud Rest Api
+(2) Registration center, dubbo is zookeep r springcloud is eureka, or it can be zookeeper
+(3) Service gateway, dubbo itself is not implemented, can only be integrated through other third-party technologies, springcloud has Zuul routing gateway, which acts as a routing server to distribute consumer requests, springcloud supports circuit breakers, and integrates perfectly with git. Configuration file supports version A series of micro-service architecture elements such as control, transaction bus implementation, configuration update and automatic service assembly.
+17. Comparison of REST and RPC
+(1) The main defect of RPC is that the dependence between the service provider and the calling method is too strong. It is necessary to define the interface of each microservice and release it through continuous inheritance. Strict version control will not conflict.
+(2) REST is a lightweight interface. There is no coupling between the provision of services and the invocation of the code, and only one convention is required for specification.
+18. The microservice technology stack you know?
+Dimensions (springcloud)
+Service development: springboot spring springmvc
+Service configuration and management: Archixius of NetFix, Diamond of Ali
+Service registration and discovery: Eureka, Zookeeper
+Service call: Rest RPC gRpc
+Service fuse: Hystrix
+Service load balancing: Ribbon Nginx
+Service interface call: Fegin
+Message Queue: Kafka Rabbitmq activemq
+Service Configuration Center Management: Spring CloudConﬁg
+Service routing (API gateway) Zuul
+Event message bus: SpringCloud Bus
+19. How do microservices communicate independently?
+(1) Remote calls, such as feign calls, directly access other services through remote procedure calls.
+(2) Message middleware
+20. How does springcloud register services?
+(1) When the service is published, specify the corresponding service name and register the service to the registration center (eureka zookeeper)
+(2) The registration center adds @EnableEurekaServer, the service uses @EnableDiscoveryClient, and then uses ribbon or feign to perform service direct call discovery.
+21. The difference between Eureka and Zookeeper
+(1) Eureka takes AP of CAP, pays attention to usability, Zookeeper takes CP of CAP to pay attention to consistency.
+(2) Zookeeper registration service is paralyzed during the election. Although the service will eventually be restored, it is not available during the election.
+(3) eureka’s self-protection mechanism will lead to the result that the service that expires due to not receiving a heartbeat for a long time will no longer be removed from the registration list. It can still accept registration and query requests for new services, but will not be synchronized to other nodes. No service paralysis.
+(4) Zookeeper has the roles of Leader and Follower, and all nodes of Eureka are equal.
+(5) Zookeeper uses the principle of more than half of the survival, and reka uses a self-protection mechanism to solve the partition.
+(6) Eureka is essentially a project, Zookeeper is just a process.
+22. What is eureka’s self-protection mechanism?
+When Eureka Server loses too many instances of connection within a short period of time (such as network failure or frequent startup and shutdown of the client), the node will enter self-protection mode to protect registration information, no longer delete registration data, and automatically exit when the failure recovers Self-protection mode.
+23. What is Ribbon?
+Ribbon is a load balancing client, which can control some behaviors of htt and tcp. Feign integrates ribbon by default.
+24. What is feigin? What are its advantages?
+(1) Feign uses interface-based annotations
+(2) Feign integrates ribbon and has the ability to load balance
+(3) Integrated Hystrix, with the ability to fuse
+use:
+(1) Add pom dependency.
+(2) Add @EnableFeignClients to the startup class
+(3) Define an interface @FeignClient(name=”xxx”) to specify which service to call
+25. The difference between Ribbon and Feign?
+(1) Ribbon calls other services, but in different ways.
+(2) The startup class annotations are different, Ribbon is @RibbonClient feign is @EnableFeignClients
+(3) The location specified by the service is different. Ribbon is declared on the @RibbonClient annotation, and Feign is declared using @FeignClient in the interface that defines the abstract method.
+(4) The calling method is different. Ribbon needs to construct the http request by itself, simulate the http request and send it to other services using RestTemplate. The steps are quite tedious. Feign needs to define the called method as an abstract method.
+26. What is Spring Cloud Bus?
+Spring cloud bus connects distributed nodes with a lightweight message broker. It can be used to broadcast configuration file changes or direct communication of services, and can also be used for monitoring.
+If the configuration file is modified, a request is sent and all clients will re-read the configuration file.
+use:
+(1) Add dependency
+(2) Configure rabbimq
+27. The role of springcloud circuit breaker?
+When a service calls another service due to network or self-cause problems, the caller will wait for the caller’s response. When more service requests to these resources lead to more requests waiting, a chain effect (avalanche effect) occurs
+The circuit breaker is fully open: it cannot be called for a certain number of times within a certain period of time and there is no sign of recovery after multiple monitoring.The circuit breaker is fully opened, so the next request will not request the service
+Half-open: The circuit breaker will send some requests to the service within a short time, and the circuit breaker will be closed when it is normally called
+Close: When the service has been in a normal state, it can be called normally
+28. Spring Cloud Gateway?
+Spring Cloud Gateway is the second-generation gateway framework officially launched by Spring Cloud, replacing Zuul Gateway. As a traffic flow, the gateway plays a very important role in the microservice system. The common functions of the gateway include routing and forwarding, permission verification, and current limit control.
+A RouteLocatorBuilder bean is used to create routes. In addition to creating routes, RouteLocatorBuilder allows you to add various predicates and ﬁlters. The meaning of predicates asserts, as the name implies, is processed by specific routes according to the rules of specific requests. ﬁlters are various filters The device is used to make various judgments and modifications to the request.
+29. As a business registration center, how is Eureka better than Zookeeper?
+(1) Eureka guarantees availability and partition fault tolerance, and Zookeeper guarantees consistency and partition fault tolerance.
+(2) Eureka also has a self-protection mechanism. If more than 85% of the nodes do not have a normal heartbeat within 15 minutes, then Eureka thinks that there is a network failure between the client and the registry. It will not paralyze the entire registration service like zookeeper.
+30. What is Ribbon load balancing?
+(1) Spring Cloud Ribbon is a set of client load balancing tools based on Netﬂix Ribbon.
+(2) The Ribbon client component provides a series of perfect configuration items such as connection timeout, retry, etc. Simply put, it is to list all the machines behind Load Balancer (LB for short) in the configuration file. Ribbon will automatically help you connect these machines based on certain rules (such as simple polling, random connection, etc.). It is also easy to use Ribbon to implement a custom load balancing algorithm.
+31. What can Ribbon load balancing do?
+(1) Distribute the user’s request equally to multiple services
+(2) Centralized LB uses an independent LB facility (which can be hardware, such as F5, or software, such as nginx) between the service consumer and the provider, and the facility is responsible for passing the access request through a certain strategy Forwarded to the service provider;
+(3) In-process LB integrates the LB logic to the consumer. The consumer learns from the service registration center which addresses are available, and then selects a suitable server from these addresses.
+Note: Ribbon belongs to in-process LB, it is just a class library, integrated in the consumer process, the consumer obtains the address of the service provider.
+32. What is zuul routing gateway
+(1) Zuul includes the two most important functions of request routing and filtering: which is responsible for forwarding external requests to specific microservice instances, which is the basis for achieving a unified access to external access and the filter function is the processing of negative requests Intervention in the process is the basis for implementing request verification, service aggregation and other functions,
+(2) Zuul and Eureka are integrated to register Zuul itself as an application under Eureka service governance, and at the same time obtain news of other microservices from Eureka, that is, after accessing microservices, they are obtained after Zuul jumps.
+Note: The Zuul service will eventually register in Eureka to provide three functions: proxy + routing + filtering
+33. What can a distributed configuration center do?
+(1) Central management of configuration files, different configurations in different environments, dynamic configuration updates, and sub-environment deployment such as
+dev/test/prod/beta/release
+(2) Dynamically adjust the settings during operation, it is no longer necessary to write configuration files on the machine deployed by each service, and the service will pull the configuration information from the configuration center
+(3) When the configuration changes, the service can detect the configuration change without restarting and apply the new configuration to expose the configuration information in the form of a REST interface
+
+How to implement API Gateway using Spring cloud?
+Spring cloud gateway, Netflix Zuul are gateway services that provide dynamic routing, monitoring, resiliency, security, and more.
+
+

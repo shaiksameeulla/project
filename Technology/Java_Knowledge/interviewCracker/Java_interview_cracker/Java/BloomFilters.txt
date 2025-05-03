@@ -1,0 +1,44 @@
+Bloom Filters
+===========
+Bloom filter is a data structure used to check whether an element is most definitely not in a dataset by using one or more hashing functions and an array of bits.
+
+A Bloom filter is a memory-efficient, probabilistic data structure that we can use to answer the question of whether or not a given element is in a set.
+
+There are no false negatives with a Bloom filter, so when it returns false, we can be 100% certain that the element is not in the set.
+
+However, a Bloom filter can return false positives, so when it returns true, there is a high probability that the element is in the set, but we can not be 100% sure.
+
+
+A Bloom filter is a space-efficient probabilistic data structure that is used to test whether an element is a member of a set or not. It is called probabilistic because while a negative answer is 100% accurate, there might be false positives means that if the answer is "Yes, this element presents in the data set` it is not 100% accurate.
+
+A bloom filter doesn't store the elements themselves, this is the crucial point. You don't use a bloom filter to test if an element is present, you use it to test whether it's certainly not present, since it guarantees no false negatives.
+
+Bloom filters are for set membership which determines whether an element is present in a set or not. Bloom filter was invented by Burton H. Bloom in 1970 in a paper called Space/Time Trade-offs in Hash Coding with Allowable Errors (1970). Bloom filter is a probabilistic data structure that works on hash-coding methods (similar to HashTable).
+
+When do we need a Bloom Filter?
+
+
+Consider any of the following situations:
+
+Suppose we have a list of some elements and we want to check whether a given element is present or not?
+Consider you are working on email service and you are trying to implement sign up endpoint with a feature that a given username is already present or not?
+Suppose you have given a set of blacklisted IP’s and you want to filter out a given IP is a blacklisted one or not?
+
+
+Why does data structure like HashSet or HashTable fail?
+HashSet or HashTable works well when we have limited data set, but might not fit as we move with a large data set. With a large data set, it takes a lot of time with a lot of memory.
+
+
+
+
+What to expect from a Bloom filter?
+
+When a Bloom filter says an element is not present it is for sure not present. It guarantees 100% that the given element is not available in the set, because either of the bit of index given by hash functions will be set to 0.
+But when Bloom filter says the given element is present it is not 100% sure, because there may be a chance due to collision all the bit of index given by hash functions has been set to 1 by other inputs.
+How to get 100% accurate result from a Bloom filter?
+
+Well, this could be achieved only by taking more number of hash functions. The more number of the hash function we take, the more accurate result we get, because of lesser chances of a collision.
+
+Conclusion
+
+Therefore it can be said that Bloom filter is a good choice in a situation where we have to process large data set with low memory consumption. Also, the more accurate result we want, the number of hash functions has to be increased.

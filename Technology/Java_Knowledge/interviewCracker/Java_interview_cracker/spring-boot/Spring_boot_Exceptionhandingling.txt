@@ -1,0 +1,48 @@
+Application Exception handling:
+
+Use @ExceptionHandler Annotation for Handling Specific Exceptions
+The @ExceptionHandler annotation is a convenient way to handle specific exceptions in a Spring Boot application. You can use this annotation to define a method that will be called whenever a specific exception is thrown. Here is an example of using the @ExceptionHandler annotation to handle a FileNotFoundException:
+
+@Controller
+public class MyController {
+
+  @ExceptionHandler(FileNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleFileNotFoundException(FileNotFoundException e) {
+    ErrorResponse error = new ErrorResponse("FILE_NOT_FOUND", e.getMessage());
+    return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+  }
+
+}
+In the example above, the handleFileNotFoundException method will be called whenever a FileNotFoundException is thrown in the controller.
+
+
+
+
+
+
+Global Exception handling:
+============================
+@ControllerAdvice is a global exception handling mechanism in Spring. It allows you to define a central place for handling exceptions that occur in your application.
+
+When an exception is thrown from any controller method (e.g., a REST endpoint), it is caught by the @ControllerAdvice annotated class.
+
+The @ExceptionHandler methods within the @ControllerAdvice class handle specific exception types and return appropriate responses.
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProductNotFoundException(ProductNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+}
+Explanation:
+
+@ControllerAdvice marks the class as a global exception handler, allowing it to handle exceptions from multiple controllers.
+The @ExceptionHandler method within the handler catches ProductNotFoundException.
+It constructs an ErrorResponse object with a 404 Not Found status code and the custom error message from the exception.
+The handler returns a JSON response containing the error details.
+4. Create a Custom Error Response Class:
+
+We define a custom error response class, ErrorResponse, to structure error messages consistently in our application.

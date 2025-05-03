@@ -1,0 +1,71 @@
+Memory management is the backbone of Java programming, determining how efficiently your applications use system resources. In this comprehensive guide, we will explore the intricacies of memory management in modern Java versions, including Java 8, 11, and beyond. By the end of this article, you’ll have a profound understanding of how memory works in Java and how to optimize it for peak performance.
+
+Heap Space: Eden + Survivor + Tenured
+Non-Heap Space: Stack + MetaSpace + Reserved (Not shown here)
+Cache
+
+
+Java’s Memory Model
+Imagine Java as an intricate puzzle, with the Java Virtual Machine (JVM) as the mastermind behind it all. Understanding how memory works in Java requires knowledge of its memory model:
+
+Heap Memory: Heap memory is where Java objects are allocated and deallocated. Objects are created on the heap, and when they are no longer needed, the JVM reclaims the memory they occupy. Heap memory is further divided into three regions:
+Young Generation: This is where newly created objects reside. It’s divided into three areas: Eden space and two Survivor spaces.
+Old Generation: Objects that survive several garbage collection cycles are promoted to the old generation.
+PermGen/Metaspace: In older Java versions (Java 7 and below), class metadata was stored in PermGen. In Java 8 and later, it’s stored in Metaspace.
+Stack Memory: Picture the stack as a set of trays. Each method call in your code gets a tray (stack frame) to hold its local variables and method call information. When a method finishes, its tray is removed. It’s a neat and orderly system that prevents clutter.
+Garbage Collection: Garbage collection is the process of identifying and reclaiming memory that is no longer in use. The JVM employs various garbage collection algorithms to manage heap memory efficiently. Garbage collection is categorized into two types:
+Generational GC: This approach divides the heap into the Young Generation and the Old Generation. Most objects die young, so the Young Generation is collected frequently, while the Old Generation is collected less often.
+Non-generational GC: Some JVMs, like the G1 GC (Garbage First), use a non-generational approach. They aim to evenly distribute the work of garbage collection across all memory regions.
+Memory Management Evolution
+Before we dive into the latest Java versions, it’s essential to appreciate how far we’ve come. Memory management in older Java versions was less refined. Garbage collection was a bit clunky, leading to memory leaks and performance bottlenecks.
+
+The release of Java 8 brought significant changes and improvements to memory management compared to previous Java versions. Here’s a comparison of memory management in Java before and after Java 8:
+
+Before Java 8:
+Class metadata and string pool were stored in a fixedsize memory area called PermGen, causing issues when it ran out of space.
+The default garbage collector had performance limitations and could lead to application pauses during garbage collection.
+Developers had limited control over memory settings and often had to guess the right values.
+After Java 8
+Java introduced Metaspace, a flexible memory area for class metadata, eliminating PermGen issues.
+Garbage collection became more efficient, with shorter pauses, thanks to the Generational Garbage Collection approach and the G1 Garbage Collector.
+Java provided better memory efficiency, with features like Compact Strings and improved garbage collection algorithms.
+Java 8 and later versions made memory management more flexible, efficient, and developerfriendly compared to earlier versions.
+
+Memory Management in Modern Java Versions
+Java 8: A gamechanger in many ways. It introduced Metaspace, replacing the infamous PermGen for class metadata storage. This reduced the likelihood of OutOfMemoryErrors related to class metadata. It is The primary memory-related parameters in JVM memory settings are:
+
+-Xmx: Sets the maximum heap size, limiting the amount of memory the heap can use.
+-Xms: Specifies the initial heap size, defining the memory allocated to the heap when the JVM starts.
+-XX:MaxMetaspaceSize (or -XX:MaxPermSize for Java 7 and below): Controls the maximum size of the Metaspace (formerly PermGen).
+You can adjust these settings using command-line options when launching your Java application:
+
+java - Xmx512m - Xms256m - XX : MaxMetaspaceSize = 128m - jar myapp.jar
+-Xmx512m: This sets the maximum heap size to 512 megabytes.
+-Xms256m: It specifies the initial heap size as 256 megabytes.
+-XX:MaxMetaspaceSize=128m: For Java 8 and later, this limits the Metaspace to 128 megabytes.
+Java 11: A significant milestone. It brought two critical improvements:
+
+Z Garbage Collector (ZGC): Designed for lowlatency applications, it minimizes pause times during garbage collection. It’s a boon for applications where responsiveness is paramount.
+Epsilon Garbage Collector: It’s a unique creature in the Java world. Epsilon is a noop garbage collector, meaning it doesn’t collect any garbage. It’s useful in scenarios where memory management is handled externally or for performance testing
+
+=======================
+
+JVM Memory
+The JVM memory is divided into two main groups: heap and non-heap.
+All Java programmers probably know about the heap. The heap stores the objects that are created while a Java application runs. After a new instance of an object is created, it lives in the heap until it is no longer referenced. Then the garbage collector can free the memory allocated to that object. This implies that the heap size can change dynamically as the application runs.
+The JVM initialises the heap at start-up. We can configure some heap size settings using the -XX:MaxHeapSize (or -Xmx), -XX:InitalHeapSize (or -Xms), -XX:NewSize (or -Xmn) and -XX:MaxNewSize JVM options.
+Non-heap memory makes up the rest of JVM memory. Non-heap memory is divided into several different areas, each storing different data. This includes JVM code and internal structures, the constant pool, interned strings, field and method metadata, and the code for methods and constructors.
+PermGen
+An important part of the non-heap memory is allocated to PermGen (the permanent generation). This is a pool containing reflective data of the virtual machine itself, such as class and method objects. PermGen contains metadata required by the JVM to describe the classes and methods used in the application. It is populated at runtime with these application classes, as well as Java SE library classes and interned strings.
+Even though PermGen is not part of the main heap, it is included in a full garbage collection. Classes may get unloaded (garbage collected) if they are no longer needed and space is required for other classes.
+The maximum size of PermGen is fixed using the -XX:MaxPermSize=size option. There is no way to make PermGen auto-increase past this allocated size. Because of this fixed size, PermGen is difficult to tune.
+Metaspace
+From Java 8 PermGen was replaced by a new memory area called Metaspace. It has the same role as PermGen which is to store class metadata. Metaspace is not part of the JVM heap, but is allocated in native operating system memory. It can auto-increase as needed to load additional class metadata.
+When PermGen was originally introduced, there was no dynamic class unloading. Once a class was loaded, it was stuck in memory permanently until the JVM was shut down (hence the “PermGen” name). These days classes can be loaded and unloaded during the lifespan of the JVM. “Metaspace” is better suited as a name for the area where the metadata is kept.
+Metaspace can auto-increase its size up to what the operating system can provide. We can set a fixed maximum size for Metaspace using the -XX:MaxMetaspaceSize flag. The default maximum size is unlimited, which means that the operating system memory is the only limit.
+Garbage collection of the dead classes and class loaders is triggered once the class metadata usage reaches the -XX:MetaspaceSize limit.
+With the removal of PermGen, we will never get another OutOfMemoryError: PermGen error. Obviously the -XX:PermSize and -XX:MaxPermSize JVM options are now ignored.
+ClassLoader Leaks
+Both PermGen and Metaspace can suffer from ClassLoader leaks. The removal of PermGen doesn’t mean that our class loader leak issues are gone. We still have to monitor memory usage and plan accordingly.
+The default JVM settings for Metaspace allow it to automatically increase its size as needed. It will obviously then take longer before the effects of any ClassLoader leaks are seen. This just pushes the problem further away without necessarily solving it. A leak could end up consuming our entire native memory. The effect of running out of OS memory will probably be more severe than running out of JVM PermGen memory.
+Since the class metadata is allocated from native operating system memory, the maximum available space is the total available system memory. Thus, we will no longer get OutOfMemoryErrors, but could end up spilling into the operating system swap space.

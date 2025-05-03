@@ -1,0 +1,99 @@
+You can create a promise using the promise constructor like this:
+
+
+	=>A Promise is in one of these states:
+
+pending: initial state, neither fulfilled nor rejected.
+fulfilled: meaning that the operation was completed successfully.
+rejected: meaning that the operation failed.
+
+	=>result – This property can have the following values:
+
+undefined: Initially when the state value is pending.
+value: When resolve(value) is called.
+error: When reject(error) is called.
+
+
+
+
+
+
+
+let promise = new Promise(function(resolve, reject) {    
+    // Make an asynchronous call and either resolve or reject
+});
+
+Here is an example of a promise that will be resolved (fulfilled state) with the value I am done immediately.
+
+let promise = new Promise(function(resolve, reject) {
+    resolve("I am done");
+});
+The promise below will be rejected (rejected state) with the error message Something is not right!.
+
+let promise = new Promise(function(resolve, reject) {
+    reject(new Error('Something is not right!'));
+});
+An important point to note:
+
+A Promise executor should call only one resolve or one reject. Once one state is changed (pending => fulfilled or pending => rejected), that's all. Any further calls to resolve or reject will be ignored.
+let promise = new Promise(function(resolve, reject) {
+  resolve("I am surely going to get resolved!");
+
+  reject(new Error('Will this be ignored?')); // ignored
+  resolve("Ignored?"); // ignored
+});
+In the example above, only the first one to resolve will be called and the rest will be ignored.
+
+
+example:
+============
+function getPromise(URL) {
+  let promise = new Promise(function (resolve, reject) {
+    let req = new XMLHttpRequest();
+    req.open("GET", URL);
+    req.onload = function () {
+      if (req.status == 200) {
+        resolve(req.response);
+      } else {
+        reject(new Error('Something is not right!'));
+      }
+    };
+    req.send();
+  });
+  return promise;
+}
+
+let loading = true;
+loading && console.log('Loading...');
+
+// Gatting Promise
+promise = getPromise(ALL_POKEMONS_URL);
+
+promise.finally(() => {
+    loading = false;
+    console.log(`Promise Settled and loading is ${loading}`);
+}).then((result) => {
+    console.log({result});
+}).catch((error) => {
+    console.log(error)
+});
+
+If the promise resolves, the .then() method will be called. 
+If the promise rejects with an error, the .catch() method will be called. 
+The .finally() will be called irrespective of the resolve or reject.
+
+
+How to Handle Multiple Promises
+================================
+Apart from the handler methods (.then, .catch, and .finally), there are six static methods available in the Promise API. The first four methods accept an array of promises and run them in parallel.
+
+The Promise class offers four static methods to facilitate async task concurrency:
+
+Promise.all() :Fulfills when all of the promises fulfill; rejects when any of the promises rejects.
+
+Promise.allSettled() :Fulfills when all promises settle.
+
+Promise.any() : Fulfills when any of the promises fulfills; rejects when all of the promises reject.
+
+Promise.race() : Settles when any of the promises settles. In other words, fulfills when any of the promises fulfills; rejects when any of the promises rejects.
+

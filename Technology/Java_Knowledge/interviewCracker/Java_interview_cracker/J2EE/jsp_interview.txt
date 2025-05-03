@@ -1,0 +1,247 @@
+jsp interview :
+JSP Life Cycle – explain.
+
+JSP’s life cycle can be grouped into following phases.
+
+1. JSP Page Translation:
+
+A java servlet file is generated from the JSP source file. 
+This is the first step in its tedious multiple phase life cycle. In the translation phase, 
+the container validates the syntactic correctness of the JSP pages and tag files. 
+The container interprets the standard directives and actions, and the custom actions referencing tag libraries used in the page.
+
+2. JSP Page Compilation:
+
+The generated java servlet file is compiled into a java servlet class.
+
+Note: The translation of a JSP source page into its implementation class can happen at any time between initial deployment of the JSP page into the JSP container and the receipt and processing of a client request for the target JSP page.
+
+3. Class Loading:
+
+The java servlet class that was compiled from the JSP source is loaded into the container.
+
+4. Execution phase:
+
+In the execution phase the container manages one or more instances of this class in response to requests and other events.
+The interface JspPage contains jspInit() and jspDestroy(). The JSP specification has provided a special interface HttpJspPage for JSP pages serving HTTP requests and this interface contains _jspService().
+
+5. Initialization:
+
+jspInit() method is called immediately after the instance was created. It is called only once during JSP life cycle.
+
+6. _jspService() execution:
+
+This method is called for every request of this JSP during its life cycle. This is where it serves the purpose of creation. Oops! it has to pass through all the above steps to reach this phase. It passes the request and the response objects. _jspService() cannot be overridden.
+
+7. jspDestroy() execution:
+
+This method is called when this JSP is destroyed. With this call the servlet serves its purpose and submits itself to heaven (garbage collection). This is the end of jsp life cycle.
+
+jspInit(), _jspService() and jspDestroy() are called the life cycle methods of the JSP.
+
+
+There are four types of building blocks in jsp
+
+1. Directives
+2. Scriptlet
+3. Implicit Object
+4. JSP standard action
+
+----------
+JSP directives provide directions and instructions to the container, telling it how to handle certain aspects of JSP processing.
+
+A JSP directive affects the overall structure of the servlet class. It usually has the following form:
+
+<%@ directive attribute="value" %>
+Directives can have a number of attributes which you can list down as key-value pairs and separated by commas.
+
+The blanks between the @ symbol and the directive name, and between the last attribute and the closing %>, are optional.
+
+There are three types of directive tag:
+
+Directive	Description
+<%@ page ... %>	Defines page-dependent attributes, such as scripting language, error page, and buffering requirements.
+<%@ include ... %>	Includes a file during the translation phase.
+<%@ taglib ... %>	Declares a tag library, containing custom actions, used in the page
+The page Directive:
+The page directive is used to provide instructions to the container that pertain to the current JSP page. You may code page directives anywhere in your JSP page. By convention, page directives are coded at the top of the JSP page.
+
+Following is the basic syntax of page directive:
+
+<%@ page attribute="value" %>
+You can write XML equivalent of the above syntax as follows:
+
+<jsp:directive.page attribute="value" />
+Attributes:
+Following is the list of attributes associated with page directive:
+
+Attribute	Purpose
+buffer	Specifies a buffering model for the output stream.
+autoFlush	Controls the behavior of the servlet output buffer.
+contentType	Defines the character encoding scheme.
+errorPage	Defines the URL of another JSP that reports on Java unchecked runtime exceptions.
+isErrorPage	Indicates if this JSP page is a URL specified by another JSP page's errorPage attribute.
+extends	Specifies a superclass that the generated servlet must extend
+import	Specifies a list of packages or classes for use in the JSP as the Java import statement does for Java classes.
+info	Defines a string that can be accessed with the servlet's getServletInfo() method.
+isThreadSafe	Defines the threading model for the generated servlet.
+language	Defines the programming language used in the JSP page.
+session	Specifies whether or not the JSP page participates in HTTP sessions
+isELIgnored	Specifies whether or not EL expression within the JSP page will be ignored.
+isScriptingEnabled	Determines if scripting elements are allowed for use.
+Check more detail related to all the above attributes at Page Directive.
+
+The include Directive:
+The include directive is used to includes a file during the translation phase.
+ This directive tells the container to merge the content of other external files with the current 
+ JSP during the translation phase. You may code include directives anywhere in your JSP page.
+
+The general usage form of this directive is as follows:
+
+<%@ include file="relative url" >
+The filename in the include directive is actually a relative URL. If you just specify a filename with no associated path, the JSP compiler assumes that the file is in the same directory as your JSP.
+
+You can write XML equivalent of the above syntax as follows:
+
+<jsp:directive.include file="relative url" />
+Check more detail related to include directive at Include Directive.
+
+The taglib Directive:
+The JavaServer Pages API allows you to define custom JSP tags that look like HTML or XML tags and a tag library is a set of user-defined tags that implement custom behavior.
+
+The taglib directive declares that your JSP page uses a set of custom tags, identifies the location of the library, and provides a means for identifying the custom tags in your JSP page.
+
+The taglib directive follows the following syntax:
+
+<%@ taglib uri="uri" prefix="prefixOfTag" >
+Where the uri attribute value resolves to a location the container understands and the prefix attribute informs a container what bits of markup are custom actions.
+
+You can write XML equivalent of the above syntax as follows:
+
+<jsp:directive.taglib uri="uri" prefix="prefixOfTag" />
+
+
+
+
+----------
+
+scriptlets :
+
+<%!  ... %>     :  in declaration :declaring an instance variable in a Java class.
+<% ...   %>     :  in scriplet :declaring a local variable inside a method in a Java class.
+
+A JSP expression is used to insert the value of a scripting language expression, converted into a string, into the data stream returned to the client. When the scripting language is the Java programming language, an expression is transformed into a statement that converts the value of the expression into a String object and inserts it into the implicit out object.
+
+The syntax for an expression is as follows:
+
+<%= scripting-language-expression %>
+A scripting expression is then used to insert the value of resp into the output stream:
+
+<h2><font color="black"><%= resp %>!</font></h2>
+--------
+
+Question 1: Explain include Directive and include Action of JSP
+Ans:  This is a very popular interview question on JSP, which has been asked from long time and still asked in various interview. This question is good to test some fundamental concept like translation of JSP and difference between translation time and run time kind of concept.
+
+Syntax for include Directive is <%@ include file="fileName" %> which means we are including some file to our JSP Page when we use include directive contents of included file will be added to calling JSP page at translation time means when the calling JSP is converted to servlet ,all the contents are added to that page .one important thing is that any JSP page is complied if we make any changes to that particular page but if we have changed the included file or JSP page the main calling JSP page will not execute again so the output will not be according to our expectation, this one is the main disadvantage of using the include directive that why it is mostly use to add static  resources, like Header and footer .
+
+Syntax for include action is <jsp:include page=”relativeURL” /> it’s a runtime procedure means the result of the JSP page which is mentioned in relative URL is appended  to calling JSP at runtime on their response object at the location where we have used this tag
+So any changes made to included page is being effected every time, this is the main advantage of this action but only relative URL we can use here ,because request and response object is passed between calling JSP and included JSP.
+
+Question 2: Difference Between include Directive and include Action of JSP
+This JSP interview question is a continuation of earlier question I just made it a separate one to write answer in clear tabular format.
+
+Include Directive
+Include Action
+include directive is processed at the translation time
+Include action is processed at the run time.
+include directive can use relative or absolute path
+Include action always use relative path
+Include directive can only include contents of resource it will not process the dynamic resource
+Include action process the dynamic resource and result will be added to calling JSP
+We can not pass any other parameter
+Here we can pass other parameter also using JSP:param
+We cannot  pass any request or response object to calling jsp to included file or JSP or vice versa
+In this case it’s possible.
+
+
+Question 3: Is it possible for one JSP to extend another java class if yes how?
+
+Ans: Yes it is possible we can extends another JSP using this <%@ include page extends="classname" %> it’s a perfectly correct because when JSP is converted to servlet its implements javax.servlet.jsp.HttpJspPage interface, so for jsp page its possible to extend another java class . This question can be tricky if you don’t know some basic fact J, though its not advisable to write java code in jsp instead its better to use expression language and tag library.
+
+Question 4: What is < jsp:usebean >tag why it is used.
+
+
+JSP Interivew questions Answers
+Ans: This was very popular JSP interview question during early 2000, it has lost some of its shine but still asked now and then on interviews.
+
+JSP Syntax
+<jsp:useBean 
+        id="beanInstName" 
+        scope="page | request | session | application" 
+        
+            class="package.class"    type="package.class" 
+
+           </jsp:useBean>
+
+This tag is used to create a instance of java bean first of all it tries to find out the bean if bean instance already exist assign stores a reference to it in the variable. If we specified type, gives the Bean that type.otherwise instantiates it from the class we specify, storing a reference to it in the new variable.so jsp:usebean is simple way to create a java bean.
+Example:
+     
+<jsp:useBean id="stock" scope="request" class="market.Stock" />
+<jsp:setProperty name="bid" property="price" value="0.0" />
+a <jsp:useBean> element contains a <jsp:setProperty> element that sets property values in the Bean,we have <jsp:getProperty>element also to get the value from the bean.
+
+Explanation of Attribute
+
+ id="beanInstanceName"
+A variable that identifies the Bean in the scope we specify. If the Bean has already been created by another <jsp:useBean> element, the value of id must match the value of id used in the original <jsp:useBean> element.
+scope="page | request | session | application"
+The scope in which the Bean exists and the variable named in id is available. The default value is page. The meanings of the different scopes are shown below:
+page – we can use the Bean within the JSP page with the <jsp:useBean> element
+request – we can use the Bean from any JSP page processing the same request, until a JSP page sends a response to the client or forwards the request to another file.
+session – we can use the Bean from any JSP page in the same session as the JSP page that created the Bean. The Bean exists across the entire session, and any page that participates in the session can use it..
+application – we can use the Bean from any JSP page in the same application as the JSP page that created the Bean. The Bean exists across an entire JSP application, and any page in the application can use the Bean.
+class="package.class"
+Instantiates a Bean from a class, using the new keyword and the class constructor. The class must not be abstract and must have a public, no-argument constructor.
+type="package.class"
+If the Bean already exists in the scope, gives the Bean a data type other than the class from which it was instantiated. If you use type without class or beanName, no Bean is instantiated.
+
+Question 5: How can one Jsp Communicate with Java file.
+
+Ans:we have import tag <%@ page import="market.stock.*” %> like this we can import all the java file to our jsp and use them as a regular class another way is  servlet can send  the instance of the java class to our  jsp and we can retrieve that object from the request obj and use it in our page.
+
+Question 6: what are the implicit Object
+
+Ans: This is a fact based interview question what it checks is how much coding you do in JSP if you are doing it frequently you definitely know them. Implicit object are the object that are created by web container provides to a developer to access them in their program using JavaBeans and Servlets. These objects are called implicit objects because they are automatically instantiated.they are bydefault available in JSP page.
+
+They are: request, response, pageContext, session, and application, out, config, page, and exception.
+
+Question 7: In JSP page how can we handle runtime exception?
+
+Ans: This is another popular JSP interview question which has asked to check how candidate used to handle Error and Exception in JSP. We can use the errorPage attribute of the page directive to have uncaught run-time exceptions automatically forwarded to an error processing page.
+
+Example: <%@ page errorPage="error.jsp" %>
+
+It will redirect the browser to the JSP page error.jsp if an uncaught exception is encountered during request processing. Within error.jsp, will have to indicate that it is an error-processing page, using the directive: <%@ page isErrorPage="true" %>
+
+
+Question 8: Why is _jspService() method starting with an '_' while other life cycle methods do not?
+
+Ans: main JSP life cycle method are jspInit() jspDestroy() and _jspService() ,bydefault whatever content we write in our jsp page will go inside the _jspService() method by the container if again will try to override this method JSP compiler will give error but we can override other two life cycle method as we have implementing this two in jsp so making this difference container use _ in jspService() method and shows that we cant override this method.
+
+
+Question 9: How can you pass information form one jsp to included jsp:
+
+Ans: This JSP interview question is little tricky and fact based. Using < Jsp: param> tag we can pass parameter from main jsp to included jsp page
+
+Example:
+<jsp:include page="newbid.jsp" flush="true">
+<jsp:param name="price" value="123.7"/>
+<jsp:param name="quantity" value="4"/>
+
+Question 10: what is the need of tag library?
+
+Ans tag library is a collection of custom tags. Custom actions helps recurring tasks will be handled more easily they can be reused across more than one application and increase productivity. JSP tag libraries are used by Web application designers who can focus on presentation issues rather than being concerned with how to access databases and other enterprise services. Some of the popular tag libraries are Apache display tag library and String tag library. You can also check my post on display tag library example on Spring.
+
+
+Read more: http://javarevisited.blogspot.com/2011/10/jsp-interview-questions-answers-for.html#ixzz3p6wuU0VI

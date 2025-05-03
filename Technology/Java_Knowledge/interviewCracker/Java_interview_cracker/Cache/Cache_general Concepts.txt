@@ -1,0 +1,43 @@
+Redis :
+
+Caching best practices:
+=========================
+
+1. validity
+2.high hit rate
+3.Cache miss
+4. TTL (time to live)
+
+Feature estimations:
+--------------
+1.Tera byte
+2.50K to 1m QPS
+3.approx  1 ms latency
+4.  LRU (eviction)
+5. 100% availablity
+6. scalable
+
+
+Cache access Pattern
+=======================
+1. write through (write to cache then DB then ack sent back if write is success)
+2. write around (write directly to DB, data will be cached for first read)
+3. write back (write to cache then ack to service , some backedn service write to DB)
+
+
+Cache Datastructure:
+======================
+1.Hash table with linked list, for distributed we can use Consistent Hashing
+
+
+Eviction policy :
+LRU
+
+
+bonus:
+
+use two TTLs (Time to live) : a SOFT TTL and a HARD TTL.
+
+
+Memcached prioritizes high performance and exceptional response times. It also scales vertically, allowing you to add more servers to the caching pool to accommodate increased traffic and data loads. Redis offers comparable performance for simple caching tasks and additional features for more advanced use cases.
+

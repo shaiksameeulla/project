@@ -1,0 +1,105 @@
+Spring boot mvc confiugrations:
+-----------------------
+
+Spring MVC Auto-configuration
+Spring Boot provides auto-configuration for Spring MVC that works well with most applications.
+
+The auto-configuration adds the following features on top of Spring’s defaults:
+
+Inclusion of ContentNegotiatingViewResolver and BeanNameViewResolver beans.
+Support for serving static resources, including support for WebJars (covered later in this document)).
+Automatic registration of Converter, GenericConverter, and Formatter beans.
+Support for HttpMessageConverters (covered later in this document).
+Automatic registration of MessageCodesResolver (covered later in this document).
+Static index.html support.
+Custom Favicon support (covered later in this document).
+Automatic use of a ConfigurableWebBindingInitializer bean (covered later in this document).
+If you want to keep Spring Boot MVC features and you want to add additional MVC configuration (interceptors, formatters, view controllers, and other features), you can add your own @Configuration class of type WebMvcConfigurer but without @EnableWebMvc. If you wish to provide custom instances of RequestMappingHandlerMapping, RequestMappingHandlerAdapter, or ExceptionHandlerExceptionResolver, you can declare a WebMvcRegistrationsAdapter instance to provide such components.
+
+If you want to take complete control of Spring MVC, you can add your own @Configuration annotated with @EnableWebMvc.
+
+By default, Spring Boot serves static content from a directory called /static (or /public or /resources or /META-INF/resources) in the classpath or from the root of the ServletContext. It uses the ResourceHttpRequestHandler from Spring MVC so that you can modify that behavior by adding your own WebMvcConfigurer and overriding the addResourceHandlers method.
+
+In a stand-alone web application, the default servlet from the container is also enabled and acts as a fallback, serving content from the root of the ServletContext if Spring decides not to handle it. Most of the time, this does not happen (unless you modify the default MVC configuration), because Spring can always handle requests through the DispatcherServlet.
+
+By default, resources are mapped on /**, but you can tune that with the spring.mvc.static-path-pattern property. For instance, relocating all resources to /resources/** can be achieved as follows:
+
+spring.mvc.static-path-pattern=/resources/**
+Spring MVC supports a variety of templating technologies, including Thymeleaf, FreeMarker, and JSPs. Also, many other templating engines include their own Spring MVC integrations.
+	
+	*********If possible, JSPs should be avoided. There are several known limitations when using them with embedded servlet containers.
+
+
+
+Spring Boot includes auto-configuration support for the following templating engines:
+
+FreeMarker
+Groovy
+Thymeleaf
+Mustache
+
+
+ Spring MVC Using Java Configuration 
+To enable Spring MVC support through a Java configuration class, we just add the @EnableWebMvc annotation:
+
+@EnableWebMvc
+@Configuration
+public class WebConfig {
+
+    /// ...
+}
+This will set up the basic support we need for an MVC project, such as registering controllers and mappings, type converters, validation support, message converters and exception handling.
+
+If we want to customize this configuration, we need to implement the WebMvcConfigurer interface:
+
+@EnableWebMvc
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+   @Override
+   public void addViewControllers(ViewControllerRegistry registry) {
+      registry.addViewController("/").setViewName("index");
+   }
+
+   @Bean
+   public ViewResolver viewResolver() {
+      InternalResourceViewResolver bean = new InternalResourceViewResolver();
+
+      bean.setViewClass(JstlView.class);
+      bean.setPrefix("/WEB-INF/view/");
+      bean.setSuffix(".jsp");
+
+      return bean;
+   }
+}
+In this example, we've registered a ViewResolver bean that will return .jsp views from the /WEB-INF/view directory.
+
+Very important here is that we can register view controllers that create a direct mapping between the URL and the view name using the ViewControllerRegistry. This way, there's no need for any Controller between the two.
+
+If we want to also define and scan controller classes, we can add the @ComponentScan annotation with the package that contains the controllers:
+
+@EnableWebMvc
+@Configuration
+@ComponentScan(basePackages = { "com.baeldung.web.controller" })
+public class WebConfig implements WebMvcConfigurer {
+    // ...
+}
+To bootstrap an application that loads this configuration, we also need an initializer class:
+
+public class MainWebAppInitializer implements WebApplicationInitializer {
+    @Override
+    public void onStartup(final ServletContext sc) throws ServletException {
+
+        AnnotationConfigWebApplicationContext root = 
+          new AnnotationConfigWebApplicationContext();
+        
+        root.scan("com.baeldung");
+        sc.addListener(new ContextLoaderListener(root));
+
+        ServletRegistration.Dynamic appServlet = 
+          sc.addServlet("mvc", new DispatcherServlet(new GenericWebApplicationContext()));
+        appServlet.setLoadOnStartup(1);
+        appServlet.addMapping("/");
+    }
+}
+Note that for versions earlier than Spring 5, we have to use the WebMvcConfigurerAdapter class instead of the interface.

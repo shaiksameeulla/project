@@ -1,0 +1,24 @@
+what-is-the-difference-between-websocket-and-stomp-protocols
+
+This question is similar to asking the difference between TCP and HTTP. I shall still try to address your question, its natural to get confused between these two terms if you are beginning.
+
+Short Answer
+
+STOMP is often implemented on top of more specialized protocols like WebSockets. STOMP describes specific formats to exchange message frames between the client and server using the underlying protocols like Websocket
+
+Long Answer
+
+WebSockets
+
+It is a specification to allow asynchronous bidirectional communication between a client and a server. While similar to TCP sockets, it is a protocol that operates as an upgraded HTTP connection, exchanging variable-length frames between the two parties, instead of a stream.
+
+STOMP
+
+It defines a protocol for clients and servers to communicate with messaging semantics. It does not define any implementation details, but rather addresses an easy-to-implement wire protocol for messaging integrations. It provides higher semantics on top of the WebSockets protocol and defines a handful of frame types that are mapped onto WebSockets frames. Some of these types are...
+
+connect
+subscribe
+unsubscribe
+send (messages sent to the server)
+message (for messages send from the server) BEGIN, COMMIT, ROLLBACK (transaction management)
+

@@ -1,0 +1,157 @@
+Introduction
+Java annotations are a mechanism for adding metadata information to our source code. They're a powerful part of Java that was added in JDK5. Annotations offer an alternative to the use of XML descriptors and marker interfaces.
+
+Although we can attach them to packages, classes, interfaces, methods, and fields, annotations by themselves have no effect on the execution of a program.
+
+In this tutorial, we're going to focus on how to create and process custom annotations. We can read more about annotations in our article on annotation basics.
+
+Marker Interfaces in Java
+Learn about Java marker interfaces and how they compare to typical interfaces and annotations
+Read more →
+2. Creating Custom Annotations
+We're going to create three custom annotations with the goal of serializing an object into a JSON string.
+
+We'll use the first one on the class level, to indicate to the compiler that our object can be serialized. Then we'll apply the second one to the fields that we want to include in the JSON string.
+
+Finally, we'll use the third annotation on the method level, to specify the method that we'll use to initialize our object.
+
+Method Level Annotation Example
+Let's imagine that before serializing an object to a JSON string, we want to execute some method to initialize an object. For that reason, we're going to create an annotation to mark this method:
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Init {
+}
+
+2.1. Class Level Annotation Example
+The first step toward creating a custom annotation is to declare it using the @interface keyword:
+
+public @interface JsonSerializable {
+}
+The next step is to add meta-annotations to specify the scope and the target of our custom annotation:
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.Type)
+public @interface JsonSerializable {
+}
+As we can see, our first annotation has runtime visibility, and we can apply it to types (classes). Moreover, it has no methods, and thus serves as a simple marker to mark classes that can be serialized into JSON.
+
+2.2. Field Level Annotation Example
+In the same fashion, we create our second annotation to mark the fields that we are going to include in the generated JSON:
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface JsonElement {
+    public String key() default "";
+}
+The annotation declares one String parameter with the name “key” and an empty string as the default value.
+Applying Annotations
+Now let's see how we can use our custom annotations. For instance, let's imagine that we have an object of type Person that we want to serialize into a JSON string. This type has a method that capitalizes the first letter of the first and last names. We'll want to call this method before serializing the object:
+
+
+freestar
+@JsonSerializable
+public class Person {
+
+    @JsonElement
+    private String firstName;
+
+    @JsonElement
+    private String lastName;
+
+    @JsonElement(key = "personAge")
+    private String age;
+
+    private String address;
+
+    @Init
+    private void initNames() {
+        this.firstName = this.firstName.substring(0, 1).toUpperCase() 
+          + this.firstName.substring(1);
+        this.lastName = this.lastName.substring(0, 1).toUpperCase() 
+          + this.lastName.substring(1);
+    }
+
+    // Standard getters and setters
+}
+By using our custom annotations, we're indicating that we can serialize a Person object to a JSON string. In addition, the output should contain only the firstName, lastName, and age fields of that object. Moreover, we want the initNames() method to be called before serialization.
+
+By setting the key parameter of the @JsonElement annotation to “personAge,” we are indicating that we'll use this name as the identifier for the field in the JSON output.
+
+For the sake of demonstration, we made initNames() private, so we can't initialize our object by calling it manually, and our constructors aren't using it either.
+
+3. Processing Annotations
+So far we've seen how to create custom annotations, and how to use them to decorate the Person class. Now we're going to see how to take advantage of them by using Java's Reflection API.
+
+The first step will be to check whether our object is null or not, as well as whether its type has the @JsonSerializable annotation or not:
+
+private void checkIfSerializable(Object object) {
+    if (Objects.isNull(object)) {
+        throw new JsonSerializationException("The object to serialize is null");
+    }
+        
+    Class<?> clazz = object.getClass();
+    if (!clazz.isAnnotationPresent(JsonSerializable.class)) {
+        throw new JsonSerializationException("The class " 
+          + clazz.getSimpleName() 
+          + " is not annotated with JsonSerializable");
+    }
+}
+Then we look for any method with the @Init annotation, and we execute it to initialize our object's fields:
+
+private void initializeObject(Object object) throws Exception {
+    Class<?> clazz = object.getClass();
+    for (Method method : clazz.getDeclaredMethods()) {
+        if (method.isAnnotationPresent(Init.class)) {
+            method.setAccessible(true);
+            method.invoke(object);
+        }
+    }
+ }
+The call of method.setAccessible(true) allows us to execute the private initNames() method.
+
+After the initialization, we iterate over our object's fields, retrieve the key and value of JSON elements, and put them in a map. Then we create the JSON string from the map:
+
+
+freestar
+private String getJsonString(Object object) throws Exception {	
+    Class<?> clazz = object.getClass();
+    Map<String, String> jsonElementsMap = new HashMap<>();
+    for (Field field : clazz.getDeclaredFields()) {
+        field.setAccessible(true);
+        if (field.isAnnotationPresent(JsonElement.class)) {
+            jsonElementsMap.put(getKey(field), (String) field.get(object));
+        }
+    }		
+     
+    String jsonString = jsonElementsMap.entrySet()
+        .stream()
+        .map(entry -> "\"" + entry.getKey() + "\":\"" 
+          + entry.getValue() + "\"")
+        .collect(Collectors.joining(","));
+    return "{" + jsonString + "}";
+}
+Again, we used field.setAccessible(true) because the Person object's fields are private.
+
+Our JSON serializer class combines all the above steps:
+
+public class ObjectToJsonConverter {
+    public String convertToJson(Object object) throws JsonSerializationException {
+        try {
+            checkIfSerializable(object);
+            initializeObject(object);
+            return getJsonString(object);
+        } catch (Exception e) {
+            throw new JsonSerializationException(e.getMessage());
+        }
+    }
+}
+Finally, we run a unit test to validate that our object was serialized as defined by our custom annotations:
+
+@Test
+public void givenObjectSerializedThenTrueReturned() throws JsonSerializationException {
+    Person person = new Person("soufiane", "cheouati", "34");
+    ObjectToJsonConverter serializer = new ObjectToJsonConverter(); 
+    String jsonString = serializer.convertToJson(person);
+    assertEquals(
+      "{\"personAge\":\"34\",\"firstName\":\"Soufiane\",\"lastName\":\"Cheouati\"}",
+      jsonString);

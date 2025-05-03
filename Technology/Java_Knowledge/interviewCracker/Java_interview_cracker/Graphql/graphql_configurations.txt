@@ -1,0 +1,224 @@
+
+ Batching
+ ==========
+Given a Book and its Author, we can create one DataFetcher for books and another for the author of a book. This means books and authors aren’t automatically loaded together, which enables queries to select the subset of data they need. However, loading multiple books, results in loading each author individually, and this is a performance issue known as the N+1 select problem.
+
+GraphQL Java provides a batching feature that allows related entities, such as the authors for all books, to be loaded together. This is how the underlying mechanism works in GraphQL Java:
+
+For each request, an application can register a batch loading function as a DataLoader in the DataLoaderRegistry to assist with loading instances of a given entity, such as Author from a set of unique keys.
+
+A DataFetcher can access the DataLoader for the entity and use it to load entity instances; for example the author DataFetcher obtains the authorId from the Book parent object, and uses it to load the Author.
+
+DataLoader does not load the entity immediately but rather returns a future, and defers until it is ready to batch load all related entities as one.
+
+DataLoader additionally maintains a cache of previously loaded entities that can further improve efficiency when the same entity is in multiple places of the response.
+
+Spring GraphQL provides:
+==============
+
+BatchLoaderRegistry that accepts and stores registrations of batch loading functions; This is used in ExecutionGraphQlService to make DataLoader registrations per request.
+
+DataLoader argument for @SchemaMapping methods to access the DataLoader for the field type.
+
+@BatchMapping data controller methods that provide a shortcut and avoid the need to use DataLoader directly.
+
+The Spring Boot starter declares a BatchLoaderRegistry bean, so that applications can simply autowire the registry into their controllers in order to register batch loading functions for entities.
+
+ DataLoader
+ ==============
+When you register a batch loading function for an entity, as explained in Batching, you can access the DataLoader for the entity by declaring a method argument of type DataLoader and use it to load the entity:
+
+@Controller
+public class BookController {
+
+    public BookController(BatchLoaderRegistry registry) {
+        registry.forTypePair(Long.class, Author.class).registerMappedBatchLoader((authorIds, env) -> {
+            // return Map<Long, Author>
+        });
+    }
+
+    @SchemaMapping
+    public CompletableFuture<Author> author(Book book, DataLoader<Long, Author> loader) {
+        return loader.load(book.getAuthorId());
+    }
+
+}
+
+By default, BatchLoaderRegistry uses the full class name of the value type (e.g. the class name for Author) for the key of the registration, and therefore simply declaring the DataLoader method argument with generic types provides enough information to locate it in the DataLoaderRegistry. As a fallback, the DataLoader method argument resolver will also try the method argument name as the key but typically that should not be necessary.
+
+For straight-forward cases where the @SchemaMapping simply delegates to a DataLoader, you can reduce boilerplate by using a @BatchMapping method instead.
+
+
+
+
+
+
+@BatchMapping
+Batching addresses the N+1 select problem through the use of an org.dataloader.DataLoader to defer the loading of individual entity instances, so they can be loaded together. For example:
+
+@Controller
+public class BookController {
+
+    public BookController(BatchLoaderRegistry registry) {
+        registry.forTypePair(Long.class, Author.class).registerMappedBatchLoader((authorIds, env) -> {
+            // load authors
+			// return Map<Long, Author>
+	
+        });
+    }
+
+    @SchemaMapping
+    public CompletableFuture<Author> author(Book book, DataLoader<Long, Author> loader) {
+        return loader.load(book.getAuthorId());
+    }
+
+}
+
+
+For the straight-forward case of loading an associated entity, shown above, the @SchemaMapping method does nothing more than delegate to the DataLoader. This is boilerplate that can be avoided with a @BatchMapping method. For example:
+
+@Controller
+public class BookController {
+
+    @BatchMapping
+    public Mono<Map<Book, Author>> author(List<Book> books) {
+        // ...
+    }
+}
+
+The above becomes a batch loading function in the BatchLoaderRegistry where keys are Book instances and the loaded values their authors. In addition, a DataFetcher is also transparently bound to the author field of the type Book, which simply delegates to the DataLoader for authors, given its source/parent Book instance.
+
+To be used as a unique key, Book must implement hashcode and equals.
+
+By default, the field name defaults to the method name, while the type name defaults to the simple class name of the input List element type. Both can be customized through annotation attributes. The type name can also be inherited from a class level @SchemaMapping.
+
+=============
+Exception Handling:
+===================
+
+Error Handling
+Error handling is a core component of any API. Users of the API must be notified properly of the errors, if any, in the API response. GraphQL specification states every request must have a well-formed response containing data, errors and extensions. If no error occurred, the error component in the response will be absent.
+
+We can have two types of errors:
+
+Request Errors:
+	This means an issue with the request itself, either a parsing failure or an invalid request.
+Field Errors:
+	This means either there was an exception in the value resolution of the field or an unexpected type for the specified field. In such cases, we may have partial responses along with errors.
+	
+By default, Spring for GraphQL has a built-in exception handler DataFetcherExceptionHandler. It allows our applications to register one or more DataFetcherExceptionResolver components. These resolvers are invoked sequentially until one resolves the exception to the GraphQLError object. If none of them can handle the exception, then the exception is categorized as INTERNAL_ERROR.
+
+A GraphQLError object can be assigned to a category via graphql.ErrorClassification. In Spring GraphQL, you can also assign via ErrorType which has the following common classifications that applications can use to categorize errors:
+
+BAD_REQUEST
+UNAUTHORIZED
+FORBIDDEN
+NOT_FOUND
+INTERNAL_ERROR
+To create a custom exception resolver, we can implement the DataFetcherExceptionHandler interface.
+
+An example implementation
+@Component
+public class CustomDataFetchingExceptionHandler implements DataFetcherExceptionHandler {
+
+   @Override
+   public CompletableFuture<DataFetcherExceptionHandlerResult> handleException(DataFetcherExceptionHandlerParameters handlerParameters) {
+      if (handlerParameters.getException() instanceof MyException) {
+         Map<String, Object> debugInfo = new HashMap<>();
+         debugInfo.put("somefield", "somevalue");
+
+         GraphQLError graphqlError = TypedGraphQLError.newInternalErrorBuilder()
+                 .message("This custom thing went wrong!")
+                 .debugInfo(debugInfo)
+                 .path(handlerParameters.getPath()).build();
+
+         DataFetcherExceptionHandlerResult result = DataFetcherExceptionHandlerResult.newResult()
+                 .error(graphqlError)
+                 .build();
+
+         return CompletableFuture.completedFuture(result);
+      } else {
+         return DataFetcherExceptionHandler.super.handleException(handlerParameters);
+      }
+   }
+}
+
+another example
+below method gets executed when we throw MyRuntimeException from controller
+	@Component
+	public class CustomExceptionResolver extends DataFetcherExceptionResolverAdapter {
+
+	@Override
+	public GraphQLError resolveToSingleError(Throwable exception, DataFetchingEnvironment environment) {
+
+
+	if (exception instanceof MyRuntimeException)
+
+	return GraphqlErrorBuilder.newError() GraphqlErrorBuilder<capture of ?> .errorType (ErrorType. ValidationError) capture of ? .message(exception.getMessage()) .path(environment.getExecutionStepInfo().getPath()) .Location(environment.getField().getSourceLocation()) .build();
+
+	}
+	return null;
+	}
+
+
+Additionally, since Spring boot 3.1, We can define @GraphQlExceptionHandler methods to handle exceptions either in a @Controller or @ControllerAdvice annotated class. When declared in a controller, exception handler methods apply to exceptions from the same controller:
+
+@Controller
+public class BookController {
+
+    @QueryMapping
+    public Book bookById(@Argument Long id) {
+        // ...
+    }
+
+    @GraphQlExceptionHandler
+    public GraphQLError handle(BindException ex) {
+        return GraphQLError.newError().errorType(ErrorType.BAD_REQUEST).message("...").build();
+    }
+
+}
+
+When declared in an @ControllerAdvice, it applies for all the controllers in the application:
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @GraphQlExceptionHandler
+    public GraphQLError handle(BindException ex) {
+        return GraphQLError.newError().errorType(ErrorType.BAD_REQUEST).message("...").build();
+    }
+
+}
+
+7.3. Query Caching
+============
+Every GraphQL query must be parsed and validated before being executed. This may have some performance impact. To speed up this and avoid the need to re-parse and validate, we can configure the PreparsedDocumentProvider that caches and reuses Document instances.
+
+@Component 
+public class CachingPreparsedDocumentProvider implements PreparsedDocumentProvider {
+
+  private final Cache<String, PreparsedDocumentEntry> cache = Caffeine
+      .newBuilder()
+      .maximumSize(2500)
+      .expireAfterAccess(Duration.ofHours(1))
+      .build();
+
+  @Override
+  public PreparsedDocumentEntry getDocument(ExecutionInput executionInput,
+          Function<ExecutionInput, PreparsedDocumentEntry> parseAndValidateFunction) {
+
+      return cache.get(executionInput.getQuery(), 
+          operationString -> parseAndValidateFunction.apply(executionInput));
+  }
+}
+
+In order to achieve a high cache hit ratio it is recommended that field arguments are passed in as variables instead of directly in the query.
+
+8. Using GraphiQL
+GraphiQL is a graphical interactive in-browser GraphQL Integrated Development Environment (IDE). It is a powerful tool for learning and test out GraphQL queries. GraphiQL offers syntax highlighting, autocompletion, automatic documentation, and much more.
+
+By default, GraphiQL is disabled. To enable add the following property.
+
+spring.graphql.graphiql.enabled=true
+
+Restart the Spring Boot application and navigate to http://localhost:8080/graphiql on your browser. It should open up the GraphiQL window.

@@ -1,0 +1,35 @@
+async vs defer attributes in Javascript | Ola Interview Question
+
+1. What is Async and defer?
+2. Difference between async and defer attributes?
+3. When should I use defer over async?
+4. Examples of scenarios covering async and defer
+
+
+
+Generally, when we use a script tag to load any JavaScript code, the HTML parsing is paused by the browser when it encounters the script tag and it starts to download the JavaScript file first. The HTML elements script tag will not be executed until the browser is done with downloading the script and executing it. The browser waits till the script gets downloaded, and executed, and after this, it processes the rest of the page. In modern browsers, the script tends to be larger than the HTML files, hence their download size is large and processing time will be longer. This increases the load time of the page and restricts the user to navigate through the website. To solve this problem, async and defer attributes come into play. 
+
+Syntax: A normal script is included on the page in the following way.
+
+<script src = "script.js"></script>
+When the HTML parser finds this element, a request is sent to the server to get the script. 
+
+Asynchronous: When we use the async attribute the script is downloaded asynchronously with the rest of the page without pausing the HTML parsing and the contents of the page are processed and displayed. Once the script is downloaded, the HTML parsing will be paused and the script’s execution will happen. Once the execution is done, HTML parsing will then resume. The page and other scripts don’t wait for async scripts and async scripts also don’t wait for them. It is great for independent scripts and externally located scripts.
+
+
+Syntax:
+
+<script async src = "script.js"></script>
+Deferred: The defer attribute tells the browser not to interfere with the HTML parsing and only to execute the script file once the HTML document has been fully parsed. Whenever a script with this attribute is encountered, the downloading of the script starts asynchronously in the background and when the scripts get downloaded, it is executed only after the HTML parsing is finished.
+
+Syntax:
+
+<script defer src = "script.js"></script>
+ 
+
+Asynchronous vs Deferred:
+
+Asynchronous	Deferred
+Asynchronous blocks the parsing of the page.	Deferred never blocks the page.
+Asynchronous scripts don’t wait for each other. So if a smaller script is second in the order, it will be loaded before the previous longer one.	Deferred scripts maintain their relative order which means the first script will be loaded first while all others below it will have to wait.
+The execution of scripts begins by pause parsing.	However, the execution of scripts begins only after parsing is completely finished but before the document’s DOMContentLoadedevent.

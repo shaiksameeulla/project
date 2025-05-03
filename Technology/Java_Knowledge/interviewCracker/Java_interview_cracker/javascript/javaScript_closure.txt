@@ -1,0 +1,156 @@
+A closure is the combination of a function and its lexical environment. Closures are functions that have access to the outer (enclosing) function’s variables—scope chain even after the outer function has returned.
+
+Why would you use one?
+
+Data privacy / emulating private methods with closures. Commonly used in the module pattern.
+Partial applications or currying.
+
+Question 1
+Let’s start with a simple one
+
+What is the output of the following code snippet?
+
+function outer() {
+    var a = 5
+
+    function inner() {
+      console.log(a)
+    }
+
+    return inner;
+  }
+
+  var baz = outer()
+  baz()
+view rawquestion1.js hosted with ❤ by GitHub
+Answer – 5
+
+Here, the inner function has access to the outer function’s variables. Since a was initialized to 5, 5 is logged to the console.
+
+Question 2
+Write a function that would allow you to do this.
+
+let addSix = createBase(6);
+addSix(10); // returns 16
+addSix(21); // returns 27
+view rawquestion2q.js hosted with ❤ by GitHub
+Here you need to write createBase function which takes in a base number and returns a function. On calling this returned function with different numbers, should add that number to the base.
+
+Answer –
+createBase can be closure that holds the value of the base number and returns a function. Since this inner function has access to the outer function’s variables, we can add the number passed to the base.
+
+function createBase(baseNumber) {
+  return function(N) {
+    // this returned function has access to baseNumber
+    return baseNumber + N;
+  }
+}
+
+var addSix = createBase(6);
+addSix(10);
+addSix(21);
+view rawquestion2A.js hosted with ❤ by GitHub
+Question 3
+How would you use closures to create a private counter?
+
+function counter(){
+    let count = 0;
+    function increment(){
+      count+=1
+    }
+    function decrement(){
+      count-=1
+    }
+    function getValue(){
+      return count
+    }
+  return {increment, decrement,getValue}
+}
+
+let count = counter()
+count.increment()
+console.log(count.getValue())
+count.decrement()
+console.log(count.getValue())
+view rawquestion3.js hosted with ❤ by GitHub
+Here counter is the outer function. Inside the counter, there’s a variable count which is our private counter and there are three other functions increment, decrement and getValue. Now, these three functions have access to the counter variable and can perform operations on it. Hence, the count variable is not directly accessible and can only be changed using these functions
+
+Question 4
+Create a memoized function using closures
+
+let sum = function (a,b,c){
+  return a+b+c; 
+}  
+let memo = function(fn){
+  let hashMap = new Map();
+  return function(...args){
+    let key = args.join();
+    if(hashMap.has(key)) {
+      return hashMap.get(key);
+    } else {
+      let val = fn(...args);
+      
+      hashMap.set(key, val);
+      return val;
+    }
+  }  
+}
+
+let myMemo = memo(sum)
+
+console.log(myMemo(1,2,3)) //=> 6  =>  compute
+console.log(myMemo(2,2,3)) //=> 7  => compute
+console.log(myMemo(3,2,3)) //=> 8 => compute
+console.log(myMemo(1,2,3)) //=> 6 =>  caching
+view rawquestion4.js hosted with ❤ by GitHub
+Memoization is a technique for storing values returned by a function to avoid having to redo computations that have already been performed previously. Here in our example myMemo() is called twice with the same arguments, the first call will compute the results and memoize them and 2nd call will return the memoized value. I have used a hashmap to store the results. The key of the hashmap is the combined string of the input arguments(for eg if the arguments are (1,2,3) the key would be “123”) and the value is the computed value. Hash_map[key] checks if the result was already computed, if yes then it is returned, else the value is computed and added to the hashmap.
+
+Question 5
+Now, comes the most important question. This question is asked in 8/10 interviews.
+What is the output of the below code snippet?
+
+for (var i = 0; i < 3; i++) {
+  setTimeout(function log() {
+    console.log(i); // What is logged?
+  }, i*1000);
+}
+view rawquestion5.js hosted with ❤ by GitHub
+Answer – 3 3 3
+
+This is because var is global scoped and the value of i becomes 3 after the for loop completes its execution. Then, the callback functions of setTimeout print the value of i which is now 3. Know more about how setTimeout works and in what phase it’s executed in the event loop here.
+
+How to fix this
+
+1. using let
+
+for (let i = 0; i < 3; i++) {
+  setTimeout(function log() {
+    console.log(i); 
+  }, i*1000);
+}
+view rawquestion5-1.js hosted with ❤ by GitHub
+2. using closures
+
+for (var i = 0; i < 3; i++) {
+	((ind) => {
+  setTimeout(function log() {
+      console.log(ind); 
+  }, ind*1000);
+  })(i);
+}
+view rawquestion5-2.js hosted with ❤ by GitHub
+Question 6
+What is logged to the console?
+
+let count = 0;
+(function immediate() {
+  if (count === 0) {
+    let count = 1;
+    console.log(count); 
+  }
+  console.log(count); 
+})();
+view rawquestion6.js hosted with ❤ by GitHub
+Answer – 1 0 
+
+The first statement declares count variable as 0. The function immediate is a closure that has access to the count variable. Since count is 0 the condition is true. Inside the condition, we redeclare count to 1. So the first console log will print 1. Outside the condition, count is accessed from the outer scope which is 0.
